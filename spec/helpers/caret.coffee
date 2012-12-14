@@ -54,6 +54,8 @@ class Caret
     if direction isnt null and not caret.end?
       parseError 'EOF', "expected '|' to end the selection"
 
+    caret.end ?= caret.start
+
     return { caret, direction, value }
 
   @printDescription: ({caret, direction, value}) ->

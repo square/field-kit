@@ -10,9 +10,36 @@ class FakeFormatter
   format: (value) ->
     value
 
+  parse: (value) ->
+    value
+
 describe 'PanField', ->
   element = null
   panField = null
+
+  applyValueAndCaretDescription = (description) ->
+    { caret, direction, value } = Caret.parseDescription description
+    element.val value
+    element.caret caret
+    panField.selectionDirection = direction
+
+  assertKeyPressTransform = (from, keys..., to) ->
+    applyValueAndCaretDescription from
+
+    for key in keys
+      event = FakeEvent.withKey(key)
+      panField.keyDown event
+      if not event.isDefaultPrevented()
+        panField.keyPress event if event.charCode
+        if not event.isDefaultPrevented()
+          panField.keyUp event
+
+    description = Caret.printDescription
+                    caret: element.caret()
+                    direction: panField.selectionDirection
+                    value: element.val()
+
+    expect(description).toEqual(to)
 
   beforeEach ->
     element = new FakeElement()
@@ -20,100 +47,28 @@ describe 'PanField', ->
     panField.formatter = new FakeFormatter()
 
   describe 'typing a digit into an empty field', ->
-    it 'does not prevent the default behavior', ->
-      event = FakeEvent.withKey('0')
-      panField.keyDown event
-      expect(event.isDefaultPrevented()).toBeFalsy()
+    it 'allows the digit to be inserted', ->
+      assertKeyPressTransform '|', '0', '0|'
 
   describe 'typing a digit into a full field', ->
-    beforeEach ->
-      panField.value = '1234 5678 9012 3456'
-      panField.caret = start: 0, end: 0
-
-    it 'does prevent default', ->
-      event = FakeEvent.withKey('0')
-      panField.keyDown event
-      expect(event.isDefaultPrevented()).toBeTruthy()
+    it 'does not allow the digit to be inserted', ->
+      assertKeyPressTransform '1234567890123456|', '0', '1234567890123456|'
 
     describe 'with part of the value selected', ->
-      beforeEach ->
-        panField.caret = start: 0, end: 3
+      it 'replaces the selection with the typed character', ->
+        assertKeyPressTransform '|123|4567890123456', '0', '0|4567890123456'
 
-      it 'does prevent default', ->
-        event = FakeEvent.withKey('0')
-        panField.keyDown event
-        expect(panField.value).toEqual('4567890123456')
-        expect(event.isDefaultPrevented()).toBeFalsy()
+  describe 'typing a non-digit character', ->
+    it 'is not inserted', ->
+      assertKeyPressTransform '12|', 'a', '12|'
 
   describe 'typing a left arrow', ->
-    event = null
-
-    beforeEach ->
-      panField.value = '4111'
-      event = FakeEvent.withKey('left')
-
-    describe 'when the caret is already at the beginning', ->
-      beforeEach ->
-        panField.caret = start: 0, end: 0
-
-      it 'does not change the caret', ->
-        panField.keyDown event
-        {start, end} = panField.caret
-        expect({start, end}).toEqual(start: 0, end: 0)
-
-    describe 'when the caret is not at the beginning', ->
-      beforeEach ->
-        panField.caret = start: 1, end: 1
-
-      it 'moves one character to the left', ->
-        panField.keyDown event
-        {start, end} = panField.caret
-        expect({start, end}).toEqual(start: 0, end: 0)
-
-    describe 'when there is a selection', ->
-      beforeEach ->
-        panField.caret = start: 2, end: 3
-
-      it 'places the caret at the start of the selection', ->
-        panField.keyDown event
-        {start, end} = panField.caret
-        expect({start, end}).toEqual(start: 2, end: 2)
-
-    describe 'with the shift key', ->
-      beforeEach ->
-        event = FakeEvent.withKey('shift+left')
-
-      describe 'and the caret anchor is the end', ->
-        beforeEach ->
-          panField.selectionDirection = 'left'
-
-        describe 'and the selection start is already at the beginning', ->
-          beforeEach ->
-            panField.caret = start: 0, end: 2
-
-          it 'does not change the selection', ->
-            panField.keyDown event
-            {start, end} = panField.caret
-            expect({start, end}).toEqual(start: 0, end: 2)
-
-        describe 'and the selection start is not at the beginning', ->
-          beforeEach ->
-            panField.caret = start: 1, end: 2
-
-          it 'extends the selection one character to the left', ->
-            panField.keyDown event
-            {start, end} = panField.caret
-            expect({start, end}).toEqual(start: 0, end: 2)
-
-      describe 'and the caret anchor is the start', ->
-        beforeEach ->
-          panField.selectionDirection = 'right'
-
-        describe 'and the selection start is at the beginning', ->
-          beforeEach ->
-            panField.caret = start: 0, end: 2
-
-          it 'shrinks the selection on the right', ->
-            panField.keyDown event
-            {start, end} = panField.caret
-            expect({start, end}).toEqual(start: 0, end: 1)
+    it 'works as expected', ->
+      assertKeyPressTransform '|4111', 'left', '|4111'
+      assertKeyPressTransform '4|111', 'left', '|4111'
+      assertKeyPressTransform '41|1|1', 'left', '41|11'
+      assertKeyPressTransform '<41|11', 'shift+left', '<41|11'
+      assertKeyPressTransform '4<1|11', 'shift+left', '<41|11'
+      assertKeyPressTransform '|41>11', 'shift+left', '|4>111'
+      assertKeyPressTransform '|4111 1>111', 'shift+left', '|4111> 1111'
+      assertKeyPressTransform '41|1>1', 'shift+left', 'shift+left', '4<1|11'

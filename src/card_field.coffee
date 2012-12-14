@@ -92,6 +92,9 @@ class CardFormatter
 
     return result
 
+  parse: (text) ->
+    no_ws text
+
 class AmexFormatter extends CardFormatter
   @GAP_INDEXES: [3, 9]
   length: 15

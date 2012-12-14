@@ -8,7 +8,6 @@ class FakeElement extends EventEmitter
 
   caret: (caret) ->
     if arguments.length is 1
-      throw new Error("NOOOOO") if isNaN(caret.start)
       @_caret.start = Math.max(caret.start, 0)
       @_caret.end = Math.min(caret.end, @_value.length)
     else
