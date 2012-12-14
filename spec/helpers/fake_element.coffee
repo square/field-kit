@@ -1,17 +1,5 @@
 {EventEmitter} = require 'events'
-
-class Caret
-  start: null
-  end: null
-
-  constructor: (@element) ->
-
-  @::__defineGetter__ 'text', ->
-    @element.val().substring(@start, @end)
-
-  replace: (string) ->
-    originalValue = @element.val()
-    originalValue.substring(0, @start) + string + originalValue.substring(@end)
+Caret = require './caret'
 
 class FakeElement extends EventEmitter
   constructor: ->
