@@ -15,7 +15,7 @@ KEYS.isDigit = (keyCode) ->
 KEYS.isDirectional = (keyCode) ->
   keyCode in [@LEFT, @RIGHT, @UP, @DOWN]
 
-GAP = ' '
+isWordChar = (char) -> char and /^\w$/.test(char)
 
 class PanField
   constructor: (@element) ->
@@ -311,19 +311,30 @@ class PanField
     caret = @caret
     caret.start isnt caret.end
 
-  @::__defineGetter__ 'wordBreakIndexes', ->
-    result = [0]
+  # Find starts of "words".
+  @::__defineGetter__ 'leftWordBreakIndexes', ->
+    result = []
+    text = @text
+    mapping = @textToValueMapping
 
-    for index in @formatter.constructor.GAP_INDEXES
-      result.push index + 1
+    for i in [0..text.length-1]
+      result.push mapping[i] if not isWordChar(text[i-1]) and isWordChar(text[i])
 
-    if result[result.length-1] isnt @value.length
-      result.push @value.length
+    return result
+
+  # Find ends of "words".
+  @::__defineGetter__ 'rightWordBreakIndexes', ->
+    result = []
+    text = @text
+    mapping = @textToValueMapping
+
+    for i in [0..text.length-1]
+      result.push mapping[i+1] if isWordChar(text[i]) and not isWordChar(text[i+1])
 
     return result
 
   lastWordBreakBeforeIndex: (index) ->
-    indexes = @wordBreakIndexes
+    indexes = @leftWordBreakIndexes
     result = indexes[0]
 
     for wordBreakIndex in indexes
@@ -335,7 +346,7 @@ class PanField
     return result
 
   nextWordBreakAfterIndex: (index) ->
-    indexes = @wordBreakIndexes.reverse()
+    indexes = @rightWordBreakIndexes.reverse()
     result = indexes[0]
 
     for wordBreakIndex in indexes
@@ -428,51 +439,46 @@ class PanField
     @_formatter = formatter
     @value = value
 
-  # TODO: Generalize the mapping done in get caret()/set caret().
+  @::__defineGetter__ 'textToValueMapping', ->
+    value = @value
+    text = @text
+    mapping = {}
+
+    valueIndex = 0
+    textIndex = 0
+
+    while textIndex <= text.length
+      mapping[textIndex] = valueIndex
+
+      if text[textIndex] is value[valueIndex]
+        textIndex++
+        valueIndex++
+      else
+        textIndex++
+
+    return mapping
+
   @::__defineGetter__ 'caret', ->
-    value = @value
-    text = @text
-    realCaret = @element.caret()
-    caret = start: 0, end: 0
+    mapping = @textToValueMapping
+    textCaret = @element.caret()
+    return start: mapping[textCaret.start], end: mapping[textCaret.end]
 
-    valueIndex = 0
-    textIndex = 0
-
-    while textIndex <= text.length
-      if text[textIndex] is value[valueIndex]
-        caret.start = valueIndex if realCaret.start is textIndex
-        caret.end = valueIndex if realCaret.end is textIndex
-        textIndex++
-        valueIndex++
-      else
-        textIndex++
-
-    return caret
-
-  @::__defineSetter__ 'caret', (caret) ->
-    value = @value
-    text = @text
-    realCaret = start: 0, end: 0
-
+  @::__defineSetter__ 'caret', (valueCaret) ->
     min = 0
-    max = value.length
-    caret =
-      start: Math.max(min, Math.min(max, caret.start))
-      end: Math.max(min, Math.min(max, caret.end))
+    max = @value.length
+    valueCaret =
+      start: Math.max(min, Math.min(max, valueCaret.start))
+      end: Math.max(min, Math.min(max, valueCaret.end))
+    textCaret = {}
 
-    valueIndex = 0
-    textIndex = 0
+    for own textIndex, valueIndex of @textToValueMapping
+      textCaret.start = textIndex if valueCaret.start is valueIndex
+      textCaret.end = textIndex if valueCaret.end is valueIndex
 
-    while textIndex <= text.length
-      if text[textIndex] is value[valueIndex]
-        realCaret.start = textIndex if caret.start is valueIndex
-        realCaret.end = textIndex if caret.end is valueIndex
-        textIndex++
-        valueIndex++
-      else
-        textIndex++
+    if not textCaret.start? or not textCaret.end?
+      throw new Error("unable to map value caret #{JSON.stringify valueCaret} to text caret, so far got: #{JSON.stringify textCaret}, mapping=#{JSON.stringify @textToValueMapping}")
 
-    @element.caret(realCaret)
+    @element.caret textCaret
 
 if module?
   module.exports = PanField
