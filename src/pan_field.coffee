@@ -112,9 +112,9 @@ class PanField
         caret.start = 0
 
     @caret = caret
-    @selectionDirection = 'left'
+    @selectionDirection = if caret.start is caret.end then null else 'left'
 
-  moveDown: ->
+  moveDown: (event) ->
     end = @value.length
     event.preventDefault()
 
@@ -123,7 +123,7 @@ class PanField
     @caret = start: end, end: end
     @selectionDirection = null
 
-  moveDownAndModifySelection: ->
+  moveDownAndModifySelection: (event) ->
     caret = @caret
     end = @value.length
     event.preventDefault()
@@ -140,7 +140,7 @@ class PanField
         caret.end = end
 
     @caret = caret
-    @selectionDirection = 'right'
+    @selectionDirection = if caret.start is caret.end then null else 'right'
 
   moveLeft: (event) ->
     caret = @caret
