@@ -1,0 +1,19 @@
+{
+  "name": "card-field.js",
+  "version": "0.0.0",
+  "description": "A simple credit card entry field.",
+  "main": "card_field.js",
+  "scripts": {
+    "build": "coffee -c -o lib/ src/",
+    "test": "npm run-script build && jasmine-node --coffee spec"
+  },
+  "repository": "",
+  "author": "Square",
+  "license": "BSD",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "coffee-script": "~1.4.0",
+    "jasmine-node": "~1.0.28"
+  }
+}
