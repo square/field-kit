@@ -101,3 +101,41 @@ describe 'PanField', ->
       assertKeyPressTransform '41|11', 'shift+alt+right', '41|11>'
       assertKeyPressTransform '41|11 1111', 'shift+alt+right', '41|11> 1111'
       assertKeyPressTransform '41|11 1111', 'shift+alt+right', 'shift+alt+right', '41|11 1111>'
+
+  describe 'typing an up arrow', ->
+    it 'works as expected', ->
+      assertKeyPressTransform '4111|', 'up', '|4111'
+      assertKeyPressTransform '411|1', 'up', '|4111'
+      assertKeyPressTransform '41|1|1', 'up', '|4111'
+
+      assertKeyPressTransform '41|11>', 'shift+up', '<41|11'
+      assertKeyPressTransform '<41|11', 'shift+up', '<41|11'
+      assertKeyPressTransform '|41>11', 'shift+up', '|4111'
+      assertKeyPressTransform '|4111> 1111', 'shift+up', '|4111 1111'
+      assertKeyPressTransform '41<1|1', 'shift+up', '<411|1'
+
+      assertKeyPressTransform '41|11', 'alt+up', '|4111'
+      assertKeyPressTransform '41|11 1111', 'alt+up', '|4111 1111'
+
+      assertKeyPressTransform '41|11', 'shift+alt+up', '<41|11'
+      assertKeyPressTransform '4111 11|11', 'shift+alt+up', '<4111 11|11'
+      assertKeyPressTransform '4111 11|11', 'shift+alt+up', 'shift+alt+up', '<4111 11|11'
+
+  describe 'typing a down arrow', ->
+    it 'works as expected', ->
+      assertKeyPressTransform '|4111', 'down', '4111|'
+      assertKeyPressTransform '411|1', 'down', '4111|'
+      assertKeyPressTransform '41|1|1', 'down', '4111|'
+
+      assertKeyPressTransform '41|11>', 'shift+down', '41|11>'
+      assertKeyPressTransform '<41|11', 'shift+down', '41|11>'
+      assertKeyPressTransform '41<11|', 'shift+down', '4111|'
+      assertKeyPressTransform '|4111> 1111', 'shift+down', '|4111 1111>'
+      assertKeyPressTransform '41|1>1', 'shift+down', '41|11>'
+
+      assertKeyPressTransform '41|11', 'alt+down', '4111|'
+      assertKeyPressTransform '41|11 1111', 'alt+down', '4111 1111|'
+
+      assertKeyPressTransform '41|11', 'shift+alt+down', '41|11>'
+      assertKeyPressTransform '41|11 1111', 'shift+alt+down', '41|11 1111>'
+      assertKeyPressTransform '4111| 1111', 'shift+alt+down', 'shift+alt+down', '4111| 1111>'

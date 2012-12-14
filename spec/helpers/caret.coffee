@@ -62,7 +62,7 @@ class Caret
   @printDescription: ({caret, direction, value}) ->
     if caret.start is caret.end
       if direction?
-        throw new Error("cannot have directional selection without a selection")
+        throw new Error("cannot have directional selection without a selection: caret=#{caret.start}..#{caret.end}, direction=#{direction}, value=#{value}")
 
       return value.substring(0, caret.start) + '|' + value.substring(caret.end)
     else
