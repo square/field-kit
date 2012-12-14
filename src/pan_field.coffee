@@ -23,6 +23,7 @@ no_ws = (string) ->
 class PanField
   constructor: (@element) ->
     @element.on 'keydown', @keyDown
+    # @element.on 'keypress', @keyPress
     @element.on 'keyup', @keyUp
     @element.on 'click', @click
 
@@ -85,8 +86,8 @@ class PanField
       event.preventDefault()
 
     # 0-9
-    else if KEYS.isDigit keyCode
-      @insertDigit event
+    else
+      @insertCharacter event
 
     return null
 
@@ -349,13 +350,18 @@ class PanField
     return result
 
   clearSelection: ->
+    # 12345678  =>  128
+    #   |---|         |
+    @replaceSelection ''
+
+  replaceSelection: (text) ->
     caret = @caret
     value = @value
 
-    # 12345678  =>  128
-    #   |---|         |
-    value = value.substring(0, caret.start) + value.substring(caret.end)
-    caret.end = caret.start
+    # 12345678  =>  12098
+    #   |---|         ||
+    value = value.substring(0, caret.start) + text + value.substring(caret.end)
+    caret.end = caret.start + text.length
 
     @value = value
     @caret = caret
@@ -364,6 +370,8 @@ class PanField
   selectAll: (event) ->
     # Let the browser act as normal, but also forget the selection direction.
     @selectionDirection = null
+
+  keyPress: (event) =>
 
   keyUp: (event) =>
     caret = @caret
@@ -375,12 +383,21 @@ class PanField
   click: =>
     @selectionDirection = null
 
-  insertDigit: (event) ->
-    if @hasSelection
-      @clearSelection()
+  insertCharacter: (event) ->
+    event.preventDefault()
 
-    if @value.length is @formatter.length
-      event.preventDefault()
+    # prevent inserting anything but digits
+    return unless KEYS.isDigit event.charCode
+
+    # clear any selection and cut out if we're full
+    @clearSelection() if @hasSelection
+    return if @value.length >= @formatter.length
+
+    # insert the digit
+    @replaceSelection String.fromCharCode(event.charCode)
+    caret = @caret
+    caret.start = caret.end
+    @caret = caret
 
   selectionDirection: null
 
@@ -397,14 +414,13 @@ class PanField
     @element.val(text)
 
   @::__defineGetter__ 'value', ->
-    no_ws @element.val()
+    value = @element.val()
+    return value unless @_formatter
+    @_formatter.parse value
 
   @::__defineSetter__ 'value', (value) ->
-    value = no_ws value
-
-    value = @_formatter.format(value)
-
-    @element.val(value)
+    value = @_formatter.format(value) if @_formatter
+    @element.val value
     @element.trigger 'change'
 
   @::__defineGetter__ 'formatter', ->
