@@ -1,5 +1,6 @@
 FakeElement = require './helpers/fake_element'
 FakeEvent = require './helpers/fake_event'
+Caret = require './helpers/caret'
 PanField = require '../lib/pan_field'
 
 class FakeFormatter
