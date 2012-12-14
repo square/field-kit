@@ -17,9 +17,6 @@ KEYS.isDirectional = (keyCode) ->
 
 GAP = ' '
 
-no_ws = (string) ->
-  string.replace(/\s+/g, '')
-
 class PanField
   constructor: (@element) ->
     @element.on 'keydown', @keyDown
@@ -431,17 +428,26 @@ class PanField
     @_formatter = formatter
     @value = value
 
+  # TODO: Generalize the mapping done in get caret()/set caret().
   @::__defineGetter__ 'caret', ->
+    value = @value
+    text = @text
     realCaret = @element.caret()
-    left  = @text.substring(0, realCaret.start)
-    leftPadding = left.length - no_ws(left).length
-    rightPadding = leftPadding + realCaret.text.length - no_ws(realCaret.text).length
+    caret = start: 0, end: 0
 
-    valueCaret =
-      start: realCaret.start - leftPadding
-      end: realCaret.end - rightPadding
+    valueIndex = 0
+    textIndex = 0
 
-    return valueCaret
+    while textIndex <= text.length
+      if text[textIndex] is value[valueIndex]
+        caret.start = valueIndex if realCaret.start is textIndex
+        caret.end = valueIndex if realCaret.end is textIndex
+        textIndex++
+        valueIndex++
+      else
+        textIndex++
+
+    return caret
 
   @::__defineSetter__ 'caret', (caret) ->
     value = @value

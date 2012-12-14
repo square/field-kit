@@ -70,7 +70,7 @@ describe 'PanField', ->
       assertKeyPressTransform '<41|11', 'shift+left', '<41|11'
       assertKeyPressTransform '4<1|11', 'shift+left', '<41|11'
       assertKeyPressTransform '|41>11', 'shift+left', '|4>111'
-      assertKeyPressTransform '|4111 1>111', 'shift+left', '|4111> 1111'
+      assertKeyPressTransform '|4111 1>111', 'shift+left', '|4111 >1111'
       assertKeyPressTransform '41|1>1', 'shift+left', 'shift+left', '4<1|11'
 
   describe 'typing a right arrow', ->
