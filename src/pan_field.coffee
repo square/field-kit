@@ -444,23 +444,27 @@ class PanField
     return valueCaret
 
   @::__defineSetter__ 'caret', (caret) ->
+    value = @value
     text = @text
     realCaret = start: 0, end: 0
 
-    # go left until we've consumed enough non-whitespace characters
-    nonWhitespaceCharacterCount = 0
-    for i in [0..text.length] when text[i] isnt GAP
-      if nonWhitespaceCharacterCount is caret.start
-        realCaret.start = i
+    min = 0
+    max = value.length
+    caret =
+      start: Math.max(min, Math.min(max, caret.start))
+      end: Math.max(min, Math.min(max, caret.end))
 
-      if nonWhitespaceCharacterCount is caret.end
-        realCaret.end = i
-        break
+    valueIndex = 0
+    textIndex = 0
 
-      nonWhitespaceCharacterCount++
-
-    if realCaret.start isnt realCaret.end and text[realCaret.end-1] is GAP
-      realCaret.end--
+    while textIndex <= text.length
+      if text[textIndex] is value[valueIndex]
+        realCaret.start = textIndex if caret.start is valueIndex
+        realCaret.end = textIndex if caret.end is valueIndex
+        textIndex++
+        valueIndex++
+      else
+        textIndex++
 
     @element.caret(realCaret)
 

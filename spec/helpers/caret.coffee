@@ -42,6 +42,7 @@ class Caret
             parseError char, "'#{char}' cannot be the start of a selection"
 
           caret.start = valueIndex
+          direction = 'left' if char is '<'
       else
         value += char
         valueIndex++
