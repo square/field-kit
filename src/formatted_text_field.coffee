@@ -17,7 +17,7 @@ KEYS.isDirectional = (keyCode) ->
 
 isWordChar = (char) -> char and /^\w$/.test(char)
 
-class PanField
+class FormattedTextField
   constructor: (@element) ->
     @element.on 'keydown', @keyDown
     # @element.on 'keypress', @keyPress
@@ -481,6 +481,6 @@ class PanField
     @element.caret textCaret
 
 if module?
-  module.exports = PanField
+  module.exports = FormattedTextField
 else if window?
-  window.PanField = PanField
+  window.FormattedTextField = FormattedTextField

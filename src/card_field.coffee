@@ -1,5 +1,3 @@
-#= require jquery.caret.1.02
-
 TEMPLATE = """
 <div class="card-field">
   <div class="card-field-inner">
@@ -35,7 +33,7 @@ GAP = ' '
 no_ws = (string) ->
   string.replace(/\s+/g, '')
 
-PanField = require './pan_field'
+FormattedTextField = require './formatted_text_field'
 
 class CardExtraField
   constructor: (@cardField, @element) ->

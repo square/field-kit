@@ -1,7 +1,7 @@
 FakeElement = require './helpers/fake_element'
 FakeEvent = require './helpers/fake_event'
 Caret = require './helpers/caret'
-PanField = require '../lib/pan_field'
+FormattedTextField = require '../lib/formatted_text_field'
 
 class FakeFormatter
   @GAP_INDEXES: []
@@ -13,38 +13,38 @@ class FakeFormatter
   parse: (text) ->
     text
 
-describe 'PanField', ->
+describe 'FormattedTextField', ->
   element = null
-  panField = null
+  formattedTextField = null
 
   applyValueAndCaretDescription = (description) ->
     { caret, direction, value } = Caret.parseDescription description
     element.val value
     element.caret caret
-    panField.selectionDirection = direction
+    formattedTextField.selectionDirection = direction
 
   assertKeyPressTransform = (from, keys..., to) ->
     applyValueAndCaretDescription from
 
     for key in keys
       event = FakeEvent.withKey(key)
-      panField.keyDown event
+      formattedTextField.keyDown event
       if not event.isDefaultPrevented()
-        panField.keyPress event if event.charCode
+        formattedTextField.keyPress event if event.charCode
         if not event.isDefaultPrevented()
-          panField.keyUp event
+          formattedTextField.keyUp event
 
     description = Caret.printDescription
                     caret: element.caret()
-                    direction: panField.selectionDirection
+                    direction: formattedTextField.selectionDirection
                     value: element.val()
 
     expect(description).toEqual(to)
 
   beforeEach ->
     element = new FakeElement()
-    panField = new PanField(element)
-    panField.formatter = new FakeFormatter()
+    formattedTextField = new FormattedTextField(element)
+    formattedTextField.formatter = new FakeFormatter()
 
   describe 'typing a digit into an empty field', ->
     it 'allows the digit to be inserted', ->
