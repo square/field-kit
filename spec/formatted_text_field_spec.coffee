@@ -46,21 +46,17 @@ describe 'FormattedTextField', ->
     formattedTextField = new FormattedTextField(element)
     formattedTextField.formatter = new FakeFormatter()
 
-  describe 'typing a digit into an empty field', ->
-    it 'allows the digit to be inserted', ->
-      assertKeyPressTransform '|', '0', '0|'
+  describe 'typing a character into an empty field', ->
+    it 'allows the character to be inserted', ->
+      assertKeyPressTransform '|', 'a', 'a|'
 
-  describe 'typing a digit into a full field', ->
-    it 'does not allow the digit to be inserted', ->
+  describe 'typing a character into a full field', ->
+    it 'does not allow the character to be inserted', ->
       assertKeyPressTransform '1234567890123456|', '0', '1234567890123456|'
 
     describe 'with part of the value selected', ->
       it 'replaces the selection with the typed character', ->
         assertKeyPressTransform '|123|4567890123456', '0', '0|4567890123456'
-
-  describe 'typing a non-digit character', ->
-    it 'is not inserted', ->
-      assertKeyPressTransform '12|', 'a', '12|'
 
   describe 'typing a backspace', ->
     describe 'with a non-empty selection', ->
@@ -149,6 +145,8 @@ describe 'FormattedTextField', ->
       assertKeyPressTransform '4111|', 'up', '|4111'
       assertKeyPressTransform '411|1', 'up', '|4111'
       assertKeyPressTransform '41|1|1', 'up', '|4111'
+      assertKeyPressTransform '41|1>1', 'up', '|4111'
+      assertKeyPressTransform '41<1|1', 'up', '|4111'
 
       assertKeyPressTransform '41|11>', 'shift+up', '<41|11'
       assertKeyPressTransform '<41|11', 'shift+up', '<41|11'
@@ -168,6 +166,8 @@ describe 'FormattedTextField', ->
       assertKeyPressTransform '|4111', 'down', '4111|'
       assertKeyPressTransform '411|1', 'down', '4111|'
       assertKeyPressTransform '41|1|1', 'down', '4111|'
+      assertKeyPressTransform '41|1>1', 'down', '4111|'
+      assertKeyPressTransform '41<1|1', 'down', '4111|'
 
       assertKeyPressTransform '41|11>', 'shift+down', '41|11>'
       assertKeyPressTransform '<41|11', 'shift+down', '41|11>'
@@ -181,3 +181,18 @@ describe 'FormattedTextField', ->
       assertKeyPressTransform '41|11', 'shift+alt+down', '41|11>'
       assertKeyPressTransform '41|11 1111', 'shift+alt+down', '41|11 1111>'
       assertKeyPressTransform '4111| 1111', 'shift+alt+down', 'shift+alt+down', '4111| 1111>'
+
+  describe 'selecting everything', ->
+    ['ctrl', 'meta'].forEach (modifier) ->
+      describe "with the #{modifier} key", ->
+      it 'works without an existing selection', ->
+        assertKeyPressTransform '123|4567', "#{modifier}+a", '|1234567|'
+
+      it 'works with an undirected selection', ->
+        assertKeyPressTransform '|123|4567', "#{modifier}+a", '|1234567|'
+
+      it 'works with a right-directed selection and resets the direction', ->
+        assertKeyPressTransform '|123>4567', "#{modifier}+a", '|1234567|'
+
+      it 'works with a left-directed selection and resets the direction', ->
+        assertKeyPressTransform '<123|4567', "#{modifier}+a", '|1234567|'

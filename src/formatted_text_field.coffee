@@ -18,12 +18,676 @@ KEYS.isDirectional = (keyCode) ->
 isWordChar = (char) -> char and /^\w$/.test(char)
 
 class FormattedTextField
+  # Internal: Contains either "left", "right", or null to indicate the
+  # direction the free end of the selection is from its anchor.
+  selectionDirection: null
+
   constructor: (@element) ->
     @element.on 'keydown', @keyDown
-    # @element.on 'keypress', @keyPress
+    @element.on 'keypress', @keyPress
     @element.on 'keyup', @keyUp
     @element.on 'click', @click
 
+  # Handles a key event that is trying to insert a character.
+  #
+  # Returns nothing.
+  insertCharacter: (event) ->
+    event.preventDefault()
+
+    # clear any selection and cut out if we're full
+    @clearSelection() if @hasSelection
+    return if @value.length >= @formatter.length
+
+    # insert the digit
+    @replaceSelection String.fromCharCode(event.charCode)
+    caret = @caret
+    caret.start = caret.end
+    @caret = caret
+
+  # Moves the cursor up, which because this is a single-line text field, means
+  # moving to the beginning of the value.
+  #
+  # Examples
+  #
+  #   Hey guys|
+  #   moveUp(event)
+  #   |Hey guys
+  #
+  #   Hey |guys|
+  #   moveUp(event)
+  #   |Hey guys
+  #
+  # Returns nothing.
+  moveUp: (event) ->
+    event.preventDefault()
+
+    @caret = start: 0, end: 0
+    @selectionDirection = null
+
+  # Moves the cursor up, keeping the current anchor point and extending the
+  # selection to the beginning as #moveUp would.
+  #
+  # Examples
+  #
+  #   # rightward selections are shrunk
+  #   Hey guys, |where> are you?
+  #   moveUpAndModifySelection(event)
+  #   <Hey guys, |where are you?
+  #
+  #   # leftward selections are extended
+  #   Hey guys, <where| are you?
+  #   moveUpAndModifySelection(event)
+  #   <Hey guys, where| are you?
+  #
+  #   # neutral selections are extended
+  #   Hey guys, |where| are you?
+  #   moveUpAndModifySelection(event)
+  #   <Hey guys, where| are you?
+  #
+  # Returns nothing.
+  moveUpAndModifySelection: (event) ->
+    caret = @caret
+    event.preventDefault()
+
+    switch @selectionDirection
+      when 'left', null
+        # 12<34 56|78  =>  <1234 56|78
+        caret.start = 0
+      when 'right'
+        # 12|34 56>78   =>   <12|34 5678
+        caret.end = caret.start
+        caret.start = 0
+
+    @caret = caret
+    @selectionDirection = if caret.start is caret.end then null else 'left'
+
+  # Moves the cursor down, which because this is a single-line text field,
+  # means moving to the end of the value.
+  #
+  # Examples
+  #
+  #   Hey |guys
+  #   moveDown(event)
+  #   Hey guys|
+  #
+  #   |Hey| guys
+  #   moveDown(event)
+  #   Hey guys|
+  #
+  # Returns nothing.
+  moveDown: (event) ->
+    end = @value.length
+    event.preventDefault()
+
+    # 12|34 56|78  =>  1234 5678|
+    @caret = start: end, end: end
+    @selectionDirection = null
+
+  # Moves the cursor down, keeping the current anchor point and extending the
+  # selection to the end as #moveDown would.
+  #
+  # Examples
+  #
+  #   # leftward selections are shrunk
+  #   Hey guys, <where| are you?
+  #   moveDownAndModifySelection(event)
+  #   Hey guys, |where are you?>
+  #
+  #   # rightward selections are extended
+  #   Hey guys, |where> are you?
+  #   moveDownAndModifySelection(event)
+  #   Hey guys, where| are you?>
+  #
+  #   # neutral selections are extended
+  #   Hey guys, |where| are you?
+  #   moveDownAndModifySelection(event)
+  #   Hey guys, |where are you?>
+  #
+  # Returns nothing.
+  moveDownAndModifySelection: (event) ->
+    caret = @caret
+    end = @value.length
+    event.preventDefault()
+
+    switch @selectionDirection
+      when 'left'
+        caret.start = caret.end
+        caret.end = end
+      when 'right', null
+        caret.end = end
+
+    @caret = caret
+    @selectionDirection = if caret.start is caret.end then null else 'right'
+
+  # Moves the cursor to the left, counting selections as a thing to move past.
+  #
+  # Examples
+  #
+  #   # no selection just moves the cursor left
+  #   Hey guys|
+  #   moveLeft(event)
+  #   Hey guy|s
+  #
+  #   # selections are removed
+  #   Hey |guys|
+  #   moveLeft(event)
+  #   Hey |guys
+  #
+  # Returns nothing.
+  moveLeft: (event) ->
+    caret = @caret
+    event.preventDefault()
+
+    if @hasSelection
+      # 1234 5678  =>  1234 5678
+      #   |--|           |
+      caret.end = caret.start
+    else
+      # 1234 5678  =>  1234 5678
+      #   |             |
+      caret.start--
+      caret.end--
+
+    @caret = caret
+    @selectionDirection = null if caret.start is caret.end
+
+  # Moves the free end of the selection one to the left.
+  #
+  # Examples
+  #
+  #   # no selection just selects to the left
+  #   Hey guys|
+  #   moveLeftAndModifySelection(event)
+  #   Hey guy<s|
+  #
+  #   # left selections are extended
+  #   Hey <guys|
+  #   moveLeftAndModifySelection(event)
+  #   Hey< guys|
+  #
+  #   # right selections are shrunk
+  #   Hey |guys>
+  #   moveLeftAndModifySelection(event)
+  #   Hey |guy>s
+  #
+  #   # neutral selections are extended
+  #   Hey |guys|
+  #   moveLeftAndModifySelection(event)
+  #   Hey< guys|
+  #
+  # Returns nothing.
+  moveLeftAndModifySelection: (event) ->
+    caret = @caret
+    event.preventDefault()
+
+    switch @selectionDirection
+      when 'left', null
+        @selectionDirection = 'left'
+        caret.start--
+      when 'right'
+        caret.end--
+
+    @caret = caret
+    @selectionDirection = null if caret.start is caret.end
+
+  # Moves the cursor left until the start of a word is found.
+  #
+  # Examples
+  #
+  #   # no selection just moves the cursor left
+  #   Hey guys|
+  #   moveWordLeft(event)
+  #   Hey |guys
+  #
+  #   # selections are removed
+  #   Hey |guys|
+  #   moveWordLeft(event)
+  #   |Hey guys
+  #
+  # Returns nothing.
+  moveWordLeft: (event) ->
+    event.preventDefault()
+    index = @lastWordBreakBeforeIndex @caret.start - 1
+    @caret = start: index, end: index
+    @selectionDirection = null
+
+  # Moves the free end of the current selection to the beginning of the
+  # previous word.
+  #
+  # Examples
+  #
+  #   # no selection just selects to the left
+  #   Hey guys|
+  #   moveWordLeftAndModifySelection(event)
+  #   Hey |guys|
+  #
+  #   # left selections are extended
+  #   Hey <guys|
+  #   moveWordLeftAndModifySelection(event)
+  #   <Hey guys|
+  #
+  #   # right selections are shrunk
+  #   |Hey guys>
+  #   moveWordLeftAndModifySelection(event)
+  #   |Hey >guys
+  #
+  #   # neutral selections are extended
+  #   Hey |guys|
+  #   moveWordLeftAndModifySelection(event)
+  #   <Hey guys|
+  #
+  # Returns nothing.
+  moveWordLeftAndModifySelection: (event) ->
+    caret = @caret
+    event.preventDefault()
+
+    switch @selectionDirection
+      when 'left', null
+        @selectionDirection = 'left'
+        caret.start = @lastWordBreakBeforeIndex caret.start - 1
+      when 'right'
+        caret.end = @lastWordBreakBeforeIndex caret.end
+        caret.end = caret.start if caret.end < caret.start
+
+    @caret = caret
+    @selectionDirection = null if caret.start is caret.end
+
+  # Moves the cursor to the right, counting selections as a thing to move past.
+  #
+  # Examples
+  #
+  #   # no selection just moves the cursor right
+  #   Hey guy|s
+  #   moveRight(event)
+  #   Hey guys|
+  #
+  #   # selections are removed
+  #   Hey |guys|
+  #   moveRight(event)
+  #   Hey guys|
+  #
+  # Returns nothing.
+  moveRight: (event) ->
+    caret = @caret
+    event.preventDefault()
+
+    if @hasSelection
+      caret.start = caret.end
+    else
+      caret.start++
+      caret.end++
+
+    @caret = caret
+    @selectionDirection = null if caret.start is caret.end
+
+  # Moves the free end of the selection one to the right.
+  #
+  # Examples
+  #
+  #   # no selection just selects to the right
+  #   Hey |guys
+  #   moveRightAndModifySelection(event)
+  #   Hey |g>uys
+  #
+  #   # right selections are extended
+  #   Hey |gu>ys
+  #   moveRightAndModifySelection(event)
+  #   Hey |guy>s
+  #
+  #   # left selections are shrunk
+  #   <Hey |guys
+  #   moveRightAndModifySelection(event)
+  #   H<ey |guys
+  #
+  #   # neutral selections are extended
+  #   |Hey| guys
+  #   moveRightAndModifySelection(event)
+  #   |Hey >guys
+  #
+  # Returns nothing.
+  moveRightAndModifySelection: (event) ->
+    caret = @caret
+    event.preventDefault()
+
+    switch @selectionDirection
+      when 'left'
+        caret.start++
+      when 'right', null
+        @selectionDirection = 'right'
+        caret.end++
+
+    @caret = caret
+    @selectionDirection = null if caret.start is caret.end
+
+  # Moves the cursor right until the end of a word is found.
+  #
+  # Examples
+  #
+  #   # no selection just moves the cursor right
+  #   Hey| guys
+  #   moveWordRight(event)
+  #   Hey guys|
+  #
+  #   # selections are removed
+  #   |Hey| guys
+  #   moveWordRight(event)
+  #   Hey guys|
+  #
+  # Returns nothing.
+  moveWordRight: (event) ->
+    event.preventDefault()
+    index = @nextWordBreakAfterIndex @caret.end
+    @caret = start: index, end: index
+    @selectionDirection = null
+
+  # Moves the free end of the current selection to the next end of word.
+  #
+  # Examples
+  #
+  #   # no selection just selects to the right
+  #   Hey |guys
+  #   moveWordRightAndModifySelection(event)
+  #   Hey |guys|
+  #
+  #   # right selections are extended
+  #   Hey |g>uys
+  #   moveWordRightAndModifySelection(event)
+  #   Hey |guys>
+  #
+  #   # left selections are shrunk
+  #   He<y |guys
+  #   moveWordRightAndModifySelection(event)
+  #   Hey< |guys
+  #
+  #   # neutral selections are extended
+  #   He|y |guys
+  #   moveWordRightAndModifySelection(event)
+  #   He|y guys>
+  #
+  # Returns nothing.
+  moveWordRightAndModifySelection: (event) ->
+    caret = @caret
+    event.preventDefault()
+
+    switch @selectionDirection
+      when 'left'
+        caret.start = @nextWordBreakAfterIndex caret.start
+        caret.start = caret.end if caret.start > caret.end
+      when 'right', null
+        @selectionDirection = 'right'
+        caret.end = @nextWordBreakAfterIndex caret.end
+
+    @caret = caret
+    @selectionDirection = null if caret.start is caret.end
+
+  # Deletes backward one character or clears a non-empty selection.
+  #
+  # Examples
+  #
+  #   |What's up, doc?
+  #   deleteBackward(event)
+  #   |What's up, doc?
+  #
+  #   What'|s up, doc?
+  #   deleteBackward(event)
+  #   What|s up, doc?
+  #
+  #   |What's| up, doc?
+  #   deleteBackward(event)
+  #   | up, doc?
+  #
+  # Returns nothing.
+  deleteBackward: (event) ->
+    event.preventDefault()
+
+    unless @hasSelection
+      caret = @caret
+      caret.start--
+      @caret = caret
+
+    @clearSelection()
+
+  # Deletes backward one word or clears a non-empty selection.
+  #
+  # Examples
+  #
+  #   |What's up, doc?
+  #   deleteWordBackward(event)
+  #   |What's up, doc?
+  #
+  #   What'|s up, doc?
+  #   deleteWordBackward(event)
+  #   |s up, doc?
+  #
+  #   |What's| up, doc?
+  #   deleteWordBackward(event)
+  #   | up, doc?
+  #
+  # Returns nothing.
+  deleteWordBackward: (event) ->
+    if @hasSelection
+      return @deleteBackward event
+
+    event.preventDefault()
+    caret = @caret
+
+    caret.start = @lastWordBreakBeforeIndex caret.start - 1
+
+    @caret = caret
+    @clearSelection()
+
+  # Deletes backward one character, clears a non-empty selection, or decomposes
+  # an accented character to its simple form.
+  #
+  # TODO: Make this work as described.
+  #
+  # Examples
+  #
+  #   |fiancée
+  #   deleteBackwardByDecomposingPreviousCharacter(event)
+  #   |What's up, doc?
+  #
+  #   fianc|é|e
+  #   deleteBackwardByDecomposingPreviousCharacter(event)
+  #   fianc|e
+  #
+  #   fiancé|e
+  #   deleteBackwardByDecomposingPreviousCharacter(event)
+  #   fiance|e
+  #
+  # Returns nothing.
+  deleteBackwardByDecomposingPreviousCharacter: (event) ->
+    @deleteBackward event
+
+  # Deletes forward one character or clears a non-empty selection.
+  #
+  # Examples
+  #
+  #   What's up, doc?|
+  #   deleteForward(event)
+  #   What's up, doc?|
+  #
+  #   What'|s up, doc?
+  #   deleteForward(event)
+  #   What'| up, doc?
+  #
+  #   |What's| up, doc?
+  #   deleteForward(event)
+  #   | up, doc?
+  #
+  # Returns nothing.
+  deleteForward: (event) ->
+    event.preventDefault()
+
+    unless @hasSelection
+      caret = @caret
+      caret.end++
+      @caret = caret
+
+    @clearSelection()
+
+  # Deletes forward one word or clears a non-empty selection.
+  #
+  # Examples
+  #
+  #   What's up, doc?|
+  #   deleteWordForward(event)
+  #   What's up, doc?|
+  #
+  #   What's |up, doc?
+  #   deleteWordForward(event)
+  #   What's |, doc?
+  #
+  #   |What's| up, doc?
+  #   deleteWordForward(event)
+  #   | up, doc?
+  #
+  # Returns nothing.
+  deleteWordForward: (event) ->
+    if @hasSelection
+      return @deleteForward event
+
+    caret = @caret
+    event.preventDefault()
+
+    caret.end = @nextWordBreakAfterIndex caret.end
+
+    @caret = caret
+    @clearSelection()
+
+  # Determines whether this field has any selection.
+  #
+  # Returns true if there is at least one character selected, false otherwise.
+  @::__defineGetter__ 'hasSelection', ->
+    caret = @caret
+    caret.start isnt caret.end
+
+  # Internal: Finds the start of the "word" before index.
+  #
+  # index - The position in value at which to start looking.
+  #
+  # Returns an index in value less than or equal to the given index.
+  lastWordBreakBeforeIndex: (index) ->
+    indexes = @leftWordBreakIndexes
+    result = indexes[0]
+
+    for wordBreakIndex in indexes
+      if index > wordBreakIndex
+        result = wordBreakIndex
+      else
+        break
+
+    return result
+
+  # Internal: Find starts of "words" for navigational purposes.
+  #
+  # Examples
+  #
+  #   # given value of "123456789" and text of "123-45-6789"
+  #   >> leftWordBreakIndexes
+  #   => [0, 3, 5]
+  #
+  # Returns an Array of Numbers mapping to indexes in the value at which
+  # "words" start.
+  @::__defineGetter__ 'leftWordBreakIndexes', ->
+    result = []
+    text = @text
+    mapping = @textToValueMapping
+
+    for i in [0..text.length-1]
+      result.push mapping[i] if not isWordChar(text[i-1]) and isWordChar(text[i])
+
+    return result
+
+  # Internal: Finds the end of the "word" after index.
+  #
+  # index - The position in value at which to start looking.
+  #
+  # Returns an index in value greater than or equal to the given index.
+  nextWordBreakAfterIndex: (index) ->
+    indexes = @rightWordBreakIndexes.reverse()
+    result = indexes[0]
+
+    for wordBreakIndex in indexes
+      if index < wordBreakIndex
+        result = wordBreakIndex
+      else
+        break
+
+    return result
+
+  # Internal: Find ends of "words" for navigational purposes.
+  #
+  # Examples
+  #
+  #   # given value of "123456789" and text of "123-45-6789"
+  #   >> rightWordBreakIndexes
+  #   => [3, 5, 9]
+  #
+  # Returns an Array of Numbers mapping to indexes in the value at which
+  # "words" end.
+  @::__defineGetter__ 'rightWordBreakIndexes', ->
+    result = []
+    text = @text
+    mapping = @textToValueMapping
+
+    for i in [0..text.length-1]
+      result.push mapping[i+1] if isWordChar(text[i]) and not isWordChar(text[i+1])
+
+    return result
+
+  # Internal: Clears all characters in the existing selection.
+  #
+  # Examples
+  #
+  #   12|34567|8
+  #   clearSelection()
+  #   12|8
+  #
+  # Returns nothing.
+  clearSelection: ->
+    @replaceSelection ''
+
+  # Internal: Replaces the characters within the selection with given text.
+  #
+  # Examples
+  #
+  #   12|34567|8
+  #   replaceSelection("00")
+  #   12|00|8
+  #
+  # Returns nothing.
+  replaceSelection: (text) ->
+    caret = @caret
+    value = @value
+
+    value = value.substring(0, caret.start) + text + value.substring(caret.end)
+    caret.end = caret.start + text.length
+
+    @value = value
+    @caret = caret
+    @selectionDirection = null
+
+  # Internal: Expands the selection to contain all the characters in the content.
+  #
+  # Examples
+  #
+  #   123|45678
+  #   selectAll(event)
+  #   |12345678|
+  #
+  # Returns nothing.
+  selectAll: (event) ->
+    # Let the browser act as normal, but also do it ourselves.
+    value = @value
+    @caret = start: 0, end: value.length
+    @selectionDirection = null
+
+  # Internal: Handles keyDown events. This method essentially just delegates to
+  # other, more semantic, methods based on the modifier keys and the pressed
+  # key of the event.
+  #
+  # Returns nothing.
   keyDown: (event) =>
     {keyCode, metaKey, ctrlKey, shiftKey, altKey} = event
 
@@ -78,311 +742,20 @@ class FormattedTextField
       else
         @deleteForward event
 
-    # shift / option / alt, probably inserting something not a digit
-    else if shiftKey or altKey
-      event.preventDefault()
-
-    # 0-9
     else
       @insertCharacter event
 
     return null
 
-  moveUp: (event) ->
-    event.preventDefault()
-
-    # 1234 5678  =>  1234 5678
-    #   |---|        |
-    @caret = start: 0, end: 0
-    @selectionDirection = null
-
-  moveUpAndModifySelection: (event) ->
-    caret = @caret
-    event.preventDefault()
-
-    switch @selectionDirection
-      when 'left', null
-        # 1234 5678   =>   1234 5678
-        #   <---|          <-----|
-        caret.start = 0
-      when 'right'
-        # 1234 5678   =>   1234 5678
-        #   |--->          <-|
-        caret.end = caret.start
-        caret.start = 0
-
-    @caret = caret
-    @selectionDirection = if caret.start is caret.end then null else 'left'
-
-  moveDown: (event) ->
-    end = @value.length
-    event.preventDefault()
-
-    # 1234 5678  =>  1234 5678
-    #   |---|                |
-    @caret = start: end, end: end
-    @selectionDirection = null
-
-  moveDownAndModifySelection: (event) ->
-    caret = @caret
-    end = @value.length
-    event.preventDefault()
-
-    switch @selectionDirection
-      when 'left'
-        # 1234 5678  =>  1234 5678
-        #   <---|              |->
-        caret.start = caret.end
-        caret.end = end
-      when 'right', null
-        # 1234 5678  =>  1234 5678
-        #   |--->          |----->
-        caret.end = end
-
-    @caret = caret
-    @selectionDirection = if caret.start is caret.end then null else 'right'
-
-  moveLeft: (event) ->
-    caret = @caret
-    event.preventDefault()
-
-    if @hasSelection
-      # 1234 5678  =>  1234 5678
-      #   |--|           |
-      caret.end = caret.start
-    else
-      # 1234 5678  =>  1234 5678
-      #   |             |
-      caret.start--
-      caret.end--
-
-    @caret = caret
-    @selectionDirection = null if caret.start is caret.end
-
-  moveWordLeft: (event) ->
-    event.preventDefault()
-    index = @lastWordBreakBeforeIndex @caret.start - 1
-    @caret = start: index, end: index
-    @selectionDirection = null
-
-  moveWordLeftAndModifySelection: (event) ->
-    caret = @caret
-    event.preventDefault()
-
-    switch @selectionDirection
-      when 'left', null
-        @selectionDirection = 'left'
-        # 1234 5678  =>  1234 5678
-        #      <-|       <------|
-        caret.start = @lastWordBreakBeforeIndex caret.start - 1
-      when 'right'
-        # 1234 5678  =>  1234 5678
-        #       |->            |
-        caret.end = @lastWordBreakBeforeIndex caret.end
-        caret.end = caret.start if caret.end < caret.start
-
-    @caret = caret
-    @selectionDirection = null if caret.start is caret.end
-
-  moveLeftAndModifySelection: (event) ->
-    caret = @caret
-    event.preventDefault()
-
-    switch @selectionDirection
-      when 'left', null
-        @selectionDirection = 'left'
-        # 1234 5678  =>  1234 5678
-        #   <---|         <----|
-        caret.start--
-      when 'right'
-        # 1234 5678   =>   1234 5678
-        #   |--->            |-->
-        caret.end--
-
-    @caret = caret
-    @selectionDirection = null if caret.start is caret.end
-
-  moveRight: (event) ->
-    caret = @caret
-    event.preventDefault()
-
-    if @hasSelection
-      # 1234 5678  =>  1234 5678
-      #   |--|              |
-      caret.start = caret.end
-    else
-      # 1234 5678  =>  1234 5678
-      #   |               |
-      caret.start++
-      caret.end++
-
-    @caret = caret
-    @selectionDirection = null if caret.start is caret.end
-
-  moveWordRight: (event) ->
-    event.preventDefault()
-    index = @nextWordBreakAfterIndex @caret.end
-    @caret = start: index, end: index
-    @selectionDirection = null
-
-  moveWordRightAndModifySelection: (event) ->
-    caret = @caret
-    event.preventDefault()
-
-    switch @selectionDirection
-      when 'left'
-        # 1234 5678  =>  1234 5678
-        #   <---|             <|
-        caret.start = @nextWordBreakAfterIndex caret.start
-        caret.start = caret.end if caret.start > caret.end
-      when 'right', null
-        @selectionDirection = 'right'
-        # 1234 5678  =>  1234 5678
-        #   |--->         |------>
-        caret.end = @nextWordBreakAfterIndex caret.end
-
-    @caret = caret
-    @selectionDirection = null if caret.start is caret.end
-
-  moveRightAndModifySelection: (event) ->
-    caret = @caret
-    event.preventDefault()
-
-    switch @selectionDirection
-      when 'left'
-        # 1234 5678  =>  1234 5678
-        #   |---|           |--|
-        caret.start++
-      when 'right', null
-        @selectionDirection = 'right'
-        # 1234 5678  =>  1234 5678
-        #   |---|         |-----|
-        caret.end++
-
-    @caret = caret
-    @selectionDirection = null if caret.start is caret.end
-
-  deleteBackward: (event) ->
-    event.preventDefault()
-
-    unless @hasSelection
-      caret = @caret
-      caret.start--
-      @caret = caret
-
-    @clearSelection()
-
-  deleteWordBackward: (event) ->
-    if @hasSelection
-      return @deleteBackward event
-
-    event.preventDefault()
-    caret = @caret
-
-    caret.start = @lastWordBreakBeforeIndex caret.start - 1
-
-    @caret = caret
-    @clearSelection()
-
-  deleteBackwardByDecomposingPreviousCharacter: (event) ->
-    @deleteBackward event
-
-  deleteForward: (event) ->
-    event.preventDefault()
-
-    unless @hasSelection
-      caret = @caret
-      caret.end++
-      @caret = caret
-
-    @clearSelection()
-
-  deleteWordForward: (event) ->
-    if @hasSelection
-      return @deleteForward event
-
-    caret = @caret
-    event.preventDefault()
-
-    caret.end = @nextWordBreakAfterIndex caret.end
-
-    @caret = caret
-    @clearSelection()
-
-  @::__defineGetter__ 'hasSelection', ->
-    caret = @caret
-    caret.start isnt caret.end
-
-  # Find starts of "words".
-  @::__defineGetter__ 'leftWordBreakIndexes', ->
-    result = []
-    text = @text
-    mapping = @textToValueMapping
-
-    for i in [0..text.length-1]
-      result.push mapping[i] if not isWordChar(text[i-1]) and isWordChar(text[i])
-
-    return result
-
-  # Find ends of "words".
-  @::__defineGetter__ 'rightWordBreakIndexes', ->
-    result = []
-    text = @text
-    mapping = @textToValueMapping
-
-    for i in [0..text.length-1]
-      result.push mapping[i+1] if isWordChar(text[i]) and not isWordChar(text[i+1])
-
-    return result
-
-  lastWordBreakBeforeIndex: (index) ->
-    indexes = @leftWordBreakIndexes
-    result = indexes[0]
-
-    for wordBreakIndex in indexes
-      if index > wordBreakIndex
-        result = wordBreakIndex
-      else
-        break
-
-    return result
-
-  nextWordBreakAfterIndex: (index) ->
-    indexes = @rightWordBreakIndexes.reverse()
-    result = indexes[0]
-
-    for wordBreakIndex in indexes
-      if index < wordBreakIndex
-        result = wordBreakIndex
-      else
-        break
-
-    return result
-
-  clearSelection: ->
-    # 12345678  =>  128
-    #   |---|         |
-    @replaceSelection ''
-
-  replaceSelection: (text) ->
-    caret = @caret
-    value = @value
-
-    # 12345678  =>  12098
-    #   |---|         ||
-    value = value.substring(0, caret.start) + text + value.substring(caret.end)
-    caret.end = caret.start + text.length
-
-    @value = value
-    @caret = caret
-    @selectionDirection = null
-
-  selectAll: (event) ->
-    # Let the browser act as normal, but also forget the selection direction.
-    @selectionDirection = null
-
+  # Internal: A stub, at this point. All work is done in #keyDown.
+  #
+  # Returns nothing.
   keyPress: (event) =>
 
+  # Internal: Handles keyUp events by reformatting the text after a
+  # (presumably) unhandled key event may have modified the value.
+  #
+  # Returns nothing.
   keyUp: (event) =>
     caret = @caret
     value = @value
@@ -390,26 +763,11 @@ class FormattedTextField
     @value = value
     @caret = caret
 
-  click: =>
+  # Internal: Handles clicks by resetting the selection direction.
+  #
+  # Returns nothing.
+  click: (event) =>
     @selectionDirection = null
-
-  insertCharacter: (event) ->
-    event.preventDefault()
-
-    # prevent inserting anything but digits
-    return unless KEYS.isDigit event.charCode
-
-    # clear any selection and cut out if we're full
-    @clearSelection() if @hasSelection
-    return if @value.length >= @formatter.length
-
-    # insert the digit
-    @replaceSelection String.fromCharCode(event.charCode)
-    caret = @caret
-    caret.start = caret.end
-    @caret = caret
-
-  selectionDirection: null
 
   on: (args...) ->
     @element.on args...
