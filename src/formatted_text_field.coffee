@@ -263,12 +263,13 @@ class FormattedTextField
     @selectionDirection = null if caret.start is caret.end
 
   deleteBackward: (event) ->
-    caret = @caret
     event.preventDefault()
 
-    caret.start--
+    unless @hasSelection
+      caret = @caret
+      caret.start--
+      @caret = caret
 
-    @caret = caret
     @clearSelection()
 
   deleteWordBackward: (event) ->
@@ -287,12 +288,13 @@ class FormattedTextField
     @deleteBackward event
 
   deleteForward: (event) ->
-    caret = @caret
     event.preventDefault()
 
-    caret.end++
+    unless @hasSelection
+      caret = @caret
+      caret.end++
+      @caret = caret
 
-    @caret = caret
     @clearSelection()
 
   deleteWordForward: (event) ->
