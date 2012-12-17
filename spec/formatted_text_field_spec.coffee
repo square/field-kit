@@ -62,6 +62,48 @@ describe 'FormattedTextField', ->
     it 'is not inserted', ->
       assertKeyPressTransform '12|', 'a', '12|'
 
+  describe 'typing a backspace', ->
+    describe 'with a non-empty selection', ->
+      it 'clears the selection', ->
+        assertKeyPressTransform '12|34|5', 'backspace', '12|5'
+        assertKeyPressTransform '12<34|5', 'backspace', '12|5'
+        assertKeyPressTransform '12|34>5', 'backspace', '12|5'
+
+        assertKeyPressTransform '12|3 4|5', 'alt+backspace', '12|5'
+        assertKeyPressTransform '12<3 4|5', 'alt+backspace', '12|5'
+        assertKeyPressTransform '12|3 4>5', 'alt+backspace', '12|5'
+
+    describe 'with an empty selection', ->
+      it 'works as expected', ->
+        assertKeyPressTransform '|12', 'backspace', '|12'
+        assertKeyPressTransform '1|2', 'backspace', '|2'
+
+        assertKeyPressTransform '|12', 'alt+backspace', '|12'
+        assertKeyPressTransform '12|', 'alt+backspace', '|'
+        assertKeyPressTransform '12 34|', 'alt+backspace', '12 |'
+        assertKeyPressTransform '12 |34', 'alt+backspace', '|34'
+
+  describe 'typing forward delete', ->
+    describe 'with a non-empty selection', ->
+      it 'clears the selection', ->
+        assertKeyPressTransform '12|34|5', 'delete', '12|5'
+        assertKeyPressTransform '12<34|5', 'delete', '12|5'
+        assertKeyPressTransform '12|34>5', 'delete', '12|5'
+
+        assertKeyPressTransform '12|3 4|5', 'alt+delete', '12|5'
+        assertKeyPressTransform '12<3 4|5', 'alt+delete', '12|5'
+        assertKeyPressTransform '12|3 4>5', 'alt+delete', '12|5'
+
+    describe 'with an empty selection', ->
+      it 'works as expected', ->
+        assertKeyPressTransform '12|', 'delete', '12|'
+        assertKeyPressTransform '1|2', 'delete', '1|'
+
+        assertKeyPressTransform '12|', 'alt+delete', '12|'
+        assertKeyPressTransform '|12', 'alt+delete', '|'
+        assertKeyPressTransform '|12 34', 'alt+delete', '| 34'
+        assertKeyPressTransform '12| 34', 'alt+delete', '12|'
+
   describe 'typing a left arrow', ->
     it 'works as expected', ->
       assertKeyPressTransform '|4111', 'left', '|4111'

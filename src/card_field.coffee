@@ -4,8 +4,8 @@ TEMPLATE = """
     <input class="card-field-pan" placeholder="1234 5678 9012 3456"/>
     <div class="card-field-extras">
       <input class="card-field-expiry" placeholder="MM/YY"/><!--
-      --><input class="card-field-cvv" placeholder="CCV"/><!--
-      --><input class="card-field-postal-code" placeholder="ZIP"/>
+   --><input class="card-field-cvv" placeholder="CCV"/><!--
+   --><input class="card-field-postal-code" placeholder="ZIP"/>
     </div>
   </div>
 </div>
@@ -66,7 +66,6 @@ class CardExtraField
         @alignLeft()
     else
       event.preventDefault()
-
 
   keyUp: (event) =>
 
