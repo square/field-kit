@@ -775,30 +775,46 @@ class FormattedTextField
   off: (args...) ->
     @element.off args...
 
+  # Gets the formatted text value. This is the same as the value of the
+  # underlying input element.
+  #
+  # Returns a String containing the input value.
   @::__defineGetter__ 'text', ->
     @element.val()
 
+  # Sets the formatted text value. This generally should not be used. Instead,
+  # use the value setter.
   @::__defineSetter__ 'text', (text) ->
     @element.val(text)
 
+  # Gets the unformatted text value. This is the value that should be
+  # considered the "real" value of the field.
+  #
+  # Returns a String containing the logical value of the field.
   @::__defineGetter__ 'value', ->
     value = @element.val()
     return value unless @_formatter
     @_formatter.parse value
 
+  # Sets the unformatted text value, or logical value, of the field.
   @::__defineSetter__ 'value', (value) ->
     value = @_formatter.format(value) if @_formatter
     @element.val value
     @element.trigger 'change'
 
+  # Gets the current formatter. Formatters are used to translate between #text
+  # and #value propertiees of the field.
   @::__defineGetter__ 'formatter', ->
     @_formatter
 
+  # Sets the current formatter.
   @::__defineSetter__ 'formatter', (formatter) ->
     value = @value
     @_formatter = formatter
     @value = value
 
+  # Internal: Returns an index map from indexes of the formatted #text to
+  # indexes of the #value.
   @::__defineGetter__ 'textToValueMapping', ->
     value = @value
     text = @text
@@ -818,11 +834,15 @@ class FormattedTextField
 
     return mapping
 
+  # Gets the selection caret with start and end indexes relative to #value.
+  #
+  # Returns an Object with 'start' and 'end' keys.
   @::__defineGetter__ 'caret', ->
     mapping = @textToValueMapping
     textCaret = @element.caret()
     return start: mapping[textCaret.start], end: mapping[textCaret.end]
 
+  # Sets the current selection caret.
   @::__defineSetter__ 'caret', (valueCaret) ->
     min = 0
     max = @value.length
