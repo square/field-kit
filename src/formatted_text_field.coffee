@@ -36,7 +36,7 @@ class FormattedTextField
 
     # clear any selection and cut out if we're full
     @clearSelection() if @hasSelection
-    return if @value.length >= @formatter.length
+    return if @formatter.length and @value.length >= @formatter.length
 
     # insert the character
     @replaceSelection String.fromCharCode(event.charCode)
