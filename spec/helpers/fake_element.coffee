@@ -8,6 +8,9 @@ class FakeElement extends EventEmitter
 
   caret: (caret) ->
     if arguments.length is 1
+      if typeof caret.start isnt 'number' or typeof caret.end isnt 'number'
+        throw new Error("expected caret start and end to be numbers, got start=#{caret.start} (#{typeof caret.start}), end=#{caret.end} (#{typeof caret.end})")
+
       @_caret.start = Math.max(caret.start, 0)
       @_caret.end = Math.min(caret.end, @_value.length)
     else
