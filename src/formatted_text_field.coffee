@@ -850,8 +850,8 @@ class FormattedTextField
     textCaret = {}
 
     for own textIndex, valueIndex of @textToValueMapping
-      textCaret.start = textIndex if valueCaret.start is valueIndex
-      textCaret.end = textIndex if valueCaret.end is valueIndex
+      textCaret.start = Number(textIndex) if valueCaret.start is valueIndex
+      textCaret.end = Number(textIndex) if valueCaret.end is valueIndex
 
     if not textCaret.start? or not textCaret.end?
       throw new Error("unable to map value caret #{JSON.stringify valueCaret} to text caret, so far got: #{JSON.stringify textCaret}, mapping=#{JSON.stringify @textToValueMapping}")
