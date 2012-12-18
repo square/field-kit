@@ -4,9 +4,6 @@ Caret = require './helpers/caret'
 FormattedTextField = require '../lib/formatted_text_field'
 
 class FakeFormatter
-  @GAP_INDEXES: []
-  length: 16
-
   format: (value) ->
     value
 
@@ -55,12 +52,15 @@ describe 'FormattedTextField', ->
       assertKeyPressTransform '|', 'a', 'a|'
 
   describe 'typing a character into a full field', ->
+    beforeEach ->
+      formattedTextField.formatter.length = 2
+
     it 'does not allow the character to be inserted', ->
-      assertKeyPressTransform '1234567890123456|', '0', '1234567890123456|'
+      assertKeyPressTransform '12|', '0', '12|'
 
     describe 'with part of the value selected', ->
       it 'replaces the selection with the typed character', ->
-        assertKeyPressTransform '|123|4567890123456', '0', '0|4567890123456'
+        assertKeyPressTransform '|1|2', '0', '0|2'
 
   describe 'typing a backspace', ->
     describe 'with a non-empty selection', ->
