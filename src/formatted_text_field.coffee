@@ -38,7 +38,7 @@ class FormattedTextField
     @clearSelection() if @hasSelection
     return if @value.length >= @formatter.length
 
-    # insert the digit
+    # insert the character
     @replaceSelection String.fromCharCode(event.charCode)
     caret = @caret
     caret.start = caret.end
@@ -742,15 +742,13 @@ class FormattedTextField
       else
         @deleteForward event
 
-    else
-      @insertCharacter event
-
     return null
 
-  # Internal: A stub, at this point. All work is done in #keyDown.
+  # Internal: Handles inserting characters based on the typed key.
   #
   # Returns nothing.
   keyPress: (event) =>
+    @insertCharacter event
 
   # Internal: Handles keyUp events by reformatting the text after a
   # (presumably) unhandled key event may have modified the value.
