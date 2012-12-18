@@ -21,11 +21,11 @@ KEYS =
 
 class FakeEvent
   keyCode: 0
-  charCode: 0
   altKey: no
   shiftKey: no
   metaKey: no
   ctrlKey: no
+  type: null
 
   _defaultPrevented: no
 
@@ -35,9 +35,18 @@ class FakeEvent
   isDefaultPrevented: ->
     @_defaultPrevented
 
+  @::__defineGetter__ 'charCode', ->
+    if @type is 'keypress' and @keyCode in KEYS.PRINTABLE and not (@metaKey or @ctrlKey)
+      @_charCode
+    else
+      0
+
+  @::__defineSetter__ 'charCode', (charCode) ->
+    @_charCode = charCode
+
   @withKeyCode: (keyCode) ->
     event = new @()
-    charCode = keyCode if keyCode in KEYS.PRINTABLE
+    charCode = keyCode
 
     # specially handle A-Z and a-z
     if KEYS.A <= keyCode <= KEYS.Z
@@ -45,8 +54,8 @@ class FakeEvent
     else if KEYS.a <= keyCode <= KEYS.z
       keyCode -= KEYS.a - KEYS.A
 
-    event.charCode = charCode
     event.keyCode = keyCode
+    event.charCode = charCode
     return event
 
   @withKey: (character) ->

@@ -28,10 +28,14 @@ describe 'FormattedTextField', ->
 
     for key in keys
       event = FakeEvent.withKey(key)
+      event.type = 'keydown'
       formattedTextField.keyDown event
       if not event.isDefaultPrevented()
-        formattedTextField.keyPress event if event.charCode
+        event.type = 'keypress'
+        if event.charCode
+          formattedTextField.keyPress event
         if not event.isDefaultPrevented()
+          event.type = 'keyup'
           formattedTextField.keyUp event
 
     description = Caret.printDescription
