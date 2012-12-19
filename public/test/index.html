@@ -1,0 +1,45 @@
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <title>Test CardField</title>
+  <script src="http://code.jquery.com/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript" charset="utf-8" src="http://jcaret.googlecode.com/files/jquery.caret.1.02.min.js"></script>
+  <script src="/lib/formatted_text_field.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+  <input type="text" id="month-year-test" placeholder="mm/yy" />
+
+  <script type="text/javascript" charset="utf-8">
+  jQuery(function($) {
+    var $monthYearInput = $('#month-year-test');
+    var monthYearField = new FormattedTextField($monthYearInput);
+
+    monthYearField.formatter = {
+      length: 4,
+
+      format: function(value) {
+        var month = value.substring(0, 2),
+            year = value.substring(2, 4);
+
+        if (year.length)
+          return month + '/' + year;
+        else
+          return month;
+      },
+
+      parse: function(text) {
+        var monthAndYear = text.split('/'),
+            month = monthAndYear[0],
+            year = monthAndYear[1];
+
+        if (year)
+          return month.substring(0, 2) + year.substring(0, 2);
+        else
+          return month.substring(0, 2);
+      }
+    };
+  });
+  </script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+#!/usr/bin/env coffee
+
+fs   = require 'fs'
+http = require 'http'
+path = require 'path'
+
+serveFromPath = (root, requestPath, request, response) ->
+  if not requestPath or requestPath.indexOf('..') > -1
+    response.writeHead 404
+    response.end()
+  else
+    filePath = path.join(__dirname, '..', root, requestPath)
+    fs.readFile filePath, 'utf8', (err, data) ->
+      if err
+        response.writeHead 404
+        response.end()
+      else
+        response.writeHead 200
+        response.end data
+
+server = http.createServer (request, response) ->
+  if request.url.indexOf('/lib/') is 0
+    requestPath = request.url.substring('/lib/'.length)
+    serveFromPath 'lib', requestPath, request, response
+  else
+    requestPath = request.url.substring(1)
+    serveFromPath 'public', requestPath, request, response
+
+server.listen 9090
