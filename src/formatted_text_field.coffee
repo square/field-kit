@@ -592,10 +592,9 @@ class FormattedTextField
   @::__defineGetter__ 'leftWordBreakIndexes', ->
     result = []
     text = @text
-    mapping = @textToValueMapping
 
     for i in [0..text.length-1]
-      result.push mapping[i] if not isWordChar(text[i-1]) and isWordChar(text[i])
+      result.push i if not isWordChar(text[i-1]) and isWordChar(text[i])
 
     return result
 
@@ -629,10 +628,9 @@ class FormattedTextField
   @::__defineGetter__ 'rightWordBreakIndexes', ->
     result = []
     text = @text
-    mapping = @textToValueMapping
 
     for i in [0..text.length-1]
-      result.push mapping[i+1] if isWordChar(text[i]) and not isWordChar(text[i+1])
+      result.push i+1 if isWordChar(text[i]) and not isWordChar(text[i+1])
 
     return result
 
@@ -689,66 +687,68 @@ class FormattedTextField
   #
   # Returns nothing.
   keyDown: (event) =>
-    {keyCode, metaKey, ctrlKey, shiftKey, altKey} = event
+    @rollbackInvalidChanges =>
+      {keyCode, metaKey, ctrlKey, shiftKey, altKey} = event
 
-    # cmd / ctrl + A (select all) should reset selection direction
-    if (metaKey or ctrlKey) and keyCode is KEYS.A
-      @selectAll event
+      # cmd / ctrl + A (select all) should reset selection direction
+      if (metaKey or ctrlKey) and keyCode is KEYS.A
+        @selectAll event
 
-    # cmd / ctrl, probably doing some action
-    else if metaKey or ctrlKey
-      -> # pass
+      # cmd / ctrl, probably doing some action
+      else if metaKey or ctrlKey
+        -> # pass
 
-    # ← ↑ → ↓
-    else if KEYS.isDirectional keyCode
-      switch keyCode
-        when KEYS.LEFT
-          if shiftKey and altKey
-            @moveWordLeftAndModifySelection event
-          else if shiftKey
-            @moveLeftAndModifySelection event
-          else if altKey
-            @moveWordLeft event
-          else
-            @moveLeft event
-        when KEYS.RIGHT
-          if shiftKey and altKey
-            @moveWordRightAndModifySelection event
-          else if shiftKey
-            @moveRightAndModifySelection event
-          else if altKey
-            @moveWordRight event
-          else
-            @moveRight event
-        when KEYS.UP
-          if shiftKey then @moveUpAndModifySelection event
-          else @moveUp event
-        when KEYS.DOWN
-          if shiftKey then @moveDownAndModifySelection event
-          else @moveDown event
+      # ← ↑ → ↓
+      else if KEYS.isDirectional keyCode
+        switch keyCode
+          when KEYS.LEFT
+            if shiftKey and altKey
+              @moveWordLeftAndModifySelection event
+            else if shiftKey
+              @moveLeftAndModifySelection event
+            else if altKey
+              @moveWordLeft event
+            else
+              @moveLeft event
+          when KEYS.RIGHT
+            if shiftKey and altKey
+              @moveWordRightAndModifySelection event
+            else if shiftKey
+              @moveRightAndModifySelection event
+            else if altKey
+              @moveWordRight event
+            else
+              @moveRight event
+          when KEYS.UP
+            if shiftKey then @moveUpAndModifySelection event
+            else @moveUp event
+          when KEYS.DOWN
+            if shiftKey then @moveDownAndModifySelection event
+            else @moveDown event
 
-    # ⌫
-    else if keyCode is KEYS.BACKSPACE
-      if altKey
-        @deleteWordBackward event
-      else if ctrlKey
-        @deleteBackwardByDecomposingPreviousCharacter event
-      else
-        @deleteBackward event
+      # ⌫
+      else if keyCode is KEYS.BACKSPACE
+        if altKey
+          @deleteWordBackward event
+        else if ctrlKey
+          @deleteBackwardByDecomposingPreviousCharacter event
+        else
+          @deleteBackward event
 
-    else if keyCode is KEYS.DELETE
-      if altKey
-        @deleteWordForward event
-      else
-        @deleteForward event
+      else if keyCode is KEYS.DELETE
+        if altKey
+          @deleteWordForward event
+        else
+          @deleteForward event
 
-    return null
+      return null
 
   # Internal: Handles inserting characters based on the typed key.
   #
   # Returns nothing.
   keyPress: (event) =>
-    @insertCharacter event
+    @rollbackInvalidChanges =>
+      @insertCharacter event
 
   # Internal: Handles keyUp events by reformatting the text after a
   # (presumably) unhandled key event may have modified the value.
@@ -760,6 +760,25 @@ class FormattedTextField
 
     @value = value
     @caret = caret
+
+  # Internal: Checks changes after invoking the passed function for validity
+  # and rolls them back if the changes turned out to be invalid.
+  #
+  # Returns whatever the given callback returns.
+  rollbackInvalidChanges: (callback) ->
+    change = current: { @caret, @value }
+    result = callback()
+    change.proposed = { @caret, @value }
+
+    if typeof @formatter.isChangeValid is 'function'
+      if @formatter.isChangeValid(change)
+        @value = change.proposed.value
+        @caret = change.proposed.caret
+      else
+        @value = change.current.value
+        @caret = change.current.caret
+
+    return result
 
   # Internal: Handles clicks by resetting the selection direction.
   #
@@ -785,19 +804,19 @@ class FormattedTextField
   @::__defineSetter__ 'text', (text) ->
     @element.val(text)
 
-  # Gets the unformatted text value. This is the value that should be
-  # considered the "real" value of the field.
+  # Gets the object value. This is the value that should be considered the
+  # "real" value of the field.
   #
-  # Returns a String containing the logical value of the field.
+  # Returns an Object containing the parsed value of the field.
   @::__defineGetter__ 'value', ->
     value = @element.val()
     return value unless @_formatter
     @_formatter.parse value
 
-  # Sets the unformatted text value, or logical value, of the field.
+  # Sets the object value of the field.
   @::__defineSetter__ 'value', (value) ->
     value = @_formatter.format(value) if @_formatter
-    @element.val value
+    @element.val "#{value}"
     @element.trigger 'change'
 
   # Gets the current formatter. Formatters are used to translate between #text
@@ -811,52 +830,21 @@ class FormattedTextField
     @_formatter = formatter
     @value = value
 
-  # Internal: Returns an index map from indexes of the formatted #text to
-  # indexes of the #value.
-  @::__defineGetter__ 'textToValueMapping', ->
-    value = @value
-    text = @text
-    mapping = {}
-
-    valueIndex = 0
-    textIndex = 0
-
-    while textIndex <= text.length
-      mapping[textIndex] = valueIndex
-
-      if text[textIndex] is value[valueIndex]
-        textIndex++
-        valueIndex++
-      else
-        textIndex++
-
-    return mapping
-
   # Gets the selection caret with start and end indexes relative to #value.
   #
   # Returns an Object with 'start' and 'end' keys.
   @::__defineGetter__ 'caret', ->
-    mapping = @textToValueMapping
-    textCaret = @element.caret()
-    return start: mapping[textCaret.start], end: mapping[textCaret.end]
+    { start, end } = @element.caret()
+    return { start, end }
 
   # Sets the current selection caret.
-  @::__defineSetter__ 'caret', (valueCaret) ->
+  @::__defineSetter__ 'caret', (caret) ->
     min = 0
     max = @value.length
-    valueCaret =
-      start: Math.max(min, Math.min(max, valueCaret.start))
-      end: Math.max(min, Math.min(max, valueCaret.end))
-    textCaret = {}
-
-    for own textIndex, valueIndex of @textToValueMapping
-      textCaret.start = Number(textIndex) if valueCaret.start is valueIndex
-      textCaret.end = Number(textIndex) if valueCaret.end is valueIndex
-
-    if not textCaret.start? or not textCaret.end?
-      throw new Error("unable to map value caret #{JSON.stringify valueCaret} to text caret, so far got: #{JSON.stringify textCaret}, mapping=#{JSON.stringify @textToValueMapping}")
-
-    @element.caret textCaret
+    caret =
+      start: Math.max(min, Math.min(max, caret.start))
+      end: Math.max(min, Math.min(max, caret.end))
+    @element.caret caret
 
 if module?
   module.exports = FormattedTextField

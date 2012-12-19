@@ -200,3 +200,16 @@ describe 'FormattedTextField', ->
 
       it 'works with a left-directed selection and resets the direction', ->
         assertKeyPressTransform '<123|4567', "#{modifier}+a", '|1234567|'
+
+  it 'allows the formatter to prevent changes', ->
+    formattedTextField.formatter.isChangeValid = -> no
+    assertKeyPressTransform '3725 |', 'backspace', '3725 |'
+    assertKeyPressTransform '3725 |', 'a', '3725 |'
+
+  it 'allows the formatter to alter changes', ->
+    formattedTextField.formatter.isChangeValid = (change) ->
+      if change.proposed.caret.start is 0 and change.proposed.caret.end is 0
+        change.proposed.caret = start: 1, end: 1
+      return yes
+
+    assertKeyPressTransform ' 234|', 'up', ' |234'
