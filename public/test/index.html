@@ -55,7 +55,9 @@
       isChangeValid: function(change) {
         var monthAndYear = change.field.text.split('/');
 
-        console.log(change);
+        if (change.inserted.text && !/^\d+$/.test(change.inserted.text)) {
+          return false;
+        }
 
         return monthAndYear.length < 3;
       }
