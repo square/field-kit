@@ -206,10 +206,28 @@ describe 'FormattedTextField', ->
     assertKeyPressTransform '3725 |', 'backspace', '3725 |'
     assertKeyPressTransform '3725 |', 'a', '3725 |'
 
-  it 'allows the formatter to alter changes', ->
+  it 'allows the formatter to alter caret changes', ->
+    # disallow the caret at the start of text
     formattedTextField.formatter.isChangeValid = (change) ->
       if change.proposed.caret.start is 0 and change.proposed.caret.end is 0
         change.proposed.caret = start: 1, end: 1
       return yes
 
     assertKeyPressTransform ' 234|', 'up', ' |234'
+
+    # disallow selection
+    formattedTextField.formatter.isChangeValid = (change) ->
+      caret = change.proposed.caret
+      if caret.start isnt caret.end
+        if change.field.selectionAnchor is caret.start
+          caret.start = caret.end
+        else
+          caret.end = caret.start
+      return yes
+
+    assertKeyPressTransform '234|', 'shift+left', '23|4'
+    assertKeyPressTransform '234|', 'shift+up', '|234'
+    assertKeyPressTransform '2|34', 'shift+right', '23|4'
+    assertKeyPressTransform '2|34', 'shift+down', '234|'
+    assertKeyPressTransform '|1234', 'meta+a', '|1234'
+    assertKeyPressTransform '|12 34', 'alt+shift+right', '12| 34'
