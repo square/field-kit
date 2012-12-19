@@ -8,6 +8,7 @@ KEYS =
   DOWN:      40
   BACKSPACE:  8
   DELETE:    46
+  TAB:        9
 
 KEYS.isDigit = (keyCode) ->
   @ZERO <= keyCode <= @NINE
@@ -16,6 +17,23 @@ KEYS.isDirectional = (keyCode) ->
   keyCode in [@LEFT, @RIGHT, @UP, @DOWN]
 
 isWordChar = (char) -> char and /^\w$/.test(char)
+
+XPATH_FOCUSABLE_FIELD = '*[name(.)="input" or name(.)="select"][not(type="hidden")][not(contains(@class, "formatted-text-field-interceptor"))]'
+
+findFieldFollowing = (element) ->
+  result = document.evaluate "following::#{XPATH_FOCUSABLE_FIELD}", element, null, XPathResult.ANY_TYPE, null
+  return result.iterateNext()
+
+findFieldPreceding = (element) ->
+  result = document.evaluate "preceding::#{XPATH_FOCUSABLE_FIELD}", element, null, XPathResult.ANY_TYPE, null
+  return result.iterateNext()
+
+makeFirstResponder = (field, event) ->
+  if formattedTextField = $(field).data('formatted-text-field')
+    formattedTextField.becomeFirstResponder event
+  else
+    field.focus?()
+    field.select?()
 
 class FormattedTextField
   # Internal: Contains either "left", "right", or null to indicate the
@@ -27,6 +45,59 @@ class FormattedTextField
     @element.on 'keypress', @keyPress
     @element.on 'keyup', @keyUp
     @element.on 'click', @click
+    @element.data 'formatted-text-field', this
+    @createTabInterceptors()
+
+  # Internal: Creates phantom input elements that intercept tab / shift+tab
+  # navigation so we can handle them appropriately.
+  createTabInterceptors: ->
+    input = @element.get(0)
+
+    createInterceptor = ->
+      interceptor = input.ownerDocument.createElement 'input'
+      interceptor.style.position = 'absolute'
+      interceptor.style.top = '0'
+      interceptor.style.left = '0'
+      interceptor.style.opacity = 0
+      interceptor.style.zIndex = -9999
+      interceptor.style.pointerEvents = 'none'
+      interceptor.className = 'formatted-text-field-interceptor'
+      interceptor
+
+    beforeInterceptor = createInterceptor()
+    beforeInterceptor.onkeyup = @beforeInterceptorKeyUp
+    input.parentNode.insertBefore beforeInterceptor, input
+
+    afterInterceptor = createInterceptor()
+    afterInterceptor.onkeyup = @afterInterceptorKeyUp
+    if input.nextSibling
+      input.parentNode.insertBefore afterInterceptor, input.nextSibling
+    else
+      input.parentNode.appendChild afterInterceptor
+
+  # Internal: Handles keyup events in the input that intercepts tab-induced
+  # focus events before this one.
+  #
+  # TODO: Test this somehow.
+  #
+  # Returns nothing.
+  beforeInterceptorKeyUp: (event) =>
+    if event.keyCode is KEYS.TAB and event.shiftKey
+      result = document.evaluate "preceding::#{XPATH_FOCUSABLE_FIELD}", event.target, null, XPathResult.ANY_TYPE, null
+      if previousField = result.iterateNext()
+        makeFirstResponder previousField
+
+  # Internal: Handles keyup events in the input that intercepts tab-induced
+  # focus events after this one.
+  #
+  # TODO: Test this somehow.
+  #
+  # Returns nothing.
+  afterInterceptorKeyUp: (event) =>
+    if event.keyCode is KEYS.TAB and not event.shiftKey
+      result = document.evaluate "following::#{XPATH_FOCUSABLE_FIELD}", event.target, null, XPathResult.ANY_TYPE, null
+      if nextField = result.iterateNext()
+        makeFirstResponder nextField
 
   # Handles a key event that is trying to insert a character.
   #
@@ -555,6 +626,32 @@ class FormattedTextField
     @caret = caret
     @clearSelection()
 
+  # Handles the tab key.
+  #
+  # Returns nothing.
+  insertTab: (event) ->
+
+  # Handles the back tab key.
+  #
+  # Returns nothing.
+  insertBackTab: (event) ->
+
+  # Removes focus from this field if it has focus.
+  #
+  # Returns nothing.
+  becomeFirstResponder: (event) ->
+    @element.focus()
+    @rollbackInvalidChanges =>
+      @element.select()
+
+  # Removes focus from this field if it has focus.
+  #
+  # Returns nothing.
+  resignFirstResponder: (event) ->
+    event.preventDefault()
+    @element.blur()
+    $('#no-selection-test').focus()
+
   # Determines whether this field has any selection.
   #
   # Returns true if there is at least one character selected, false otherwise.
@@ -741,6 +838,12 @@ class FormattedTextField
         else
           @deleteForward event
 
+      else if keyCode is KEYS.TAB
+        if shiftKey
+          @insertBackTab event
+        else
+          @insertTab event
+
       return null
 
   # Internal: Handles inserting characters based on the typed key.
@@ -750,10 +853,13 @@ class FormattedTextField
     @rollbackInvalidChanges =>
       @insertCharacter event
 
-  # Internal: Stub.
+  # Internal: Handles keyup events.
   #
   # Returns nothing.
   keyUp: (event) =>
+    @rollbackInvalidChanges =>
+      if event.keyCode is KEYS.TAB
+        @selectAll event
 
   # Internal: Checks changes after invoking the passed function for validity
   # and rolls them back if the changes turned out to be invalid.

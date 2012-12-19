@@ -73,10 +73,10 @@
       isChangeValid: function(change) {
         var caret = change.proposed.caret;
         if (caret.start !== caret.end) {
-          if (change.field.selectionAnchor === caret.start)
-            caret.start = caret.end;
-          else
+          if (change.field.selectionAnchor === caret.end)
             caret.end = caret.start
+          else
+            caret.start = caret.end;
         }
 
         return true;
