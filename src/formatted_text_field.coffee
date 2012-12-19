@@ -788,6 +788,15 @@ class FormattedTextField
 
       change.inserted = inserted
       change.deleted = deleted
+    else
+      change.inserted =
+        start: change.proposed.caret.start
+        end: change.proposed.caret.end
+        text: ''
+      change.deleted =
+        start: change.current.caret.start
+        end: change.current.caret.end
+        text: ''
 
     if typeof @formatter.isChangeValid is 'function'
       if @formatter.isChangeValid(change)
