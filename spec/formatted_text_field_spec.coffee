@@ -1,4 +1,6 @@
-FakeElement = require './helpers/fake_element'
+FakeDocument = require './helpers/fake_document'
+FakeInput = require './helpers/fake_input'
+WrappedFakeElements = require './helpers/wrapped_fake_elements'
 FakeEvent = require './helpers/fake_event'
 Caret = require './helpers/caret'
 FormattedTextField = require '../lib/formatted_text_field'
@@ -11,13 +13,13 @@ class FakeFormatter
     text
 
 describe 'FormattedTextField', ->
-  element = null
+  wrapper = null
   formattedTextField = null
 
   applyValueAndCaretDescription = (description) ->
     { caret, direction, value } = Caret.parseDescription description
-    element.val value
-    element.caret caret
+    wrapper.val value
+    wrapper.caret caret
     formattedTextField.selectionDirection = direction
 
   assertKeyPressTransform = (from, keys..., to) ->
@@ -36,15 +38,18 @@ describe 'FormattedTextField', ->
           formattedTextField.keyUp event
 
     description = Caret.printDescription
-                    caret: element.caret()
+                    caret: wrapper.caret()
                     direction: formattedTextField.selectionDirection
-                    value: element.val()
+                    value: wrapper.val()
 
     expect(description).toEqual(to)
 
   beforeEach ->
-    element = new FakeElement()
-    formattedTextField = new FormattedTextField(element)
+    document = new FakeDocument()
+    input = new FakeInput(document)
+    document.body.appendChild(input)
+    wrapper = new WrappedFakeElements([input])
+    formattedTextField = new FormattedTextField(wrapper)
     formattedTextField.formatter = new FakeFormatter()
 
   describe 'typing a character into an empty field', ->
