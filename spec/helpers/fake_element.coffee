@@ -1,28 +1,75 @@
 {EventEmitter} = require 'events'
-Caret = require './caret'
 
 class FakeElement extends EventEmitter
-  constructor: ->
-    @_value = ''
-    @_caret = new Caret(this)
+  tagName: null
+  attributes: null
+  childNodes: null
+  parentNode: null
+  style: null
+  selfClosing: no
 
-  caret: (caret) ->
-    if arguments.length is 1
-      if typeof caret.start isnt 'number' or typeof caret.end isnt 'number'
-        throw new Error("expected caret start and end to be numbers, got start=#{caret.start} (#{typeof caret.start}), end=#{caret.end} (#{typeof caret.end})")
+  constructor: (@ownerDocument, @tagName) ->
+    unless @ownerDocument
+      throw new Error("cannot create elements without an owner document")
 
-      @_caret.start = Math.max(caret.start, 0)
-      @_caret.end = Math.min(caret.end, @_value.length)
+    unless @tagName
+      throw new Error("cannot create elements without a tag name")
+
+    @attributes = {}
+    @childNodes = []
+    @style = {}
+
+  getAttribute: (name) ->
+    @attributes[name]
+
+  setAttribute: (name, value) ->
+    @attributes[name] = "#{value}"
+
+  insertBefore: (newChild, referenceChild) ->
+    @reparent newChild, =>
+      referenceIndex = @childNodes.indexOf(referenceChild)
+      @childNodes.splice referenceIndex, 0, [newChild]
+
+  appendChild: (child) ->
+    @reparent child, =>
+      @childNodes.push child
+
+  reparent: (child, callback) ->
+    if child.ownerDocument isnt @ownerDocument
+      throw new Error('cannot append child node from another document')
+
+    if child.parentNode is this
+      index = @childNodes.indexOf(child)
+      @childNodes.splice index, 1
+
+    if child.parentNode
+      child.parentNode.removeChild(child)
+
+    callback()
+
+    child.parentNode = this
+
+  @::__defineGetter__ 'nextSibling', ->
+    siblingsAndSelf = @parentNode.childNodes
+    myIndex = siblingsAndSelf.indexOf(this)
+    siblingsAndSelf[myIndex+1]
+
+  @::__defineGetter__ 'previousSibling', ->
+    siblingsAndSelf = @parentNode.childNodes
+    myIndex = siblingsAndSelf.indexOf(this)
+    siblingsAndSelf[myIndex-1]
+
+  toString: ->
+    result = "<#{@tagName}"
+    result += " #{name}=\"#{value}\"" for own name, value of @attributes
+
+    if @selfClosing
+      result += " />"
     else
-      @_caret
+      result += ">"
+      result += child.toString() for child in @childNodes
+      result += "</#{@tagName}>"
 
-  val: (value) ->
-    if arguments.length is 1
-      @_value = value
-    else
-      @_value
-
-  trigger: (args...) ->
-    @emit args...
+    return result
 
 module.exports = FakeElement

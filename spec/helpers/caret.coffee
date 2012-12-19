@@ -2,13 +2,13 @@ class Caret
   start: null
   end: null
 
-  constructor: (@element) ->
+  constructor: (@input) ->
 
   @::__defineGetter__ 'text', ->
-    @element.val().substring(@start, @end)
+    @input.value.substring(@start, @end)
 
   replace: (string) ->
-    originalValue = @element.val()
+    originalValue = @input.value
     originalValue.substring(0, @start) + string + originalValue.substring(@end)
 
   @parseDescription: (description) ->
