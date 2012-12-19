@@ -9,6 +9,7 @@
 </head>
 <body>
   <input type="text" id="month-year-test" placeholder="mm/yy" />
+  <input type="text" id="no-selection-test" placeholder="no selection" />
 
   <script type="text/javascript" charset="utf-8">
   jQuery(function($) {
@@ -16,16 +17,23 @@
     var monthYearField = new FormattedTextField($monthYearInput);
 
     monthYearField.formatter = {
-      length: 4,
-
       format: function(value) {
-        var month = value.substring(0, 2),
-            year = value.substring(2, 4);
+        var month, year;
 
-        if (year.length)
-          return month + '/' + year;
-        else
-          return month;
+        if (value)
+          month = value.month, year = value.year;
+
+        if (month === undefined) month = null;
+        if (year === undefined) year = null;
+
+        if (month) {
+          if (year)
+            return month + '/' + (year % 100);
+          else
+            return month;
+        } else {
+          return '';
+        }
       },
 
       parse: function(text) {
@@ -33,10 +41,43 @@
             month = monthAndYear[0],
             year = monthAndYear[1];
 
-        if (year)
-          return month.substring(0, 2) + year.substring(0, 2);
-        else
-          return month.substring(0, 2);
+        if (month !== null) {
+          month = Number(month);
+        }
+
+        if (year !== null) {
+          year = Number(year);
+        }
+
+        return { month: month, year: year };
+      },
+
+      isChangeValid: function(change) {
+        var monthAndYear = change.field.text.split('/');
+
+        console.log(change);
+
+        return monthAndYear.length < 3;
+      }
+    };
+
+    var $noSelectionInput = $('#no-selection-test');
+    var noSelectionField = new FormattedTextField($noSelectionInput);
+
+    noSelectionField.formatter = {
+      format: function(value){ return value; },
+      parse: function(value){ return value; },
+
+      isChangeValid: function(change) {
+        var caret = change.proposed.caret;
+        if (caret.start !== caret.end) {
+          if (change.field.selectionAnchor === caret.start)
+            caret.start = caret.end;
+          else
+            caret.end = caret.start
+        }
+
+        return true;
       }
     };
   });

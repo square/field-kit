@@ -36,7 +36,7 @@ class FormattedTextField
 
     # clear any selection and cut out if we're full
     @clearSelection() if @hasSelection
-    return if @formatter.length and @value.length >= @formatter.length
+    return if @formatter.length and @text.length >= @formatter.length
 
     # insert the character
     @replaceSelection String.fromCharCode(event.charCode)
@@ -116,7 +116,7 @@ class FormattedTextField
   #
   # Returns nothing.
   moveDown: (event) ->
-    end = @value.length
+    end = @text.length
     event.preventDefault()
 
     # 12|34 56|78  =>  1234 5678|
@@ -146,7 +146,7 @@ class FormattedTextField
   # Returns nothing.
   moveDownAndModifySelection: (event) ->
     caret = @caret
-    end = @value.length
+    end = @text.length
     event.preventDefault()
 
     switch @selectionDirection
@@ -655,14 +655,14 @@ class FormattedTextField
   #   12|00|8
   #
   # Returns nothing.
-  replaceSelection: (text) ->
+  replaceSelection: (replacement) ->
     caret = @caret
-    value = @value
+    text = @text
 
-    value = value.substring(0, caret.start) + text + value.substring(caret.end)
-    caret.end = caret.start + text.length
+    text = text.substring(0, caret.start) + replacement + text.substring(caret.end)
+    caret.end = caret.start + replacement.length
 
-    @value = value
+    @text = text
     @caret = caret
     @selectionDirection = null
 
@@ -676,9 +676,9 @@ class FormattedTextField
   #
   # Returns nothing.
   selectAll: (event) ->
-    # Let the browser act as normal, but also do it ourselves.
-    value = @value
-    @caret = start: 0, end: value.length
+    event.preventDefault()
+    text = @text
+    @caret = start: 0, end: text.length
     @selectionDirection = null
 
   # Internal: Handles keyDown events. This method essentially just delegates to
@@ -750,33 +750,53 @@ class FormattedTextField
     @rollbackInvalidChanges =>
       @insertCharacter event
 
-  # Internal: Handles keyUp events by reformatting the text after a
-  # (presumably) unhandled key event may have modified the value.
+  # Internal: Stub.
   #
   # Returns nothing.
   keyUp: (event) =>
-    caret = @caret
-    value = @value
-
-    @value = value
-    @caret = caret
 
   # Internal: Checks changes after invoking the passed function for validity
   # and rolls them back if the changes turned out to be invalid.
   #
   # Returns whatever the given callback returns.
   rollbackInvalidChanges: (callback) ->
-    change = current: { @caret, @value }
+    change = field: this, current: { @caret, @text }
     result = callback()
-    change.proposed = { @caret, @value }
+    change.proposed = { @caret, @text }
+
+    if change.proposed.text isnt change.current.text
+      ctext = change.current.text
+      ptext = change.proposed.text
+      sharedPrefixLength = ctext.length
+      sharedSuffixLength = ctext.length
+
+      for i in [0...ctext.length]
+        if ptext[i] isnt ctext[i]
+          sharedPrefixLength = i
+          break
+
+      for i in [0...ctext.length]
+        if ptext[ptext.length - 1 - i] isnt ctext[ctext.length - 1 - i]
+          sharedSuffixLength = i
+          break
+
+      inserted = start: sharedPrefixLength, end: ptext.length - sharedSuffixLength
+      deleted = start: sharedPrefixLength, end: ctext.length - sharedSuffixLength
+
+      inserted.text = ptext.substring(inserted.start, inserted.end)
+      deleted.text = ctext.substring(deleted.start, deleted.end)
+
+      change.inserted = inserted
+      change.deleted = deleted
 
     if typeof @formatter.isChangeValid is 'function'
       if @formatter.isChangeValid(change)
-        @value = change.proposed.value
+        @text = change.proposed.text
         @caret = change.proposed.caret
       else
-        @value = change.current.value
+        @text = change.current.text
         @caret = change.current.caret
+      @selectionDirection = null unless @hasSelection
 
     return result
 
@@ -840,11 +860,24 @@ class FormattedTextField
   # Sets the current selection caret.
   @::__defineSetter__ 'caret', (caret) ->
     min = 0
-    max = @value.length
+    max = @text.length
     caret =
       start: Math.max(min, Math.min(max, caret.start))
       end: Math.max(min, Math.min(max, caret.end))
     @element.caret caret
+
+  # Gets the position of the current selection's anchor point, i.e. the point
+  # that the selection extends from, if any.
+  #
+  # Returns an index within the current text.
+  @::__defineGetter__ 'selectionAnchor', ->
+    switch @selectionDirection
+      when 'left'
+        @caret.end
+      when 'right'
+        @caret.start
+      else
+        null
 
 if module?
   module.exports = FormattedTextField
