@@ -129,6 +129,10 @@ describe 'FormattedTextField', ->
       assertKeyPressTransform '4111 11|11', 'shift+alt+left', '4111 <11|11'
       assertKeyPressTransform '4111 11|11', 'shift+alt+left', 'shift+alt+left', '<4111 11|11'
 
+      assertKeyPressTransform '41|11', 'meta+left', '|4111'
+      assertKeyPressTransform '41|11', 'shift+meta+left', '<41|11'
+      assertKeyPressTransform '|4111', 'shift+meta+left', '|4111'
+
   describe 'typing a right arrow', ->
     it 'works as expected', ->
       assertKeyPressTransform '|4111', 'right', '4|111'
@@ -148,6 +152,10 @@ describe 'FormattedTextField', ->
       assertKeyPressTransform '41|11', 'shift+alt+right', '41|11>'
       assertKeyPressTransform '41|11 1111', 'shift+alt+right', '41|11> 1111'
       assertKeyPressTransform '41|11 1111', 'shift+alt+right', 'shift+alt+right', '41|11 1111>'
+
+      assertKeyPressTransform '41|11', 'meta+right', '4111|'
+      assertKeyPressTransform '41|11', 'shift+meta+right', '41|11>'
+      assertKeyPressTransform '4111|', 'shift+meta+right', '4111|'
 
   describe 'typing an up arrow', ->
     it 'works as expected', ->
@@ -169,6 +177,11 @@ describe 'FormattedTextField', ->
       assertKeyPressTransform '41|11', 'shift+alt+up', '<41|11'
       assertKeyPressTransform '4111 11|11', 'shift+alt+up', '<4111 11|11'
       assertKeyPressTransform '4111 11|11', 'shift+alt+up', 'shift+alt+up', '<4111 11|11'
+      assertKeyPressTransform '4111 |11>11', 'shift+alt+up', '4111 |1111'
+
+      assertKeyPressTransform '41|11', 'meta+up', '|4111'
+      assertKeyPressTransform '41|1>1', 'shift+meta+up', '<411|1'
+      assertKeyPressTransform '41|11', 'shift+meta+up', '<41|11'
 
   describe 'typing a down arrow', ->
     it 'works as expected', ->
@@ -189,7 +202,12 @@ describe 'FormattedTextField', ->
 
       assertKeyPressTransform '41|11', 'shift+alt+down', '41|11>'
       assertKeyPressTransform '41|11 1111', 'shift+alt+down', '41|11 1111>'
+      assertKeyPressTransform '<41|11 1111', 'shift+alt+down', '41|11 1111'
       assertKeyPressTransform '4111| 1111', 'shift+alt+down', 'shift+alt+down', '4111| 1111>'
+
+      assertKeyPressTransform '41|11', 'meta+down', '4111|'
+      assertKeyPressTransform '4<1|11', 'shift+meta+down', '4|111>'
+      assertKeyPressTransform '41|11', 'shift+meta+down', '41|11>'
 
   describe 'selecting everything', ->
     ['ctrl', 'meta'].forEach (modifier) ->
