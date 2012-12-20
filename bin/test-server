@@ -3,6 +3,7 @@
 fs   = require 'fs'
 http = require 'http'
 path = require 'path'
+CoffeeScript = require 'coffee-script'
 
 server = http.createServer (request, response) ->
   respond = (status, headers, data) ->
@@ -30,13 +31,15 @@ server = http.createServer (request, response) ->
         if err
           fs.readFile path.join(filePath, 'index.html'), 'utf8', writeFileIfFound
         else
+          if path.extname(requestPath) is '.coffee'
+            data = CoffeeScript.compile data
           writeFileIfFound err, data
 
   if request.url is '/'
     respond 302, Location: '/test'
-  else if request.url.indexOf('/lib/') is 0
-    requestPath = request.url.substring('/lib/'.length)
-    serveFromPath 'lib', requestPath
+  else if match = request.url.match(/^\/(lib|src)\//)
+    requestPath = request.url.substring(match[0].length)
+    serveFromPath match[1], requestPath
   else
     requestPath = request.url.substring(1)
     serveFromPath 'public', requestPath
