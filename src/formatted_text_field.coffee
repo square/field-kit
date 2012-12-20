@@ -88,8 +88,7 @@ class FormattedTextField
   # Returns nothing.
   beforeInterceptorKeyUp: (event) =>
     if event.keyCode is KEYS.TAB and event.shiftKey
-      result = document.evaluate "preceding::#{XPATH_FOCUSABLE_FIELD}", event.target, null, XPathResult.ANY_TYPE, null
-      if previousField = result.iterateNext()
+      if previousField = findFieldPreceding event.target
         makeFirstResponder previousField
 
   # Internal: Handles keyup events in the input that intercepts tab-induced
@@ -100,8 +99,7 @@ class FormattedTextField
   # Returns nothing.
   afterInterceptorKeyUp: (event) =>
     if event.keyCode is KEYS.TAB and not event.shiftKey
-      result = document.evaluate "following::#{XPATH_FOCUSABLE_FIELD}", event.target, null, XPathResult.ANY_TYPE, null
-      if nextField = result.iterateNext()
+      if nextField = findFieldFollowing event.target
         makeFirstResponder nextField
 
   # Handles a key event that is trying to insert a character.
