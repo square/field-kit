@@ -16,6 +16,11 @@ KEYS.isDigit = (keyCode) ->
 KEYS.isDirectional = (keyCode) ->
   keyCode in [@LEFT, @RIGHT, @UP, @DOWN]
 
+DIRECTION =
+  LEFT:  'left'
+  RIGHT: 'right'
+  NONE:  null
+
 isWordChar = (char) -> char and /^\w$/.test(char)
 
 XPATH_FOCUSABLE_FIELD = '*[name(.)="input" or name(.)="select"][not(type="hidden")][not(contains(@class, "formatted-text-field-interceptor"))]'
@@ -36,9 +41,9 @@ makeFirstResponder = (field, event) ->
     field.select?()
 
 class FormattedTextField
-  # Internal: Contains either "left", "right", or null to indicate the
-  # direction the free end of the selection is from its anchor.
-  selectionDirection: null
+  # Internal: Contains one of the DIRECTION enum to indicate the direction the
+  # free end of the selection is from its anchor.
+  selectionDirection: DIRECTION.NONE
 
   constructor: (@element) ->
     @element.on 'keydown', @keyDown
@@ -133,7 +138,7 @@ class FormattedTextField
     event.preventDefault()
 
     @caret = start: 0, end: 0
-    @selectionDirection = null
+    @selectionDirection = DIRECTION.NONE
 
   # Moves the cursor up to the beginning of the current paragraph, which
   # because this is a single-line text field, means moving to the beginning of
@@ -179,16 +184,16 @@ class FormattedTextField
     event.preventDefault()
 
     switch @selectionDirection
-      when 'left', null
+      when DIRECTION.LEFT, DIRECTION.NONE
         # 12<34 56|78  =>  <1234 56|78
         caret.start = 0
-      when 'right'
+      when DIRECTION.RIGHT
         # 12|34 56>78   =>   <12|34 5678
         caret.end = caret.start
         caret.start = 0
 
     @caret = caret
-    @selectionDirection = if caret.start is caret.end then null else 'left'
+    @selectionDirection = if caret.start is caret.end then DIRECTION.NONE else DIRECTION.LEFT
 
   # Moves the free end of the selection to the beginning of the paragraph, or
   # since this is a single-line text field to the beginning of the line.
@@ -199,15 +204,15 @@ class FormattedTextField
     event.preventDefault()
 
     switch @selectionDirection
-      when 'left', null
+      when DIRECTION.LEFT, DIRECTION.NONE
         # 12<34 56|78  =>  <1234 56|78
         caret.start = 0
-      when 'right'
+      when DIRECTION.RIGHT
         # 12|34 56>78  =>  12|34 5678
         caret.end = caret.start
 
     @caret = caret
-    @selectionDirection = if caret.start is caret.end then null else 'left'
+    @selectionDirection = if caret.start is caret.end then DIRECTION.NONE else DIRECTION.LEFT
 
   # Moves the cursor to the beginning of the document.
   #
@@ -224,7 +229,7 @@ class FormattedTextField
     caret = @caret
     caret.start = 0
     @caret = caret
-    @selectionDirection = if caret.start is caret.end then null else 'left'
+    @selectionDirection = if caret.start is caret.end then DIRECTION.NONE else DIRECTION.LEFT
 
   # Moves the cursor down, which because this is a single-line text field,
   # means moving to the end of the value.
@@ -246,7 +251,7 @@ class FormattedTextField
 
     # 12|34 56|78  =>  1234 5678|
     @caret = start: end, end: end
-    @selectionDirection = null
+    @selectionDirection = DIRECTION.NONE
 
   # Moves the cursor up to the end of the current paragraph, which because this
   # is a single-line text field, means moving to the end of the value.
@@ -292,14 +297,14 @@ class FormattedTextField
     event.preventDefault()
 
     switch @selectionDirection
-      when 'left'
+      when DIRECTION.LEFT
         caret.start = caret.end
         caret.end = end
-      when 'right', null
+      when DIRECTION.RIGHT, DIRECTION.NONE
         caret.end = end
 
     @caret = caret
-    @selectionDirection = if caret.start is caret.end then null else 'right'
+    @selectionDirection = if caret.start is caret.end then DIRECTION.NONE else DIRECTION.RIGHT
 
   # Moves the free end of the selection to the end of the paragraph, or since
   # this is a single-line text field to the end of the line.
@@ -310,15 +315,15 @@ class FormattedTextField
     event.preventDefault()
 
     switch @selectionDirection
-      when 'right', null
+      when DIRECTION.RIGHT, DIRECTION.NONE
         # 12|34 56>78  =>  12|34 5678>
         caret.end = @text.length
-      when 'left'
+      when DIRECTION.LEFT
         # 12<34 56|78  =>  12|34 5678
         caret.start = caret.end
 
     @caret = caret
-    @selectionDirection = if caret.start is caret.end then null else 'right'
+    @selectionDirection = if caret.start is caret.end then DIRECTION.NONE else DIRECTION.RIGHT
 
   # Moves the cursor to the end of the document.
   #
@@ -335,7 +340,7 @@ class FormattedTextField
     caret = @caret
     caret.end = @text.length
     @caret = caret
-    @selectionDirection = if caret.start is caret.end then null else 'right'
+    @selectionDirection = if caret.start is caret.end then DIRECTION.NONE else DIRECTION.RIGHT
 
   # Moves the cursor to the left, counting selections as a thing to move past.
   #
@@ -367,7 +372,7 @@ class FormattedTextField
       caret.end--
 
     @caret = caret
-    @selectionDirection = null if caret.start is caret.end
+    @selectionDirection = DIRECTION.NONE if caret.start is caret.end
 
   # Moves the free end of the selection one to the left.
   #
@@ -399,14 +404,14 @@ class FormattedTextField
     event.preventDefault()
 
     switch @selectionDirection
-      when 'left', null
-        @selectionDirection = 'left'
+      when DIRECTION.LEFT, DIRECTION.NONE
+        @selectionDirection = DIRECTION.LEFT
         caret.start--
-      when 'right'
+      when DIRECTION.RIGHT
         caret.end--
 
     @caret = caret
-    @selectionDirection = null if caret.start is caret.end
+    @selectionDirection = DIRECTION.NONE if caret.start is caret.end
 
   # Moves the cursor left until the start of a word is found.
   #
@@ -427,7 +432,7 @@ class FormattedTextField
     event.preventDefault()
     index = @lastWordBreakBeforeIndex @caret.start - 1
     @caret = start: index, end: index
-    @selectionDirection = null
+    @selectionDirection = DIRECTION.NONE
 
   # Moves the free end of the current selection to the beginning of the
   # previous word.
@@ -460,15 +465,15 @@ class FormattedTextField
     event.preventDefault()
 
     switch @selectionDirection
-      when 'left', null
-        @selectionDirection = 'left'
+      when DIRECTION.LEFT, DIRECTION.NONE
+        @selectionDirection = DIRECTION.LEFT
         caret.start = @lastWordBreakBeforeIndex caret.start - 1
-      when 'right'
+      when DIRECTION.RIGHT
         caret.end = @lastWordBreakBeforeIndex caret.end
         caret.end = caret.start if caret.end < caret.start
 
     @caret = caret
-    @selectionDirection = null if caret.start is caret.end
+    @selectionDirection = DIRECTION.NONE if caret.start is caret.end
 
   # Moves the cursor to the beginning of the current line.
   #
@@ -482,7 +487,7 @@ class FormattedTextField
   moveToBeginningOfLine: (event) ->
     event.preventDefault()
     @caret = start: 0, end: 0
-    @selectionDirection = null
+    @selectionDirection = DIRECTION.NONE
 
   # Select from the free end of the caret to the beginning of line.
   #
@@ -501,14 +506,14 @@ class FormattedTextField
     event.preventDefault()
     caret = @caret
     switch @selectionDirection
-      when 'left', null
+      when DIRECTION.LEFT, DIRECTION.NONE
         caret.start = 0
-      when 'right'
+      when DIRECTION.RIGHT
         caret.end = caret.start
         caret.start = 0
 
     @caret = caret
-    @selectionDirection = if caret.start is caret.end then null else 'left'
+    @selectionDirection = if caret.start is caret.end then DIRECTION.NONE else DIRECTION.LEFT
 
   # Moves the cursor to the right, counting selections as a thing to move past.
   #
@@ -536,7 +541,7 @@ class FormattedTextField
       caret.end++
 
     @caret = caret
-    @selectionDirection = null if caret.start is caret.end
+    @selectionDirection = DIRECTION.NONE if caret.start is caret.end
 
   # Moves the free end of the selection one to the right.
   #
@@ -568,14 +573,14 @@ class FormattedTextField
     event.preventDefault()
 
     switch @selectionDirection
-      when 'left'
+      when DIRECTION.LEFT
         caret.start++
-      when 'right', null
-        @selectionDirection = 'right'
+      when DIRECTION.RIGHT, DIRECTION.NONE
+        @selectionDirection = DIRECTION.RIGHT
         caret.end++
 
     @caret = caret
-    @selectionDirection = null if caret.start is caret.end
+    @selectionDirection = DIRECTION.NONE if caret.start is caret.end
 
   # Moves the cursor right until the end of a word is found.
   #
@@ -596,7 +601,7 @@ class FormattedTextField
     event.preventDefault()
     index = @nextWordBreakAfterIndex @caret.end
     @caret = start: index, end: index
-    @selectionDirection = null
+    @selectionDirection = DIRECTION.NONE
 
   # Moves the free end of the current selection to the next end of word.
   #
@@ -628,15 +633,15 @@ class FormattedTextField
     event.preventDefault()
 
     switch @selectionDirection
-      when 'left'
+      when DIRECTION.LEFT
         caret.start = @nextWordBreakAfterIndex caret.start
         caret.start = caret.end if caret.start > caret.end
-      when 'right', null
-        @selectionDirection = 'right'
+      when DIRECTION.RIGHT, DIRECTION.NONE
+        @selectionDirection = DIRECTION.RIGHT
         caret.end = @nextWordBreakAfterIndex caret.end
 
     @caret = caret
-    @selectionDirection = null if caret.start is caret.end
+    @selectionDirection = DIRECTION.NONE if caret.start is caret.end
 
   # Moves the cursor to the end of the current line.
   #
@@ -651,7 +656,7 @@ class FormattedTextField
     event.preventDefault()
     text = @text
     @caret = start: text.length, end: text.length
-    @selectionDirection = null
+    @selectionDirection = DIRECTION.NONE
 
   # Moves the free end of the caret to the end of the current line.
   #
@@ -670,14 +675,14 @@ class FormattedTextField
     event.preventDefault()
     caret = @caret
     switch @selectionDirection
-      when 'right', null
+      when DIRECTION.RIGHT, DIRECTION.NONE
         caret.end = @text.length
-      when 'left'
+      when DIRECTION.LEFT
         caret.start = caret.end
         caret.end = @text.length
 
     @caret = caret
-    @selectionDirection = if caret.start is caret.end then null else 'right'
+    @selectionDirection = if caret.start is caret.end then DIRECTION.NONE else DIRECTION.RIGHT
 
 
   # Deletes backward one character or clears a non-empty selection.
@@ -973,7 +978,7 @@ class FormattedTextField
 
     @text = text
     @caret = caret
-    @selectionDirection = null
+    @selectionDirection = DIRECTION.NONE
 
   # Internal: Expands the selection to contain all the characters in the content.
   #
@@ -988,7 +993,7 @@ class FormattedTextField
     event.preventDefault()
     text = @text
     @caret = start: 0, end: text.length
-    @selectionDirection = null
+    @selectionDirection = DIRECTION.NONE
 
   # Internal: Handles keyDown events. This method essentially just delegates to
   # other, more semantic, methods based on the modifier keys and the pressed
@@ -1170,7 +1175,7 @@ class FormattedTextField
       else
         @text = change.current.text
         @caret = change.current.caret
-      @selectionDirection = null unless @hasSelection
+      @selectionDirection = DIRECTION.NONE unless @hasSelection
 
     return result
 
@@ -1178,7 +1183,7 @@ class FormattedTextField
   #
   # Returns nothing.
   click: (event) =>
-    @selectionDirection = null
+    @selectionDirection = DIRECTION.NONE
 
   on: (args...) ->
     @element.on args...
@@ -1246,9 +1251,9 @@ class FormattedTextField
   # Returns an index within the current text.
   @::__defineGetter__ 'selectionAnchor', ->
     switch @selectionDirection
-      when 'left'
+      when DIRECTION.LEFT
         @caret.end
-      when 'right'
+      when DIRECTION.RIGHT
         @caret.start
       else
         null
