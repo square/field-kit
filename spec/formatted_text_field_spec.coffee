@@ -78,6 +78,8 @@ describe 'FormattedTextField', ->
         assertKeyPressTransform '12<3 4|5', 'alt+backspace', '12|5'
         assertKeyPressTransform '12|3 4>5', 'alt+backspace', '12|5'
 
+        assertKeyPressTransform '12|3 4>5', 'meta+backspace', '12|5'
+
     describe 'with an empty selection', ->
       it 'works as expected', ->
         assertKeyPressTransform '|12', 'backspace', '|12'
@@ -87,6 +89,8 @@ describe 'FormattedTextField', ->
         assertKeyPressTransform '12|', 'alt+backspace', '|'
         assertKeyPressTransform '12 34|', 'alt+backspace', '12 |'
         assertKeyPressTransform '12 |34', 'alt+backspace', '|34'
+
+        assertKeyPressTransform '12 34 |56', 'meta+backspace', '|56'
 
   describe 'typing forward delete', ->
     describe 'with a non-empty selection', ->
