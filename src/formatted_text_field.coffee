@@ -135,6 +135,24 @@ class FormattedTextField
     @caret = start: 0, end: 0
     @selectionDirection = null
 
+  # Moves the cursor up to the beginning of the current paragraph, which
+  # because this is a single-line text field, means moving to the beginning of
+  # the value.
+  #
+  # Examples
+  #
+  #   Hey guys|
+  #   moveToBeginningOfParagraph(event)
+  #   |Hey guys
+  #
+  #   Hey |guys|
+  #   moveToBeginningOfParagraph(event)
+  #   |Hey guys
+  #
+  # Returns nothing.
+  moveToBeginningOfParagraph: (event) ->
+    @moveUp event
+
   # Moves the cursor up, keeping the current anchor point and extending the
   # selection to the beginning as #moveUp would.
   #
@@ -172,6 +190,42 @@ class FormattedTextField
     @caret = caret
     @selectionDirection = if caret.start is caret.end then null else 'left'
 
+  # Moves the free end of the selection to the beginning of the paragraph, or
+  # since this is a single-line text field to the beginning of the line.
+  #
+  # Returns nothing.
+  moveParagraphBackwardAndModifySelection: (event) ->
+    caret = @caret
+    event.preventDefault()
+
+    switch @selectionDirection
+      when 'left', null
+        # 12<34 56|78  =>  <1234 56|78
+        caret.start = 0
+      when 'right'
+        # 12|34 56>78  =>  12|34 5678
+        caret.end = caret.start
+
+    @caret = caret
+    @selectionDirection = if caret.start is caret.end then null else 'left'
+
+  # Moves the cursor to the beginning of the document.
+  #
+  # Returns nothing.
+  moveToBeginningOfDocument: (event) ->
+    # Since we only support a single line this is just an alias.
+    @moveToBeginningOfLine event
+
+  # Moves the selection start to the beginning of the document.
+  #
+  # Returns nothing.
+  moveToBeginningOfDocumentAndModifySelection: (event) ->
+    event.preventDefault()
+    caret = @caret
+    caret.start = 0
+    @caret = caret
+    @selectionDirection = if caret.start is caret.end then null else 'left'
+
   # Moves the cursor down, which because this is a single-line text field,
   # means moving to the end of the value.
   #
@@ -193,6 +247,23 @@ class FormattedTextField
     # 12|34 56|78  =>  1234 5678|
     @caret = start: end, end: end
     @selectionDirection = null
+
+  # Moves the cursor up to the end of the current paragraph, which because this
+  # is a single-line text field, means moving to the end of the value.
+  #
+  # Examples
+  #
+  #   |Hey guys
+  #   moveToEndOfParagraph(event)
+  #   Hey guys|
+  #
+  #   Hey |guys|
+  #   moveToEndOfParagraph(event)
+  #   Hey guys|
+  #
+  # Returns nothing.
+  moveToEndOfParagraph: (event) ->
+    @moveDown event
 
   # Moves the cursor down, keeping the current anchor point and extending the
   # selection to the end as #moveDown would.
@@ -227,6 +298,42 @@ class FormattedTextField
       when 'right', null
         caret.end = end
 
+    @caret = caret
+    @selectionDirection = if caret.start is caret.end then null else 'right'
+
+  # Moves the free end of the selection to the end of the paragraph, or since
+  # this is a single-line text field to the end of the line.
+  #
+  # Returns nothing.
+  moveParagraphForwardAndModifySelection: (event) ->
+    caret = @caret
+    event.preventDefault()
+
+    switch @selectionDirection
+      when 'right', null
+        # 12|34 56>78  =>  12|34 5678>
+        caret.end = @text.length
+      when 'left'
+        # 12<34 56|78  =>  12|34 5678
+        caret.start = caret.end
+
+    @caret = caret
+    @selectionDirection = if caret.start is caret.end then null else 'right'
+
+  # Moves the cursor to the end of the document.
+  #
+  # Returns nothing.
+  moveToEndOfDocument: (event) ->
+    # Since we only support a single line this is just an alias.
+    @moveToEndOfLine event
+
+  # Moves the selection end to the end of the document.
+  #
+  # Returns nothing.
+  moveToEndOfDocumentAndModifySelection: (event) ->
+    event.preventDefault()
+    caret = @caret
+    caret.end = @text.length
     @caret = caret
     @selectionDirection = if caret.start is caret.end then null else 'right'
 
@@ -363,6 +470,46 @@ class FormattedTextField
     @caret = caret
     @selectionDirection = null if caret.start is caret.end
 
+  # Moves the cursor to the beginning of the current line.
+  #
+  # Examples
+  #
+  #   Hey guys, where| are ya?
+  #   moveToBeginningOfLine(event)
+  #   |Hey guys, where are ya?
+  #
+  # Returns nothing.
+  moveToBeginningOfLine: (event) ->
+    event.preventDefault()
+    @caret = start: 0, end: 0
+    @selectionDirection = null
+
+  # Select from the free end of the caret to the beginning of line.
+  #
+  # Examples
+  #
+  #   Hey guys, where| are ya?
+  #   moveToBeginningOfLineAndModifySelection(event)
+  #   <Hey guys, where| are ya?
+  #
+  #   Hey guys, where| are> ya?
+  #   moveToBeginningOfLineAndModifySelection(event)
+  #   <Hey guys, where| are ya?
+  #
+  # Returns nothing.
+  moveToBeginningOfLineAndModifySelection: (event) ->
+    event.preventDefault()
+    caret = @caret
+    switch @selectionDirection
+      when 'left', null
+        caret.start = 0
+      when 'right'
+        caret.end = caret.start
+        caret.start = 0
+
+    @caret = caret
+    @selectionDirection = if caret.start is caret.end then null else 'left'
+
   # Moves the cursor to the right, counting selections as a thing to move past.
   #
   # Examples
@@ -490,6 +637,48 @@ class FormattedTextField
 
     @caret = caret
     @selectionDirection = null if caret.start is caret.end
+
+  # Moves the cursor to the end of the current line.
+  #
+  # Examples
+  #
+  #   Hey guys, where| are ya?
+  #   moveToEndOfLine(event)
+  #   |Hey guys, where are ya?
+  #
+  # Returns nothing.
+  moveToEndOfLine: (event) ->
+    event.preventDefault()
+    text = @text
+    @caret = start: text.length, end: text.length
+    @selectionDirection = null
+
+  # Moves the free end of the caret to the end of the current line.
+  #
+  # Examples
+  #
+  #   Hey guys, where| are ya?
+  #   moveToEndofLineAndModifySelection(event)
+  #   Hey guys, where| are ya?>
+  #
+  #   Hey guys, <where| are ya?
+  #   moveToEndofLineAndModifySelection(event)
+  #   Hey guys, where| are ya?>
+  #
+  # Returns nothing.
+  moveToEndOfLineAndModifySelection: (event) ->
+    event.preventDefault()
+    caret = @caret
+    switch @selectionDirection
+      when 'right', null
+        caret.end = @text.length
+      when 'left'
+        caret.start = caret.end
+        caret.end = @text.length
+
+    @caret = caret
+    @selectionDirection = if caret.start is caret.end then null else 'right'
+
 
   # Deletes backward one character or clears a non-empty selection.
   #
@@ -786,42 +975,84 @@ class FormattedTextField
   keyDown: (event) =>
     @rollbackInvalidChanges =>
       {keyCode, metaKey, ctrlKey, shiftKey, altKey} = event
+      modifiers = []
+      modifiers.push 'alt' if altKey
+      modifiers.push 'ctrl' if ctrlKey
+      modifiers.push 'meta' if metaKey
+      modifiers.push 'shift' if shiftKey
+      modifiers = modifiers.join '+'
 
       # cmd / ctrl + A (select all) should reset selection direction
       if (metaKey or ctrlKey) and keyCode is KEYS.A
         @selectAll event
 
-      # cmd / ctrl, probably doing some action
-      else if metaKey or ctrlKey
-        -> # pass
-
       # ← ↑ → ↓
       else if KEYS.isDirectional keyCode
         switch keyCode
           when KEYS.LEFT
-            if shiftKey and altKey
-              @moveWordLeftAndModifySelection event
-            else if shiftKey
-              @moveLeftAndModifySelection event
-            else if altKey
-              @moveWordLeft event
-            else
-              @moveLeft event
+            switch modifiers
+              when ''
+                @moveLeft event
+              when 'alt'
+                @moveWordLeft event
+              when 'shift'
+                @moveLeftAndModifySelection event
+              when 'alt+shift'
+                @moveWordLeftAndModifySelection event
+              when 'meta'
+                @moveToBeginningOfLine event
+              when 'meta+shift'
+                @moveToBeginningOfLineAndModifySelection event
+              else
+                throw new Error("unhandled left+#{modifiers}")
           when KEYS.RIGHT
-            if shiftKey and altKey
-              @moveWordRightAndModifySelection event
-            else if shiftKey
-              @moveRightAndModifySelection event
-            else if altKey
-              @moveWordRight event
-            else
-              @moveRight event
+            switch modifiers
+              when ''
+                @moveRight event
+              when 'alt'
+                @moveWordRight event
+              when 'shift'
+                @moveRightAndModifySelection event
+              when 'alt+shift'
+                @moveWordRightAndModifySelection event
+              when 'meta'
+                @moveToEndOfLine event
+              when 'meta+shift'
+                @moveToEndOfLineAndModifySelection event
+              else
+                throw new Error("unhandled right+#{modifiers}")
           when KEYS.UP
-            if shiftKey then @moveUpAndModifySelection event
-            else @moveUp event
+            switch modifiers
+              when ''
+                @moveUp event
+              when 'alt'
+                @moveToBeginningOfParagraph event
+              when 'shift'
+                @moveUpAndModifySelection event
+              when 'alt+shift'
+                @moveParagraphBackwardAndModifySelection event
+              when 'meta'
+                @moveToBeginningOfDocument event
+              when 'meta+shift'
+                @moveToBeginningOfDocumentAndModifySelection event
+              else
+                throw new Error("unhandled up+#{modifiers}")
           when KEYS.DOWN
-            if shiftKey then @moveDownAndModifySelection event
-            else @moveDown event
+            switch modifiers
+              when ''
+                @moveDown event
+              when 'alt'
+                @moveToEndOfParagraph event
+              when 'shift'
+                @moveDownAndModifySelection event
+              when 'alt+shift'
+                @moveParagraphForwardAndModifySelection event
+              when 'meta'
+                @moveToEndOfDocument event
+              when 'meta+shift'
+                @moveToEndOfDocumentAndModifySelection event
+              else
+                throw new Error("unhandled down+#{modifiers}")
 
       # ⌫
       else if keyCode is KEYS.BACKSPACE
