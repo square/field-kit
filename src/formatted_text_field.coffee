@@ -136,7 +136,6 @@ class FormattedTextField
     event.preventDefault()
 
     @caret = start: 0, end: 0
-    @selectionDirection = DIRECTION.NONE
 
   # Moves the cursor up to the beginning of the current paragraph, which
   # because this is a single-line text field, means moving to the beginning of
@@ -178,8 +177,8 @@ class FormattedTextField
   #
   # Returns nothing.
   moveUpAndModifySelection: (event) ->
-    caret = @caret
     event.preventDefault()
+    caret = @caret
 
     switch @selectionDirection
       when DIRECTION.LEFT, DIRECTION.NONE
@@ -190,16 +189,16 @@ class FormattedTextField
         caret.end = caret.start
         caret.start = 0
 
+    @selectionDirection = DIRECTION.LEFT
     @caret = caret
-    @selectionDirection = if caret.start is caret.end then DIRECTION.NONE else DIRECTION.LEFT
 
   # Moves the free end of the selection to the beginning of the paragraph, or
   # since this is a single-line text field to the beginning of the line.
   #
   # Returns nothing.
   moveParagraphBackwardAndModifySelection: (event) ->
-    caret = @caret
     event.preventDefault()
+    caret = @caret
 
     switch @selectionDirection
       when DIRECTION.LEFT, DIRECTION.NONE
@@ -209,8 +208,8 @@ class FormattedTextField
         # 12|34 56>78  =>  12|34 5678
         caret.end = caret.start
 
+    @selectionDirection = DIRECTION.LEFT
     @caret = caret
-    @selectionDirection = if caret.start is caret.end then DIRECTION.NONE else DIRECTION.LEFT
 
   # Moves the cursor to the beginning of the document.
   #
@@ -226,8 +225,8 @@ class FormattedTextField
     event.preventDefault()
     caret = @caret
     caret.start = 0
+    @selectionDirection = DIRECTION.LEFT
     @caret = caret
-    @selectionDirection = if caret.start is caret.end then DIRECTION.NONE else DIRECTION.LEFT
 
   # Moves the cursor down, which because this is a single-line text field,
   # means moving to the end of the value.
@@ -244,12 +243,11 @@ class FormattedTextField
   #
   # Returns nothing.
   moveDown: (event) ->
-    end = @text.length
     event.preventDefault()
+    end = @text.length
 
     # 12|34 56|78  =>  1234 5678|
     @caret = start: end, end: end
-    @selectionDirection = DIRECTION.NONE
 
   # Moves the cursor up to the end of the current paragraph, which because this
   # is a single-line text field, means moving to the end of the value.
@@ -290,9 +288,9 @@ class FormattedTextField
   #
   # Returns nothing.
   moveDownAndModifySelection: (event) ->
+    event.preventDefault()
     caret = @caret
     end = @text.length
-    event.preventDefault()
 
     switch @selectionDirection
       when DIRECTION.LEFT
@@ -301,16 +299,16 @@ class FormattedTextField
       when DIRECTION.RIGHT, DIRECTION.NONE
         caret.end = end
 
+    @selectionDirection = DIRECTION.RIGHT
     @caret = caret
-    @selectionDirection = if caret.start is caret.end then DIRECTION.NONE else DIRECTION.RIGHT
 
   # Moves the free end of the selection to the end of the paragraph, or since
   # this is a single-line text field to the end of the line.
   #
   # Returns nothing.
   moveParagraphForwardAndModifySelection: (event) ->
-    caret = @caret
     event.preventDefault()
+    caret = @caret
 
     switch @selectionDirection
       when DIRECTION.RIGHT, DIRECTION.NONE
@@ -320,8 +318,8 @@ class FormattedTextField
         # 12<34 56|78  =>  12|34 5678
         caret.start = caret.end
 
+    @selectionDirection = DIRECTION.RIGHT
     @caret = caret
-    @selectionDirection = if caret.start is caret.end then DIRECTION.NONE else DIRECTION.RIGHT
 
   # Moves the cursor to the end of the document.
   #
@@ -337,8 +335,8 @@ class FormattedTextField
     event.preventDefault()
     caret = @caret
     caret.end = @text.length
+    @selectionDirection = DIRECTION.RIGHT
     @caret = caret
-    @selectionDirection = if caret.start is caret.end then DIRECTION.NONE else DIRECTION.RIGHT
 
   # Moves the cursor to the left, counting selections as a thing to move past.
   #
@@ -356,21 +354,16 @@ class FormattedTextField
   #
   # Returns nothing.
   moveLeft: (event) ->
-    caret = @caret
     event.preventDefault()
+    caret = @caret
 
     if @hasSelection
-      # 1234 5678  =>  1234 5678
-      #   |--|           |
       caret.end = caret.start
     else
-      # 1234 5678  =>  1234 5678
-      #   |             |
       caret.start--
       caret.end--
 
     @caret = caret
-    @selectionDirection = DIRECTION.NONE if caret.start is caret.end
 
   # Moves the free end of the selection one to the left.
   #
@@ -398,8 +391,8 @@ class FormattedTextField
   #
   # Returns nothing.
   moveLeftAndModifySelection: (event) ->
-    caret = @caret
     event.preventDefault()
+    caret = @caret
 
     switch @selectionDirection
       when DIRECTION.LEFT, DIRECTION.NONE
@@ -409,7 +402,6 @@ class FormattedTextField
         caret.end--
 
     @caret = caret
-    @selectionDirection = DIRECTION.NONE if caret.start is caret.end
 
   # Moves the cursor left until the start of a word is found.
   #
@@ -430,7 +422,6 @@ class FormattedTextField
     event.preventDefault()
     index = @lastWordBreakBeforeIndex @caret.start - 1
     @caret = start: index, end: index
-    @selectionDirection = DIRECTION.NONE
 
   # Moves the free end of the current selection to the beginning of the
   # previous word.
@@ -459,8 +450,8 @@ class FormattedTextField
   #
   # Returns nothing.
   moveWordLeftAndModifySelection: (event) ->
-    caret = @caret
     event.preventDefault()
+    caret = @caret
 
     switch @selectionDirection
       when DIRECTION.LEFT, DIRECTION.NONE
@@ -471,7 +462,6 @@ class FormattedTextField
         caret.end = caret.start if caret.end < caret.start
 
     @caret = caret
-    @selectionDirection = DIRECTION.NONE if caret.start is caret.end
 
   # Moves the cursor to the beginning of the current line.
   #
@@ -485,7 +475,6 @@ class FormattedTextField
   moveToBeginningOfLine: (event) ->
     event.preventDefault()
     @caret = start: 0, end: 0
-    @selectionDirection = DIRECTION.NONE
 
   # Select from the free end of the caret to the beginning of line.
   #
@@ -503,15 +492,16 @@ class FormattedTextField
   moveToBeginningOfLineAndModifySelection: (event) ->
     event.preventDefault()
     caret = @caret
+
     switch @selectionDirection
       when DIRECTION.LEFT, DIRECTION.NONE
+        @selectionDirection = DIRECTION.LEFT
         caret.start = 0
       when DIRECTION.RIGHT
         caret.end = caret.start
         caret.start = 0
 
     @caret = caret
-    @selectionDirection = if caret.start is caret.end then DIRECTION.NONE else DIRECTION.LEFT
 
   # Moves the cursor to the right, counting selections as a thing to move past.
   #
@@ -529,8 +519,8 @@ class FormattedTextField
   #
   # Returns nothing.
   moveRight: (event) ->
-    caret = @caret
     event.preventDefault()
+    caret = @caret
 
     if @hasSelection
       caret.start = caret.end
@@ -539,7 +529,6 @@ class FormattedTextField
       caret.end++
 
     @caret = caret
-    @selectionDirection = DIRECTION.NONE if caret.start is caret.end
 
   # Moves the free end of the selection one to the right.
   #
@@ -567,8 +556,8 @@ class FormattedTextField
   #
   # Returns nothing.
   moveRightAndModifySelection: (event) ->
-    caret = @caret
     event.preventDefault()
+    caret = @caret
 
     switch @selectionDirection
       when DIRECTION.LEFT
@@ -578,7 +567,6 @@ class FormattedTextField
         caret.end++
 
     @caret = caret
-    @selectionDirection = DIRECTION.NONE if caret.start is caret.end
 
   # Moves the cursor right until the end of a word is found.
   #
@@ -599,7 +587,6 @@ class FormattedTextField
     event.preventDefault()
     index = @nextWordBreakAfterIndex @caret.end
     @caret = start: index, end: index
-    @selectionDirection = DIRECTION.NONE
 
   # Moves the free end of the current selection to the next end of word.
   #
@@ -627,8 +614,8 @@ class FormattedTextField
   #
   # Returns nothing.
   moveWordRightAndModifySelection: (event) ->
-    caret = @caret
     event.preventDefault()
+    caret = @caret
 
     switch @selectionDirection
       when DIRECTION.LEFT
@@ -639,7 +626,6 @@ class FormattedTextField
         caret.end = @nextWordBreakAfterIndex caret.end
 
     @caret = caret
-    @selectionDirection = DIRECTION.NONE if caret.start is caret.end
 
   # Moves the cursor to the end of the current line.
   #
@@ -654,7 +640,6 @@ class FormattedTextField
     event.preventDefault()
     text = @text
     @caret = start: text.length, end: text.length
-    @selectionDirection = DIRECTION.NONE
 
   # Moves the free end of the caret to the end of the current line.
   #
@@ -672,15 +657,16 @@ class FormattedTextField
   moveToEndOfLineAndModifySelection: (event) ->
     event.preventDefault()
     caret = @caret
+
     switch @selectionDirection
       when DIRECTION.RIGHT, DIRECTION.NONE
+        @selectionDirection = DIRECTION.RIGHT
         caret.end = @text.length
       when DIRECTION.LEFT
         caret.start = caret.end
         caret.end = @text.length
 
     @caret = caret
-    @selectionDirection = if caret.start is caret.end then DIRECTION.NONE else DIRECTION.RIGHT
 
 
   # Deletes backward one character or clears a non-empty selection.
@@ -1008,77 +994,76 @@ class FormattedTextField
       modifiers.push 'shift' if shiftKey
       modifiers = modifiers.join '+'
 
-      # cmd / ctrl + A (select all) should reset selection direction
       if (metaKey or ctrlKey) and keyCode is KEYS.A
         @selectAll event
 
-      # ← ↑ → ↓
-      else if KEYS.isDirectional keyCode
-        switch keyCode
-          when KEYS.LEFT
-            switch modifiers
-              when ''
-                @moveLeft event
-              when 'alt'
-                @moveWordLeft event
-              when 'shift'
-                @moveLeftAndModifySelection event
-              when 'alt+shift'
-                @moveWordLeftAndModifySelection event
-              when 'meta'
-                @moveToBeginningOfLine event
-              when 'meta+shift'
-                @moveToBeginningOfLineAndModifySelection event
-              else
-                throw new Error("unhandled left+#{modifiers}")
-          when KEYS.RIGHT
-            switch modifiers
-              when ''
-                @moveRight event
-              when 'alt'
-                @moveWordRight event
-              when 'shift'
-                @moveRightAndModifySelection event
-              when 'alt+shift'
-                @moveWordRightAndModifySelection event
-              when 'meta'
-                @moveToEndOfLine event
-              when 'meta+shift'
-                @moveToEndOfLineAndModifySelection event
-              else
-                throw new Error("unhandled right+#{modifiers}")
-          when KEYS.UP
-            switch modifiers
-              when ''
-                @moveUp event
-              when 'alt'
-                @moveToBeginningOfParagraph event
-              when 'shift'
-                @moveUpAndModifySelection event
-              when 'alt+shift'
-                @moveParagraphBackwardAndModifySelection event
-              when 'meta'
-                @moveToBeginningOfDocument event
-              when 'meta+shift'
-                @moveToBeginningOfDocumentAndModifySelection event
-              else
-                throw new Error("unhandled up+#{modifiers}")
-          when KEYS.DOWN
-            switch modifiers
-              when ''
-                @moveDown event
-              when 'alt'
-                @moveToEndOfParagraph event
-              when 'shift'
-                @moveDownAndModifySelection event
-              when 'alt+shift'
-                @moveParagraphForwardAndModifySelection event
-              when 'meta'
-                @moveToEndOfDocument event
-              when 'meta+shift'
-                @moveToEndOfDocumentAndModifySelection event
-              else
-                throw new Error("unhandled down+#{modifiers}")
+      else if keyCode is KEYS.LEFT
+        switch modifiers
+          when ''
+            @moveLeft event
+          when 'alt'
+            @moveWordLeft event
+          when 'shift'
+            @moveLeftAndModifySelection event
+          when 'alt+shift'
+            @moveWordLeftAndModifySelection event
+          when 'meta'
+            @moveToBeginningOfLine event
+          when 'meta+shift'
+            @moveToBeginningOfLineAndModifySelection event
+          else
+            throw new Error("unhandled left+#{modifiers}")
+
+      else if keyCode is KEYS.RIGHT
+        switch modifiers
+          when ''
+            @moveRight event
+          when 'alt'
+            @moveWordRight event
+          when 'shift'
+            @moveRightAndModifySelection event
+          when 'alt+shift'
+            @moveWordRightAndModifySelection event
+          when 'meta'
+            @moveToEndOfLine event
+          when 'meta+shift'
+            @moveToEndOfLineAndModifySelection event
+          else
+            throw new Error("unhandled right+#{modifiers}")
+
+      else if keyCode is KEYS.UP
+        switch modifiers
+          when ''
+            @moveUp event
+          when 'alt'
+            @moveToBeginningOfParagraph event
+          when 'shift'
+            @moveUpAndModifySelection event
+          when 'alt+shift'
+            @moveParagraphBackwardAndModifySelection event
+          when 'meta'
+            @moveToBeginningOfDocument event
+          when 'meta+shift'
+            @moveToBeginningOfDocumentAndModifySelection event
+          else
+            throw new Error("unhandled up+#{modifiers}")
+
+      else if keyCode is KEYS.DOWN
+        switch modifiers
+          when ''
+            @moveDown event
+          when 'alt'
+            @moveToEndOfParagraph event
+          when 'shift'
+            @moveDownAndModifySelection event
+          when 'alt+shift'
+            @moveParagraphForwardAndModifySelection event
+          when 'meta'
+            @moveToEndOfDocument event
+          when 'meta+shift'
+            @moveToEndOfDocumentAndModifySelection event
+          else
+            throw new Error("unhandled down+#{modifiers}")
 
       # ⌫
       else if keyCode is KEYS.BACKSPACE
@@ -1173,7 +1158,6 @@ class FormattedTextField
       else
         @text = change.current.text
         @caret = change.current.caret
-      @selectionDirection = DIRECTION.NONE unless @hasSelection
 
     return result
 
@@ -1242,6 +1226,7 @@ class FormattedTextField
       start: Math.max(min, Math.min(max, caret.start))
       end: Math.max(min, Math.min(max, caret.end))
     @element.caret caret
+    @selectionDirection = DIRECTION.NONE if caret.start is caret.end
 
   # Gets the position of the current selection's anchor point, i.e. the point
   # that the selection extends from, if any.
