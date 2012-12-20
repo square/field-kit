@@ -759,6 +759,29 @@ class FormattedTextField
   deleteBackwardByDecomposingPreviousCharacter: (event) ->
     @deleteBackward event
 
+  # Deletes all characters before the cursor or clears a non-empty selection.
+  #
+  # Examples
+  #
+  #   The quick |brown fox.
+  #   deleteBackwardToBeginningOfLine(event)
+  #   |brown fox.
+  #
+  #   The |quick |brown fox.
+  #   deleteBackwardToBeginningOfLine(event)
+  #   The brown fox.
+  #
+  # Returns nothing.
+  deleteBackwardToBeginningOfLine: (event) ->
+    if @hasSelection
+      return @deleteBackward event
+
+    event.preventDefault()
+    caret = @caret
+    caret.start = 0
+    @caret = caret
+    @clearSelection()
+
   # Deletes forward one character or clears a non-empty selection.
   #
   # Examples
@@ -1056,12 +1079,17 @@ class FormattedTextField
 
       # ⌫
       else if keyCode is KEYS.BACKSPACE
-        if altKey
-          @deleteWordBackward event
-        else if ctrlKey
-          @deleteBackwardByDecomposingPreviousCharacter event
-        else
-          @deleteBackward event
+        switch modifiers
+          when ''
+            @deleteBackward event
+          when 'alt', 'alt+shift'
+            @deleteWordBackward event
+          when 'ctrl', 'ctrl+shift'
+            @deleteBackwardByDecomposingPreviousCharacter event
+          when 'meta', 'meta+shift'
+            @deleteBackwardToBeginningOfLine event
+          else
+            throw new Error("unhandled backspace+#{modifiers}")
 
       else if keyCode is KEYS.DELETE
         if altKey
