@@ -1,249 +1,205 @@
-FakeDocument = require './helpers/fake_document'
-FakeInput = require './helpers/fake_input'
-WrappedFakeElements = require './helpers/wrapped_fake_elements'
-FakeEvent = require './helpers/fake_event'
-Caret = require './helpers/caret'
-FormattedTextField = require '../lib/formatted_text_field'
-
-class FakeFormatter
-  format: (value) ->
-    value
-
-  parse: (text) ->
-    text
+PassthroughFormatter = require './helpers/passthrough_formatter'
+{buildField} = require './helpers/builders'
+{expectThatTyping} = require './helpers/expectations'
 
 describe 'FormattedTextField', ->
-  wrapper = null
-  formattedTextField = null
-
-  applyValueAndCaretDescription = (description) ->
-    { caret, direction, value } = Caret.parseDescription description
-    wrapper.val value
-    wrapper.caret caret
-    formattedTextField.selectionDirection = direction
-
-  assertKeyPressTransform = (from, keys..., to) ->
-    applyValueAndCaretDescription from
-
-    for key in keys
-      event = FakeEvent.withKey(key)
-      event.type = 'keydown'
-      formattedTextField.keyDown event
-      if not event.isDefaultPrevented()
-        event.type = 'keypress'
-        if event.charCode
-          formattedTextField.keyPress event
-        if not event.isDefaultPrevented()
-          event.type = 'keyup'
-          formattedTextField.keyUp event
-
-    description = Caret.printDescription
-                    caret: wrapper.caret()
-                    direction: formattedTextField.selectionDirection
-                    value: wrapper.val()
-
-    expect(description).toEqual(to)
-
-  beforeEach ->
-    document = new FakeDocument()
-    input = new FakeInput(document)
-    document.body.appendChild(input)
-    wrapper = new WrappedFakeElements([input])
-    formattedTextField = new FormattedTextField(wrapper)
-    formattedTextField.formatter = new FakeFormatter()
-
   describe 'typing a character into an empty field', ->
     it 'allows the character to be inserted', ->
-      assertKeyPressTransform '|', 'a', 'a|'
+      expectThatTyping('a').willChange('|').to('a|')
 
   describe 'typing a character into a full field', ->
+    formatter = null
+
     beforeEach ->
-      formattedTextField.formatter.length = 2
+      formatter = new PassthroughFormatter()
+      formatter.length = 2
 
     it 'does not allow the character to be inserted', ->
-      assertKeyPressTransform '12|', '0', '12|'
+      expectThatTyping('0').withFormatter(formatter).willNotChange('12|')
 
     describe 'with part of the value selected', ->
       it 'replaces the selection with the typed character', ->
-        assertKeyPressTransform '|1|2', '0', '0|2'
+        expectThatTyping('0').withFormatter(formatter).willChange('|1|2').to('0|2')
 
   describe 'typing a backspace', ->
     describe 'with a non-empty selection', ->
       it 'clears the selection', ->
-        assertKeyPressTransform '12|34|5', 'backspace', '12|5'
-        assertKeyPressTransform '12<34|5', 'backspace', '12|5'
-        assertKeyPressTransform '12|34>5', 'backspace', '12|5'
+        expectThatTyping('backspace').willChange('12|34|5').to('12|5')
+        expectThatTyping('backspace').willChange('12<34|5').to('12|5')
+        expectThatTyping('backspace').willChange('12|34>5').to('12|5')
 
-        assertKeyPressTransform '12|3 4|5', 'alt+backspace', '12|5'
-        assertKeyPressTransform '12<3 4|5', 'alt+backspace', '12|5'
-        assertKeyPressTransform '12|3 4>5', 'alt+backspace', '12|5'
+        expectThatTyping('alt+backspace').willChange('12|3 4|5').to('12|5')
+        expectThatTyping('alt+backspace').willChange('12<3 4|5').to('12|5')
+        expectThatTyping('alt+backspace').willChange('12|3 4>5').to('12|5')
 
-        assertKeyPressTransform '12|3 4>5', 'meta+backspace', '12|5'
+        expectThatTyping('meta+backspace').willChange('12|3 4>5').to('12|5')
 
     describe 'with an empty selection', ->
       it 'works as expected', ->
-        assertKeyPressTransform '|12', 'backspace', '|12'
-        assertKeyPressTransform '1|2', 'backspace', '|2'
+        expectThatTyping('backspace').willNotChange('|12')
+        expectThatTyping('backspace').willChange('1|2').to('|2')
 
-        assertKeyPressTransform '|12', 'alt+backspace', '|12'
-        assertKeyPressTransform '12|', 'alt+backspace', '|'
-        assertKeyPressTransform '12 34|', 'alt+backspace', '12 |'
-        assertKeyPressTransform '12 |34', 'alt+backspace', '|34'
+        expectThatTyping('alt+backspace').willNotChange('|12')
+        expectThatTyping('alt+backspace').willChange('12|').to('|')
+        expectThatTyping('alt+backspace').willChange('12 34|').to('12 |')
+        expectThatTyping('alt+backspace').willChange('12 |34').to('|34')
 
-        assertKeyPressTransform '12 34 |56', 'meta+backspace', '|56'
+        expectThatTyping('meta+backspace').willChange('12 34 |56').to('|56')
 
   describe 'typing forward delete', ->
     describe 'with a non-empty selection', ->
       it 'clears the selection', ->
-        assertKeyPressTransform '12|34|5', 'delete', '12|5'
-        assertKeyPressTransform '12<34|5', 'delete', '12|5'
-        assertKeyPressTransform '12|34>5', 'delete', '12|5'
+        expectThatTyping('delete').willChange('12|34|5').to('12|5')
+        expectThatTyping('delete').willChange('12<34|5').to('12|5')
+        expectThatTyping('delete').willChange('12|34>5').to('12|5')
 
-        assertKeyPressTransform '12|3 4|5', 'alt+delete', '12|5'
-        assertKeyPressTransform '12<3 4|5', 'alt+delete', '12|5'
-        assertKeyPressTransform '12|3 4>5', 'alt+delete', '12|5'
+        expectThatTyping('alt+delete').willChange('12|3 4|5').to('12|5')
+        expectThatTyping('alt+delete').willChange('12<3 4|5').to('12|5')
+        expectThatTyping('alt+delete').willChange('12|3 4>5').to('12|5')
 
     describe 'with an empty selection', ->
       it 'works as expected', ->
-        assertKeyPressTransform '12|', 'delete', '12|'
-        assertKeyPressTransform '1|2', 'delete', '1|'
+        expectThatTyping('delete').willNotChange('12|')
+        expectThatTyping('delete').willChange('1|2').to('1|')
 
-        assertKeyPressTransform '12|', 'alt+delete', '12|'
-        assertKeyPressTransform '|12', 'alt+delete', '|'
-        assertKeyPressTransform '|12 34', 'alt+delete', '| 34'
-        assertKeyPressTransform '12| 34', 'alt+delete', '12|'
+        expectThatTyping('alt+delete').willNotChange('12|')
+        expectThatTyping('alt+delete').willChange('|12').to('|')
+        expectThatTyping('alt+delete').willChange('|12 34').to('| 34')
+        expectThatTyping('alt+delete').willChange('12| 34').to('12|')
 
   describe 'typing a left arrow', ->
     it 'works as expected', ->
-      assertKeyPressTransform '|4111', 'left', '|4111'
-      assertKeyPressTransform '4|111', 'left', '|4111'
-      assertKeyPressTransform '41|1|1', 'left', '41|11'
+      expectThatTyping('left').willNotChange('|4111')
+      expectThatTyping('left').willChange('4|111').to('|4111')
+      expectThatTyping('left').willChange('41|1|1').to('41|11')
 
-      assertKeyPressTransform '<41|11', 'shift+left', '<41|11'
-      assertKeyPressTransform '4<1|11', 'shift+left', '<41|11'
-      assertKeyPressTransform '|41>11', 'shift+left', '|4>111'
-      assertKeyPressTransform '|4111 1>111', 'shift+left', '|4111 >1111'
-      assertKeyPressTransform '41|1>1', 'shift+left', 'shift+left', '4<1|11'
+      expectThatTyping('shift+left').willNotChange('<41|11')
+      expectThatTyping('shift+left').willChange('4<1|11').to('<41|11')
+      expectThatTyping('shift+left').willChange('|41>11').to('|4>111')
+      expectThatTyping('shift+left').willChange('|4111 1>111').to('|4111 >1111')
+      expectThatTyping('shift+left', 'shift+left').willChange('41|1>1').to('4<1|11')
 
-      assertKeyPressTransform '41|11', 'alt+left', '|4111'
-      assertKeyPressTransform '4111 11|11', 'alt+left', '4111 |1111'
-      assertKeyPressTransform '4111 11|11', 'alt+left', 'alt+left', '|4111 1111'
+      expectThatTyping('alt+left').willChange('41|11').to('|4111')
+      expectThatTyping('alt+left').willChange('4111 11|11').to('4111 |1111')
+      expectThatTyping('alt+left', 'alt+left').willChange('4111 11|11').to('|4111 1111')
 
-      assertKeyPressTransform '41|11', 'shift+alt+left', '<41|11'
-      assertKeyPressTransform '4111 11|11', 'shift+alt+left', '4111 <11|11'
-      assertKeyPressTransform '4111 11|11', 'shift+alt+left', 'shift+alt+left', '<4111 11|11'
+      expectThatTyping('shift+alt+left').willChange('41|11').to('<41|11')
+      expectThatTyping('shift+alt+left').willChange('4111 11|11').to('4111 <11|11')
+      expectThatTyping('shift+alt+left', 'shift+alt+left').willChange('4111 11|11').to('<4111 11|11')
 
-      assertKeyPressTransform '41|11', 'meta+left', '|4111'
-      assertKeyPressTransform '41|11', 'shift+meta+left', '<41|11'
-      assertKeyPressTransform '|4111', 'shift+meta+left', '|4111'
+      expectThatTyping('meta+left').willChange('41|11').to('|4111')
+      expectThatTyping('shift+meta+left').willChange('41|11').to('<41|11')
+      expectThatTyping('shift+meta+left').willNotChange('|4111')
 
   describe 'typing a right arrow', ->
     it 'works as expected', ->
-      assertKeyPressTransform '|4111', 'right', '4|111'
-      assertKeyPressTransform '4111|', 'right', '4111|'
-      assertKeyPressTransform '41|1|1', 'right', '411|1'
+      expectThatTyping('right').willChange('|4111').to('4|111')
+      expectThatTyping('right').willNotChange('4111|')
+      expectThatTyping('right').willChange('41|1|1').to('411|1')
 
-      assertKeyPressTransform '41|11>', 'shift+right', '41|11>'
-      assertKeyPressTransform '<41|11', 'shift+right', '4<1|11'
-      assertKeyPressTransform '|41>11', 'shift+right', '|411>1'
-      assertKeyPressTransform '|4111> 1111', 'shift+right', '|4111 >1111'
-      assertKeyPressTransform '41<1|1', 'shift+right', 'shift+right', '411|1>'
+      expectThatTyping('shift+right').willNotChange('41|11>')
+      expectThatTyping('shift+right').willChange('<41|11').to('4<1|11')
+      expectThatTyping('shift+right').willChange('|41>11').to('|411>1')
+      expectThatTyping('shift+right').willChange('|4111> 1111').to('|4111 >1111')
+      expectThatTyping('shift+right', 'shift+right').willChange('41<1|1').to('411|1>')
 
-      assertKeyPressTransform '41|11', 'alt+right', '4111|'
-      assertKeyPressTransform '41|11 1111', 'alt+right', '4111| 1111'
-      assertKeyPressTransform '41|11 1111', 'alt+right', 'alt+right', '4111 1111|'
+      expectThatTyping('alt+right').willChange('41|11').to('4111|')
+      expectThatTyping('alt+right').willChange('41|11 1111').to('4111| 1111')
+      expectThatTyping('alt+right', 'alt+right').willChange('41|11 1111').to('4111 1111|')
 
-      assertKeyPressTransform '41|11', 'shift+alt+right', '41|11>'
-      assertKeyPressTransform '41|11 1111', 'shift+alt+right', '41|11> 1111'
-      assertKeyPressTransform '41|11 1111', 'shift+alt+right', 'shift+alt+right', '41|11 1111>'
+      expectThatTyping('shift+alt+right').willChange('41|11').to('41|11>')
+      expectThatTyping('shift+alt+right').willChange('41|11 1111').to('41|11> 1111')
+      expectThatTyping('shift+alt+right', 'shift+alt+right').willChange('41|11 1111').to('41|11 1111>')
 
-      assertKeyPressTransform '41|11', 'meta+right', '4111|'
-      assertKeyPressTransform '41|11', 'shift+meta+right', '41|11>'
-      assertKeyPressTransform '4111|', 'shift+meta+right', '4111|'
+      expectThatTyping('meta+right').willChange('41|11').to('4111|')
+      expectThatTyping('shift+meta+right').willChange('41|11').to('41|11>')
+      expectThatTyping('shift+meta+right').willNotChange('4111|')
 
   describe 'typing an up arrow', ->
     it 'works as expected', ->
-      assertKeyPressTransform '4111|', 'up', '|4111'
-      assertKeyPressTransform '411|1', 'up', '|4111'
-      assertKeyPressTransform '41|1|1', 'up', '|4111'
-      assertKeyPressTransform '41|1>1', 'up', '|4111'
-      assertKeyPressTransform '41<1|1', 'up', '|4111'
+      expectThatTyping('up').willChange('4111|').to('|4111')
+      expectThatTyping('up').willChange('411|1').to('|4111')
+      expectThatTyping('up').willChange('41|1|1').to('|4111')
+      expectThatTyping('up').willChange('41|1>1').to('|4111')
+      expectThatTyping('up').willChange('41<1|1').to('|4111')
 
-      assertKeyPressTransform '41|11>', 'shift+up', '<41|11'
-      assertKeyPressTransform '<41|11', 'shift+up', '<41|11'
-      assertKeyPressTransform '|41>11', 'shift+up', '|4111'
-      assertKeyPressTransform '|4111> 1111', 'shift+up', '|4111 1111'
-      assertKeyPressTransform '41<1|1', 'shift+up', '<411|1'
+      expectThatTyping('shift+up').willChange('41|11>').to('<41|11')
+      expectThatTyping('shift+up').willNotChange('<41|11')
+      expectThatTyping('shift+up').willChange('|41>11').to('|4111')
+      expectThatTyping('shift+up').willChange('|4111> 1111').to('|4111 1111')
+      expectThatTyping('shift+up').willChange('41<1|1').to('<411|1')
 
-      assertKeyPressTransform '41|11', 'alt+up', '|4111'
-      assertKeyPressTransform '41|11 1111', 'alt+up', '|4111 1111'
+      expectThatTyping('alt+up').willChange('41|11').to('|4111')
+      expectThatTyping('alt+up').willChange('41|11 1111').to('|4111 1111')
 
-      assertKeyPressTransform '41|11', 'shift+alt+up', '<41|11'
-      assertKeyPressTransform '4111 11|11', 'shift+alt+up', '<4111 11|11'
-      assertKeyPressTransform '4111 11|11', 'shift+alt+up', 'shift+alt+up', '<4111 11|11'
-      assertKeyPressTransform '4111 |11>11', 'shift+alt+up', '4111 |1111'
+      expectThatTyping('shift+alt+up').willChange('41|11').to('<41|11')
+      expectThatTyping('shift+alt+up').willChange('4111 11|11').to('<4111 11|11')
+      expectThatTyping('shift+alt+up', 'shift+alt+up').willChange('4111 11|11').to('<4111 11|11')
+      expectThatTyping('shift+alt+up').willChange('4111 |11>11').to('4111 |1111')
 
-      assertKeyPressTransform '41|11', 'meta+up', '|4111'
-      assertKeyPressTransform '41|1>1', 'shift+meta+up', '<411|1'
-      assertKeyPressTransform '41|11', 'shift+meta+up', '<41|11'
+      expectThatTyping('meta+up').willChange('41|11').to('|4111')
+      expectThatTyping('shift+meta+up').willChange('41|1>1').to('<411|1')
+      expectThatTyping('shift+meta+up').willChange('41|11').to('<41|11')
 
   describe 'typing a down arrow', ->
     it 'works as expected', ->
-      assertKeyPressTransform '|4111', 'down', '4111|'
-      assertKeyPressTransform '411|1', 'down', '4111|'
-      assertKeyPressTransform '41|1|1', 'down', '4111|'
-      assertKeyPressTransform '41|1>1', 'down', '4111|'
-      assertKeyPressTransform '41<1|1', 'down', '4111|'
+      expectThatTyping('down').willChange('|4111').to('4111|')
+      expectThatTyping('down').willChange('411|1').to('4111|')
+      expectThatTyping('down').willChange('41|1|1').to('4111|')
+      expectThatTyping('down').willChange('41|1>1').to('4111|')
+      expectThatTyping('down').willChange('41<1|1').to('4111|')
 
-      assertKeyPressTransform '41|11>', 'shift+down', '41|11>'
-      assertKeyPressTransform '<41|11', 'shift+down', '41|11>'
-      assertKeyPressTransform '41<11|', 'shift+down', '4111|'
-      assertKeyPressTransform '|4111> 1111', 'shift+down', '|4111 1111>'
-      assertKeyPressTransform '41|1>1', 'shift+down', '41|11>'
+      expectThatTyping('shift+down').willNotChange('41|11>')
+      expectThatTyping('shift+down').willChange('<41|11').to('41|11>')
+      expectThatTyping('shift+down').willChange('41<11|').to('4111|')
+      expectThatTyping('shift+down').willChange('|4111> 1111').to('|4111 1111>')
+      expectThatTyping('shift+down').willChange('41|1>1').to('41|11>')
 
-      assertKeyPressTransform '41|11', 'alt+down', '4111|'
-      assertKeyPressTransform '41|11 1111', 'alt+down', '4111 1111|'
+      expectThatTyping('alt+down').willChange('41|11').to('4111|')
+      expectThatTyping('alt+down').willChange('41|11 1111').to('4111 1111|')
 
-      assertKeyPressTransform '41|11', 'shift+alt+down', '41|11>'
-      assertKeyPressTransform '41|11 1111', 'shift+alt+down', '41|11 1111>'
-      assertKeyPressTransform '<41|11 1111', 'shift+alt+down', '41|11 1111'
-      assertKeyPressTransform '4111| 1111', 'shift+alt+down', 'shift+alt+down', '4111| 1111>'
+      expectThatTyping('shift+alt+down').willChange('41|11').to('41|11>')
+      expectThatTyping('shift+alt+down').willChange('41|11 1111').to('41|11 1111>')
+      expectThatTyping('shift+alt+down').willChange('<41|11 1111').to('41|11 1111')
+      expectThatTyping('shift+alt+down', 'shift+alt+down').willChange('4111| 1111').to('4111| 1111>')
 
-      assertKeyPressTransform '41|11', 'meta+down', '4111|'
-      assertKeyPressTransform '4<1|11', 'shift+meta+down', '4|111>'
-      assertKeyPressTransform '41|11', 'shift+meta+down', '41|11>'
+      expectThatTyping('meta+down').willChange('41|11').to('4111|')
+      expectThatTyping('shift+meta+down').willChange('4<1|11').to('4|111>')
+      expectThatTyping('shift+meta+down').willChange('41|11').to('41|11>')
 
   describe 'selecting everything', ->
     ['ctrl', 'meta'].forEach (modifier) ->
       describe "with the #{modifier} key", ->
       it 'works without an existing selection', ->
-        assertKeyPressTransform '123|4567', "#{modifier}+a", '|1234567|'
+        expectThatTyping("#{modifier}+a").willChange('123|4567').to('|1234567|')
 
       it 'works with an undirected selection', ->
-        assertKeyPressTransform '|123|4567', "#{modifier}+a", '|1234567|'
+        expectThatTyping("#{modifier}+a").willChange('|123|4567').to('|1234567|')
 
       it 'works with a right-directed selection and resets the direction', ->
-        assertKeyPressTransform '|123>4567', "#{modifier}+a", '|1234567|'
+        expectThatTyping("#{modifier}+a").willChange('|123>4567').to('|1234567|')
 
       it 'works with a left-directed selection and resets the direction', ->
-        assertKeyPressTransform '<123|4567', "#{modifier}+a", '|1234567|'
+        expectThatTyping("#{modifier}+a").willChange('<123|4567').to('|1234567|')
 
   it 'allows the formatter to prevent changes', ->
-    formattedTextField.formatter.isChangeValid = -> no
-    assertKeyPressTransform '3725 |', 'backspace', '3725 |'
-    assertKeyPressTransform '3725 |', 'a', '3725 |'
+    field = buildField()
+    field.formatter.isChangeValid = -> no
+    expectThatTyping('backspace').into(field).willNotChange('3725 |')
+    expectThatTyping('a').into(field).willNotChange('3725 |')
 
   it 'allows the formatter to alter caret changes', ->
+    field = buildField()
     # disallow the caret at the start of text
-    formattedTextField.formatter.isChangeValid = (change) ->
+    field.formatter.isChangeValid = (change) ->
       if change.proposed.caret.start is 0 and change.proposed.caret.end is 0
         change.proposed.caret = start: 1, end: 1
       return yes
 
-    assertKeyPressTransform ' 234|', 'up', ' |234'
+    expectThatTyping('up').into(field).willChange(' 234|').to(' |234')
 
     # disallow selection
-    formattedTextField.formatter.isChangeValid = (change) ->
+    field.formatter.isChangeValid = (change) ->
       caret = change.proposed.caret
       if caret.start isnt caret.end
         if change.field.selectionAnchor is caret.start
@@ -252,9 +208,9 @@ describe 'FormattedTextField', ->
           caret.end = caret.start
       return yes
 
-    assertKeyPressTransform '234|', 'shift+left', '23|4'
-    assertKeyPressTransform '234|', 'shift+up', '|234'
-    assertKeyPressTransform '2|34', 'shift+right', '23|4'
-    assertKeyPressTransform '2|34', 'shift+down', '234|'
-    assertKeyPressTransform '|1234', 'meta+a', '|1234'
-    assertKeyPressTransform '|12 34', 'alt+shift+right', '12| 34'
+    expectThatTyping('shift+left').into(field).willChange('234|').to('23|4')
+    expectThatTyping('shift+up').into(field).willChange('234|').to('|234')
+    expectThatTyping('shift+right').into(field).willChange('2|34').to('23|4')
+    expectThatTyping('shift+down').into(field).willChange('2|34').to('234|')
+    expectThatTyping('meta+a').into(field).willNotChange('|1234')
+    expectThatTyping('alt+shift+right').into(field).willChange('|12 34').to('12| 34')
