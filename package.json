@@ -1,8 +1,7 @@
 {
-  "name": "card-field.js",
+  "name": "field-kit",
   "version": "0.0.0",
-  "description": "A simple credit card entry field.",
-  "main": "card_field.js",
+  "description": "Utilities to effectively manage text entry on the web.",
   "scripts": {
     "build": "coffee -c -o lib/ src/",
     "test": "npm run-script build && jasmine-node --coffee spec"
