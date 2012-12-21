@@ -6,6 +6,7 @@
   <script src="http://code.jquery.com/jquery.min.js" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript" charset="utf-8" src="http://jcaret.googlecode.com/files/jquery.caret.1.02.min.js"></script>
   <script src="/src/formatted_text_field.coffee" type="text/javascript" charset="utf-8"></script>
+  <script src="/src/expiry_date_formatter.coffee" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
   <input type="text" id="month-year-test" placeholder="mm/yy" />
@@ -15,53 +16,7 @@
   jQuery(function($) {
     var $monthYearInput = $('#month-year-test');
     var monthYearField = new FormattedTextField($monthYearInput);
-
-    monthYearField.formatter = {
-      format: function(value) {
-        var month, year;
-
-        if (value)
-          month = value.month, year = value.year;
-
-        if (month === undefined) month = null;
-        if (year === undefined) year = null;
-
-        if (month) {
-          if (year)
-            return month + '/' + (year % 100);
-          else
-            return month;
-        } else {
-          return '';
-        }
-      },
-
-      parse: function(text) {
-        var monthAndYear = text.split('/'),
-            month = monthAndYear[0],
-            year = monthAndYear[1];
-
-        if (month !== null) {
-          month = Number(month);
-        }
-
-        if (year !== null) {
-          year = Number(year);
-        }
-
-        return { month: month, year: year };
-      },
-
-      isChangeValid: function(change) {
-        var monthAndYear = change.field.text.split('/');
-
-        if (change.inserted.text && !/^\d+$/.test(change.inserted.text)) {
-          return false;
-        }
-
-        return monthAndYear.length < 3;
-      }
-    };
+    monthYearField.formatter = new ExpiryDateFormatter();
 
     var $noSelectionInput = $('#no-selection-test');
     var noSelectionField = new FormattedTextField($noSelectionInput);
