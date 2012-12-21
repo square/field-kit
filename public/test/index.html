@@ -7,17 +7,23 @@
   <script src="/test/jquery.caret.1.02.js" type="text/javascript" charset="utf-8"></script>
   <script src="/src/formatted_text_field.coffee" type="text/javascript" charset="utf-8"></script>
   <script src="/src/expiry_date_formatter.coffee" type="text/javascript" charset="utf-8"></script>
+  <script src="/src/default_card_formatter.coffee" type="text/javascript" charset="utf-8"></script>
+
+  <style type="text/css" media="screen">
+    input[type=text] {
+      width: 230px;
+      height: 30px;
+      font-size: 20px;
+    }
+  </style>
 </head>
 <body>
-  <input type="text" id="month-year-test" placeholder="mm/yy" />
   <input type="text" id="no-selection-test" placeholder="no selection" />
+  <input type="text" id="month-year-test" placeholder="mm/yy" />
+  <input type="text" id="credit-card-test" placeholder="1234 5678 8901 2345" />
 
   <script type="text/javascript" charset="utf-8">
   jQuery(function($) {
-    var $monthYearInput = $('#month-year-test');
-    var monthYearField = new FormattedTextField($monthYearInput);
-    monthYearField.formatter = new ExpiryDateFormatter();
-
     var $noSelectionInput = $('#no-selection-test');
     var noSelectionField = new FormattedTextField($noSelectionInput);
 
@@ -37,6 +43,14 @@
         return true;
       }
     };
+
+    var $monthYearInput = $('#month-year-test');
+    var monthYearField = new FormattedTextField($monthYearInput);
+    monthYearField.formatter = new ExpiryDateFormatter();
+
+    var $creditCardInput = $('#credit-card-test');
+    var creditCardField = new FormattedTextField($creditCardInput);
+    creditCardField.formatter = new DefaultCardFormatter();
   });
   </script>
 </body>
