@@ -39,3 +39,6 @@ describe 'ExpiryDateFormatter', ->
 
   it 'backspaces to the beginning if the last character after backspacing is 0', ->
     expectThatTyping('backspace').into(field).willChange('01/|').to('|')
+
+  it 'allows typing a character matching the suffix that hits the end of the allowed input', ->
+    expectThatTyping('1').into(field).willChange('12/1|').to('12/11|')

@@ -1121,14 +1121,14 @@ class FormattedTextField
       ctext = change.current.text
       ptext = change.proposed.text
       sharedPrefixLength = ctext.length
-      sharedSuffixLength = ctext.length
+      sharedSuffixLength = 0
 
       for i in [0...ctext.length]
         if ptext[i] isnt ctext[i]
           sharedPrefixLength = i
           break
 
-      for i in [0...ctext.length]
+      for i in [0...(ctext.length-sharedPrefixLength)]
         if ptext[ptext.length - 1 - i] isnt ctext[ctext.length - 1 - i]
           sharedSuffixLength = i
           break
