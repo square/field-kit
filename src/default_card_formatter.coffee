@@ -6,7 +6,7 @@ class DefaultCardFormatter
   cardLength: 16
 
   constructor: ->
-    @spaceIndexes = DEFAULT_SPACE_INDEXES
+    @spaceIndexes = DEFAULT_SPACE_INDEXES.slice()
 
   format: (pan) ->
     return '' unless pan
