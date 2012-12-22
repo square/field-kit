@@ -1151,7 +1151,7 @@ class FormattedTextField
         end: change.current.caret.end
         text: ''
 
-    if typeof @formatter.isChangeValid is 'function'
+    if typeof @formatter?.isChangeValid is 'function'
       if @formatter.isChangeValid(change)
         @text = change.proposed.text
         @caret = change.proposed.caret
