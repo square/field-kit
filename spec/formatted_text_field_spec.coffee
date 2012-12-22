@@ -42,6 +42,7 @@ describe 'FormattedTextField', ->
         expectThatTyping('alt+backspace').willNotChange('|12')
         expectThatTyping('alt+backspace').willChange('12|').to('|')
         expectThatTyping('alt+backspace').willChange('12 34|').to('12 |')
+        expectThatTyping('alt+backspace').willChange('12 3|4').to('12 |4')
         expectThatTyping('alt+backspace').willChange('12 |34').to('|34')
 
         expectThatTyping('meta+backspace').willChange('12 34 |56').to('|56')

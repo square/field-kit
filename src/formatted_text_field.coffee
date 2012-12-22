@@ -720,7 +720,7 @@ class FormattedTextField
     event.preventDefault()
     caret = @caret
 
-    caret.start = @lastWordBreakBeforeIndex caret.start - 1
+    caret.start = @lastWordBreakBeforeIndex caret.start
 
     @caret = caret
     @clearSelection()
