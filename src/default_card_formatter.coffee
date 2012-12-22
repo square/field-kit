@@ -1,8 +1,9 @@
-DEFAULT_SPACE_INDEXES = [3, 7, 11]
+DEFAULT_SPACE_INDEXES = [4, 8, 12]
 Object.freeze?(DEFAULT_SPACE_INDEXES)
 
 class DefaultCardFormatter
   spaceIndexes: null
+  cardLength: 16
 
   constructor: ->
     @spaceIndexes = DEFAULT_SPACE_INDEXES
@@ -11,9 +12,9 @@ class DefaultCardFormatter
     return '' unless pan
 
     result = ''
-    for char, i in pan.slice(0, 16)
+    for char, i in pan.slice(0, @cardLength)
       result += char
-      result += ' ' if i in @spaceIndexes
+      result += ' ' if i+1 in @spaceIndexes
     result
 
   parse: (text) ->
@@ -26,9 +27,30 @@ class DefaultCardFormatter
     if change.deleted.text is ' '
       newText = newText.substring(0, newText.length - 1)
 
+    caret = change.proposed.caret
+    hasSelection = caret.start isnt caret.end
+    startMovedLeft = caret.start < change.current.caret.start
+    endMovedLeft = caret.end < change.current.caret.end
+
+    for spaceIndex, i in @spaceIndexes
+      if caret.start is spaceIndex + i
+        if startMovedLeft
+          caret.start--
+        else
+          caret.start++
+
+    if hasSelection
+      for spaceIndex, i in @spaceIndexes
+        if caret.end is spaceIndex + i + 1
+          if startMovedLeft or endMovedLeft
+            caret.end--
+          else
+            caret.end++
+    else
+      caret.end = caret.start
+
     newText = @format @parse(newText)
     change.proposed.text = newText
-    change.proposed.caret = start: newText.length, end: newText.length
     return yes
 
 if module?
