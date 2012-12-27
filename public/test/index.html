@@ -27,7 +27,7 @@
   <script type="text/javascript" charset="utf-8">
   jQuery(function($) {
     var $noSelectionInput = $('#no-selection-test');
-    var noSelectionField = new FormattedTextField($noSelectionInput);
+    var noSelectionField = new FieldKit.FormattedTextField($noSelectionInput);
 
     noSelectionField.formatter = {
       format: function(value){ return value; },
@@ -47,12 +47,12 @@
     };
 
     var $monthYearInput = $('#month-year-test');
-    var monthYearField = new FormattedTextField($monthYearInput);
-    monthYearField.formatter = new ExpiryDateFormatter();
+    var monthYearField = new FieldKit.FormattedTextField($monthYearInput);
+    monthYearField.formatter = new FieldKit.ExpiryDateFormatter();
 
     var $creditCardInput = $('#credit-card-test');
-    var creditCardField = new FormattedTextField($creditCardInput);
-    creditCardField.formatter = new AdaptiveCardFormatter();
+    var creditCardField = new FieldKit.FormattedTextField($creditCardInput);
+    creditCardField.formatter = new FieldKit.AdaptiveCardFormatter();
   });
   </script>
 </body>

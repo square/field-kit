@@ -2,8 +2,8 @@ if require?
   AmexCardFormatter = require './amex_card_formatter'
   DefaultCardFormatter = require './default_card_formatter'
 else
-  AmexCardFormatter = @AmexCardFormatter
-  DefaultCardFormatter = @DefaultCardFormatter
+  {AmexCardFormatter} = @FieldKit
+  {DefaultCardFormatter} = @FieldKit
 
 AMEX        = 'amex'
 DISCOVER    = 'discover'
@@ -49,4 +49,4 @@ class AdaptiveCardFormatter
 if module?
   module.exports = AdaptiveCardFormatter
 else
-  @AdaptiveCardFormatter = AdaptiveCardFormatter
+  (@FieldKit ||= {}).AdaptiveCardFormatter = AdaptiveCardFormatter

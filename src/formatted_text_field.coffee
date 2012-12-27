@@ -1244,4 +1244,4 @@ class FormattedTextField
 if module?
   module.exports = FormattedTextField
 else if window?
-  window.FormattedTextField = FormattedTextField
+  (@FieldKit ||= {}).FormattedTextField = FormattedTextField
