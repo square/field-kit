@@ -20,7 +20,12 @@ server = http.createServer (request, response) ->
     if err
       respond 404
     else
-      respond 200, data
+      headers = {}
+      if /\.(js|coffee)$/.test(request.url)
+        headers['Content-Type'] = 'application/javascript'
+      else if /\.html$/.test(request.url)
+        headers['Content-Type'] = 'text/html'
+      respond 200, headers, data
 
   serveFromPath = (root, requestPath) ->
     if not requestPath or requestPath.indexOf('..') > -1
