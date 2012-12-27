@@ -53,4 +53,4 @@ class ExpiryDateFormatter
 if module?
   module.exports = ExpiryDateFormatter
 else
-  @ExpiryDateFormatter = ExpiryDateFormatter
+  (@FieldKit ||= {}).ExpiryDateFormatter = ExpiryDateFormatter

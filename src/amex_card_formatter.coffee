@@ -1,7 +1,7 @@
 if require?
   DefaultCardFormatter = require './default_card_formatter'
 else
-  DefaultCardFormatter = @DefaultCardFormatter
+  {DefaultCardFormatter} = @FieldKit
 
 AMEX_SPACE_INDEXES = [4, 10]
 Object.freeze?(AMEX_SPACE_INDEXES)
@@ -15,4 +15,4 @@ class AmexCardFormatter extends DefaultCardFormatter
 if module?
   module.exports = AmexCardFormatter
 else
-  @AmexCardFormatter = AmexCardFormatter
+  (@FieldKit ||= {}).AmexCardFormatter = AmexCardFormatter

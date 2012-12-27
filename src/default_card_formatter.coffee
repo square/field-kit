@@ -56,4 +56,4 @@ class DefaultCardFormatter
 if module?
   module.exports = DefaultCardFormatter
 else
-  @DefaultCardFormatter = DefaultCardFormatter
+  (@FieldKit ||= {}).DefaultCardFormatter = DefaultCardFormatter
