@@ -2,7 +2,7 @@ PassthroughFormatter = require './helpers/passthrough_formatter'
 {buildField} = require './helpers/builders'
 {expectThatTyping, expectThatPasting} = require './helpers/expectations'
 
-describe 'FormattedTextField', ->
+describe 'TextField', ->
   describe 'typing a character into an empty field', ->
     it 'allows the character to be inserted', ->
       expectThatTyping('a').willChange('|').to('a|')

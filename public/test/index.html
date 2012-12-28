@@ -5,7 +5,7 @@
   <title>Test CardField</title>
   <script src="/test/jquery.js" type="text/javascript" charset="utf-8"></script>
   <script src="/test/jquery.caret.1.02.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/src/formatted_text_field.coffee" type="text/javascript" charset="utf-8"></script>
+  <script src="/src/text_field.coffee" type="text/javascript" charset="utf-8"></script>
   <script src="/src/expiry_date_formatter.coffee" type="text/javascript" charset="utf-8"></script>
   <script src="/src/default_card_formatter.coffee" type="text/javascript" charset="utf-8"></script>
   <script src="/src/amex_card_formatter.coffee" type="text/javascript" charset="utf-8"></script>
@@ -27,7 +27,7 @@
   <script type="text/javascript" charset="utf-8">
   jQuery(function($) {
     var $noSelectionInput = $('#no-selection-test');
-    var noSelectionField = new FieldKit.FormattedTextField($noSelectionInput);
+    var noSelectionField = new FieldKit.TextField($noSelectionInput);
 
     noSelectionField.formatter = {
       format: function(value){ return value; },
@@ -47,11 +47,11 @@
     };
 
     var $monthYearInput = $('#month-year-test');
-    var monthYearField = new FieldKit.FormattedTextField($monthYearInput);
+    var monthYearField = new FieldKit.TextField($monthYearInput);
     monthYearField.formatter = new FieldKit.ExpiryDateFormatter();
 
     var $creditCardInput = $('#credit-card-test');
-    var creditCardField = new FieldKit.FormattedTextField($creditCardInput);
+    var creditCardField = new FieldKit.TextField($creditCardInput);
     creditCardField.formatter = new FieldKit.AdaptiveCardFormatter();
   });
   </script>

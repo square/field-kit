@@ -40,7 +40,7 @@ makeFirstResponder = (field, event) ->
     field.focus?()
     field.select?()
 
-class FormattedTextField
+class TextField
   # Internal: Contains one of the DIRECTION enum to indicate the direction the
   # free end of the selection is from its anchor.
   selectionDirection: DIRECTION.NONE
@@ -1263,6 +1263,6 @@ class FormattedTextField
         null
 
 if module?
-  module.exports = FormattedTextField
+  module.exports = TextField
 else if window?
-  (@FieldKit ||= {}).FormattedTextField = FormattedTextField
+  (@FieldKit ||= {}).TextField = TextField

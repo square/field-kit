@@ -1,6 +1,6 @@
 FakeDocument = require './fake_document'
 FakeInput = require './fake_input'
-FormattedTextField = require '../../lib/formatted_text_field'
+FormattedTextField = require '../../lib/text_field'
 PassthroughFormatter = require './passthrough_formatter'
 WrappedFakeElements = require './wrapped_fake_elements'
 
