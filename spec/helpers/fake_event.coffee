@@ -78,4 +78,24 @@ class FakeEvent
 
     return event
 
+  @pasteEventWithData: (data) ->
+    event = new @()
+    event.clipboardData = new ClipboardData(data)
+    return event
+
+  # jQuery has an originalEvent property to get the real DOM event, but since
+  # we're already faking it we might as well just use ourselves.
+  @::__defineGetter__ 'originalEvent', ->
+    this
+
+class ClipboardData
+  constructor: (data) ->
+    @data = data
+
+  getData: (type) ->
+    @data[type]
+
+  setData: (type, value) ->
+    @data[type] = value
+
 module.exports = FakeEvent
