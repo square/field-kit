@@ -22,15 +22,15 @@ class FieldExpectationBase
     @assert()
 
   applyDescription: ->
-    { caret, direction, value } = Caret.parseDescription @currentDescription
+    { caret, affinity, value } = Caret.parseDescription @currentDescription
     @field.element.val value
     @field.element.caret caret
-    @field.selectionDirection = direction
+    @field.selectionAffinity = affinity
 
   assert: ->
     actual = Caret.printDescription
                caret: @field.element.caret()
-               direction: @field.selectionDirection
+               affinity: @field.selectionAffinity
                value: @field.element.val()
 
     expect(actual).toEqual(@expectedDescription)
