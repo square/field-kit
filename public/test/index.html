@@ -1,8 +1,341 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
 
   <title>Test CardField</title>
+
+  <link rel="stylesheet" media="screen" href="/test/bootstrap.min.css" />
+  <link rel="stylesheet" media="screen" href="/google-code-prettify/prettify.css" />
+  <style type="text/css" media="screen">
+    input[type=text], input[type=password] {
+      width: 230px;
+      height: 30px;
+      font-size: 20px;
+    }
+
+    #expiry {
+      width: 150px;
+      position: relative;
+      top: 23px;
+    }
+
+    #card-number {
+      width: 200px;
+      position: relative;
+      top: 23px;
+    }
+
+    #b-to-a {
+      width: 200px;
+      position: relative;
+      top: 12px;
+    }
+
+    .docs-example .tryout {
+      background: none;
+      border: none;
+    }
+
+  /* Base class */
+  .docs-example {
+    position: relative;
+    margin: 15px 0;
+    padding: 39px 19px 14px;
+    *padding-top: 19px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    -webkit-border-radius: 4px;
+       -moz-border-radius: 4px;
+            border-radius: 4px;
+  }
+
+  /* Echo out a label for the example */
+  .docs-example:after {
+    content: "Example";
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    padding: 3px 7px;
+    font-size: 12px;
+    font-weight: bold;
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    color: #9da0a4;
+    -webkit-border-radius: 4px 0 4px 0;
+       -moz-border-radius: 4px 0 4px 0;
+            border-radius: 4px 0 4px 0;
+  }
+
+  /* Remove spacing between an example and it's code */
+  .docs-example + .prettyprint {
+    margin-top: -20px;
+    padding-top: 5px;
+  }
+
+  /* Base class */
+  .docs-example-code {
+    position: relative;
+    margin: 15px 0;
+    border: 1px solid #ddd;
+    -webkit-border-radius: 4px;
+       -moz-border-radius: 4px;
+            border-radius: 4px;
+  }
+
+  /* Echo out a label for the example */
+  .docs-example-code:after {
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    padding: 3px 7px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #9da0a4;
+    -webkit-border-radius: 4px 0 4px 0;
+       -moz-border-radius: 4px 0 4px 0;
+            border-radius: 4px 0 4px 0;
+  }
+
+  .docs-example-code-js:after {
+    content: "JS";
+  }
+
+  .docs-example-code-coffee:after {
+    content: "Coffee";
+  }
+
+  .docs-example-code-html:after {
+    content: "HTML";
+  }
+
+  .docs-example-code + .docs-example-code {
+    border-top-style: dotted;
+    margin-top: -24px;
+    padding-top: 5px;
+  }
+
+  .docs-example-code + .docs-example-code:after {
+  }
+  </style>
+</head>
+
+<body onload="prettyPrint()">
+  <div class="container">
+    <div class="row">
+      <div class="page-header">
+        <h1>FieldKit Demo</h1>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="offset2 span8">
+        <h3>ExpiryDateFormatter</h3>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="offset2 span8">
+        <p>
+          The <code>ExpiryDateFormatter</code> provides formatting for credit card
+          expiry dates, preventing the input of nonsense months or non-date characters.
+          It also adds the preceding zero and the slash between the month and year
+          automatically, but treats them as if they are not there. In order to do this
+          predictably it forces the cursor to remain at the end of the field and
+          prevents any kind of selection.
+        </p>
+
+        <div class="docs-example">
+          <div class="row">
+            <div class="span3">
+              <input type="text" id="expiry" placeholder="mm/yy" />
+            </div>
+
+            <div class="span4">
+              <pre class="tryout">&ldquo;4&rdquo; &rarr; &ldquo;04/&rdquo;
+&ldquo;1212&rdquo; &rarr; &ldquo;12/12&rdquo;
+&ldquo;12/&rdquo; + backspace &rarr; &ldquo;1&rdquo;
+            </div>
+          </div>
+        </div>
+
+        <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="expiry" placeholder="mm/yy"&gt;</code></pre>
+        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField($('#expiry'));
+field.formatter = new FieldKit.ExpiryDateFormatter();</code></pre>
+      </div>
+    </div>
+
+
+    <div class="row">
+      <div class="offset2 span8">
+        <h3>AdaptiveCardFormatter</h3>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="offset2 span8">
+        <p>
+          The <code>AdaptiveCardFormatter</code> provides formatting for credit card
+          PANs, preventing the input of non-digit characters and automatically breaking
+          into digit groups according to the rules for the entered card type.
+        </p>
+
+        <div class="docs-example">
+          <div class="row">
+            <div class="span3">
+              <input type="text" id="card-number" placeholder="1234 5678 9012 3456" />
+            </div>
+
+            <div class="span4">
+              <pre class="tryout">&ldquo;411111111&rdquo; &rarr; &ldquo;4111 1111 1&rdquo;  # visa
+&ldquo;3725123456&rdquo; &rarr; &ldquo;3725 123456&rdquo; # amex
+&ldquo;4111 &rdquo; + backspace &rarr; &ldquo;411&rdquo;
+            </div>
+          </div>
+        </div>
+
+        <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="card-number" placeholder="1234 5678 9012 3456"&gt;</code></pre>
+        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField($('#card-number'));
+field.formatter = new FieldKit.AdaptiveCardFormatter();</code></pre>
+      </div>
+    </div>
+
+
+    <div class="row">
+      <div class="offset2 span8">
+        <h3>Writing a custom formatter</h3>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="offset2 span8">
+        <p>
+          Formatters are objects that implement the <code>Formatter</code> interface:
+        </p>
+
+        <pre class="prettyprint"><code>interface Formatter
+{
+  string format(any objectValue);
+  any parse(string stringValue);
+
+  [Optional] boolean isChangeValid(Change change);
+}
+
+interface Change
+{
+  attribute TextField field;
+  attribute TextState current;
+  attribute TextState proposed;
+  attribute TextChange inserted;
+  attribute TextChange deleted;
+}
+
+interface TextState
+{
+  attribute string text;
+  attribute Range caret;
+}
+
+interface TextChange
+{
+  attribute string text;
+  attribute unsigned long start;
+  attribute unsigned long end;
+}
+
+interface Range
+{
+  attribute unsigned long start;
+  attribute unsigned long end;
+}
+</code></pre>
+
+        <h4>Character Replacement</h4>
+
+        <p>
+          This example replaces any &lsquo;b&rsquo; it finds with &lsquo;a&rsquo;.
+          It does this using all three of the methods on <code>Formatter</code>.
+        </p>
+
+        <div class="docs-example">
+          <div class="row">
+            <div class="span3">
+              <input type="text" id="b-to-a" placeholder="changes 'b' to 'a'" />
+            </div>
+
+            <div class="span4">
+              <pre class="tryout">&ldquo;Hot tub&rdquo; &rarr; &ldquo;Hot tua&rdquo;
+&ldquo;But why?&rdquo; &rarr; &ldquo;Aut why?&rdquo;
+            </div>
+          </div>
+        </div>
+
+        <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="b-to-a" placeholder="changes 'b' to 'a'"&gt;</code></pre>
+        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField($('#b-to-a'));
+field.formatter = {
+  format: function(value){ return value.replace(/b/g, 'a').replace(/B/g, 'A'); },
+  parse: function(value){ return value; },
+
+  isChangeValid: function(change) {
+    change.proposed.text = this.format(this.parse(change.proposed.text));
+    return true;
+  }
+};</code></pre>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="offset2 span8">
+        <h4>Controlling the Caret</h4>
+
+        <p>
+          Formatters not only have control over the editable text but also the
+          caret and selection, if they so choose. Formatters can exercise this
+          control by implementing the <code>#isChangeValid(change)</code>
+          method and changing the proposed caret. The example below does not
+          impose any restrictions on what can be typed or how to display the
+          value, but disables all selection.
+        </p>
+
+        <div class="docs-example">
+          <input type="text" id="no-selection" placeholder="no selection" />
+        </div>
+
+        <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="no-selection" placeholder="no selection"&gt;</code></pre>
+        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField($('#card-number'));
+field.formatter = {
+  format: function(value){ return value; },
+  parse: function(value){ return value; },
+
+  isChangeValid: function(change) {
+    var caret = change.proposed.caret;
+
+    // Check to see whether the user tried to select something.
+    if (caret.start !== caret.end) {
+      if (change.field.selectionAnchor === caret.end)
+        // Move to the beginning since the selection extended
+        // from the end toward the beginning (e.g. shift+left).
+        caret.end = caret.start;
+      else
+        // Move to the end since the selection extended
+        // from the beginning toward the end (e.g. shift+right).
+        caret.start = caret.end;
+    }
+
+    return true;
+  }
+};</code></pre>
+      </div>
+    </div>
+
+
+    <div class="row">
+      <div class="span4">
+      </div>
+    </div>
+  </div>
+
+
   <script src="/test/jquery.js" type="text/javascript" charset="utf-8"></script>
   <script src="/test/jquery.caret.1.02.js" type="text/javascript" charset="utf-8"></script>
   <script src="/src/text_field.coffee" type="text/javascript" charset="utf-8"></script>
@@ -10,50 +343,8 @@
   <script src="/src/default_card_formatter.coffee" type="text/javascript" charset="utf-8"></script>
   <script src="/src/amex_card_formatter.coffee" type="text/javascript" charset="utf-8"></script>
   <script src="/src/adaptive_card_formatter.coffee" type="text/javascript" charset="utf-8"></script>
+  <script src="/test/index.coffee" type="text/javascript" charset="utf-8"></script>
 
-  <style type="text/css" media="screen">
-    input[type=text] {
-      width: 230px;
-      height: 30px;
-      font-size: 20px;
-    }
-  </style>
-</head>
-<body>
-  <input type="text" id="no-selection-test" placeholder="no selection" />
-  <input type="text" id="month-year-test" placeholder="mm/yy" />
-  <input type="text" id="credit-card-test" placeholder="1234 5678 8901 2345" />
-
-  <script type="text/javascript" charset="utf-8">
-  jQuery(function($) {
-    var $noSelectionInput = $('#no-selection-test');
-    var noSelectionField = new FieldKit.TextField($noSelectionInput);
-
-    noSelectionField.formatter = {
-      format: function(value){ return value; },
-      parse: function(value){ return value; },
-
-      isChangeValid: function(change) {
-        var caret = change.proposed.caret;
-        if (caret.start !== caret.end) {
-          if (change.field.selectionAnchor === caret.end)
-            caret.end = caret.start
-          else
-            caret.start = caret.end;
-        }
-
-        return true;
-      }
-    };
-
-    var $monthYearInput = $('#month-year-test');
-    var monthYearField = new FieldKit.TextField($monthYearInput);
-    monthYearField.formatter = new FieldKit.ExpiryDateFormatter();
-
-    var $creditCardInput = $('#credit-card-test');
-    var creditCardField = new FieldKit.TextField($creditCardInput);
-    creditCardField.formatter = new FieldKit.AdaptiveCardFormatter();
-  });
-  </script>
+  <script src="/google-code-prettify/prettify.js" type="text/javascript" charset="utf-8"></script>
 </body>
 </html>
