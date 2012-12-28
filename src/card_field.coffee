@@ -33,7 +33,7 @@ GAP = ' '
 no_ws = (string) ->
   string.replace(/\s+/g, '')
 
-FormattedTextField = require './formatted_text_field'
+FormattedTextField = require './text_field'
 
 class CardExtraField
   constructor: (@cardField, @element) ->
