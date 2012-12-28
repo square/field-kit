@@ -1,6 +1,6 @@
 PassthroughFormatter = require './helpers/passthrough_formatter'
 {buildField} = require './helpers/builders'
-{expectThatTyping} = require './helpers/expectations'
+{expectThatTyping, expectThatPasting} = require './helpers/expectations'
 
 describe 'FormattedTextField', ->
   describe 'typing a character into an empty field', ->
@@ -215,3 +215,7 @@ describe 'FormattedTextField', ->
     expectThatTyping('shift+down').into(field).willChange('2|34').to('234|')
     expectThatTyping('meta+a').into(field).willNotChange('|1234')
     expectThatTyping('alt+shift+right').into(field).willChange('|12 34').to('12| 34')
+
+  it 'handles pastes a any other input', ->
+    expectThatPasting('eat').willChange('|').to('eat|')
+    expectThatPasting('eat').willChange('Want something to |drink>?').to('Want something to eat|?')

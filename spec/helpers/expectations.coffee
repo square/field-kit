@@ -2,10 +2,7 @@ FakeEvent = require './fake_event'
 Caret = require './caret'
 {buildField} = require './builders'
 
-class ExpectThatTyping
-  constructor: (keys...) ->
-    @keys = keys
-
+class FieldExpectationBase
   into: (@field) ->
     this
 
@@ -21,7 +18,7 @@ class ExpectThatTyping
 
   to: (@expectedDescription) ->
     @applyDescription()
-    @typeKeys()
+    @perform()
     @assert()
 
   applyDescription: ->
@@ -29,18 +26,6 @@ class ExpectThatTyping
     @field.element.val value
     @field.element.caret caret
     @field.selectionDirection = direction
-
-  typeKeys: ->
-    for key in @keys
-      event = FakeEvent.withKey(key)
-      event.type = 'keydown'
-      @field.keyDown event
-      if not event.isDefaultPrevented()
-        event.type = 'keypress'
-        if event.charCode
-          @field.keyPress event
-        event.type = 'keyup'
-        @field.keyUp event
 
   assert: ->
     actual = Caret.printDescription
@@ -56,7 +41,40 @@ class ExpectThatTyping
   @::__defineSetter__ 'field', (field) ->
     @_field = field
 
+class ExpectThatTyping extends FieldExpectationBase
+  constructor: (keys...) ->
+    @keys = keys
+
+  perform: ->
+    @typeKeys()
+
+  typeKeys: ->
+    for key in @keys
+      event = FakeEvent.withKey(key)
+      event.type = 'keydown'
+      @field.keyDown event
+      if not event.isDefaultPrevented()
+        event.type = 'keypress'
+        if event.charCode
+          @field.keyPress event
+        event.type = 'keyup'
+        @field.keyUp event
+
+class ExpectThatPasting extends FieldExpectationBase
+  constructor: (text) ->
+    @text = text
+
+  perform: ->
+    @paste()
+
+  paste: ->
+    event = FakeEvent.pasteEventWithData Text: @text
+    @field.paste event
+
 expectThatTyping = (keys...) ->
   new ExpectThatTyping(keys...)
 
-module.exports = { expectThatTyping }
+expectThatPasting = (text) ->
+  new ExpectThatPasting(text)
+
+module.exports = { expectThatTyping, expectThatPasting }

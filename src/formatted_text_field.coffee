@@ -50,6 +50,7 @@ class FormattedTextField
     @element.on 'keypress', @keyPress
     @element.on 'keyup', @keyUp
     @element.on 'click', @click
+    @element.on 'paste', @paste
     @element.data 'formatted-text-field', this
     @createTabInterceptors()
 
@@ -979,6 +980,18 @@ class FormattedTextField
     @caret = start: 0, end: text.length
     @selectionDirection = DIRECTION.NONE
 
+  # Replaces the current selection with text from the given pasteboard.
+  #
+  # pasteboard - A DOM event's clipboardData property value.
+  #
+  # Returns nothing.
+  readSelectionFromPasteboard: (pasteboard) ->
+    text = pasteboard.getData 'Text'
+    @replaceSelection text
+    caret = @caret
+    caret.start = caret.end
+    @caret = caret
+
   # Internal: Handles keyDown events. This method essentially just delegates to
   # other, more semantic, methods based on the modifier keys and the pressed
   # key of the event.
@@ -1107,6 +1120,14 @@ class FormattedTextField
     @rollbackInvalidChanges =>
       if event.keyCode is KEYS.TAB
         @selectAll event
+
+  # Internal: Handles paste events.
+  #
+  # Returns nothing.
+  paste: (event) =>
+    event.preventDefault()
+    @rollbackInvalidChanges =>
+      @readSelectionFromPasteboard event.originalEvent.clipboardData
 
   # Internal: Checks changes after invoking the passed function for validity
   # and rolls them back if the changes turned out to be invalid.
