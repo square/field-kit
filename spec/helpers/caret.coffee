@@ -14,7 +14,7 @@ class Caret
   @parseDescription: (description) ->
     value = ''
     caret = new @()
-    direction = null
+    affinity = null
     valueIndex = 0
     parseIndex = 0
 
@@ -31,18 +31,18 @@ class Caret
           if char is '<'
             parseError char, "'#{char}' cannot be the end of a selection"
 
-          if direction isnt null and char is '>'
+          if affinity isnt null and char is '>'
             parseError char, "'#{char}' cannot be the end of an already-leftward selection"
 
           caret.end = valueIndex
-          direction = 'right' if char is '>'
+          affinity = 1 if char is '>'
 
         else
           if char is '>'
             parseError char, "'#{char}' cannot be the start of a selection"
 
           caret.start = valueIndex
-          direction = 'left' if char is '<'
+          affinity = 0 if char is '<'
       else
         value += char
         valueIndex++
@@ -52,24 +52,24 @@ class Caret
     if not caret.start?
       parseError 'EOF', "no caret found in description"
 
-    if direction isnt null and not caret.end?
+    if affinity isnt null and not caret.end?
       parseError 'EOF', "expected '|' to end the selection"
 
     caret.end ?= caret.start
 
-    return { caret, direction, value }
+    return { caret, affinity, value }
 
-  @printDescription: ({caret, direction, value}) ->
+  @printDescription: ({caret, affinity, value}) ->
     if caret.start is caret.end
-      if direction?
-        throw new Error("cannot have directional selection without a selection: caret=#{caret.start}..#{caret.end}, direction=#{direction}, value=#{value}")
+      if affinity?
+        throw new Error("cannot have directional selection without a selection: caret=#{caret.start}..#{caret.end}, direction=#{if affinity is 0 then 'upstream' else 'downstream'}, value=#{value}")
 
       return value.substring(0, caret.start) + '|' + value.substring(caret.end)
     else
       result = value.substring(0, caret.start)
-      result += if direction is 'left' then '<' else '|'
+      result += if affinity is 0 then '<' else '|'
       result += value.substring(caret.start, caret.end)
-      result += if direction is 'right' then '>' else '|'
+      result += if affinity is 1 then '>' else '|'
       result += value.substring(caret.end)
       return result
 

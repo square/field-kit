@@ -16,10 +16,10 @@ KEYS.isDigit = (keyCode) ->
 KEYS.isDirectional = (keyCode) ->
   keyCode in [@LEFT, @RIGHT, @UP, @DOWN]
 
-DIRECTION =
-  LEFT:  'left'
-  RIGHT: 'right'
-  NONE:  null
+AFFINITY =
+  UPSTREAM:   0
+  DOWNSTREAM: 1
+  NONE:       null
 
 isWordChar = (char) -> char and /^\w$/.test(char)
 
@@ -41,9 +41,9 @@ makeFirstResponder = (field, event) ->
     field.select?()
 
 class TextField
-  # Internal: Contains one of the DIRECTION enum to indicate the direction the
-  # free end of the selection is from its anchor.
-  selectionDirection: DIRECTION.NONE
+  # Internal: Contains one of the AFFINITY enum to indicate the preferred
+  # direction of selection.
+  selectionAffinity: AFFINITY.NONE
 
   constructor: (@element) ->
     @element.on 'keydown', @keyDown
@@ -115,9 +115,10 @@ class TextField
 
     # insert the character
     @replaceSelection String.fromCharCode(event.charCode)
-    caret = @caret
-    caret.start = caret.end
-    @caret = caret
+    range = @selectedRange
+    range.start += range.length
+    range.length = 0
+    @setSelectedRange range
 
   # Moves the cursor up, which because this is a single-line text field, means
   # moving to the beginning of the value.
@@ -135,8 +136,7 @@ class TextField
   # Returns nothing.
   moveUp: (event) ->
     event.preventDefault()
-
-    @caret = start: 0, end: 0
+    @setSelectedRange start: 0, length: 0
 
   # Moves the cursor up to the beginning of the current paragraph, which
   # because this is a single-line text field, means moving to the beginning of
@@ -179,19 +179,19 @@ class TextField
   # Returns nothing.
   moveUpAndModifySelection: (event) ->
     event.preventDefault()
-    caret = @caret
+    range = @selectedRange
 
-    switch @selectionDirection
-      when DIRECTION.LEFT, DIRECTION.NONE
+    switch @selectionAffinity
+      when AFFINITY.UPSTREAM, AFFINITY.NONE
         # 12<34 56|78  =>  <1234 56|78
-        caret.start = 0
-      when DIRECTION.RIGHT
+        range.length += range.start
+        range.start = 0
+      when AFFINITY.DOWNSTREAM
         # 12|34 56>78   =>   <12|34 5678
-        caret.end = caret.start
-        caret.start = 0
+        range.length = range.start
+        range.start = 0
 
-    @selectionDirection = DIRECTION.LEFT
-    @caret = caret
+    @setSelectedRangeWithAffinity range, AFFINITY.UPSTREAM
 
   # Moves the free end of the selection to the beginning of the paragraph, or
   # since this is a single-line text field to the beginning of the line.
@@ -199,18 +199,18 @@ class TextField
   # Returns nothing.
   moveParagraphBackwardAndModifySelection: (event) ->
     event.preventDefault()
-    caret = @caret
+    range = @selectedRange
 
-    switch @selectionDirection
-      when DIRECTION.LEFT, DIRECTION.NONE
+    switch @selectionAffinity
+      when AFFINITY.UPSTREAM, AFFINITY.NONE
         # 12<34 56|78  =>  <1234 56|78
-        caret.start = 0
-      when DIRECTION.RIGHT
+        range.length += range.start
+        range.start = 0
+      when AFFINITY.DOWNSTREAM
         # 12|34 56>78  =>  12|34 5678
-        caret.end = caret.start
+        range.length = 0
 
-    @selectionDirection = DIRECTION.LEFT
-    @caret = caret
+    @setSelectedRangeWithAffinity range, AFFINITY.UPSTREAM
 
   # Moves the cursor to the beginning of the document.
   #
@@ -224,10 +224,10 @@ class TextField
   # Returns nothing.
   moveToBeginningOfDocumentAndModifySelection: (event) ->
     event.preventDefault()
-    caret = @caret
-    caret.start = 0
-    @selectionDirection = DIRECTION.LEFT
-    @caret = caret
+    range = @selectedRange
+    range.length += range.start
+    range.start = 0
+    @setSelectedRangeWithAffinity range, AFFINITY.UPSTREAM
 
   # Moves the cursor down, which because this is a single-line text field,
   # means moving to the end of the value.
@@ -245,10 +245,9 @@ class TextField
   # Returns nothing.
   moveDown: (event) ->
     event.preventDefault()
-    end = @text.length
-
     # 12|34 56|78  =>  1234 5678|
-    @caret = start: end, end: end
+    range = start: @text.length, length: 0
+    @setSelectedRangeWithAffinity range, AFFINITY.NONE
 
   # Moves the cursor up to the end of the current paragraph, which because this
   # is a single-line text field, means moving to the end of the value.
@@ -290,18 +289,14 @@ class TextField
   # Returns nothing.
   moveDownAndModifySelection: (event) ->
     event.preventDefault()
-    caret = @caret
+    range = @selectedRange
     end = @text.length
 
-    switch @selectionDirection
-      when DIRECTION.LEFT
-        caret.start = caret.end
-        caret.end = end
-      when DIRECTION.RIGHT, DIRECTION.NONE
-        caret.end = end
+    if @selectionAffinity is AFFINITY.UPSTREAM
+      range.start += range.length
 
-    @selectionDirection = DIRECTION.RIGHT
-    @caret = caret
+    range.length = end - range.start
+    @setSelectedRangeWithAffinity range, AFFINITY.DOWNSTREAM
 
   # Moves the free end of the selection to the end of the paragraph, or since
   # this is a single-line text field to the end of the line.
@@ -309,18 +304,18 @@ class TextField
   # Returns nothing.
   moveParagraphForwardAndModifySelection: (event) ->
     event.preventDefault()
-    caret = @caret
+    range = @selectedRange
 
-    switch @selectionDirection
-      when DIRECTION.RIGHT, DIRECTION.NONE
+    switch @selectionAffinity
+      when AFFINITY.DOWNSTREAM, AFFINITY.NONE
         # 12|34 56>78  =>  12|34 5678>
-        caret.end = @text.length
-      when DIRECTION.LEFT
+        range.length = @text.length - range.start
+      when AFFINITY.UPSTREAM
         # 12<34 56|78  =>  12|34 5678
-        caret.start = caret.end
+        range.start += range.length
+        range.length = 0
 
-    @selectionDirection = DIRECTION.RIGHT
-    @caret = caret
+    @setSelectedRangeWithAffinity range, AFFINITY.DOWNSTREAM
 
   # Moves the cursor to the end of the document.
   #
@@ -334,10 +329,9 @@ class TextField
   # Returns nothing.
   moveToEndOfDocumentAndModifySelection: (event) ->
     event.preventDefault()
-    caret = @caret
-    caret.end = @text.length
-    @selectionDirection = DIRECTION.RIGHT
-    @caret = caret
+    range = @selectedRange
+    range.length = @text.length - range.start
+    @setSelectedRangeWithAffinity range, AFFINITY.DOWNSTREAM
 
   # Moves the cursor to the left, counting selections as a thing to move past.
   #
@@ -356,15 +350,14 @@ class TextField
   # Returns nothing.
   moveLeft: (event) ->
     event.preventDefault()
-    caret = @caret
+    range = @selectedRange
 
-    if @hasSelection
-      caret.end = caret.start
+    if range.length isnt 0
+      range.length = 0
     else
-      caret.start--
-      caret.end--
+      range.start--
 
-    @caret = caret
+    @setSelectedRangeWithAffinity range, AFFINITY.NONE
 
   # Moves the free end of the selection one to the left.
   #
@@ -393,16 +386,17 @@ class TextField
   # Returns nothing.
   moveLeftAndModifySelection: (event) ->
     event.preventDefault()
-    caret = @caret
+    range = @selectedRange
 
-    switch @selectionDirection
-      when DIRECTION.LEFT, DIRECTION.NONE
-        @selectionDirection = DIRECTION.LEFT
-        caret.start--
-      when DIRECTION.RIGHT
-        caret.end--
+    switch @selectionAffinity
+      when AFFINITY.UPSTREAM, AFFINITY.NONE
+        @selectionAffinity = AFFINITY.UPSTREAM
+        range.start--
+        range.length++
+      when AFFINITY.DOWNSTREAM
+        range.length--
 
-    @caret = caret
+    @setSelectedRange range
 
   # Moves the cursor left until the start of a word is found.
   #
@@ -421,8 +415,8 @@ class TextField
   # Returns nothing.
   moveWordLeft: (event) ->
     event.preventDefault()
-    index = @lastWordBreakBeforeIndex @caret.start - 1
-    @caret = start: index, end: index
+    index = @lastWordBreakBeforeIndex @selectedRange.start - 1
+    @setSelectedRange start: index, length: 0
 
   # Moves the free end of the current selection to the beginning of the
   # previous word.
@@ -452,17 +446,20 @@ class TextField
   # Returns nothing.
   moveWordLeftAndModifySelection: (event) ->
     event.preventDefault()
-    caret = @caret
+    range = @selectedRange
 
-    switch @selectionDirection
-      when DIRECTION.LEFT, DIRECTION.NONE
-        @selectionDirection = DIRECTION.LEFT
-        caret.start = @lastWordBreakBeforeIndex caret.start - 1
-      when DIRECTION.RIGHT
-        caret.end = @lastWordBreakBeforeIndex caret.end
-        caret.end = caret.start if caret.end < caret.start
+    switch @selectionAffinity
+      when AFFINITY.UPSTREAM, AFFINITY.NONE
+        @selectionAffinity = AFFINITY.UPSTREAM
+        start = @lastWordBreakBeforeIndex range.start - 1
+        range.length += range.start - start
+        range.start = start
+      when AFFINITY.DOWNSTREAM
+        end = @lastWordBreakBeforeIndex range.start + range.length
+        end = range.start if end < range.start
+        range.length -= range.start + range.length - end
 
-    @caret = caret
+    @setSelectedRange range
 
   # Moves the cursor to the beginning of the current line.
   #
@@ -475,7 +472,7 @@ class TextField
   # Returns nothing.
   moveToBeginningOfLine: (event) ->
     event.preventDefault()
-    @caret = start: 0, end: 0
+    @setSelectedRange start: 0, length: 0
 
   # Select from the free end of the caret to the beginning of line.
   #
@@ -487,22 +484,15 @@ class TextField
   #
   #   Hey guys, where| are> ya?
   #   moveToBeginningOfLineAndModifySelection(event)
-  #   <Hey guys, where| are ya?
+  #   <Hey guys, where are| ya?
   #
   # Returns nothing.
   moveToBeginningOfLineAndModifySelection: (event) ->
     event.preventDefault()
-    caret = @caret
-
-    switch @selectionDirection
-      when DIRECTION.LEFT, DIRECTION.NONE
-        @selectionDirection = DIRECTION.LEFT
-        caret.start = 0
-      when DIRECTION.RIGHT
-        caret.end = caret.start
-        caret.start = 0
-
-    @caret = caret
+    range = @selectedRange
+    range.length += range.start
+    range.start = 0
+    @setSelectedRangeWithAffinity range, AFFINITY.UPSTREAM
 
   # Moves the cursor to the right, counting selections as a thing to move past.
   #
@@ -521,15 +511,15 @@ class TextField
   # Returns nothing.
   moveRight: (event) ->
     event.preventDefault()
-    caret = @caret
+    range = @selectedRange
 
-    if @hasSelection
-      caret.start = caret.end
+    if range.length isnt 0
+      range.start += range.length
+      range.length = 0
     else
-      caret.start++
-      caret.end++
+      range.start++
 
-    @caret = caret
+    @setSelectedRangeWithAffinity range, AFFINITY.NONE
 
   # Moves the free end of the selection one to the right.
   #
@@ -558,16 +548,17 @@ class TextField
   # Returns nothing.
   moveRightAndModifySelection: (event) ->
     event.preventDefault()
-    caret = @caret
+    range = @selectedRange
 
-    switch @selectionDirection
-      when DIRECTION.LEFT
-        caret.start++
-      when DIRECTION.RIGHT, DIRECTION.NONE
-        @selectionDirection = DIRECTION.RIGHT
-        caret.end++
+    switch @selectionAffinity
+      when AFFINITY.UPSTREAM
+        range.start++
+        range.length--
+      when AFFINITY.DOWNSTREAM, AFFINITY.NONE
+        @selectionAffinity = AFFINITY.DOWNSTREAM
+        range.length++
 
-    @caret = caret
+    @setSelectedRange range
 
   # Moves the cursor right until the end of a word is found.
   #
@@ -586,8 +577,9 @@ class TextField
   # Returns nothing.
   moveWordRight: (event) ->
     event.preventDefault()
-    index = @nextWordBreakAfterIndex @caret.end
-    @caret = start: index, end: index
+    range = @selectedRange
+    index = @nextWordBreakAfterIndex range.start + range.length
+    @setSelectedRange start: index, length: 0
 
   # Moves the free end of the current selection to the next end of word.
   #
@@ -616,17 +608,18 @@ class TextField
   # Returns nothing.
   moveWordRightAndModifySelection: (event) ->
     event.preventDefault()
-    caret = @caret
+    range = @selectedRange
+    start = range.start
+    end = range.start + range.length
 
-    switch @selectionDirection
-      when DIRECTION.LEFT
-        caret.start = @nextWordBreakAfterIndex caret.start
-        caret.start = caret.end if caret.start > caret.end
-      when DIRECTION.RIGHT, DIRECTION.NONE
-        @selectionDirection = DIRECTION.RIGHT
-        caret.end = @nextWordBreakAfterIndex caret.end
+    switch @selectionAffinity
+      when AFFINITY.UPSTREAM
+        start = Math.min @nextWordBreakAfterIndex(start), end
+      when AFFINITY.DOWNSTREAM, AFFINITY.NONE
+        @selectionAffinity = AFFINITY.DOWNSTREAM
+        end = @nextWordBreakAfterIndex range.start + range.length
 
-    @caret = caret
+    @setSelectedRange start: start, length: end - start
 
   # Moves the cursor to the end of the current line.
   #
@@ -640,7 +633,7 @@ class TextField
   moveToEndOfLine: (event) ->
     event.preventDefault()
     text = @text
-    @caret = start: text.length, end: text.length
+    @setSelectedRange start: @text.length, length: 0
 
   # Moves the free end of the caret to the end of the current line.
   #
@@ -652,23 +645,14 @@ class TextField
   #
   #   Hey guys, <where| are ya?
   #   moveToEndofLineAndModifySelection(event)
-  #   Hey guys, where| are ya?>
+  #   Hey guys, |where are ya?>
   #
   # Returns nothing.
   moveToEndOfLineAndModifySelection: (event) ->
     event.preventDefault()
-    caret = @caret
-
-    switch @selectionDirection
-      when DIRECTION.RIGHT, DIRECTION.NONE
-        @selectionDirection = DIRECTION.RIGHT
-        caret.end = @text.length
-      when DIRECTION.LEFT
-        caret.start = caret.end
-        caret.end = @text.length
-
-    @caret = caret
-
+    range = @selectedRange
+    range.length = @text.length - range.start
+    @setSelectedRangeWithAffinity range, AFFINITY.DOWNSTREAM
 
   # Deletes backward one character or clears a non-empty selection.
   #
@@ -689,11 +673,12 @@ class TextField
   # Returns nothing.
   deleteBackward: (event) ->
     event.preventDefault()
+    range = @selectedRange
 
-    unless @hasSelection
-      caret = @caret
-      caret.start--
-      @caret = caret
+    if range.length is 0
+      range.start--
+      range.length++
+      @setSelectedRange range
 
     @clearSelection()
 
@@ -719,11 +704,13 @@ class TextField
       return @deleteBackward event
 
     event.preventDefault()
-    caret = @caret
+    range = @selectedRange
 
-    caret.start = @lastWordBreakBeforeIndex caret.start
+    start = @lastWordBreakBeforeIndex range.start
+    range.length += range.start - start
+    range.start = start
 
-    @caret = caret
+    @setSelectedRange range
     @clearSelection()
 
   # Deletes backward one character, clears a non-empty selection, or decomposes
@@ -767,9 +754,10 @@ class TextField
       return @deleteBackward event
 
     event.preventDefault()
-    caret = @caret
-    caret.start = 0
-    @caret = caret
+    range = @selectedRange
+    range.length = range.start
+    range.start = 0
+    @setSelectedRange range
     @clearSelection()
 
   # Deletes forward one character or clears a non-empty selection.
@@ -791,11 +779,11 @@ class TextField
   # Returns nothing.
   deleteForward: (event) ->
     event.preventDefault()
+    range = @selectedRange
 
-    unless @hasSelection
-      caret = @caret
-      caret.end++
-      @caret = caret
+    if range.length is 0
+      range.length++
+      @setSelectedRange range
 
     @clearSelection()
 
@@ -820,12 +808,12 @@ class TextField
     if @hasSelection
       return @deleteForward event
 
-    caret = @caret
     event.preventDefault()
+    range = @selectedRange
 
-    caret.end = @nextWordBreakAfterIndex caret.end
+    end = @nextWordBreakAfterIndex range.start + range.length
 
-    @caret = caret
+    @setSelectedRange start: range.start, length: end - range.start
     @clearSelection()
 
   # Handles the tab key.
@@ -858,8 +846,7 @@ class TextField
   #
   # Returns true if there is at least one character selected, false otherwise.
   @::__defineGetter__ 'hasSelection', ->
-    caret = @caret
-    caret.start isnt caret.end
+    @selectedRange.length isnt 0
 
   # Internal: Finds the start of the "word" before index.
   #
@@ -955,15 +942,15 @@ class TextField
   #
   # Returns nothing.
   replaceSelection: (replacement) ->
-    caret = @caret
+    range = @selectedRange
+    end = range.start + range.length
     text = @text
 
-    text = text.substring(0, caret.start) + replacement + text.substring(caret.end)
-    caret.end = caret.start + replacement.length
+    text = text.substring(0, range.start) + replacement + text.substring(end)
+    range.length = replacement.length
 
     @text = text
-    @caret = caret
-    @selectionDirection = DIRECTION.NONE
+    @setSelectedRangeWithAffinity range, AFFINITY.NONE
 
   # Internal: Expands the selection to contain all the characters in the content.
   #
@@ -976,9 +963,7 @@ class TextField
   # Returns nothing.
   selectAll: (event) ->
     event.preventDefault()
-    text = @text
-    @caret = start: 0, end: text.length
-    @selectionDirection = DIRECTION.NONE
+    @setSelectedRangeWithAffinity {start: 0, length: @text.length}, AFFINITY.NONE
 
   # Replaces the current selection with text from the given pasteboard.
   #
@@ -988,9 +973,10 @@ class TextField
   readSelectionFromPasteboard: (pasteboard) ->
     text = pasteboard.getData 'Text'
     @replaceSelection text
-    caret = @caret
-    caret.start = caret.end
-    @caret = caret
+    range = @selectedRange
+    range.start += range.length
+    range.length = 0
+    @setSelectedRange range
 
   # Internal: Handles keyDown events. This method essentially just delegates to
   # other, more semantic, methods based on the modifier keys and the pressed
@@ -1182,11 +1168,11 @@ class TextField
 
     return result
 
-  # Internal: Handles clicks by resetting the selection direction.
+  # Internal: Handles clicks by resetting the selection affinity.
   #
   # Returns nothing.
   click: (event) =>
-    @selectionDirection = DIRECTION.NONE
+    @selectionAffinity = AFFINITY.NONE
 
   on: (args...) ->
     @element.on args...
@@ -1232,12 +1218,19 @@ class TextField
     @_formatter = formatter
     @value = value
 
-  # Gets the selection caret with start and end indexes relative to #value.
+  # Deprecated: Gets the selection caret with start and end indexes relative to #value.
   #
   # Returns an Object with 'start' and 'end' keys.
   @::__defineGetter__ 'caret', ->
     { start, end } = @element.caret()
     return { start, end }
+
+  # Gets the range of the current selection.
+  #
+  # Returns an Object with 'start', 'length', and 'end' keys.
+  @::__defineGetter__ 'selectedRange', ->
+    caret = @caret
+    return start: caret.start, length: caret.end - caret.start
 
   # Sets the current selection caret.
   @::__defineSetter__ 'caret', (caret) ->
@@ -1247,18 +1240,32 @@ class TextField
       start: Math.max(min, Math.min(max, caret.start))
       end: Math.max(min, Math.min(max, caret.end))
     @element.caret caret
-    @selectionDirection = DIRECTION.NONE if caret.start is caret.end
+    @selectionAffinity = AFFINITY.NONE if caret.start is caret.end
+
+  # Sets the range of the current selection without changing the affinity.
+  #
+  # Returns nothing.
+  setSelectedRange: (range) ->
+    @setSelectedRangeWithAffinity range, @selectionAffinity
+
+  # Sets the range of the current selection and the selection affinity.
+  #
+  # Returns nothing.
+  setSelectedRangeWithAffinity: (range, affinity) ->
+    @selectionAffinity = affinity
+    @caret = start: range.start, end: range.start + range.length
 
   # Gets the position of the current selection's anchor point, i.e. the point
   # that the selection extends from, if any.
   #
   # Returns an index within the current text.
   @::__defineGetter__ 'selectionAnchor', ->
-    switch @selectionDirection
-      when DIRECTION.LEFT
-        @caret.end
-      when DIRECTION.RIGHT
-        @caret.start
+    range = @selectedRange
+    switch @selectionAffinity
+      when AFFINITY.UPSTREAM
+        range.start + range.length
+      when AFFINITY.DOWNSTREAM
+        range.start
       else
         null
 

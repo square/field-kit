@@ -90,6 +90,7 @@ describe 'TextField', ->
 
       expectThatTyping('meta+left').willChange('41|11').to('|4111')
       expectThatTyping('shift+meta+left').willChange('41|11').to('<41|11')
+      expectThatTyping('shift+meta+left').willChange('41|1>1').to('<411|1')
       expectThatTyping('shift+meta+left').willNotChange('|4111')
 
   describe 'typing a right arrow', ->
@@ -114,6 +115,7 @@ describe 'TextField', ->
 
       expectThatTyping('meta+right').willChange('41|11').to('4111|')
       expectThatTyping('shift+meta+right').willChange('41|11').to('41|11>')
+      expectThatTyping('shift+meta+right').willChange('<41|11').to('|4111>')
       expectThatTyping('shift+meta+right').willNotChange('4111|')
 
   describe 'typing an up arrow', ->
