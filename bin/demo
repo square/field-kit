@@ -30,6 +30,8 @@ server = http.createServer (request, response) ->
       respond 200, headers, data
 
   serveFromPath = (root, requestPath) ->
+    requestPath ||= '.'
+
     if not requestPath or requestPath.indexOf('..') > -1
       respond 404
     else
@@ -42,9 +44,7 @@ server = http.createServer (request, response) ->
             data = CoffeeScript.compile data
           writeFileIfFound err, data
 
-  if request.url is '/'
-    respond 302, Location: '/test'
-  else if match = request.url.match(/^\/(lib|src)\//)
+  if match = request.url.match(/^\/(lib|src)\//)
     requestPath = request.url.substring(match[0].length)
     serveFromPath match[1], requestPath
   else
