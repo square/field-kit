@@ -1,57 +1,19 @@
-DEFAULT_SPACE_INDEXES = [4, 8, 12]
-Object.freeze?(DEFAULT_SPACE_INDEXES)
+if require?
+  DelimitedTextFormatter = require './delimited_text_formatter'
+else
+  {DelimitedTextFormatter} = @FieldKit
 
-class DefaultCardFormatter
-  spaceIndexes: null
-  cardLength: 16
+class DefaultCardFormatter extends DelimitedTextFormatter
+  maximumLength: 16 + 3
 
   constructor: ->
-    @spaceIndexes = DEFAULT_SPACE_INDEXES.slice()
+    super ' '
 
-  format: (pan) ->
-    return '' unless pan
-
-    result = ''
-    for char, i in pan.slice(0, @cardLength)
-      result += char
-      result += ' ' if i+1 in @spaceIndexes
-    result
+  hasDelimiterAtIndex: (index) ->
+    index in [4, 9, 14]
 
   parse: (text) ->
-    return null unless text
-    text.replace /[^\d]/g, ''
-
-  isChangeValid: (change) ->
-    newText = change.proposed.text
-
-    if change.deleted.text is ' '
-      newText = newText.substring(0, newText.length - 1)
-
-    caret = change.proposed.caret
-    hasSelection = caret.start isnt caret.end
-    startMovedLeft = caret.start < change.current.caret.start
-    endMovedLeft = caret.end < change.current.caret.end
-
-    for spaceIndex, i in @spaceIndexes
-      if caret.start is spaceIndex + i
-        if startMovedLeft
-          caret.start--
-        else
-          caret.start++
-
-    if hasSelection
-      for spaceIndex, i in @spaceIndexes
-        if caret.end is spaceIndex + i + 1
-          if startMovedLeft or endMovedLeft
-            caret.end--
-          else
-            caret.end++
-    else
-      caret.end = caret.start
-
-    newText = @format @parse(newText)
-    change.proposed.text = newText
-    return yes
+    super (text ? '').replace(/[^\d]/g, '')
 
 if module?
   module.exports = DefaultCardFormatter

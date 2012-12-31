@@ -3,14 +3,11 @@ if require?
 else
   {DefaultCardFormatter} = @FieldKit
 
-AMEX_SPACE_INDEXES = [4, 10]
-Object.freeze?(AMEX_SPACE_INDEXES)
-
 class AmexCardFormatter extends DefaultCardFormatter
-  cardLength: 15
+  maximumLength: 15 + 2
 
-  constructor: ->
-    @spaceIndexes = AMEX_SPACE_INDEXES.slice()
+  hasDelimiterAtIndex: (index) ->
+    index in [4, 11]
 
 if module?
   module.exports = AmexCardFormatter

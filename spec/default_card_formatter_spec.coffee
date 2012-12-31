@@ -15,12 +15,14 @@ describe 'DefaultCardFormatter', ->
   it 'groups digits into four groups of four separated by spaces', ->
     expectThatTyping('4111111111111111'.split('')...).into(field).willChange('|').to('4111 1111 1111 1111|')
 
+  it 'prevents entering more digits than are allowed', ->
+    expectThatTyping('1').into(field).willNotChange('4111 1111 1111 1111|')
+
   it 'backspaces both the space and the character before it', ->
     expectThatTyping('backspace').into(field).willChange('4111 |').to('411|')
 
   it 'allows backspacing a whole group of digits', ->
     expectThatTyping('alt+backspace').into(field).willChange('4111 1111 |').to('4111 |')
-    field.formatter = null
     expectThatTyping('alt+backspace').into(field).willChange('4111 1|1').to('4111 |1')
 
   it 'prevents adding more than 16 digits', ->
