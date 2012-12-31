@@ -5,6 +5,9 @@ jQuery ($) ->
   creditCardField = new FieldKit.TextField($('#card-number'))
   creditCardField.formatter = new FieldKit.AdaptiveCardFormatter()
 
+  ssnField = new FieldKit.TextField($('#ssn'))
+  ssnField.formatter = new FieldKit.SocialSecurityNumberFormatter()
+
   bToAField = new FieldKit.TextField($('#b-to-a'))
   bToAField.formatter =
     format: (value) -> value.replace(/b/g, 'a').replace(/B/g, 'A')
