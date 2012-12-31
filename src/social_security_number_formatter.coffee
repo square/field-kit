@@ -10,6 +10,12 @@ class SocialSecurityNumberFormatter extends DelimitedTextFormatter
   hasDelimiterAtIndex: (index) ->
     index in [3, 6]
 
+  isChangeValid: (change) ->
+    if /^\d*$/.test change.inserted.text
+      super change
+    else
+      return no
+
 if module?
   module.exports = SocialSecurityNumberFormatter
 else
