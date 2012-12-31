@@ -14,3 +14,6 @@ describe 'SocialSecurityNumberFormatter', ->
 
   it 'prevents extra digits from being entered', ->
     expectThatTyping('0').into(field).willNotChange('123-45-6789|')
+
+  it 'prevents entering non-digit characters', ->
+    expectThatTyping('f').into(field).willNotChange('|')
