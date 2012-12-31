@@ -50,8 +50,12 @@ class ExpiryDateFormatter extends DelimitedTextFormatter
       if /^1[3-9]$/.test(newText)
         return false
 
+      # Don't allow 00
+      if newText is '00'
+        return false
+
       # 11| -> 11/
-      if /^(0\d|1[0-2])$/.test(newText)
+      if /^(0[1-9]|1[0-2])$/.test(newText)
         newText += @delimiter
 
       if (match = newText.match(/^(\d\d)(.)(\d\d?).*$/)) and match[2] is @delimiter
