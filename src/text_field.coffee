@@ -1127,17 +1127,19 @@ class TextField
     if change.proposed.text isnt change.current.text
       ctext = change.current.text
       ptext = change.proposed.text
-      sharedPrefixLength = ctext.length
+      sharedPrefixLength = 0
       sharedSuffixLength = 0
 
       for i in [0...ctext.length]
-        if ptext[i] isnt ctext[i]
-          sharedPrefixLength = i
+        if ptext[i] is ctext[i]
+          sharedPrefixLength = i + 1
+        else
           break
 
       for i in [0...(ctext.length-sharedPrefixLength)]
-        if ptext[ptext.length - 1 - i] isnt ctext[ctext.length - 1 - i]
-          sharedSuffixLength = i
+        if ptext[ptext.length - 1 - i] is ctext[ctext.length - 1 - i]
+          sharedSuffixLength = i + 1
+        else
           break
 
       inserted = start: sharedPrefixLength, end: ptext.length - sharedSuffixLength
