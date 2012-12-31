@@ -9,10 +9,8 @@ zpad2 = (n) ->
   result
 
 class ExpiryDateFormatter extends DelimitedTextFormatter
+  delimiter: '/'
   maximumLength: 5
-
-  constructor: ->
-    super '/'
 
   hasDelimiterAtIndex: (index) ->
     index is 2

@@ -6,7 +6,8 @@ else
 class DelimitedTextFormatter extends Formatter
   delimiter: null
 
-  constructor: (@delimiter) ->
+  constructor: (delimiter=@delimiter) ->
+    @delimiter = delimiter
     if @delimiter?.length isnt 1
       throw new Error('delimiter must have just one character')
 

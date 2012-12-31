@@ -4,10 +4,8 @@ else
   {DelimitedTextFormatter} = @FieldKit
 
 class DefaultCardFormatter extends DelimitedTextFormatter
+  delimiter: ' '
   maximumLength: 16 + 3
-
-  constructor: ->
-    super ' '
 
   hasDelimiterAtIndex: (index) ->
     index in [4, 9, 14]
