@@ -22,6 +22,9 @@ describe 'ExpiryDateFormatter', ->
   it 'adds a preceding zero when a slash is typed after an ambiguous month', ->
     expectThatTyping('/').into(field).willChange('1|').to('01/|')
 
+  it 'prevents 00 as a month', ->
+    expectThatTyping('0').into(field).willNotChange('0|')
+
   it 'prevents entry of an invalid two-digit month', ->
     expectThatTyping('3').into(field).willNotChange('1|')
 
