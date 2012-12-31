@@ -26,6 +26,12 @@
       top: 23px;
     }
 
+    #ssn {
+      width: 120px;
+      position: relative;
+      top: 12px;
+    }
+
     #b-to-a {
       width: 200px;
       position: relative;
@@ -203,6 +209,41 @@ field.formatter = new FieldKit.AdaptiveCardFormatter();</code></pre>
 
     <div class="row">
       <div class="offset2 span8">
+        <h3>SocialSecurityNumberFormatter</h3>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="offset2 span8">
+        <p>
+          The <code>SocialSecurityNumberFormatter</code> provides formatting for
+          US Social Security numbers, preventing the input of non-digit characters
+          and automatically breaking into digit groups like
+          <code>NNN-NN-NNNN</code>.
+        </p>
+
+        <div class="docs-example">
+          <div class="row">
+            <div class="span3">
+              <input type="text" id="ssn" placeholder="123-45-6789" />
+            </div>
+
+            <div class="span4">
+              <pre class="tryout">&ldquo;1234&rdquo; &rarr; &ldquo;123-4&rdquo;
+&ldquo;123-45-&rdquo; + backspace &rarr; &ldquo;123-4&rdquo;
+            </div>
+          </div>
+        </div>
+
+        <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="ssn" placeholder="123-45-6789"&gt;</code></pre>
+        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField($('#ssn'));
+field.formatter = new FieldKit.SocialSecurityNumberFormatter();</code></pre>
+      </div>
+    </div>
+
+
+    <div class="row">
+      <div class="offset2 span8">
         <h3>Writing a custom formatter</h3>
       </div>
     </div>
@@ -345,6 +386,7 @@ field.formatter = {
   <script src="/src/default_card_formatter.coffee" type="text/javascript" charset="utf-8"></script>
   <script src="/src/amex_card_formatter.coffee" type="text/javascript" charset="utf-8"></script>
   <script src="/src/adaptive_card_formatter.coffee" type="text/javascript" charset="utf-8"></script>
+  <script src="/src/social_security_number_formatter.coffee" type="text/javascript" charset="utf-8"></script>
   <script src="/index.coffee" type="text/javascript" charset="utf-8"></script>
 
   <script src="/google-code-prettify/prettify.js" type="text/javascript" charset="utf-8"></script>
