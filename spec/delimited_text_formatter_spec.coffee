@@ -37,3 +37,6 @@ describe 'DelimitedTextFormatter', ->
   it 'selects past delimiters as if they are not there', ->
     expectThatTyping('shift+left').into(field).willChange('411-|1').to('41<1|-1')
     expectThatTyping('shift+left').into(field).willChange('411-<1|1').to('41<1-1|1')
+
+  it 'prevents entering the delimiter character', ->
+    expectThatTyping('-').into(field).willNotChange('123-456-|')
