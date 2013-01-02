@@ -1,7 +1,4 @@
-if require?
-  DefaultCardFormatter = require './default_card_formatter'
-else
-  {DefaultCardFormatter} = @FieldKit
+DefaultCardFormatter = require './default_card_formatter'
 
 class AmexCardFormatter extends DefaultCardFormatter
   maximumLength: 15 + 2
@@ -9,7 +6,4 @@ class AmexCardFormatter extends DefaultCardFormatter
   hasDelimiterAtIndex: (index) ->
     index in [4, 11]
 
-if module?
-  module.exports = AmexCardFormatter
-else
-  (@FieldKit ||= {}).AmexCardFormatter = AmexCardFormatter
+module.exports = AmexCardFormatter

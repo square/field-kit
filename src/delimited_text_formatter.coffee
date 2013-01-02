@@ -1,7 +1,4 @@
-if require?
-  Formatter = require './formatter'
-else
-  {Formatter} = @FieldKit
+Formatter = require './formatter'
 
 class DelimitedTextFormatter extends Formatter
   delimiter: null
@@ -57,7 +54,4 @@ class DelimitedTextFormatter extends Formatter
     change.proposed.text = newText
     return yes
 
-if module?
-  module.exports = DelimitedTextFormatter
-else
-  (@FieldKit ||= {}).DelimitedTextFormatter = DelimitedTextFormatter
+module.exports = DelimitedTextFormatter

@@ -25,7 +25,4 @@ class Formatter
       caret.end -= truncatedLength
     return yes
 
-if module?
-  module.exports = Formatter
-else
-  (@FieldKit ||= {}).Formatter = Formatter
+module.exports = Formatter
