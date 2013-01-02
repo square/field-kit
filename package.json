@@ -5,7 +5,7 @@
   "scripts": {
     "build": "coffee -c -o lib/ src/",
     "test": "npm run-script build && jasmine-node --coffee spec",
-    "package": "npm run-script test && gluejs --include lib --out field-kit.js --global FieldKit && uglifyjs field-kit.js > field-kit.min.js"
+    "package": "npm run-script test && gluejs --basepath lib --include . --out ../field-kit.js --global FieldKit && uglifyjs field-kit.js > field-kit.min.js"
   },
   "repository": "",
   "author": "Square",
