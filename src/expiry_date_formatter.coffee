@@ -1,7 +1,4 @@
-if require?
-  DelimitedTextFormatter = require './delimited_text_formatter'
-else
-  {DelimitedTextFormatter} = @FieldKit
+DelimitedTextFormatter = require './delimited_text_formatter'
 
 zpad2 = (n) ->
   result = "#{n}"
@@ -66,7 +63,4 @@ class ExpiryDateFormatter extends DelimitedTextFormatter
 
     return true
 
-if module?
-  module.exports = ExpiryDateFormatter
-else
-  (@FieldKit ||= {}).ExpiryDateFormatter = ExpiryDateFormatter
+module.exports = ExpiryDateFormatter

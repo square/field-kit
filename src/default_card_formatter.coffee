@@ -1,7 +1,4 @@
-if require?
-  DelimitedTextFormatter = require './delimited_text_formatter'
-else
-  {DelimitedTextFormatter} = @FieldKit
+DelimitedTextFormatter = require './delimited_text_formatter'
 
 class DefaultCardFormatter extends DelimitedTextFormatter
   delimiter: ' '
@@ -13,7 +10,4 @@ class DefaultCardFormatter extends DelimitedTextFormatter
   parse: (text) ->
     super (text ? '').replace(/[^\d]/g, '')
 
-if module?
-  module.exports = DefaultCardFormatter
-else
-  (@FieldKit ||= {}).DefaultCardFormatter = DefaultCardFormatter
+module.exports = DefaultCardFormatter

@@ -4,15 +4,17 @@
   "description": "Utilities to effectively manage text entry on the web.",
   "scripts": {
     "build": "coffee -c -o lib/ src/",
-    "test": "npm run-script build && jasmine-node --coffee spec"
+    "test": "npm run-script build && jasmine-node --coffee spec",
+    "package": "npm run-script test && gluejs --include lib --out field-kit.js --global FieldKit && uglifyjs field-kit.js > field-kit.min.js"
   },
   "repository": "",
   "author": "Square",
   "license": "BSD",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "coffee-script": "~1.4.0",
-    "jasmine-node": "~1.0.28"
+    "jasmine-node": "~1.0.28",
+    "gluejs": "~0.2.0",
+    "uglify-js": "~2.2.2"
   }
 }

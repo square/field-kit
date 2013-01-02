@@ -3,6 +3,7 @@
 fs   = require 'fs'
 http = require 'http'
 path = require 'path'
+Glue = require 'gluejs'
 {exec} = require 'child_process'
 CoffeeScript = require 'coffee-script'
 PORT = 9090
@@ -44,6 +45,8 @@ server = http.createServer (request, response) ->
             data = CoffeeScript.compile data
           writeFileIfFound err, data
 
+  if request.url is '/field-kit.js'
+    new Glue().basepath('lib').include('lib').export('FieldKit').render writeFileIfFound
   if match = request.url.match(/^\/(lib|src)\//)
     requestPath = request.url.substring(match[0].length)
     serveFromPath match[1], requestPath

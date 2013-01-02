@@ -1,7 +1,4 @@
-if require?
-  DelimitedTextFormatter = require './delimited_text_formatter'
-else
-  {DelimitedTextFormatter} = @FieldKit
+DelimitedTextFormatter = require './delimited_text_formatter'
 
 class SocialSecurityNumberFormatter extends DelimitedTextFormatter
   delimiter: '-'
@@ -16,7 +13,4 @@ class SocialSecurityNumberFormatter extends DelimitedTextFormatter
     else
       return no
 
-if module?
-  module.exports = SocialSecurityNumberFormatter
-else
-  (@FieldKit ||= {}).SocialSecurityNumberFormatter = SocialSecurityNumberFormatter
+module.exports = SocialSecurityNumberFormatter

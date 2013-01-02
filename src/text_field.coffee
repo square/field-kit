@@ -1272,7 +1272,4 @@ class TextField
       else
         null
 
-if module?
-  module.exports = TextField
-else if window?
-  (@FieldKit ||= {}).TextField = TextField
+module.exports = TextField
