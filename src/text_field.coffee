@@ -1129,14 +1129,15 @@ class TextField
       ptext = change.proposed.text
       sharedPrefixLength = 0
       sharedSuffixLength = 0
+      minTextLength = Math.min(ctext.length, ptext.length)
 
-      for i in [0...ctext.length]
+      for i in [0...minTextLength]
         if ptext[i] is ctext[i]
           sharedPrefixLength = i + 1
         else
           break
 
-      for i in [0...(ctext.length-sharedPrefixLength)]
+      for i in [0...(minTextLength-sharedPrefixLength)]
         if ptext[ptext.length - 1 - i] is ctext[ctext.length - 1 - i]
           sharedSuffixLength = i + 1
         else

@@ -17,3 +17,6 @@ describe 'SocialSecurityNumberFormatter', ->
 
   it 'prevents entering non-digit characters', ->
     expectThatTyping('f').into(field).willNotChange('|')
+
+  it 'backspaces words correctly', ->
+    expectThatTyping('alt+backspace').into(field).willChange('123-45-|').to('123-|')
