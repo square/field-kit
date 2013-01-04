@@ -106,15 +106,12 @@ class TextField
   # Handles a key event that is trying to insert a character.
   #
   # Returns nothing.
-  insertCharacter: (event) ->
-    event.preventDefault()
-
-    # clear any selection and cut out if we're full
+  insertText: (text) ->
+    # clear any selection
     @clearSelection() if @hasSelection
-    return if @formatter.length and @text.length >= @formatter.length
 
-    # insert the character
-    @replaceSelection String.fromCharCode(event.charCode)
+    # insert the text
+    @replaceSelection text
     range = @selectedRange
     range.start += range.length
     range.length = 0
@@ -1096,8 +1093,10 @@ class TextField
   #
   # Returns nothing.
   keyPress: (event) =>
+    event.preventDefault()
+
     @rollbackInvalidChanges =>
-      @insertCharacter event
+      @insertText String.fromCharCode(event.charCode)
 
   # Internal: Handles keyup events.
   #

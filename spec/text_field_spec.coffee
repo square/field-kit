@@ -1,4 +1,3 @@
-PassthroughFormatter = require './helpers/passthrough_formatter'
 {buildField} = require './helpers/builders'
 {expectThatTyping, expectThatPasting} = require './helpers/expectations'
 
@@ -6,20 +5,6 @@ describe 'TextField', ->
   describe 'typing a character into an empty field', ->
     it 'allows the character to be inserted', ->
       expectThatTyping('a').willChange('|').to('a|')
-
-  describe 'typing a character into a full field', ->
-    formatter = null
-
-    beforeEach ->
-      formatter = new PassthroughFormatter()
-      formatter.length = 2
-
-    it 'does not allow the character to be inserted', ->
-      expectThatTyping('0').withFormatter(formatter).willNotChange('12|')
-
-    describe 'with part of the value selected', ->
-      it 'replaces the selection with the typed character', ->
-        expectThatTyping('0').withFormatter(formatter).willChange('|1|2').to('0|2')
 
   describe 'typing a backspace', ->
     describe 'with a non-empty selection', ->
