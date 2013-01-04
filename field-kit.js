@@ -794,16 +794,12 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       }
     };
 
-    TextField.prototype.insertCharacter = function(event) {
+    TextField.prototype.insertText = function(text) {
       var range;
-      event.preventDefault();
       if (this.hasSelection) {
         this.clearSelection();
       }
-      if (this.formatter.length && this.text.length >= this.formatter.length) {
-        return;
-      }
-      this.replaceSelection(String.fromCharCode(event.charCode));
+      this.replaceSelection(text);
       range = this.selectedRange;
       range.start += range.length;
       range.length = 0;
@@ -1410,8 +1406,9 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
 
     TextField.prototype.keyPress = function(event) {
       var _this = this;
+      event.preventDefault();
       return this.rollbackInvalidChanges(function() {
-        return _this.insertCharacter(event);
+        return _this.insertText(String.fromCharCode(event.charCode));
       });
     };
 
