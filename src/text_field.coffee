@@ -1,5 +1,9 @@
+UndoManager = require './undo_manager'
+
 KEYS =
   A:         65
+  Y:         89
+  Z:         90
   ZERO:      48
   NINE:      57
   LEFT:      37
@@ -981,15 +985,22 @@ class TextField
   #
   # Returns nothing.
   keyDown: (event) =>
-    @rollbackInvalidChanges =>
-      {keyCode, metaKey, ctrlKey, shiftKey, altKey} = event
-      modifiers = []
-      modifiers.push 'alt' if altKey
-      modifiers.push 'ctrl' if ctrlKey
-      modifiers.push 'meta' if metaKey
-      modifiers.push 'shift' if shiftKey
-      modifiers = modifiers.join '+'
+    {keyCode, metaKey, ctrlKey, shiftKey, altKey} = event
+    modifiers = []
+    modifiers.push 'alt' if altKey
+    modifiers.push 'ctrl' if ctrlKey
+    modifiers.push 'meta' if metaKey
+    modifiers.push 'shift' if shiftKey
+    modifiers = modifiers.join '+'
 
+    if keyCode is KEYS.Z and modifiers in ['meta', 'ctrl']
+      @undoManager().undo() if @undoManager().canUndo()
+      event.preventDefault()
+    else if (keyCode is KEYS.Z and modifiers is 'meta+shift') or (keyCode is KEYS.Y and modifiers is 'ctrl')
+      @undoManager().redo() if @undoManager().canRedo()
+      event.preventDefault()
+
+    @rollbackInvalidChanges =>
       if (metaKey or ctrlKey) and keyCode is KEYS.A
         @selectAll event
 
@@ -1119,54 +1130,20 @@ class TextField
   #
   # Returns whatever the given callback returns.
   rollbackInvalidChanges: (callback) ->
-    change = field: this, current: { @caret, @text }
-    result = callback()
-    change.proposed = { @caret, @text }
-
-    if change.proposed.text isnt change.current.text
-      ctext = change.current.text
-      ptext = change.proposed.text
-      sharedPrefixLength = 0
-      sharedSuffixLength = 0
-      minTextLength = Math.min(ctext.length, ptext.length)
-
-      for i in [0...minTextLength]
-        if ptext[i] is ctext[i]
-          sharedPrefixLength = i + 1
-        else
-          break
-
-      for i in [0...(minTextLength-sharedPrefixLength)]
-        if ptext[ptext.length - 1 - i] is ctext[ctext.length - 1 - i]
-          sharedSuffixLength = i + 1
-        else
-          break
-
-      inserted = start: sharedPrefixLength, end: ptext.length - sharedSuffixLength
-      deleted = start: sharedPrefixLength, end: ctext.length - sharedSuffixLength
-
-      inserted.text = ptext.substring(inserted.start, inserted.end)
-      deleted.text = ctext.substring(deleted.start, deleted.end)
-
-      change.inserted = inserted
-      change.deleted = deleted
-    else
-      change.inserted =
-        start: change.proposed.caret.start
-        end: change.proposed.caret.end
-        text: ''
-      change.deleted =
-        start: change.current.caret.start
-        end: change.current.caret.end
-        text: ''
+    result = null
+    change = TextFieldStateChange.build this, -> result = callback()
 
     if typeof @formatter?.isChangeValid is 'function'
       if @formatter.isChangeValid(change)
+        change.recomputeDiff()
         @text = change.proposed.text
         @caret = change.proposed.caret
       else
         @text = change.current.text
         @caret = change.current.caret
+
+    if change.inserted.text.length or change.deleted.text.length
+      @undoManager().proxyFor(this)._applyChangeFromUndoManager(change)
 
     return result
 
@@ -1270,5 +1247,97 @@ class TextField
         range.start
       else
         null
+
+  ##
+  ## Undo support
+  ##
+
+  # Gets the UndoManager for this text field.
+  #
+  # Returns an instance of UndoManager.
+  undoManager: ->
+    @_undoManager ||= new UndoManager()
+
+  # Gets whether this text field records undo actions with its undo manager.
+  #
+  # Returns true if it does record undo actions, false otherwise.
+  allowsUndo: ->
+    @_allowsUndo
+
+  # Sets whether this text field records undo actions with its undo manager.
+  #
+  # allowsUndo - true to record undo actions, false to prevent recording.
+  #
+  # Returns nothing.
+  setAllowsUndo: (allowsUndo) ->
+    @_allowsUndo = allowsUndo
+
+  # Internal: Applies the given change as an undo/redo.
+  #
+  # Returns nothing.
+  _applyChangeFromUndoManager: (change) ->
+    @undoManager().proxyFor(this)._applyChangeFromUndoManager(change)
+
+    if @undoManager().isUndoing()
+      @text = change.current.text
+      @caret = change.current.caret
+    else
+      @text = change.proposed.text
+      @caret = change.proposed.caret
+
+class TextFieldStateChange
+  field: null
+  current: null
+  proposed: null
+
+  constructor: (@field) ->
+
+  @build: (field, callback) ->
+    change = new @(field)
+    change.current = text: field.text, caret: field.caret
+    callback()
+    change.proposed = text: field.text, caret: field.caret
+    change.recomputeDiff()
+    return change
+
+  recomputeDiff: ->
+    if @proposed.text isnt @current.text
+      ctext = @current.text
+      ptext = @proposed.text
+      sharedPrefixLength = 0
+      sharedSuffixLength = 0
+      minTextLength = Math.min(ctext.length, ptext.length)
+
+      for i in [0...minTextLength]
+        if ptext[i] is ctext[i]
+          sharedPrefixLength = i + 1
+        else
+          break
+
+      for i in [0...(minTextLength-sharedPrefixLength)]
+        if ptext[ptext.length - 1 - i] is ctext[ctext.length - 1 - i]
+          sharedSuffixLength = i + 1
+        else
+          break
+
+      inserted = start: sharedPrefixLength, end: ptext.length - sharedSuffixLength
+      deleted = start: sharedPrefixLength, end: ctext.length - sharedSuffixLength
+
+      inserted.text = ptext.substring(inserted.start, inserted.end)
+      deleted.text = ctext.substring(deleted.start, deleted.end)
+
+      @inserted = inserted
+      @deleted = deleted
+    else
+      @inserted =
+        start: @proposed.caret.start
+        end: @proposed.caret.end
+        text: ''
+      @deleted =
+        start: @current.caret.start
+        end: @current.caret.end
+        text: ''
+
+    return null
 
 module.exports = TextField

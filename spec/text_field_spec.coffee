@@ -206,3 +206,18 @@ describe 'TextField', ->
   it 'handles pastes a any other input', ->
     expectThatPasting('eat').willChange('|').to('eat|')
     expectThatPasting('eat').willChange('Want something to |drink>?').to('Want something to eat|?')
+
+  describe 'undo and redo', ->
+    it 'undoes the last change', ->
+      expectThatTyping('a', 'meta+z').willNotChange('1|')
+
+    it 'can be done sequentially to effectively cancel each other', ->
+      expectThatTyping('a', 'meta+z', 'meta+shift+z').willChange('1|').to('1a|')
+
+    it 'work with selections', ->
+      expectThatTyping('a', 'meta+z').willChange('a|b>c').to('a|b|c')
+      expectThatTyping('a', 'meta+z', 'ctrl+y').willChange('a|b>c').to('aa|c')
+
+    it 'have no effect when they run out of actions', ->
+      expectThatTyping('meta+z').willNotChange('abc|')
+      expectThatTyping('meta+shift+z').willNotChange('abc|')
