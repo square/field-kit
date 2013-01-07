@@ -1,5 +1,6 @@
 {buildField} = require './helpers/builders'
 {expectThatTyping, expectThatPasting} = require './helpers/expectations'
+PassthroughFormatter = require './helpers/passthrough_formatter'
 
 describe 'TextField', ->
   describe 'typing a character into an empty field', ->
@@ -221,3 +222,13 @@ describe 'TextField', ->
     it 'have no effect when they run out of actions', ->
       expectThatTyping('meta+z').willNotChange('abc|')
       expectThatTyping('meta+shift+z').willNotChange('abc|')
+
+    describe 'when the formatter rejects a change', ->
+      formatter = null
+
+      beforeEach ->
+        formatter = new PassthroughFormatter()
+        formatter.isChangeValid = (change) -> change.inserted.text isnt 'a'
+
+      it 'does not count the rejected change as something to undo', ->
+        expectThatTyping('0', 'a', '1', 'meta+z', 'meta+z').withFormatter(formatter).willNotChange('|')
