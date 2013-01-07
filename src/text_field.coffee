@@ -1141,6 +1141,7 @@ class TextField
       else
         @text = change.current.text
         @caret = change.current.caret
+        return result # change is rejected, don't do undo processing
 
     if change.inserted.text.length or change.deleted.text.length
       @undoManager().proxyFor(this)._applyChangeFromUndoManager(change)

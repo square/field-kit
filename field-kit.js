@@ -1458,6 +1458,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
         } else {
           this.text = change.current.text;
           this.caret = change.current.caret;
+          return result;
         }
       }
       if (change.inserted.text.length || change.deleted.text.length) {
