@@ -1,0 +1,77 @@
+#!/usr/bin/env ruby
+# encoding: utf-8
+
+require 'fileutils'
+require 'stringio'
+
+def root
+  @root ||= File.expand_path('../..', __FILE__)
+end
+
+def pages
+  @pages ||= File.expand_path('../field-kit-pages', root)
+end
+
+def die(msg)
+  abort "~ \e[31m#{msg}\e[0m"
+end
+
+def step(msg)
+  puts "~ \e[32m#{msg}\e[0m"
+end
+
+def run(cmd, *args)
+  output = nil
+  IO.popen([cmd, *args]) { |io| output = io.read }
+  CommandResult.new $?.success?, output
+end
+
+def git(*args)
+  run 'git', "--git-dir=#{pages}/.git", "--work-tree=#{pages}", *args
+end
+
+class CommandResult
+  def initialize(success, output)
+    @success = success
+    @output = output
+  end
+
+  def success?
+    @success
+  end
+
+  def output
+    @output
+  end
+end
+
+# clone copy as pages repo
+if !File.directory?(pages)
+  step 'Clone pages repo…'
+  run('git', 'clone', root, pages).success? || die("Failed to clone repo to #{pages}!")
+end
+
+step 'Update pages repo…'
+git('checkout', 'gh-pages').success? || die("Failed to checkout 'gh-pages' branch!")
+git('pull', '--rebase').success? || die("Failed to update 'gh-pages' repo!")
+
+step 'Package field-kit.js…'
+run 'npm', 'run-script', 'package'
+
+# copy files over
+Dir["#{root}/public/*"].each do |file|
+  step "Copy #{file}…"
+  FileUtils.cp_r file, pages
+end
+
+if git('status').output.include? 'working directory clean'
+  step "No files changed."
+else
+  # commit files
+  step 'Push changes…'
+  git('add', '.') || die("Failed to add copied files to index!")
+  git('commit', '-m', 'Updating GitHub pages.') || die("Failed to commit copied gh-pages files!")
+  git('push', 'origin', 'gh-pages') || die("Failed to push changes to gh-pages branch!")
+
+  step 'Done.'
+end
