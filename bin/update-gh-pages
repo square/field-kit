@@ -59,7 +59,7 @@ step 'Package field-kit.js…'
 run 'npm', 'run-script', 'package'
 
 # copy files over
-Dir["#{root}/public/*"].each do |file|
+(Dir["#{root}/field-kit.*"] + Dir["#{root}/public/*"]).each do |file|
   step "Copy #{file}…"
   FileUtils.cp_r file, pages
 end
