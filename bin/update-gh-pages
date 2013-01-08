@@ -4,6 +4,8 @@
 require 'fileutils'
 require 'stringio'
 
+PAGES_BRANCH = 'gh-pages'.freeze
+
 class Repo
   attr_reader :path
 
@@ -68,8 +70,8 @@ if not pages.exist?
 end
 
 step 'Update pages repo…'
-pages.git('checkout', 'gh-pages').success? || die("Failed to checkout 'gh-pages' branch!")
-pages.git('pull', '--rebase').success? || die("Failed to update 'gh-pages' repo!")
+pages.git('checkout', PAGES_BRANCH).success? || die("Failed to checkout '#{PAGES_BRANCH}' branch!")
+pages.git('pull', '--rebase').success? || die("Failed to update '#{PAGES_BRANCH}' repo!")
 
 step 'Package field-kit.js…'
 run 'npm', 'run-script', 'package'
@@ -84,8 +86,9 @@ if pages.dirty?
   # commit files
   step 'Push changes…'
   pages.git('add', '.') || die("Failed to add copied files to index!")
-  pages.git('commit', '-m', 'Updating GitHub pages.') || die("Failed to commit copied gh-pages files!")
-  pages.git('push', 'origin', 'gh-pages') || die("Failed to sync changes to gh-pages branch!")
+  pages.git('commit', '-m', 'Updating GitHub pages.') || die("Failed to commit copied #{PAGES_BRANCH} files!")
+  pages.git('push', 'origin', PAGES_BRANCH) || die("Failed to sync changes to #{PAGES_BRANCH} branch!")
+  root.git('push', 'origin', "#{PAGES_BRANCH}:#{PAGES_BRANCH}") || die("Failed to push changes to #{PAGES_BRANCH} branch!")
 
   step 'Done.'
 else
