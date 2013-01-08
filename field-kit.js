@@ -610,7 +610,8 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     Formatter: require('./formatter'),
     SocialSecurityNumberFormatter: require('./social_security_number_formatter'),
     DelimitedTextFormatter: require('./delimited_text_formatter'),
-    TextField: require('./text_field')
+    TextField: require('./text_field'),
+    UndoManager: require('./undo_manager')
   };
 
   module.exports = FieldKit;

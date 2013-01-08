@@ -7,5 +7,6 @@ FieldKit =
   SocialSecurityNumberFormatter : require './social_security_number_formatter'
   DelimitedTextFormatter        : require './delimited_text_formatter'
   TextField                     : require './text_field'
+  UndoManager                   : require './undo_manager'
 
 module.exports = FieldKit
