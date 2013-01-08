@@ -60,7 +60,7 @@ run 'npm', 'run-script', 'package'
 
 # copy files over
 (Dir["#{root}/field-kit.*"] + Dir["#{root}/public/*"]).each do |file|
-  step "Copy #{file}…"
+  step "Copy #{file[root.size+1..-1]}…"
   FileUtils.cp_r file, pages
 end
 
