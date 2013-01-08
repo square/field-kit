@@ -173,9 +173,9 @@ describe 'TextField', ->
 
   it 'allows the formatter to prevent changes', ->
     field = buildField()
-    field.formatter.isChangeValid = -> no
-    expectThatTyping('backspace').into(field).willNotChange('3725 |')
-    expectThatTyping('a').into(field).willNotChange('3725 |')
+    field.formatter.isChangeValid = (change, error) -> error 'NO WAY'; return no
+    expectThatTyping('backspace').into(field).willNotChange('3725 |').withError('NO WAY')
+    expectThatTyping('a').into(field).willNotChange('3725 |').withError('NO WAY')
 
   it 'allows the formatter to alter caret changes', ->
     field = buildField()

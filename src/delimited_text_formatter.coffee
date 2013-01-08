@@ -18,12 +18,12 @@ class DelimitedTextFormatter extends Formatter
       result += @delimiter if @hasDelimiterAtIndex result.length
     result
 
-  parse: (text) ->
+  parse: (text, error) ->
     return null unless text
     (char for char in text when char isnt @delimiter).join('')
 
-  isChangeValid: (change) ->
-    return no unless super change
+  isChangeValid: (change, error) ->
+    return no unless super change, error
 
     newText = change.proposed.text
 
@@ -50,8 +50,15 @@ class DelimitedTextFormatter extends Formatter
     else
       caret.end = caret.start
 
-    newText = @format @parse(newText)
-    change.proposed.text = newText
-    return yes
+    isChangeValid = yes
+
+    object = @parse newText, (args...) ->
+      isChangeValid = no
+      error args...
+
+    if isChangeValid
+      change.proposed.text = @format object
+
+    return isChangeValid
 
 module.exports = DelimitedTextFormatter

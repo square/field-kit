@@ -338,7 +338,8 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
 (function() {
   var DelimitedTextFormatter, Formatter,
     __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    __slice = [].slice;
 
   Formatter = require('./formatter');
 
@@ -378,7 +379,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       return result;
     };
 
-    DelimitedTextFormatter.prototype.parse = function(text) {
+    DelimitedTextFormatter.prototype.parse = function(text, error) {
       var char;
       if (!text) {
         return null;
@@ -396,9 +397,9 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       }).call(this)).join('');
     };
 
-    DelimitedTextFormatter.prototype.isChangeValid = function(change) {
-      var caret, endMovedLeft, hasSelection, newText, startMovedLeft;
-      if (!DelimitedTextFormatter.__super__.isChangeValid.call(this, change)) {
+    DelimitedTextFormatter.prototype.isChangeValid = function(change, error) {
+      var caret, endMovedLeft, hasSelection, isChangeValid, newText, object, startMovedLeft;
+      if (!DelimitedTextFormatter.__super__.isChangeValid.call(this, change, error)) {
         return false;
       }
       newText = change.proposed.text;
@@ -427,9 +428,17 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       } else {
         caret.end = caret.start;
       }
-      newText = this.format(this.parse(newText));
-      change.proposed.text = newText;
-      return true;
+      isChangeValid = true;
+      object = this.parse(newText, function() {
+        var args;
+        args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+        isChangeValid = false;
+        return error.apply(null, args);
+      });
+      if (isChangeValid) {
+        change.proposed.text = this.format(object);
+      }
+      return isChangeValid;
     };
 
     return DelimitedTextFormatter;
@@ -483,7 +492,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       return ExpiryDateFormatter.__super__.format.call(this, zpad2(month) + zpad2(year));
     };
 
-    ExpiryDateFormatter.prototype.parse = function(text) {
+    ExpiryDateFormatter.prototype.parse = function(text, error) {
       var match;
       text = ExpiryDateFormatter.__super__.parse.call(this, text);
       if (match = text.match(/^(0?[1-9]|1\d)(\d\d)$/)) {
@@ -491,10 +500,13 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
           month: Number(match[1]),
           year: Number(match[2])
         };
+      } else {
+        error('expiry-date-formatter.invalid-date');
+        return null;
       }
     };
 
-    ExpiryDateFormatter.prototype.isChangeValid = function(change) {
+    ExpiryDateFormatter.prototype.isChangeValid = function(change, error) {
       var isBackspace, match, newText;
       isBackspace = change.proposed.text.length < change.current.text.length;
       newText = change.proposed.text;
@@ -507,16 +519,19 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
         }
       } else if (change.inserted.text === this.delimiter && change.current.text === '1') {
         newText = "01" + this.delimiter;
-      } else if (!/^\d$/.test(change.inserted.text)) {
+      } else if (change.inserted.text.length > 0 && !/^\d$/.test(change.inserted.text)) {
+        error('expiry-date-formatter.only-digits-allowed');
         return false;
       } else {
         if (/^[2-9]$/.test(newText)) {
           newText = '0' + newText;
         }
         if (/^1[3-9]$/.test(newText)) {
+          error('expiry-date-formatter.invalid-month');
           return false;
         }
         if (newText === '00') {
+          error('expiry-date-formatter.invalid-month');
           return false;
         }
         if (/^(0[1-9]|1[0-2])$/.test(newText)) {
@@ -562,7 +577,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       return text;
     };
 
-    Formatter.prototype.parse = function(text) {
+    Formatter.prototype.parse = function(text, error) {
       if (text == null) {
         text = '';
       }
@@ -572,7 +587,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       return text;
     };
 
-    Formatter.prototype.isChangeValid = function(change) {
+    Formatter.prototype.isChangeValid = function(change, error) {
       var available, caret, newText, text, truncatedLength, _ref;
       _ref = change.proposed, caret = _ref.caret, text = _ref.text;
       if ((this.maximumLength != null) && text.length > this.maximumLength) {
@@ -728,6 +743,17 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
   TextField = (function() {
 
     TextField.prototype.selectionAffinity = AFFINITY.NONE;
+
+    TextField.prototype._delegate = null;
+
+    TextField.prototype.delegate = function() {
+      return this._delegate;
+    };
+
+    TextField.prototype.setDelegate = function(delegate) {
+      this._delegate = delegate;
+      return null;
+    };
 
     function TextField(element) {
       this.element = element;
@@ -1438,17 +1464,26 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     };
 
     TextField.prototype.rollbackInvalidChanges = function(callback) {
-      var change, result, _ref;
+      var change, error, errorType, result, _ref, _ref1;
       result = null;
+      errorType = null;
       change = TextFieldStateChange.build(this, function() {
         return result = callback();
       });
+      error = function(type) {
+        return errorType = type;
+      };
       if (typeof ((_ref = this.formatter) != null ? _ref.isChangeValid : void 0) === 'function') {
-        if (this.formatter.isChangeValid(change)) {
+        if (this.formatter.isChangeValid(change, error)) {
           change.recomputeDiff();
           this.text = change.proposed.text;
           this.caret = change.proposed.caret;
         } else {
+          if ((_ref1 = this._delegate) != null) {
+            if (typeof _ref1.textFieldDidFailToValidateChange === "function") {
+              _ref1.textFieldDidFailToValidateChange(this, change, errorType);
+            }
+          }
           this.text = change.current.text;
           this.caret = change.current.caret;
           return result;
@@ -1485,12 +1520,16 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     });
 
     TextField.prototype.__defineGetter__('value', function() {
-      var value;
+      var value,
+        _this = this;
       value = this.element.val();
       if (!this._formatter) {
         return value;
       }
-      return this._formatter.parse(value);
+      return this._formatter.parse(value, function(errorType) {
+        var _ref;
+        return (_ref = _this._delegate) != null ? typeof _ref.textFieldDidFailToParseString === "function" ? _ref.textFieldDidFailToParseString(_this, value, errorType) : void 0 : void 0;
+      });
     });
 
     TextField.prototype.__defineSetter__('value', function(value) {
@@ -1692,6 +1731,10 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
           return this.setPlaceholder(this._unfocusedPlaceholder);
         }
       }
+    };
+
+    TextField.prototype.inspect = function() {
+      return "#<TextField text=" + this.text + ">";
     };
 
     return TextField;

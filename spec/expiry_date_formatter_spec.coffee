@@ -23,7 +23,7 @@ describe 'ExpiryDateFormatter', ->
     expectThatTyping('/').into(field).willChange('1|').to('01/|')
 
   it 'prevents 00 as a month', ->
-    expectThatTyping('0').into(field).willNotChange('0|')
+    expectThatTyping('0').into(field).willNotChange('0|').withError('expiry-date-formatter.invalid-month')
 
   it 'prevents entry of an invalid two-digit month', ->
     expectThatTyping('3').into(field).willNotChange('1|')
@@ -45,3 +45,9 @@ describe 'ExpiryDateFormatter', ->
 
   it 'allows typing a character matching the suffix that hits the end of the allowed input', ->
     expectThatTyping('1').into(field).willChange('12/1|').to('12/11|')
+
+  it 'calls its delegate when parsing the text fails', ->
+    field.setDelegate(textFieldDidFailToParseString: jasmine.createSpy('textFieldDidFailToParseString'))
+    field.text = 'abc'
+    expect(field.value).toBeNull()
+    expect(field.delegate().textFieldDidFailToParseString).toHaveBeenCalledWith(field, 'abc', 'expiry-date-formatter.invalid-date')

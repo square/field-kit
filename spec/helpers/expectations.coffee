@@ -18,14 +18,29 @@ class FieldExpectationBase
 
   to: (@expectedDescription) ->
     @applyDescription()
+    @proxyDelegate()
     @perform()
     @assert()
+    this
+
+  withError: (errorType) ->
+    expect(@actualErrorType).toEqual(errorType)
 
   applyDescription: ->
     { caret, affinity, value } = Caret.parseDescription @currentDescription
     @field.element.val value
     @field.element.caret caret
     @field.selectionAffinity = affinity
+
+  proxyDelegate: ->
+    currentDelegate = @field.delegate()
+    @field.setDelegate
+      textFieldDidFailToValidateChange: (textField, change, errorType) =>
+        @actualErrorType = errorType
+        currentDelegate?.textFieldDidFailToValidateChange?(change, errorType)
+      textFieldDidFailToParseString: (textField, change, errorType) =>
+        @actualErrorType = errorType
+        currentDelegate?.textFieldDidFailToParseString?(change, errorType)
 
   assert: ->
     actual = Caret.printDescription

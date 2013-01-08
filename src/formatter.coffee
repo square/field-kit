@@ -6,12 +6,12 @@ class Formatter
     text = text.substring(0, @maximumLength) if @maximumLength?
     text
 
-  parse: (text) ->
+  parse: (text, error) ->
     text ?= ''
     text = text.substring(0, @maximumLength) if @maximumLength?
     text
 
-  isChangeValid: (change) ->
+  isChangeValid: (change, error) ->
     {caret, text} = change.proposed
     if @maximumLength? and text.length > @maximumLength
       available = @maximumLength - (text.length - change.inserted.text.length)
