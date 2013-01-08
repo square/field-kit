@@ -27,7 +27,7 @@ AFFINITY =
 
 isWordChar = (char) -> char and /^\w$/.test(char)
 
-XPATH_FOCUSABLE_FIELD = '*[name(.)="input" or name(.)="select"][not(type="hidden")][not(contains(@class, "formatted-text-field-interceptor"))]'
+XPATH_FOCUSABLE_FIELD = '*[name(.)="input" or name(.)="select"][not(type="hidden")][not(contains(@class, "field-kit-text-field-interceptor"))]'
 
 findFieldFollowing = (element) ->
   result = document.evaluate "following::#{XPATH_FOCUSABLE_FIELD}", element, null, XPathResult.ANY_TYPE, null
@@ -38,8 +38,8 @@ findFieldPreceding = (element) ->
   return result.iterateNext()
 
 makeFirstResponder = (field, event) ->
-  if formattedTextField = $(field).data('formatted-text-field')
-    formattedTextField.becomeFirstResponder event
+  if textField = $(field).data('field-kit-text-field')
+    textField.becomeFirstResponder event
   else
     field.focus?()
     field.select?()
@@ -55,7 +55,9 @@ class TextField
     @element.on 'keyup', @keyUp
     @element.on 'click', @click
     @element.on 'paste', @paste
-    @element.data 'formatted-text-field', this
+    @element.on 'focus', @_focus
+    @element.on 'blur', @_blur
+    @element.data 'field-kit-text-field', this
     @createTabInterceptors()
 
   # Internal: Creates phantom input elements that intercept tab / shift+tab
@@ -71,7 +73,7 @@ class TextField
       interceptor.style.opacity = 0
       interceptor.style.zIndex = -9999
       interceptor.style.pointerEvents = 'none'
-      interceptor.className = 'formatted-text-field-interceptor'
+      interceptor.className = 'field-kit-text-field-interceptor'
       interceptor
 
     beforeInterceptor = createInterceptor()
@@ -827,22 +829,6 @@ class TextField
   # Returns nothing.
   insertBackTab: (event) ->
 
-  # Removes focus from this field if it has focus.
-  #
-  # Returns nothing.
-  becomeFirstResponder: (event) ->
-    @element.focus()
-    @rollbackInvalidChanges =>
-      @element.select()
-
-  # Removes focus from this field if it has focus.
-  #
-  # Returns nothing.
-  resignFirstResponder: (event) ->
-    event.preventDefault()
-    @element.blur()
-    $('#no-selection-test').focus()
-
   # Determines whether this field has any selection.
   #
   # Returns true if there is at least one character selected, false otherwise.
@@ -1285,6 +1271,94 @@ class TextField
     else
       @text = change.proposed.text
       @caret = change.proposed.caret
+
+  ##
+  ## Enabled/disabled support
+  ##
+
+  _enabled: yes
+
+  isEnabled: ->
+    @_enabled
+
+  setEnabled: (@_enabled) ->
+    @_syncPlaceholder()
+    return null
+
+  ##
+  ## Focus/blur support
+  ##
+
+  hasFocus: ->
+    @element.get(0).ownerDocument.activeElement is @element.get(0)
+
+  _focus: (event) =>
+    @_syncPlaceholder()
+
+  _blur: (event) =>
+    @_syncPlaceholder()
+
+  # Removes focus from this field if it has focus.
+  #
+  # Returns nothing.
+  becomeFirstResponder: (event) ->
+    @element.focus()
+    @rollbackInvalidChanges =>
+      @element.select()
+      @_syncPlaceholder()
+
+  # Removes focus from this field if it has focus.
+  #
+  # Returns nothing.
+  resignFirstResponder: (event) ->
+    event.preventDefault()
+    @element.blur()
+    @_syncPlaceholder()
+
+  ##
+  ## Placeholder support
+  ##
+
+  _placeholder: null
+  _disabledPlaceholder: null
+  _focusedPlaceholder: null
+  _unfocusedPlaceholder: null
+
+  disabledPlaceholder: ->
+    @_disabledPlaceholder
+
+  setDisabledPlaceholder: (@_disabledPlaceholder) ->
+    @_syncPlaceholder()
+    return null
+
+  focusedPlaceholder: ->
+    @_focusedPlaceholder
+
+  setFocusedPlaceholder: (@_focusedPlaceholder) ->
+    @_syncPlaceholder()
+    return null
+
+  unfocusedPlaceholder: ->
+    @_unfocusedPlaceholder
+
+  setUnfocusedPlaceholder: (@_unfocusedPlaceholder) ->
+    @_syncPlaceholder()
+    return null
+
+  placeholder: ->
+    @_placeholder
+
+  setPlaceholder: (@_placeholder) ->
+    @element.attr 'placeholder', @_placeholder
+
+  _syncPlaceholder: ->
+    if not @_enabled
+      @setPlaceholder @_disabledPlaceholder if @_disabledPlaceholder?
+    else if @hasFocus()
+      @setPlaceholder @_focusedPlaceholder if @_focusedPlaceholder?
+    else
+      @setPlaceholder @_unfocusedPlaceholder if @_unfocusedPlaceholder?
+
 
 class TextFieldStateChange
   field: null

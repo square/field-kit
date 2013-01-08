@@ -698,7 +698,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     return char && /^\w$/.test(char);
   };
 
-  XPATH_FOCUSABLE_FIELD = '*[name(.)="input" or name(.)="select"][not(type="hidden")][not(contains(@class, "formatted-text-field-interceptor"))]';
+  XPATH_FOCUSABLE_FIELD = '*[name(.)="input" or name(.)="select"][not(type="hidden")][not(contains(@class, "field-kit-text-field-interceptor"))]';
 
   findFieldFollowing = function(element) {
     var result;
@@ -713,9 +713,9 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
   };
 
   makeFirstResponder = function(field, event) {
-    var formattedTextField;
-    if (formattedTextField = $(field).data('formatted-text-field')) {
-      return formattedTextField.becomeFirstResponder(event);
+    var textField;
+    if (textField = $(field).data('field-kit-text-field')) {
+      return textField.becomeFirstResponder(event);
     } else {
       if (typeof field.focus === "function") {
         field.focus();
@@ -730,6 +730,10 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
 
     function TextField(element) {
       this.element = element;
+      this._blur = __bind(this._blur, this);
+
+      this._focus = __bind(this._focus, this);
+
       this.click = __bind(this.click, this);
 
       this.paste = __bind(this.paste, this);
@@ -749,7 +753,9 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       this.element.on('keyup', this.keyUp);
       this.element.on('click', this.click);
       this.element.on('paste', this.paste);
-      this.element.data('formatted-text-field', this);
+      this.element.on('focus', this._focus);
+      this.element.on('blur', this._blur);
+      this.element.data('field-kit-text-field', this);
       this.createTabInterceptors();
     }
 
@@ -765,7 +771,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
         interceptor.style.opacity = 0;
         interceptor.style.zIndex = -9999;
         interceptor.style.pointerEvents = 'none';
-        interceptor.className = 'formatted-text-field-interceptor';
+        interceptor.className = 'field-kit-text-field-interceptor';
         return interceptor;
       };
       beforeInterceptor = createInterceptor();
@@ -1152,20 +1158,6 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     TextField.prototype.insertTab = function(event) {};
 
     TextField.prototype.insertBackTab = function(event) {};
-
-    TextField.prototype.becomeFirstResponder = function(event) {
-      var _this = this;
-      this.element.focus();
-      return this.rollbackInvalidChanges(function() {
-        return _this.element.select();
-      });
-    };
-
-    TextField.prototype.resignFirstResponder = function(event) {
-      event.preventDefault();
-      this.element.blur();
-      return $('#no-selection-test').focus();
-    };
 
     TextField.prototype.__defineGetter__('hasSelection', function() {
       return this.selectedRange.length !== 0;
@@ -1596,6 +1588,108 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       } else {
         this.text = change.proposed.text;
         return this.caret = change.proposed.caret;
+      }
+    };
+
+    TextField.prototype._enabled = true;
+
+    TextField.prototype.isEnabled = function() {
+      return this._enabled;
+    };
+
+    TextField.prototype.setEnabled = function(_enabled) {
+      this._enabled = _enabled;
+      this._syncPlaceholder();
+      return null;
+    };
+
+    TextField.prototype.hasFocus = function() {
+      return this.element.get(0).ownerDocument.activeElement === this.element.get(0);
+    };
+
+    TextField.prototype._focus = function(event) {
+      return this._syncPlaceholder();
+    };
+
+    TextField.prototype._blur = function(event) {
+      return this._syncPlaceholder();
+    };
+
+    TextField.prototype.becomeFirstResponder = function(event) {
+      var _this = this;
+      this.element.focus();
+      return this.rollbackInvalidChanges(function() {
+        _this.element.select();
+        return _this._syncPlaceholder();
+      });
+    };
+
+    TextField.prototype.resignFirstResponder = function(event) {
+      event.preventDefault();
+      this.element.blur();
+      return this._syncPlaceholder();
+    };
+
+    TextField.prototype._placeholder = null;
+
+    TextField.prototype._disabledPlaceholder = null;
+
+    TextField.prototype._focusedPlaceholder = null;
+
+    TextField.prototype._unfocusedPlaceholder = null;
+
+    TextField.prototype.disabledPlaceholder = function() {
+      return this._disabledPlaceholder;
+    };
+
+    TextField.prototype.setDisabledPlaceholder = function(_disabledPlaceholder) {
+      this._disabledPlaceholder = _disabledPlaceholder;
+      this._syncPlaceholder();
+      return null;
+    };
+
+    TextField.prototype.focusedPlaceholder = function() {
+      return this._focusedPlaceholder;
+    };
+
+    TextField.prototype.setFocusedPlaceholder = function(_focusedPlaceholder) {
+      this._focusedPlaceholder = _focusedPlaceholder;
+      this._syncPlaceholder();
+      return null;
+    };
+
+    TextField.prototype.unfocusedPlaceholder = function() {
+      return this._unfocusedPlaceholder;
+    };
+
+    TextField.prototype.setUnfocusedPlaceholder = function(_unfocusedPlaceholder) {
+      this._unfocusedPlaceholder = _unfocusedPlaceholder;
+      this._syncPlaceholder();
+      return null;
+    };
+
+    TextField.prototype.placeholder = function() {
+      return this._placeholder;
+    };
+
+    TextField.prototype.setPlaceholder = function(_placeholder) {
+      this._placeholder = _placeholder;
+      return this.element.attr('placeholder', this._placeholder);
+    };
+
+    TextField.prototype._syncPlaceholder = function() {
+      if (!this._enabled) {
+        if (this._disabledPlaceholder != null) {
+          return this.setPlaceholder(this._disabledPlaceholder);
+        }
+      } else if (this.hasFocus()) {
+        if (this._focusedPlaceholder != null) {
+          return this.setPlaceholder(this._focusedPlaceholder);
+        }
+      } else {
+        if (this._unfocusedPlaceholder != null) {
+          return this.setPlaceholder(this._unfocusedPlaceholder);
+        }
       }
     };
 

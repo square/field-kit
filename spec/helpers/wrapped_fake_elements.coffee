@@ -38,4 +38,11 @@ class WrappedFakeElements extends EventEmitter
   get: (index) ->
     @_elements[index]
 
+  attr: (attr, value=null) ->
+    if arguments.length is 1
+      return @_elements[0]?.getAttribute attr
+    else
+      element.setAttribute attr, value for element in @_elements
+      return this
+
 module.exports = WrappedFakeElements
