@@ -49,6 +49,23 @@ class TextField
   # direction of selection.
   selectionAffinity: AFFINITY.NONE
 
+  _delegate: null
+
+  # Gets the current delegate for this text field.
+  #
+  # Returns an object implementing the TextField delegate interface.
+  delegate: ->
+    @_delegate
+
+  # Sets the current delegate for this text field.
+  #
+  # delegate - An object implementing the TextField delegate interface.
+  #
+  # Returns nothing.
+  setDelegate: (delegate) ->
+    @_delegate = delegate
+    return null
+
   constructor: (@element) ->
     @element.on 'keydown', @keyDown
     @element.on 'keypress', @keyPress
@@ -1116,15 +1133,18 @@ class TextField
   #
   # Returns whatever the given callback returns.
   rollbackInvalidChanges: (callback) ->
-    result = null
-    change = TextFieldStateChange.build this, -> result = callback()
+    result    = null
+    errorType = null
+    change    = TextFieldStateChange.build this, -> result = callback()
+    error     = (type) -> errorType = type
 
     if typeof @formatter?.isChangeValid is 'function'
-      if @formatter.isChangeValid(change)
+      if @formatter.isChangeValid(change, error)
         change.recomputeDiff()
         @text = change.proposed.text
         @caret = change.proposed.caret
       else
+        @_delegate?.textFieldDidFailToValidateChange?(this, change, errorType)
         @text = change.current.text
         @caret = change.current.caret
         return result # change is rejected, don't do undo processing
@@ -1165,7 +1185,7 @@ class TextField
   @::__defineGetter__ 'value', ->
     value = @element.val()
     return value unless @_formatter
-    @_formatter.parse value
+    @_formatter.parse value, (errorType) => @_delegate?.textFieldDidFailToParseString?(this, value, errorType)
 
   # Sets the object value of the field.
   @::__defineSetter__ 'value', (value) ->
@@ -1358,6 +1378,13 @@ class TextField
       @setPlaceholder @_focusedPlaceholder if @_focusedPlaceholder?
     else
       @setPlaceholder @_unfocusedPlaceholder if @_unfocusedPlaceholder?
+
+  ##
+  ## Debug support
+  ##
+
+  inspect: ->
+    "#<TextField text=#{@text}>"
 
 
 class TextFieldStateChange

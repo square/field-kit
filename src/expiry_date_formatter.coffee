@@ -20,12 +20,15 @@ class ExpiryDateFormatter extends DelimitedTextFormatter
 
     super zpad2(month) + zpad2(year)
 
-  parse: (text) ->
+  parse: (text, error) ->
     text = super text
     if match = text.match /^(0?[1-9]|1\d)(\d\d)$/
-      return month: Number(match[1]), year: Number(match[2])
+      { month: Number(match[1]), year: Number(match[2]) }
+    else
+      error 'expiry-date-formatter.invalid-date'
+      return null
 
-  isChangeValid: (change) ->
+  isChangeValid: (change, error) ->
     isBackspace = change.proposed.text.length < change.current.text.length
     newText = change.proposed.text
 
@@ -36,8 +39,9 @@ class ExpiryDateFormatter extends DelimitedTextFormatter
         newText = ''
     else if change.inserted.text is @delimiter and change.current.text is '1'
       newText = "01#{@delimiter}"
-    else if !/^\d$/.test(change.inserted.text)
-      return false
+    else if change.inserted.text.length > 0 and !/^\d$/.test(change.inserted.text)
+      error 'expiry-date-formatter.only-digits-allowed'
+      return no
     else
       # 4| -> 04|
       if /^[2-9]$/.test(newText)
@@ -45,10 +49,12 @@ class ExpiryDateFormatter extends DelimitedTextFormatter
 
       # 15| -> 1|
       if /^1[3-9]$/.test(newText)
-        return false
+        error 'expiry-date-formatter.invalid-month'
+        return no
 
       # Don't allow 00
       if newText is '00'
+        error 'expiry-date-formatter.invalid-month'
         return false
 
       # 11| -> 11/
