@@ -4,12 +4,32 @@
 require 'fileutils'
 require 'stringio'
 
+class Repo
+  attr_reader :path
+
+  def initialize(path)
+    @path = path
+  end
+
+  def dirty?
+    not git('status').output.include?('working directory clean')
+  end
+
+  def exist?
+    File.exist?(path)
+  end
+
+  def git(*args)
+    run 'git', "--git-dir=#{@path}/.git", "--work-tree=#{@path}", *args
+  end
+end
+
 def root
-  @root ||= File.expand_path('../..', __FILE__)
+  @root ||= Repo.new(File.expand_path('../..', __FILE__))
 end
 
 def pages
-  @pages ||= File.expand_path('../field-kit-pages', root)
+  @pages ||= Repo.new(File.expand_path('../field-kit-pages', root.path))
 end
 
 def die(msg)
@@ -24,10 +44,6 @@ def run(cmd, *args)
   output = nil
   IO.popen([cmd, *args]) { |io| output = io.read }
   CommandResult.new $?.success?, output
-end
-
-def git(*args)
-  run 'git', "--git-dir=#{pages}/.git", "--work-tree=#{pages}", *args
 end
 
 class CommandResult
@@ -46,32 +62,32 @@ class CommandResult
 end
 
 # clone copy as pages repo
-if !File.directory?(pages)
+if not pages.exist?
   step 'Clone pages repo…'
-  run('git', 'clone', root, pages).success? || die("Failed to clone repo to #{pages}!")
+  root.git('clone', root.path, pages.path).success? || die("Failed to clone repo to #{pages}!")
 end
 
 step 'Update pages repo…'
-git('checkout', 'gh-pages').success? || die("Failed to checkout 'gh-pages' branch!")
-git('pull', '--rebase').success? || die("Failed to update 'gh-pages' repo!")
+pages.git('checkout', 'gh-pages').success? || die("Failed to checkout 'gh-pages' branch!")
+pages.git('pull', '--rebase').success? || die("Failed to update 'gh-pages' repo!")
 
 step 'Package field-kit.js…'
 run 'npm', 'run-script', 'package'
 
 # copy files over
-(Dir["#{root}/field-kit.*"] + Dir["#{root}/public/*"]).each do |file|
-  step "Copy #{file[root.size+1..-1]}…"
-  FileUtils.cp_r file, pages
+(Dir["#{root.path}/field-kit.*"] + Dir["#{root.path}/public/*"]).each do |file|
+  step "Copy #{file[root.path.size+1..-1]}…"
+  FileUtils.cp_r file, pages.path
 end
 
-if git('status').output.include? 'working directory clean'
-  step "No files changed."
-else
+if pages.dirty?
   # commit files
   step 'Push changes…'
-  git('add', '.') || die("Failed to add copied files to index!")
-  git('commit', '-m', 'Updating GitHub pages.') || die("Failed to commit copied gh-pages files!")
-  git('push', 'origin', 'gh-pages') || die("Failed to push changes to gh-pages branch!")
+  pages.git('add', '.') || die("Failed to add copied files to index!")
+  pages.git('commit', '-m', 'Updating GitHub pages.') || die("Failed to commit copied gh-pages files!")
+  pages.git('push', 'origin', 'gh-pages') || die("Failed to sync changes to gh-pages branch!")
 
   step 'Done.'
+else
+  step "No files changed."
 end
