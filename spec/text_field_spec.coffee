@@ -232,3 +232,92 @@ describe 'TextField', ->
 
       it 'does not count the rejected change as something to undo', ->
         expectThatTyping('0', 'a', '1', 'meta+z', 'meta+z').withFormatter(formatter).willNotChange('|')
+
+  describe '#hasFocus', ->
+    it 'is true when the document active element is the text field element', ->
+      field = buildField()
+      field.element.get(0).ownerDocument.activeElement = field.element.get(0)
+      expect(field.hasFocus()).toBeTruthy()
+
+    it 'is false when the document active element is not the text field element', ->
+      field = buildField()
+      field.element.get(0).ownerDocument.activeElement = null
+      expect(field.hasFocus()).toBeFalsy()
+
+  describe '#disabledPlaceholder', ->
+    field = null
+
+    beforeEach ->
+      field = buildField()
+
+    it 'is not set by default', ->
+      expect(field.disabledPlaceholder()).toBeNull()
+
+    it 'is not used as the placeholder when the text field is enabled', ->
+      field.setEnabled yes
+      field.setDisabledPlaceholder 'OMG CLICK ME'
+      expect(field.placeholder()).not.toEqual('OMG CLICK ME')
+
+    it 'is used as the placeholder when the text field is disabled', ->
+      field.setEnabled no
+      field.setDisabledPlaceholder 'OMG CLICK ME'
+      expect(field.placeholder()).toEqual('OMG CLICK ME')
+      expect(field.element.attr('placeholder')).toEqual(field.placeholder())
+
+    it 'is used as the placeholder when the text field becomes disabled', ->
+      field.setDisabledPlaceholder 'OMG CLICK ME'
+      field.setEnabled no
+      expect(field.placeholder()).toEqual('OMG CLICK ME')
+      expect(field.element.attr('placeholder')).toEqual(field.placeholder())
+
+  describe '#focusedPlaceholder', ->
+    field = null
+    hasFocus = null
+
+    beforeEach ->
+      field = buildField()
+      spyOn(field, 'hasFocus').andCallFake -> hasFocus
+
+    it 'is not set by default', ->
+      expect(field.focusedPlaceholder()).toBeNull()
+
+    it 'is not used as the placeholder when the text field is unfocused', ->
+      hasFocus = no
+      field.setFocusedPlaceholder 'laser focus!'
+      expect(field.placeholder()).not.toEqual('laser focus!')
+
+    it 'is used as the placeholder when the text field is focused', ->
+      hasFocus = yes
+      field.setFocusedPlaceholder 'laser focus!'
+      expect(field.placeholder()).toEqual('laser focus!')
+
+    it 'is used as the placeholder when the text field becomes focused', ->
+      field.setFocusedPlaceholder 'laser focus!'
+      hasFocus = yes
+      expect(field.placeholder()).toEqual('laser focus!')
+
+  describe '#unfocusedPlaceholder', ->
+    field = null
+    hasFocus = null
+
+    beforeEach ->
+      field = buildField()
+      spyOn(field, 'hasFocus').andCallFake -> hasFocus
+
+    it 'is not set by default', ->
+      expect(field.unfocusedPlaceholder()).toBeNull()
+
+    it 'is not used as the placeholder when the text field is focused', ->
+      hasFocus = yes
+      field.setUnfocusedPlaceholder 'fine, leave me'
+      expect(field.placeholder()).not.toEqual('fine, leave me')
+
+    it 'is used as the placeholder when the text field is unfocused', ->
+      hasFocus = no
+      field.setUnfocusedPlaceholder 'fine, leave me'
+      expect(field.placeholder()).toEqual('fine, leave me')
+
+    it 'is used as the placeholder when the text field becomes unfocused', ->
+      field.setUnfocusedPlaceholder 'fine, leave me'
+      hasFocus = no
+      expect(field.placeholder()).toEqual('fine, leave me')
