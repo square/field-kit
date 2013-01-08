@@ -136,11 +136,39 @@
 
     <div class="row">
       <div class="offset2 span8">
+        <h3>TextField</h3>
+      </div>
+    </div>
+
+    <div class="row field-kit-example">
+      <div class="offset2 span8">
+        <p>
+          <code>TextField</code> is the base class that wraps an
+          <code>&lt;input type=&quot;text&quot;&gt;</code> with helpers that
+          give you advanced control over the field.
+        </p>
+
+        <div class="docs-example">
+          <div class="row">
+            <div class="span3"></div>
+          </div>
+        </div>
+
+        <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="text-field-example" /&gt;</code></pre>
+        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField($('#text-field-example'));
+field.setFocusedPlaceholder('John Smith');
+field.setUnfocusedPlaceholder('First Name');</code></pre>
+      </div>
+    </div>
+
+
+    <div class="row">
+      <div class="offset2 span8">
         <h3>ExpiryDateFormatter</h3>
       </div>
     </div>
 
-    <div class="row">
+    <div class="row field-kit-example">
       <div class="offset2 span8">
         <p>
           The <code>ExpiryDateFormatter</code> provides formatting for credit card
@@ -153,9 +181,7 @@
 
         <div class="docs-example">
           <div class="row">
-            <div class="span3">
-              <input type="text" id="expiry" placeholder="mm/yy" />
-            </div>
+            <div class="span3"></div>
 
             <div class="span4">
               <pre class="tryout">&ldquo;4&rdquo; &rarr; &ldquo;04/&rdquo;
@@ -178,7 +204,7 @@ field.formatter = new FieldKit.ExpiryDateFormatter();</code></pre>
       </div>
     </div>
 
-    <div class="row">
+    <div class="row field-kit-example">
       <div class="offset2 span8">
         <p>
           The <code>AdaptiveCardFormatter</code> provides formatting for credit card
@@ -188,9 +214,7 @@ field.formatter = new FieldKit.ExpiryDateFormatter();</code></pre>
 
         <div class="docs-example">
           <div class="row">
-            <div class="span3">
-              <input type="text" id="card-number" placeholder="1234 5678 9012 3456" />
-            </div>
+            <div class="span3"></div>
 
             <div class="span4">
               <pre class="tryout">&ldquo;411111111&rdquo; &rarr; &ldquo;4111 1111 1&rdquo;  # visa
@@ -213,7 +237,7 @@ field.formatter = new FieldKit.AdaptiveCardFormatter();</code></pre>
       </div>
     </div>
 
-    <div class="row">
+    <div class="row field-kit-example">
       <div class="offset2 span8">
         <p>
           The <code>SocialSecurityNumberFormatter</code> provides formatting for
@@ -224,9 +248,7 @@ field.formatter = new FieldKit.AdaptiveCardFormatter();</code></pre>
 
         <div class="docs-example">
           <div class="row">
-            <div class="span3">
-              <input type="text" id="ssn" placeholder="123-45-6789" />
-            </div>
+            <div class="span3"></div>
 
             <div class="span4">
               <pre class="tryout">&ldquo;1234&rdquo; &rarr; &ldquo;123-4&rdquo;
@@ -248,7 +270,7 @@ field.formatter = new FieldKit.SocialSecurityNumberFormatter();</code></pre>
       </div>
     </div>
 
-    <div class="row">
+    <div class="row field-kit-example">
       <div class="offset2 span8">
         <p>
           Formatters are objects that implement the <code>Formatter</code> interface:
@@ -300,9 +322,7 @@ interface Range
 
         <div class="docs-example">
           <div class="row">
-            <div class="span3">
-              <input type="text" id="b-to-a" placeholder="changes 'b' to 'a'" />
-            </div>
+            <div class="span3"></div>
 
             <div class="span4">
               <pre class="tryout">&ldquo;Hot tub&rdquo; &rarr; &ldquo;Hot tua&rdquo;
@@ -325,7 +345,7 @@ field.formatter = {
       </div>
     </div>
 
-    <div class="row">
+    <div class="row field-kit-example">
       <div class="offset2 span8">
         <h4>Controlling the Caret</h4>
 
@@ -339,11 +359,13 @@ field.formatter = {
         </p>
 
         <div class="docs-example">
-          <input type="text" id="no-selection" placeholder="no selection" />
+          <div class="row">
+            <div class="span3"></div>
+          </div>
         </div>
 
         <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="no-selection" placeholder="no selection"&gt;</code></pre>
-        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField($('#card-number'));
+        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField($('#no-selection'));
 field.formatter = {
   format: function(value){ return value; },
   parse: function(value){ return value; },
@@ -380,7 +402,7 @@ field.formatter = {
   <script src="jquery.js" type="text/javascript" charset="utf-8"></script>
   <script src="jquery.caret.1.02.js" type="text/javascript" charset="utf-8"></script>
   <script src="field-kit.js" type="text/javascript" charset="utf-8"></script>
-  <script src="index.coffee" type="text/javascript" charset="utf-8"></script>
+  <script src="index.js" type="text/javascript" charset="utf-8"></script>
 
   <script src="google-code-prettify/prettify.js" type="text/javascript" charset="utf-8"></script>
 </body>
