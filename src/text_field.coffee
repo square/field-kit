@@ -494,7 +494,7 @@ class TextField
     event.preventDefault()
     @setSelectedRange start: 0, length: 0
 
-  # Select from the free end of the caret to the beginning of line.
+  # Select from the free end of the selection to the beginning of line.
   #
   # Examples
   #
@@ -654,7 +654,7 @@ class TextField
     event.preventDefault()
     @setSelectedRange start: @text().length, length: 0
 
-  # Moves the free end of the caret to the end of the current line.
+  # Moves the free end of the selection to the end of the current line.
   #
   # Examples
   #
@@ -1141,11 +1141,11 @@ class TextField
       if @formatter().isChangeValid(change, error)
         change.recomputeDiff()
         @setText change.proposed.text
-        @setCaret change.proposed.caret
+        @setSelectedRange change.proposed.selectedRange
       else
         @_delegate?.textFieldDidFailToValidateChange?(this, change, errorType)
         @setText change.current.text
-        @setCaret change.current.caret
+        @setSelectedRange change.current.selectedRange
         return result # change is rejected, don't do undo processing
 
     if change.inserted.text.length or change.deleted.text.length
@@ -1203,29 +1203,12 @@ class TextField
     @_formatter = formatter
     @setValue value
 
-  # Deprecated: Gets the selection caret with start and end indexes in #text.
-  #
-  # Returns an Object with 'start' and 'end' keys.
-  caret: ->
-    { start, end } = @element.caret()
-    return { start, end }
-
   # Gets the range of the current selection.
   #
   # Returns an Object with 'start', 'length', and 'end' keys.
   selectedRange: ->
-    caret = @caret()
+    caret = @element.caret()
     return start: caret.start, length: caret.end - caret.start
-
-  # Sets the current selection caret.
-  setCaret: (caret) ->
-    min = 0
-    max = @text().length
-    caret =
-      start: Math.max(min, Math.min(max, caret.start))
-      end: Math.max(min, Math.min(max, caret.end))
-    @element.caret caret
-    @selectionAffinity = AFFINITY.NONE if caret.start is caret.end
 
   # Sets the range of the current selection without changing the affinity.
   #
@@ -1237,8 +1220,13 @@ class TextField
   #
   # Returns nothing.
   setSelectedRangeWithAffinity: (range, affinity) ->
-    @selectionAffinity = affinity
-    @setCaret start: range.start, end: range.start + range.length
+    min = 0
+    max = @text().length
+    caret =
+      start: Math.max(min, Math.min(max, range.start))
+      end: Math.max(min, Math.min(max, range.start + range.length))
+    @element.caret caret
+    @selectionAffinity = if range.length is 0 then AFFINITY.NONE else affinity
 
   # Gets the position of the current selection's anchor point, i.e. the point
   # that the selection extends from, if any.
@@ -1286,10 +1274,10 @@ class TextField
 
     if @undoManager().isUndoing()
       @setText change.current.text
-      @setCaret change.current.caret
+      @setSelectedRange change.current.selectedRange
     else
       @setText change.proposed.text
-      @setCaret change.proposed.caret
+      @setSelectedRange change.proposed.selectedRange
 
   ##
   ## Enabled/disabled support
@@ -1395,9 +1383,9 @@ class TextFieldStateChange
 
   @build: (field, callback) ->
     change = new @(field)
-    change.current = text: field.text(), caret: field.caret()
+    change.current = text: field.text(), selectedRange: field.selectedRange()
     callback()
-    change.proposed = text: field.text(), caret: field.caret()
+    change.proposed = text: field.text(), selectedRange: field.selectedRange()
     change.recomputeDiff()
     return change
 
@@ -1431,12 +1419,12 @@ class TextFieldStateChange
       @deleted = deleted
     else
       @inserted =
-        start: @proposed.caret.start
-        end: @proposed.caret.end
+        start: @proposed.selectedRange.start
+        end: @proposed.selectedRange.start + @proposed.selectedRange.length
         text: ''
       @deleted =
-        start: @current.caret.start
-        end: @current.caret.end
+        start: @current.selectedRange.start
+        end: @current.selectedRange.start + @current.selectedRange.length
         text: ''
 
     return null

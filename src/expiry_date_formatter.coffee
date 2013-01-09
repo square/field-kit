@@ -65,7 +65,7 @@ class ExpiryDateFormatter extends DelimitedTextFormatter
         newText = match[1] + @delimiter + match[3]
 
     change.proposed.text = newText
-    change.proposed.caret = start: newText.length, end: newText.length
+    change.proposed.selectedRange = start: newText.length, length: 0
 
     return true
 

@@ -177,24 +177,26 @@ describe 'TextField', ->
     expectThatTyping('backspace').into(field).willNotChange('3725 |').withError('NO WAY')
     expectThatTyping('a').into(field).willNotChange('3725 |').withError('NO WAY')
 
-  it 'allows the formatter to alter caret changes', ->
+  it 'allows the formatter to alter selection range changes', ->
     field = buildField()
-    # disallow the caret at the start of text
+    # disallow empty selection at the start of text
     field.formatter().isChangeValid = (change) ->
-      if change.proposed.caret.start is 0 and change.proposed.caret.end is 0
-        change.proposed.caret = start: 1, end: 1
+      range = change.proposed.selectedRange
+      if range.start is 0 and range.length is 0
+        range.start = 1
       return yes
 
     expectThatTyping('up').into(field).willChange(' 234|').to(' |234')
 
     # disallow selection
     field.formatter().isChangeValid = (change) ->
-      caret = change.proposed.caret
-      if caret.start isnt caret.end
-        if change.field.selectionAnchor() is caret.start
-          caret.start = caret.end
+      range = change.proposed.selectedRange
+      if range.length isnt 0
+        if change.field.selectionAnchor() is range.start
+          range.start += range.length
         else
-          caret.end = caret.start
+          range.end -= range.length
+        range.length = 0
       return yes
 
     expectThatTyping('shift+left').into(field).willChange('234|').to('23|4')

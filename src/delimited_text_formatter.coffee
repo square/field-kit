@@ -30,25 +30,27 @@ class DelimitedTextFormatter extends Formatter
     if change.deleted.text is @delimiter
       newText = newText.substring(0, newText.length - 1)
 
-    caret = change.proposed.caret
-    hasSelection = caret.start isnt caret.end
-    startMovedLeft = caret.start < change.current.caret.start
-    endMovedLeft = caret.end < change.current.caret.end
+    range = change.proposed.selectedRange
+    hasSelection = range.length isnt 0
+    startMovedLeft = range.start < change.current.selectedRange.start
+    endMovedLeft = (range.start + range.length) < (change.current.selectedRange.start + change.current.selectedRange.length)
 
-    if @hasDelimiterAtIndex caret.start
+    if @hasDelimiterAtIndex range.start
       if startMovedLeft
-        caret.start--
+        range.start--
+        range.length++
       else
-        caret.start++
+        range.start++
+        range.length--
 
     if hasSelection
-      if @hasDelimiterAtIndex caret.end - 1
+      if @hasDelimiterAtIndex range.start + range.length - 1
         if startMovedLeft or endMovedLeft
-          caret.end--
+          range.length--
         else
-          caret.end++
+          range.length++
     else
-      caret.end = caret.start
+      range.length = 0
 
     isChangeValid = yes
 
