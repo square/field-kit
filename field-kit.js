@@ -398,7 +398,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     };
 
     DelimitedTextFormatter.prototype.isChangeValid = function(change, error) {
-      var caret, endMovedLeft, hasSelection, isChangeValid, newText, object, startMovedLeft;
+      var endMovedLeft, hasSelection, isChangeValid, newText, object, range, startMovedLeft;
       if (!DelimitedTextFormatter.__super__.isChangeValid.call(this, change, error)) {
         return false;
       }
@@ -406,27 +406,29 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       if (change.deleted.text === this.delimiter) {
         newText = newText.substring(0, newText.length - 1);
       }
-      caret = change.proposed.caret;
-      hasSelection = caret.start !== caret.end;
-      startMovedLeft = caret.start < change.current.caret.start;
-      endMovedLeft = caret.end < change.current.caret.end;
-      if (this.hasDelimiterAtIndex(caret.start)) {
+      range = change.proposed.selectedRange;
+      hasSelection = range.length !== 0;
+      startMovedLeft = range.start < change.current.selectedRange.start;
+      endMovedLeft = (range.start + range.length) < (change.current.selectedRange.start + change.current.selectedRange.length);
+      if (this.hasDelimiterAtIndex(range.start)) {
         if (startMovedLeft) {
-          caret.start--;
+          range.start--;
+          range.length++;
         } else {
-          caret.start++;
+          range.start++;
+          range.length--;
         }
       }
       if (hasSelection) {
-        if (this.hasDelimiterAtIndex(caret.end - 1)) {
+        if (this.hasDelimiterAtIndex(range.start + range.length - 1)) {
           if (startMovedLeft || endMovedLeft) {
-            caret.end--;
+            range.length--;
           } else {
-            caret.end++;
+            range.length++;
           }
         }
       } else {
-        caret.end = caret.start;
+        range.length = 0;
       }
       isChangeValid = true;
       object = this.parse(newText, function() {
@@ -542,9 +544,9 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
         }
       }
       change.proposed.text = newText;
-      change.proposed.caret = {
+      change.proposed.selectedRange = {
         start: newText.length,
-        end: newText.length
+        length: 0
       };
       return true;
     };
@@ -588,19 +590,18 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     };
 
     Formatter.prototype.isChangeValid = function(change, error) {
-      var available, caret, newText, text, truncatedLength, _ref;
-      _ref = change.proposed, caret = _ref.caret, text = _ref.text;
+      var available, newText, selectedRange, text, truncatedLength, _ref;
+      _ref = change.proposed, selectedRange = _ref.selectedRange, text = _ref.text;
       if ((this.maximumLength != null) && text.length > this.maximumLength) {
         available = this.maximumLength - (text.length - change.inserted.text.length);
-        newText = change.current.text.substring(0, change.current.caret.start);
+        newText = change.current.text.substring(0, change.current.selectedRange.start);
         if (available > 0) {
           newText += change.inserted.text.substring(0, available);
         }
-        newText += change.current.text.substring(change.current.caret.end);
+        newText += change.current.text.substring(change.current.selectedRange.start + change.current.selectedRange.length);
         truncatedLength = text.length - newText.length;
         change.proposed.text = newText;
-        caret.start -= truncatedLength;
-        caret.end -= truncatedLength;
+        selectedRange.start -= truncatedLength;
       }
       return true;
     };
@@ -1475,7 +1476,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
         if (this.formatter().isChangeValid(change, error)) {
           change.recomputeDiff();
           this.setText(change.proposed.text);
-          this.setCaret(change.proposed.caret);
+          this.setSelectedRange(change.proposed.selectedRange);
         } else {
           if ((_ref1 = this._delegate) != null) {
             if (typeof _ref1.textFieldDidFailToValidateChange === "function") {
@@ -1483,7 +1484,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
             }
           }
           this.setText(change.current.text);
-          this.setCaret(change.current.caret);
+          this.setSelectedRange(change.current.selectedRange);
           return result;
         }
       }
@@ -1549,36 +1550,13 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       return this.setValue(value);
     };
 
-    TextField.prototype.caret = function() {
-      var end, start, _ref;
-      _ref = this.element.caret(), start = _ref.start, end = _ref.end;
-      return {
-        start: start,
-        end: end
-      };
-    };
-
     TextField.prototype.selectedRange = function() {
       var caret;
-      caret = this.caret();
+      caret = this.element.caret();
       return {
         start: caret.start,
         length: caret.end - caret.start
       };
-    };
-
-    TextField.prototype.setCaret = function(caret) {
-      var max, min;
-      min = 0;
-      max = this.text().length;
-      caret = {
-        start: Math.max(min, Math.min(max, caret.start)),
-        end: Math.max(min, Math.min(max, caret.end))
-      };
-      this.element.caret(caret);
-      if (caret.start === caret.end) {
-        return this.selectionAffinity = AFFINITY.NONE;
-      }
     };
 
     TextField.prototype.setSelectedRange = function(range) {
@@ -1586,11 +1564,15 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     };
 
     TextField.prototype.setSelectedRangeWithAffinity = function(range, affinity) {
-      this.selectionAffinity = affinity;
-      return this.setCaret({
-        start: range.start,
-        end: range.start + range.length
-      });
+      var caret, max, min;
+      min = 0;
+      max = this.text().length;
+      caret = {
+        start: Math.max(min, Math.min(max, range.start)),
+        end: Math.max(min, Math.min(max, range.start + range.length))
+      };
+      this.element.caret(caret);
+      return this.selectionAffinity = range.length === 0 ? AFFINITY.NONE : affinity;
     };
 
     TextField.prototype.selectionAnchor = function() {
@@ -1622,10 +1604,10 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       this.undoManager().proxyFor(this)._applyChangeFromUndoManager(change);
       if (this.undoManager().isUndoing()) {
         this.setText(change.current.text);
-        return this.setCaret(change.current.caret);
+        return this.setSelectedRange(change.current.selectedRange);
       } else {
         this.setText(change.proposed.text);
-        return this.setCaret(change.proposed.caret);
+        return this.setSelectedRange(change.proposed.selectedRange);
       }
     };
 
@@ -1756,12 +1738,12 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       change = new this(field);
       change.current = {
         text: field.text(),
-        caret: field.caret()
+        selectedRange: field.selectedRange()
       };
       callback();
       change.proposed = {
         text: field.text(),
-        caret: field.caret()
+        selectedRange: field.selectedRange()
       };
       change.recomputeDiff();
       return change;
@@ -1803,13 +1785,13 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
         this.deleted = deleted;
       } else {
         this.inserted = {
-          start: this.proposed.caret.start,
-          end: this.proposed.caret.end,
+          start: this.proposed.selectedRange.start,
+          end: this.proposed.selectedRange.start + this.proposed.selectedRange.length,
           text: ''
         };
         this.deleted = {
-          start: this.current.caret.start,
-          end: this.current.caret.end,
+          start: this.current.selectedRange.start,
+          end: this.current.selectedRange.start + this.current.selectedRange.length,
           text: ''
         };
       }

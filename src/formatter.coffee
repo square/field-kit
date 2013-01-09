@@ -12,17 +12,16 @@ class Formatter
     text
 
   isChangeValid: (change, error) ->
-    {caret, text} = change.proposed
+    {selectedRange, text} = change.proposed
     if @maximumLength? and text.length > @maximumLength
       available = @maximumLength - (text.length - change.inserted.text.length)
-      newText = change.current.text.substring(0, change.current.caret.start)
+      newText = change.current.text.substring(0, change.current.selectedRange.start)
       if available > 0
         newText += change.inserted.text.substring(0, available)
-      newText += change.current.text.substring(change.current.caret.end)
+      newText += change.current.text.substring(change.current.selectedRange.start + change.current.selectedRange.length)
       truncatedLength = text.length - newText.length
       change.proposed.text = newText
-      caret.start -= truncatedLength
-      caret.end -= truncatedLength
+      selectedRange.start -= truncatedLength
     return yes
 
 module.exports = Formatter
