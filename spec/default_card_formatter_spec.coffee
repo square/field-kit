@@ -7,7 +7,7 @@ describe 'DefaultCardFormatter', ->
 
   beforeEach ->
     field = buildField()
-    field.formatter = new DefaultCardFormatter()
+    field.setFormatter new DefaultCardFormatter()
 
   it 'adds a space after the first four digits', ->
     expectThatTyping('1').into(field).willChange('411|').to('4111 |')

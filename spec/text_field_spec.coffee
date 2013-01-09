@@ -173,14 +173,14 @@ describe 'TextField', ->
 
   it 'allows the formatter to prevent changes', ->
     field = buildField()
-    field.formatter.isChangeValid = (change, error) -> error 'NO WAY'; return no
+    field.formatter().isChangeValid = (change, error) -> error 'NO WAY'; return no
     expectThatTyping('backspace').into(field).willNotChange('3725 |').withError('NO WAY')
     expectThatTyping('a').into(field).willNotChange('3725 |').withError('NO WAY')
 
   it 'allows the formatter to alter caret changes', ->
     field = buildField()
     # disallow the caret at the start of text
-    field.formatter.isChangeValid = (change) ->
+    field.formatter().isChangeValid = (change) ->
       if change.proposed.caret.start is 0 and change.proposed.caret.end is 0
         change.proposed.caret = start: 1, end: 1
       return yes
@@ -188,10 +188,10 @@ describe 'TextField', ->
     expectThatTyping('up').into(field).willChange(' 234|').to(' |234')
 
     # disallow selection
-    field.formatter.isChangeValid = (change) ->
+    field.formatter().isChangeValid = (change) ->
       caret = change.proposed.caret
       if caret.start isnt caret.end
-        if change.field.selectionAnchor is caret.start
+        if change.field.selectionAnchor() is caret.start
           caret.start = caret.end
         else
           caret.end = caret.start

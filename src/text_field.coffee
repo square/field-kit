@@ -131,11 +131,11 @@ class TextField
   # Returns nothing.
   insertText: (text) ->
     # clear any selection
-    @clearSelection() if @hasSelection
+    @clearSelection() if @hasSelection()
 
     # insert the text
     @replaceSelection text
-    range = @selectedRange
+    range = @selectedRange()
     range.start += range.length
     range.length = 0
     @setSelectedRange range
@@ -199,7 +199,7 @@ class TextField
   # Returns nothing.
   moveUpAndModifySelection: (event) ->
     event.preventDefault()
-    range = @selectedRange
+    range = @selectedRange()
 
     switch @selectionAffinity
       when AFFINITY.UPSTREAM, AFFINITY.NONE
@@ -219,7 +219,7 @@ class TextField
   # Returns nothing.
   moveParagraphBackwardAndModifySelection: (event) ->
     event.preventDefault()
-    range = @selectedRange
+    range = @selectedRange()
 
     switch @selectionAffinity
       when AFFINITY.UPSTREAM, AFFINITY.NONE
@@ -244,7 +244,7 @@ class TextField
   # Returns nothing.
   moveToBeginningOfDocumentAndModifySelection: (event) ->
     event.preventDefault()
-    range = @selectedRange
+    range = @selectedRange()
     range.length += range.start
     range.start = 0
     @setSelectedRangeWithAffinity range, AFFINITY.UPSTREAM
@@ -266,7 +266,7 @@ class TextField
   moveDown: (event) ->
     event.preventDefault()
     # 12|34 56|78  =>  1234 5678|
-    range = start: @text.length, length: 0
+    range = start: @text().length, length: 0
     @setSelectedRangeWithAffinity range, AFFINITY.NONE
 
   # Moves the cursor up to the end of the current paragraph, which because this
@@ -309,8 +309,8 @@ class TextField
   # Returns nothing.
   moveDownAndModifySelection: (event) ->
     event.preventDefault()
-    range = @selectedRange
-    end = @text.length
+    range = @selectedRange()
+    end = @text().length
 
     if @selectionAffinity is AFFINITY.UPSTREAM
       range.start += range.length
@@ -324,12 +324,12 @@ class TextField
   # Returns nothing.
   moveParagraphForwardAndModifySelection: (event) ->
     event.preventDefault()
-    range = @selectedRange
+    range = @selectedRange()
 
     switch @selectionAffinity
       when AFFINITY.DOWNSTREAM, AFFINITY.NONE
         # 12|34 56>78  =>  12|34 5678>
-        range.length = @text.length - range.start
+        range.length = @text().length - range.start
       when AFFINITY.UPSTREAM
         # 12<34 56|78  =>  12|34 5678
         range.start += range.length
@@ -349,8 +349,8 @@ class TextField
   # Returns nothing.
   moveToEndOfDocumentAndModifySelection: (event) ->
     event.preventDefault()
-    range = @selectedRange
-    range.length = @text.length - range.start
+    range = @selectedRange()
+    range.length = @text().length - range.start
     @setSelectedRangeWithAffinity range, AFFINITY.DOWNSTREAM
 
   # Moves the cursor to the left, counting selections as a thing to move past.
@@ -370,7 +370,7 @@ class TextField
   # Returns nothing.
   moveLeft: (event) ->
     event.preventDefault()
-    range = @selectedRange
+    range = @selectedRange()
 
     if range.length isnt 0
       range.length = 0
@@ -406,7 +406,7 @@ class TextField
   # Returns nothing.
   moveLeftAndModifySelection: (event) ->
     event.preventDefault()
-    range = @selectedRange
+    range = @selectedRange()
 
     switch @selectionAffinity
       when AFFINITY.UPSTREAM, AFFINITY.NONE
@@ -435,7 +435,7 @@ class TextField
   # Returns nothing.
   moveWordLeft: (event) ->
     event.preventDefault()
-    index = @lastWordBreakBeforeIndex @selectedRange.start - 1
+    index = @lastWordBreakBeforeIndex @selectedRange().start - 1
     @setSelectedRange start: index, length: 0
 
   # Moves the free end of the current selection to the beginning of the
@@ -466,7 +466,7 @@ class TextField
   # Returns nothing.
   moveWordLeftAndModifySelection: (event) ->
     event.preventDefault()
-    range = @selectedRange
+    range = @selectedRange()
 
     switch @selectionAffinity
       when AFFINITY.UPSTREAM, AFFINITY.NONE
@@ -509,7 +509,7 @@ class TextField
   # Returns nothing.
   moveToBeginningOfLineAndModifySelection: (event) ->
     event.preventDefault()
-    range = @selectedRange
+    range = @selectedRange()
     range.length += range.start
     range.start = 0
     @setSelectedRangeWithAffinity range, AFFINITY.UPSTREAM
@@ -531,7 +531,7 @@ class TextField
   # Returns nothing.
   moveRight: (event) ->
     event.preventDefault()
-    range = @selectedRange
+    range = @selectedRange()
 
     if range.length isnt 0
       range.start += range.length
@@ -568,7 +568,7 @@ class TextField
   # Returns nothing.
   moveRightAndModifySelection: (event) ->
     event.preventDefault()
-    range = @selectedRange
+    range = @selectedRange()
 
     switch @selectionAffinity
       when AFFINITY.UPSTREAM
@@ -597,7 +597,7 @@ class TextField
   # Returns nothing.
   moveWordRight: (event) ->
     event.preventDefault()
-    range = @selectedRange
+    range = @selectedRange()
     index = @nextWordBreakAfterIndex range.start + range.length
     @setSelectedRange start: index, length: 0
 
@@ -628,7 +628,7 @@ class TextField
   # Returns nothing.
   moveWordRightAndModifySelection: (event) ->
     event.preventDefault()
-    range = @selectedRange
+    range = @selectedRange()
     start = range.start
     end = range.start + range.length
 
@@ -652,8 +652,7 @@ class TextField
   # Returns nothing.
   moveToEndOfLine: (event) ->
     event.preventDefault()
-    text = @text
-    @setSelectedRange start: @text.length, length: 0
+    @setSelectedRange start: @text().length, length: 0
 
   # Moves the free end of the caret to the end of the current line.
   #
@@ -670,8 +669,8 @@ class TextField
   # Returns nothing.
   moveToEndOfLineAndModifySelection: (event) ->
     event.preventDefault()
-    range = @selectedRange
-    range.length = @text.length - range.start
+    range = @selectedRange()
+    range.length = @text().length - range.start
     @setSelectedRangeWithAffinity range, AFFINITY.DOWNSTREAM
 
   # Deletes backward one character or clears a non-empty selection.
@@ -693,7 +692,7 @@ class TextField
   # Returns nothing.
   deleteBackward: (event) ->
     event.preventDefault()
-    range = @selectedRange
+    range = @selectedRange()
 
     if range.length is 0
       range.start--
@@ -720,11 +719,11 @@ class TextField
   #
   # Returns nothing.
   deleteWordBackward: (event) ->
-    if @hasSelection
+    if @hasSelection()
       return @deleteBackward event
 
     event.preventDefault()
-    range = @selectedRange
+    range = @selectedRange()
 
     start = @lastWordBreakBeforeIndex range.start
     range.length += range.start - start
@@ -770,11 +769,11 @@ class TextField
   #
   # Returns nothing.
   deleteBackwardToBeginningOfLine: (event) ->
-    if @hasSelection
+    if @hasSelection()
       return @deleteBackward event
 
     event.preventDefault()
-    range = @selectedRange
+    range = @selectedRange()
     range.length = range.start
     range.start = 0
     @setSelectedRange range
@@ -799,7 +798,7 @@ class TextField
   # Returns nothing.
   deleteForward: (event) ->
     event.preventDefault()
-    range = @selectedRange
+    range = @selectedRange()
 
     if range.length is 0
       range.length++
@@ -825,11 +824,11 @@ class TextField
   #
   # Returns nothing.
   deleteWordForward: (event) ->
-    if @hasSelection
+    if @hasSelection()
       return @deleteForward event
 
     event.preventDefault()
-    range = @selectedRange
+    range = @selectedRange()
 
     end = @nextWordBreakAfterIndex range.start + range.length
 
@@ -849,8 +848,8 @@ class TextField
   # Determines whether this field has any selection.
   #
   # Returns true if there is at least one character selected, false otherwise.
-  @::__defineGetter__ 'hasSelection', ->
-    @selectedRange.length isnt 0
+  hasSelection: ->
+    @selectedRange().length isnt 0
 
   # Internal: Finds the start of the "word" before index.
   #
@@ -858,7 +857,7 @@ class TextField
   #
   # Returns an index in value less than or equal to the given index.
   lastWordBreakBeforeIndex: (index) ->
-    indexes = @leftWordBreakIndexes
+    indexes = @leftWordBreakIndexes()
     result = indexes[0]
 
     for wordBreakIndex in indexes
@@ -874,14 +873,14 @@ class TextField
   # Examples
   #
   #   # given value of "123456789" and text of "123-45-6789"
-  #   >> leftWordBreakIndexes
+  #   >> leftWordBreakIndexes()
   #   => [0, 3, 5]
   #
   # Returns an Array of Numbers mapping to indexes in the value at which
   # "words" start.
-  @::__defineGetter__ 'leftWordBreakIndexes', ->
+  leftWordBreakIndexes: ->
     result = []
-    text = @text
+    text = @text()
 
     for i in [0..text.length-1]
       result.push i if not isWordChar(text[i-1]) and isWordChar(text[i])
@@ -894,7 +893,7 @@ class TextField
   #
   # Returns an index in value greater than or equal to the given index.
   nextWordBreakAfterIndex: (index) ->
-    indexes = @rightWordBreakIndexes.reverse()
+    indexes = @rightWordBreakIndexes().reverse()
     result = indexes[0]
 
     for wordBreakIndex in indexes
@@ -910,14 +909,14 @@ class TextField
   # Examples
   #
   #   # given value of "123456789" and text of "123-45-6789"
-  #   >> rightWordBreakIndexes
+  #   >> rightWordBreakIndexes()
   #   => [3, 5, 9]
   #
   # Returns an Array of Numbers mapping to indexes in the value at which
   # "words" end.
-  @::__defineGetter__ 'rightWordBreakIndexes', ->
+  rightWordBreakIndexes: ->
     result = []
-    text = @text
+    text = @text()
 
     for i in [0..text.length-1]
       result.push i+1 if isWordChar(text[i]) and not isWordChar(text[i+1])
@@ -946,14 +945,14 @@ class TextField
   #
   # Returns nothing.
   replaceSelection: (replacement) ->
-    range = @selectedRange
+    range = @selectedRange()
     end = range.start + range.length
-    text = @text
+    text = @text()
 
     text = text.substring(0, range.start) + replacement + text.substring(end)
     range.length = replacement.length
 
-    @text = text
+    @setText text
     @setSelectedRangeWithAffinity range, AFFINITY.NONE
 
   # Internal: Expands the selection to contain all the characters in the content.
@@ -967,7 +966,7 @@ class TextField
   # Returns nothing.
   selectAll: (event) ->
     event.preventDefault()
-    @setSelectedRangeWithAffinity {start: 0, length: @text.length}, AFFINITY.NONE
+    @setSelectedRangeWithAffinity {start: 0, length: @text().length}, AFFINITY.NONE
 
   # Replaces the current selection with text from the given pasteboard.
   #
@@ -977,7 +976,7 @@ class TextField
   readSelectionFromPasteboard: (pasteboard) ->
     text = pasteboard.getData 'Text'
     @replaceSelection text
-    range = @selectedRange
+    range = @selectedRange()
     range.start += range.length
     range.length = 0
     @setSelectedRange range
@@ -1138,15 +1137,15 @@ class TextField
     change    = TextFieldStateChange.build this, -> result = callback()
     error     = (type) -> errorType = type
 
-    if typeof @formatter?.isChangeValid is 'function'
-      if @formatter.isChangeValid(change, error)
+    if typeof @formatter()?.isChangeValid is 'function'
+      if @formatter().isChangeValid(change, error)
         change.recomputeDiff()
-        @text = change.proposed.text
-        @caret = change.proposed.caret
+        @setText change.proposed.text
+        @setCaret change.proposed.caret
       else
         @_delegate?.textFieldDidFailToValidateChange?(this, change, errorType)
-        @text = change.current.text
-        @caret = change.current.caret
+        @setText change.current.text
+        @setCaret change.current.caret
         return result # change is rejected, don't do undo processing
 
     if change.inserted.text.length or change.deleted.text.length
@@ -1170,58 +1169,58 @@ class TextField
   # underlying input element.
   #
   # Returns a String containing the input value.
-  @::__defineGetter__ 'text', ->
+  text: ->
     @element.val()
 
   # Sets the formatted text value. This generally should not be used. Instead,
   # use the value setter.
-  @::__defineSetter__ 'text', (text) ->
+  setText: (text) ->
     @element.val(text)
 
   # Gets the object value. This is the value that should be considered the
   # "real" value of the field.
   #
   # Returns an Object containing the parsed value of the field.
-  @::__defineGetter__ 'value', ->
+  value: ->
     value = @element.val()
     return value unless @_formatter
     @_formatter.parse value, (errorType) => @_delegate?.textFieldDidFailToParseString?(this, value, errorType)
 
   # Sets the object value of the field.
-  @::__defineSetter__ 'value', (value) ->
+  setValue: (value) ->
     value = @_formatter.format(value) if @_formatter
     @element.val "#{value}"
     @element.trigger 'change'
 
   # Gets the current formatter. Formatters are used to translate between #text
   # and #value propertiees of the field.
-  @::__defineGetter__ 'formatter', ->
+  formatter: ->
     @_formatter
 
   # Sets the current formatter.
-  @::__defineSetter__ 'formatter', (formatter) ->
-    value = @value
+  setFormatter: (formatter) ->
+    value = @value()
     @_formatter = formatter
-    @value = value
+    @setValue value
 
-  # Deprecated: Gets the selection caret with start and end indexes relative to #value.
+  # Deprecated: Gets the selection caret with start and end indexes in #text.
   #
   # Returns an Object with 'start' and 'end' keys.
-  @::__defineGetter__ 'caret', ->
+  caret: ->
     { start, end } = @element.caret()
     return { start, end }
 
   # Gets the range of the current selection.
   #
   # Returns an Object with 'start', 'length', and 'end' keys.
-  @::__defineGetter__ 'selectedRange', ->
-    caret = @caret
+  selectedRange: ->
+    caret = @caret()
     return start: caret.start, length: caret.end - caret.start
 
   # Sets the current selection caret.
-  @::__defineSetter__ 'caret', (caret) ->
+  setCaret: (caret) ->
     min = 0
-    max = @text.length
+    max = @text().length
     caret =
       start: Math.max(min, Math.min(max, caret.start))
       end: Math.max(min, Math.min(max, caret.end))
@@ -1239,14 +1238,14 @@ class TextField
   # Returns nothing.
   setSelectedRangeWithAffinity: (range, affinity) ->
     @selectionAffinity = affinity
-    @caret = start: range.start, end: range.start + range.length
+    @setCaret start: range.start, end: range.start + range.length
 
   # Gets the position of the current selection's anchor point, i.e. the point
   # that the selection extends from, if any.
   #
   # Returns an index within the current text.
-  @::__defineGetter__ 'selectionAnchor', ->
-    range = @selectedRange
+  selectionAnchor: ->
+    range = @selectedRange()
     switch @selectionAffinity
       when AFFINITY.UPSTREAM
         range.start + range.length
@@ -1286,11 +1285,11 @@ class TextField
     @undoManager().proxyFor(this)._applyChangeFromUndoManager(change)
 
     if @undoManager().isUndoing()
-      @text = change.current.text
-      @caret = change.current.caret
+      @setText change.current.text
+      @setCaret change.current.caret
     else
-      @text = change.proposed.text
-      @caret = change.proposed.caret
+      @setText change.proposed.text
+      @setCaret change.proposed.caret
 
   ##
   ## Enabled/disabled support
@@ -1384,7 +1383,7 @@ class TextField
   ##
 
   inspect: ->
-    "#<TextField text=#{@text}>"
+    "#<TextField text=#{@text()}>"
 
 
 class TextFieldStateChange
@@ -1396,9 +1395,9 @@ class TextFieldStateChange
 
   @build: (field, callback) ->
     change = new @(field)
-    change.current = text: field.text, caret: field.caret
+    change.current = text: field.text(), caret: field.caret()
     callback()
-    change.proposed = text: field.text, caret: field.caret
+    change.proposed = text: field.text(), caret: field.caret()
     change.recomputeDiff()
     return change
 

@@ -7,7 +7,7 @@ class FieldExpectationBase
     this
 
   withFormatter: (formatter) ->
-    @field.formatter = formatter
+    @field.setFormatter formatter
     this
 
   willChange: (@currentDescription) ->

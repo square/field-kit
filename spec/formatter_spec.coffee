@@ -7,11 +7,11 @@ describe 'Formatter', ->
 
   beforeEach ->
     field = buildField()
-    field.formatter = new Formatter()
+    field.setFormatter new Formatter()
 
   describe 'when #maximumLength is set', ->
     beforeEach ->
-      field.formatter.maximumLength = 3
+      field.formatter().maximumLength = 3
 
     it 'allows input that would not make the text longer than the maximum', ->
       expectThatTyping('c').into(field).willChange('ab|').to('abc|')
