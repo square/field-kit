@@ -11,7 +11,7 @@ describe 'DelimitedTextFormatter', ->
 
   beforeEach ->
     field = buildField()
-    field.formatter = new ThreeCharsThenDelimiter('-')
+    field.setFormatter new ThreeCharsThenDelimiter('-')
 
   it 'adds a delimiter wherever they need to be', ->
     expectThatTyping('1').into(field).willChange('41|').to('411-|')

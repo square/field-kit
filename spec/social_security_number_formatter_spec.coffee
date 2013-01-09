@@ -7,7 +7,7 @@ describe 'SocialSecurityNumberFormatter', ->
 
   beforeEach ->
     field = buildField()
-    field.formatter = new SocialSecurityNumberFormatter()
+    field.setFormatter new SocialSecurityNumberFormatter()
 
   it 'places dashes in the right places', ->
     expectThatTyping('123456789'.split('')...).into(field).willChange('|').to('123-45-6789|')

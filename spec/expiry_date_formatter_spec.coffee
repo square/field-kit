@@ -7,7 +7,7 @@ describe 'ExpiryDateFormatter', ->
 
   beforeEach ->
     field = buildField()
-    field.formatter = new ExpiryDateFormatter()
+    field.setFormatter new ExpiryDateFormatter()
 
   it 'adds a preceding zero and a succeeding slash if an unambiguous month is typed', ->
     expectThatTyping('4').into(field).willChange('|').to('04/|')
@@ -48,6 +48,6 @@ describe 'ExpiryDateFormatter', ->
 
   it 'calls its delegate when parsing the text fails', ->
     field.setDelegate(textFieldDidFailToParseString: jasmine.createSpy('textFieldDidFailToParseString'))
-    field.text = 'abc'
-    expect(field.value).toBeNull()
+    field.setText 'abc'
+    expect(field.value()).toBeNull()
     expect(field.delegate().textFieldDidFailToParseString).toHaveBeenCalledWith(field, 'abc', 'expiry-date-formatter.invalid-date')

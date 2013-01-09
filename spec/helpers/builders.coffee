@@ -10,7 +10,7 @@ buildField = ->
   document.body.appendChild(input)
   wrapper = new WrappedFakeElements([input])
   field = new FormattedTextField(wrapper)
-  field.formatter = new PassthroughFormatter()
+  field.setFormatter new PassthroughFormatter()
   return field
 
 module.exports = { buildField }

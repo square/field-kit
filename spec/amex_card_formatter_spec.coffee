@@ -7,7 +7,7 @@ describe 'AmexCardFormatter', ->
 
   beforeEach ->
     field = buildField()
-    field.formatter = new AmexCardFormatter()
+    field.setFormatter new AmexCardFormatter()
 
   it 'formats Amex card numbers correctly', ->
     expectThatTyping('37251111112000'.split('')...).into(field).willChange('|').to('3725 111111 2000|')

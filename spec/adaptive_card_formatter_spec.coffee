@@ -7,7 +7,7 @@ describe 'AdaptiveCardFormatter', ->
 
   beforeEach ->
     field = buildField()
-    field.formatter = new AdaptiveCardFormatter()
+    field.setFormatter new AdaptiveCardFormatter()
 
   it 'formats as Visa once it can tell it is a Visa card', ->
     expectThatTyping('4111111'.split('')...).into(field).willChange('|').to('4111 111|')

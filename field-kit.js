@@ -253,7 +253,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       this._element = $(TEMPLATE);
       this._panField = new PanField(this, this._element.find('.card-field-pan'));
       this._panField.on('change', this.onPanChanged);
-      this._panField.formatter = new CardFormatter();
+      this._panField.setFormatter(new CardFormatter());
       this._expiryField = new CardExtraField(this, this._element.find('.card-field-expiry'));
       this._cvvField = new CardExtraField(this, this._element.find('.card-field-cvv'));
       this._postalField = new CardExtraField(this, this._element.find('.card-field-postal-code'));
@@ -280,9 +280,9 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       }
       this._cardType = cardType;
       if (cardType === Juno.CardType.AMEX) {
-        return this._panField.formatter = new AmexFormatter();
+        return this._panField.setFormatter(new AmexFormatter());
       } else {
-        return this._panField.formatter = new CardFormatter();
+        return this._panField.setFormatter(new CardFormatter());
       }
     });
 
@@ -833,11 +833,11 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
 
     TextField.prototype.insertText = function(text) {
       var range;
-      if (this.hasSelection) {
+      if (this.hasSelection()) {
         this.clearSelection();
       }
       this.replaceSelection(text);
-      range = this.selectedRange;
+      range = this.selectedRange();
       range.start += range.length;
       range.length = 0;
       return this.setSelectedRange(range);
@@ -858,7 +858,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     TextField.prototype.moveUpAndModifySelection = function(event) {
       var range;
       event.preventDefault();
-      range = this.selectedRange;
+      range = this.selectedRange();
       switch (this.selectionAffinity) {
         case AFFINITY.UPSTREAM:
         case AFFINITY.NONE:
@@ -875,7 +875,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     TextField.prototype.moveParagraphBackwardAndModifySelection = function(event) {
       var range;
       event.preventDefault();
-      range = this.selectedRange;
+      range = this.selectedRange();
       switch (this.selectionAffinity) {
         case AFFINITY.UPSTREAM:
         case AFFINITY.NONE:
@@ -895,7 +895,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     TextField.prototype.moveToBeginningOfDocumentAndModifySelection = function(event) {
       var range;
       event.preventDefault();
-      range = this.selectedRange;
+      range = this.selectedRange();
       range.length += range.start;
       range.start = 0;
       return this.setSelectedRangeWithAffinity(range, AFFINITY.UPSTREAM);
@@ -905,7 +905,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       var range;
       event.preventDefault();
       range = {
-        start: this.text.length,
+        start: this.text().length,
         length: 0
       };
       return this.setSelectedRangeWithAffinity(range, AFFINITY.NONE);
@@ -918,8 +918,8 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     TextField.prototype.moveDownAndModifySelection = function(event) {
       var end, range;
       event.preventDefault();
-      range = this.selectedRange;
-      end = this.text.length;
+      range = this.selectedRange();
+      end = this.text().length;
       if (this.selectionAffinity === AFFINITY.UPSTREAM) {
         range.start += range.length;
       }
@@ -930,11 +930,11 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     TextField.prototype.moveParagraphForwardAndModifySelection = function(event) {
       var range;
       event.preventDefault();
-      range = this.selectedRange;
+      range = this.selectedRange();
       switch (this.selectionAffinity) {
         case AFFINITY.DOWNSTREAM:
         case AFFINITY.NONE:
-          range.length = this.text.length - range.start;
+          range.length = this.text().length - range.start;
           break;
         case AFFINITY.UPSTREAM:
           range.start += range.length;
@@ -950,15 +950,15 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     TextField.prototype.moveToEndOfDocumentAndModifySelection = function(event) {
       var range;
       event.preventDefault();
-      range = this.selectedRange;
-      range.length = this.text.length - range.start;
+      range = this.selectedRange();
+      range.length = this.text().length - range.start;
       return this.setSelectedRangeWithAffinity(range, AFFINITY.DOWNSTREAM);
     };
 
     TextField.prototype.moveLeft = function(event) {
       var range;
       event.preventDefault();
-      range = this.selectedRange;
+      range = this.selectedRange();
       if (range.length !== 0) {
         range.length = 0;
       } else {
@@ -970,7 +970,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     TextField.prototype.moveLeftAndModifySelection = function(event) {
       var range;
       event.preventDefault();
-      range = this.selectedRange;
+      range = this.selectedRange();
       switch (this.selectionAffinity) {
         case AFFINITY.UPSTREAM:
         case AFFINITY.NONE:
@@ -987,7 +987,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     TextField.prototype.moveWordLeft = function(event) {
       var index;
       event.preventDefault();
-      index = this.lastWordBreakBeforeIndex(this.selectedRange.start - 1);
+      index = this.lastWordBreakBeforeIndex(this.selectedRange().start - 1);
       return this.setSelectedRange({
         start: index,
         length: 0
@@ -997,7 +997,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     TextField.prototype.moveWordLeftAndModifySelection = function(event) {
       var end, range, start;
       event.preventDefault();
-      range = this.selectedRange;
+      range = this.selectedRange();
       switch (this.selectionAffinity) {
         case AFFINITY.UPSTREAM:
         case AFFINITY.NONE:
@@ -1027,7 +1027,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     TextField.prototype.moveToBeginningOfLineAndModifySelection = function(event) {
       var range;
       event.preventDefault();
-      range = this.selectedRange;
+      range = this.selectedRange();
       range.length += range.start;
       range.start = 0;
       return this.setSelectedRangeWithAffinity(range, AFFINITY.UPSTREAM);
@@ -1036,7 +1036,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     TextField.prototype.moveRight = function(event) {
       var range;
       event.preventDefault();
-      range = this.selectedRange;
+      range = this.selectedRange();
       if (range.length !== 0) {
         range.start += range.length;
         range.length = 0;
@@ -1049,7 +1049,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     TextField.prototype.moveRightAndModifySelection = function(event) {
       var range;
       event.preventDefault();
-      range = this.selectedRange;
+      range = this.selectedRange();
       switch (this.selectionAffinity) {
         case AFFINITY.UPSTREAM:
           range.start++;
@@ -1066,7 +1066,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     TextField.prototype.moveWordRight = function(event) {
       var index, range;
       event.preventDefault();
-      range = this.selectedRange;
+      range = this.selectedRange();
       index = this.nextWordBreakAfterIndex(range.start + range.length);
       return this.setSelectedRange({
         start: index,
@@ -1077,7 +1077,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     TextField.prototype.moveWordRightAndModifySelection = function(event) {
       var end, range, start;
       event.preventDefault();
-      range = this.selectedRange;
+      range = this.selectedRange();
       start = range.start;
       end = range.start + range.length;
       switch (this.selectionAffinity) {
@@ -1096,11 +1096,9 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     };
 
     TextField.prototype.moveToEndOfLine = function(event) {
-      var text;
       event.preventDefault();
-      text = this.text;
       return this.setSelectedRange({
-        start: this.text.length,
+        start: this.text().length,
         length: 0
       });
     };
@@ -1108,15 +1106,15 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     TextField.prototype.moveToEndOfLineAndModifySelection = function(event) {
       var range;
       event.preventDefault();
-      range = this.selectedRange;
-      range.length = this.text.length - range.start;
+      range = this.selectedRange();
+      range.length = this.text().length - range.start;
       return this.setSelectedRangeWithAffinity(range, AFFINITY.DOWNSTREAM);
     };
 
     TextField.prototype.deleteBackward = function(event) {
       var range;
       event.preventDefault();
-      range = this.selectedRange;
+      range = this.selectedRange();
       if (range.length === 0) {
         range.start--;
         range.length++;
@@ -1127,11 +1125,11 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
 
     TextField.prototype.deleteWordBackward = function(event) {
       var range, start;
-      if (this.hasSelection) {
+      if (this.hasSelection()) {
         return this.deleteBackward(event);
       }
       event.preventDefault();
-      range = this.selectedRange;
+      range = this.selectedRange();
       start = this.lastWordBreakBeforeIndex(range.start);
       range.length += range.start - start;
       range.start = start;
@@ -1145,11 +1143,11 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
 
     TextField.prototype.deleteBackwardToBeginningOfLine = function(event) {
       var range;
-      if (this.hasSelection) {
+      if (this.hasSelection()) {
         return this.deleteBackward(event);
       }
       event.preventDefault();
-      range = this.selectedRange;
+      range = this.selectedRange();
       range.length = range.start;
       range.start = 0;
       this.setSelectedRange(range);
@@ -1159,7 +1157,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     TextField.prototype.deleteForward = function(event) {
       var range;
       event.preventDefault();
-      range = this.selectedRange;
+      range = this.selectedRange();
       if (range.length === 0) {
         range.length++;
         this.setSelectedRange(range);
@@ -1169,11 +1167,11 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
 
     TextField.prototype.deleteWordForward = function(event) {
       var end, range;
-      if (this.hasSelection) {
+      if (this.hasSelection()) {
         return this.deleteForward(event);
       }
       event.preventDefault();
-      range = this.selectedRange;
+      range = this.selectedRange();
       end = this.nextWordBreakAfterIndex(range.start + range.length);
       this.setSelectedRange({
         start: range.start,
@@ -1186,13 +1184,13 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
 
     TextField.prototype.insertBackTab = function(event) {};
 
-    TextField.prototype.__defineGetter__('hasSelection', function() {
-      return this.selectedRange.length !== 0;
-    });
+    TextField.prototype.hasSelection = function() {
+      return this.selectedRange().length !== 0;
+    };
 
     TextField.prototype.lastWordBreakBeforeIndex = function(index) {
       var indexes, result, wordBreakIndex, _i, _len;
-      indexes = this.leftWordBreakIndexes;
+      indexes = this.leftWordBreakIndexes();
       result = indexes[0];
       for (_i = 0, _len = indexes.length; _i < _len; _i++) {
         wordBreakIndex = indexes[_i];
@@ -1205,21 +1203,21 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       return result;
     };
 
-    TextField.prototype.__defineGetter__('leftWordBreakIndexes', function() {
+    TextField.prototype.leftWordBreakIndexes = function() {
       var i, result, text, _i, _ref;
       result = [];
-      text = this.text;
+      text = this.text();
       for (i = _i = 0, _ref = text.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
         if (!isWordChar(text[i - 1]) && isWordChar(text[i])) {
           result.push(i);
         }
       }
       return result;
-    });
+    };
 
     TextField.prototype.nextWordBreakAfterIndex = function(index) {
       var indexes, result, wordBreakIndex, _i, _len;
-      indexes = this.rightWordBreakIndexes.reverse();
+      indexes = this.rightWordBreakIndexes().reverse();
       result = indexes[0];
       for (_i = 0, _len = indexes.length; _i < _len; _i++) {
         wordBreakIndex = indexes[_i];
@@ -1232,17 +1230,17 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       return result;
     };
 
-    TextField.prototype.__defineGetter__('rightWordBreakIndexes', function() {
+    TextField.prototype.rightWordBreakIndexes = function() {
       var i, result, text, _i, _ref;
       result = [];
-      text = this.text;
+      text = this.text();
       for (i = _i = 0, _ref = text.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
         if (isWordChar(text[i]) && !isWordChar(text[i + 1])) {
           result.push(i + 1);
         }
       }
       return result;
-    });
+    };
 
     TextField.prototype.clearSelection = function() {
       return this.replaceSelection('');
@@ -1250,12 +1248,12 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
 
     TextField.prototype.replaceSelection = function(replacement) {
       var end, range, text;
-      range = this.selectedRange;
+      range = this.selectedRange();
       end = range.start + range.length;
-      text = this.text;
+      text = this.text();
       text = text.substring(0, range.start) + replacement + text.substring(end);
       range.length = replacement.length;
-      this.text = text;
+      this.setText(text);
       return this.setSelectedRangeWithAffinity(range, AFFINITY.NONE);
     };
 
@@ -1263,7 +1261,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       event.preventDefault();
       return this.setSelectedRangeWithAffinity({
         start: 0,
-        length: this.text.length
+        length: this.text().length
       }, AFFINITY.NONE);
     };
 
@@ -1271,7 +1269,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       var range, text;
       text = pasteboard.getData('Text');
       this.replaceSelection(text);
-      range = this.selectedRange;
+      range = this.selectedRange();
       range.start += range.length;
       range.length = 0;
       return this.setSelectedRange(range);
@@ -1473,19 +1471,19 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       error = function(type) {
         return errorType = type;
       };
-      if (typeof ((_ref = this.formatter) != null ? _ref.isChangeValid : void 0) === 'function') {
-        if (this.formatter.isChangeValid(change, error)) {
+      if (typeof ((_ref = this.formatter()) != null ? _ref.isChangeValid : void 0) === 'function') {
+        if (this.formatter().isChangeValid(change, error)) {
           change.recomputeDiff();
-          this.text = change.proposed.text;
-          this.caret = change.proposed.caret;
+          this.setText(change.proposed.text);
+          this.setCaret(change.proposed.caret);
         } else {
           if ((_ref1 = this._delegate) != null) {
             if (typeof _ref1.textFieldDidFailToValidateChange === "function") {
               _ref1.textFieldDidFailToValidateChange(this, change, errorType);
             }
           }
-          this.text = change.current.text;
-          this.caret = change.current.caret;
+          this.setText(change.current.text);
+          this.setCaret(change.current.caret);
           return result;
         }
       }
@@ -1511,15 +1509,15 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       return (_ref = this.element).off.apply(_ref, args);
     };
 
-    TextField.prototype.__defineGetter__('text', function() {
+    TextField.prototype.text = function() {
       return this.element.val();
-    });
+    };
 
-    TextField.prototype.__defineSetter__('text', function(text) {
+    TextField.prototype.setText = function(text) {
       return this.element.val(text);
-    });
+    };
 
-    TextField.prototype.__defineGetter__('value', function() {
+    TextField.prototype.value = function() {
       var value,
         _this = this;
       value = this.element.val();
@@ -1530,49 +1528,49 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
         var _ref;
         return (_ref = _this._delegate) != null ? typeof _ref.textFieldDidFailToParseString === "function" ? _ref.textFieldDidFailToParseString(_this, value, errorType) : void 0 : void 0;
       });
-    });
+    };
 
-    TextField.prototype.__defineSetter__('value', function(value) {
+    TextField.prototype.setValue = function(value) {
       if (this._formatter) {
         value = this._formatter.format(value);
       }
       this.element.val("" + value);
       return this.element.trigger('change');
-    });
+    };
 
-    TextField.prototype.__defineGetter__('formatter', function() {
+    TextField.prototype.formatter = function() {
       return this._formatter;
-    });
+    };
 
-    TextField.prototype.__defineSetter__('formatter', function(formatter) {
+    TextField.prototype.setFormatter = function(formatter) {
       var value;
-      value = this.value;
+      value = this.value();
       this._formatter = formatter;
-      return this.value = value;
-    });
+      return this.setValue(value);
+    };
 
-    TextField.prototype.__defineGetter__('caret', function() {
+    TextField.prototype.caret = function() {
       var end, start, _ref;
       _ref = this.element.caret(), start = _ref.start, end = _ref.end;
       return {
         start: start,
         end: end
       };
-    });
+    };
 
-    TextField.prototype.__defineGetter__('selectedRange', function() {
+    TextField.prototype.selectedRange = function() {
       var caret;
-      caret = this.caret;
+      caret = this.caret();
       return {
         start: caret.start,
         length: caret.end - caret.start
       };
-    });
+    };
 
-    TextField.prototype.__defineSetter__('caret', function(caret) {
+    TextField.prototype.setCaret = function(caret) {
       var max, min;
       min = 0;
-      max = this.text.length;
+      max = this.text().length;
       caret = {
         start: Math.max(min, Math.min(max, caret.start)),
         end: Math.max(min, Math.min(max, caret.end))
@@ -1581,7 +1579,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       if (caret.start === caret.end) {
         return this.selectionAffinity = AFFINITY.NONE;
       }
-    });
+    };
 
     TextField.prototype.setSelectedRange = function(range) {
       return this.setSelectedRangeWithAffinity(range, this.selectionAffinity);
@@ -1589,15 +1587,15 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
 
     TextField.prototype.setSelectedRangeWithAffinity = function(range, affinity) {
       this.selectionAffinity = affinity;
-      return this.caret = {
+      return this.setCaret({
         start: range.start,
         end: range.start + range.length
-      };
+      });
     };
 
-    TextField.prototype.__defineGetter__('selectionAnchor', function() {
+    TextField.prototype.selectionAnchor = function() {
       var range;
-      range = this.selectedRange;
+      range = this.selectedRange();
       switch (this.selectionAffinity) {
         case AFFINITY.UPSTREAM:
           return range.start + range.length;
@@ -1606,7 +1604,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
         default:
           return null;
       }
-    });
+    };
 
     TextField.prototype.undoManager = function() {
       return this._undoManager || (this._undoManager = new UndoManager());
@@ -1623,11 +1621,11 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     TextField.prototype._applyChangeFromUndoManager = function(change) {
       this.undoManager().proxyFor(this)._applyChangeFromUndoManager(change);
       if (this.undoManager().isUndoing()) {
-        this.text = change.current.text;
-        return this.caret = change.current.caret;
+        this.setText(change.current.text);
+        return this.setCaret(change.current.caret);
       } else {
-        this.text = change.proposed.text;
-        return this.caret = change.proposed.caret;
+        this.setText(change.proposed.text);
+        return this.setCaret(change.proposed.caret);
       }
     };
 
@@ -1734,7 +1732,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     };
 
     TextField.prototype.inspect = function() {
-      return "#<TextField text=" + this.text + ">";
+      return "#<TextField text=" + (this.text()) + ">";
     };
 
     return TextField;
@@ -1757,13 +1755,13 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       var change;
       change = new this(field);
       change.current = {
-        text: field.text,
-        caret: field.caret
+        text: field.text(),
+        caret: field.caret()
       };
       callback();
       change.proposed = {
-        text: field.text,
-        caret: field.caret
+        text: field.text(),
+        caret: field.caret()
       };
       change.recomputeDiff();
       return change;

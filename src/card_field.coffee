@@ -104,7 +104,7 @@ class CardField
     @_element = $(TEMPLATE)
     @_panField = new PanField(this, @_element.find('.card-field-pan'))
     @_panField.on 'change', @onPanChanged
-    @_panField.formatter = new CardFormatter()
+    @_panField.setFormatter new CardFormatter()
     @_expiryField = new CardExtraField(this, @_element.find('.card-field-expiry'))
     @_cvvField    = new CardExtraField(this, @_element.find('.card-field-cvv'))
     @_postalField = new CardExtraField(this, @_element.find('.card-field-postal-code'))
@@ -126,9 +126,9 @@ class CardField
     @_cardType = cardType
 
     if cardType is Juno.CardType.AMEX
-      @_panField.formatter = new AmexFormatter()
+      @_panField.setFormatter new AmexFormatter()
     else
-      @_panField.formatter = new CardFormatter()
+      @_panField.setFormatter new CardFormatter()
 
 if module?
   module.exports = CardField
