@@ -178,6 +178,41 @@ field.setUnfocusedPlaceholder('First Name');</code></pre>
 
     <div class="row">
       <div class="offset2 span8">
+        <h3>NumberFormatter</h3>
+      </div>
+    </div>
+
+    <div class="row field-kit-example">
+      <div class="offset2 span8">
+        <p>
+          The <code>NumberFormatter</code> provides formatting for all kinds of
+          numbers, percentages, currencies, etc.
+        </p>
+
+        <div class="docs-example">
+          <div class="row">
+            <div class="span3"></div>
+
+            <div class="span4">
+              <pre class="tryout"></pre>
+            </div>
+          </div>
+        </div>
+
+        <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="number"&gt;</code></pre>
+        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField($('#number'));
+field.setFormatter(new FieldKit.NumberFormatter()
+  .setMinimumFractionDigits(1)
+  .setMaximumFractionDigits(2)
+  .setPositivePrefix('+')
+  .setRoundingMode(FieldKit.NumberFormatter.Rounding.FLOOR));
+field.setValue((Math.random() &gt; 0.5 ? 1 : -1) * Math.random()*100);</code></pre>
+      </div>
+    </div>
+
+
+    <div class="row">
+      <div class="offset2 span8">
         <h3>ExpiryDateFormatter</h3>
       </div>
     </div>
@@ -375,7 +410,7 @@ interface Range
 
             <div class="span4">
               <pre class="tryout">&ldquo;Hot tub&rdquo; &rarr; &ldquo;Hot tua&rdquo;
-&ldquo;But why?&rdquo; &rarr; &ldquo;Aut why?&rdquo;
+&ldquo;But why?&rdquo; &rarr; &ldquo;Aut why?&rdquo;</pre>
             </div>
           </div>
         </div>
