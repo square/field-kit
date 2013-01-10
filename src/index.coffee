@@ -6,6 +6,7 @@ FieldKit =
   DelimitedTextFormatter        : require './delimited_text_formatter'
   ExpiryDateFormatter           : require './expiry_date_formatter'
   Formatter                     : require './formatter'
+  NumberFormatter               : require './number_formatter'
   SocialSecurityNumberFormatter : require './social_security_number_formatter'
   TextField                     : require './text_field'
   UndoManager                   : require './undo_manager'

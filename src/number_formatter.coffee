@@ -24,63 +24,63 @@ class NumberFormatter extends Formatter
 
   setAlwaysShowsDecimalSeparator: (alwaysShowsDecimalSeparator) ->
     @_alwaysShowsDecimalSeparator = alwaysShowsDecimalSeparator
-    return null
+    return this
 
   decimalSeparator: ->
     @_decimalSeparator
 
   setDecimalSeparator: (decimalSeparator) ->
     @_decimalSeparator = decimalSeparator
-    return null
+    return this
 
   maximumFractionDigits: ->
     @_maximumFractionDigits
 
   setMaximumFractionDigits: (maximumFractionDigits) ->
     @_maximumFractionDigits = maximumFractionDigits
-    return null
+    return this
 
   minimumFractionDigits: ->
     @_minimumFractionDigits
 
   setMinimumFractionDigits: (minimumFractionDigits) ->
     @_minimumFractionDigits = minimumFractionDigits
-    return null
+    return this
 
   negativePrefix: ->
     @_negativePrefix
 
   setNegativePrefix: (prefix) ->
     @_negativePrefix = prefix
-    return null
+    return this
 
   negativeSuffix: ->
     @_negativeSuffix
 
   setNegativeSuffix: (prefix) ->
     @_negativeSuffix = prefix
-    return null
+    return this
 
   positivePrefix: ->
     @_positivePrefix
 
   setPositivePrefix: (prefix) ->
     @_positivePrefix = prefix
-    return null
+    return this
 
   positiveSuffix: ->
     @_positiveSuffix
 
   setPositiveSuffix: (prefix) ->
     @_positiveSuffix = prefix
-    return null
+    return this
 
   roundingMode: ->
     @_roundingMode
 
   setRoundingMode: (roundingMode) ->
     @_roundingMode = roundingMode
-    return null
+    return this
 
   format: (number) ->
     negative = number < 0
