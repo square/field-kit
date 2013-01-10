@@ -13,6 +13,7 @@ KEYS =
   BACKSPACE:  8
   DELETE:    46
   TAB:        9
+  ENTER:     13
 
 KEYS.isDigit = (keyCode) ->
   @ZERO <= keyCode <= @NINE
@@ -139,6 +140,9 @@ class TextField
     range.start += range.length
     range.length = 0
     @setSelectedRange range
+
+  insertNewline: (event) ->
+    @_delegate?.textFieldDidEndEditing?(this)
 
   # Moves the cursor up, which because this is a single-line text field, means
   # moving to the beginning of the value.
@@ -1100,6 +1104,9 @@ class TextField
         else
           @insertTab event
 
+      else if keyCode is KEYS.ENTER
+        @insertNewline event
+
       return null
 
   # Internal: Handles inserting characters based on the typed key.
@@ -1303,6 +1310,7 @@ class TextField
     @_syncPlaceholder()
 
   _blur: (event) =>
+    @_delegate?.textFieldDidEndEditing?(this)
     @_syncPlaceholder()
 
   # Removes focus from this field if it has focus.
@@ -1318,7 +1326,7 @@ class TextField
   #
   # Returns nothing.
   resignFirstResponder: (event) ->
-    event.preventDefault()
+    event?.preventDefault()
     @element.blur()
     @_syncPlaceholder()
 

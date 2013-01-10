@@ -495,7 +495,8 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     DOWN: 40,
     BACKSPACE: 8,
     DELETE: 46,
-    TAB: 9
+    TAB: 9,
+    ENTER: 13
   };
 
   KEYS.isDigit = function(keyCode) {
@@ -643,6 +644,11 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       range.start += range.length;
       range.length = 0;
       return this.setSelectedRange(range);
+    };
+
+    TextField.prototype.insertNewline = function(event) {
+      var _ref;
+      return (_ref = this._delegate) != null ? typeof _ref.textFieldDidEndEditing === "function" ? _ref.textFieldDidEndEditing(this) : void 0 : void 0;
     };
 
     TextField.prototype.moveUp = function(event) {
@@ -1233,6 +1239,8 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
           } else {
             _this.insertTab(event);
           }
+        } else if (keyCode === KEYS.ENTER) {
+          _this.insertNewline(event);
         }
         return null;
       });
@@ -1433,6 +1441,12 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     };
 
     TextField.prototype._blur = function(event) {
+      var _ref;
+      if ((_ref = this._delegate) != null) {
+        if (typeof _ref.textFieldDidEndEditing === "function") {
+          _ref.textFieldDidEndEditing(this);
+        }
+      }
       return this._syncPlaceholder();
     };
 
@@ -1446,7 +1460,9 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     };
 
     TextField.prototype.resignFirstResponder = function(event) {
-      event.preventDefault();
+      if (event != null) {
+        event.preventDefault();
+      }
       this.element.blur();
       return this._syncPlaceholder();
     };

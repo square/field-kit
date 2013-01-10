@@ -16,6 +16,7 @@ KEYS =
   BACKSPACE:  8
   "⌫":        8
   DELETE:    46
+  ENTER:     13
 
   PRINTABLE: [32..126]
 

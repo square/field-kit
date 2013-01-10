@@ -59,6 +59,23 @@ class FakeElement extends EventEmitter
     myIndex = siblingsAndSelf.indexOf(this)
     siblingsAndSelf[myIndex-1]
 
+  blur: ->
+    if @ownerDocument.activeElement is this
+      @ownerDocument.activeElement = null
+      @emit 'blur'
+      @emit 'focusout'
+
+  focus: ->
+    @ownerDocument.activeElement = this
+    @emit 'focusin'
+    @emit 'focus'
+
+  addEventListener: (type, callback, capture) ->
+    @on type, callback
+
+  removeEventListener: (type, callback, capture) ->
+    @off type, callback
+
   toString: ->
     result = "<#{@tagName}"
     result += " #{name}=\"#{value}\"" for own name, value of @attributes

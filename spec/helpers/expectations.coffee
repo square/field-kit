@@ -1,6 +1,7 @@
 FakeEvent = require './fake_event'
 Caret = require './caret'
 {buildField} = require './builders'
+{type} = require './typing'
 
 class FieldExpectationBase
   into: (@field) ->
@@ -64,16 +65,7 @@ class ExpectThatTyping extends FieldExpectationBase
     @typeKeys()
 
   typeKeys: ->
-    for key in @keys
-      event = FakeEvent.withKey(key)
-      event.type = 'keydown'
-      @field.keyDown event
-      if not event.isDefaultPrevented()
-        event.type = 'keypress'
-        if event.charCode
-          @field.keyPress event
-        event.type = 'keyup'
-        @field.keyUp event
+    type(@keys...).into(@field)
 
 class ExpectThatPasting extends FieldExpectationBase
   constructor: (text) ->

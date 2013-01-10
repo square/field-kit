@@ -2,6 +2,7 @@ FakeElement = require './fake_element'
 FakeInput = require './fake_input'
 
 class FakeDocument
+  activeElement: null
   documentElement: null
   body: null
 

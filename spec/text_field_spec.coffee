@@ -1,5 +1,6 @@
 {buildField} = require './helpers/builders'
 {expectThatTyping, expectThatPasting} = require './helpers/expectations'
+{type} = require './helpers/typing'
 PassthroughFormatter = require './helpers/passthrough_formatter'
 
 describe 'TextField', ->
@@ -323,3 +324,20 @@ describe 'TextField', ->
       field.setUnfocusedPlaceholder 'fine, leave me'
       hasFocus = no
       expect(field.placeholder()).toEqual('fine, leave me')
+
+  describe 'when we have a delegate', ->
+    field = null
+
+    beforeEach ->
+      field = buildField()
+      field.setDelegate textFieldDidEndEditing: jasmine.createSpy('delegate.textFieldDidEndEditing')
+      expect(field.delegate().textFieldDidEndEditing).not.toHaveBeenCalled()
+
+    it 'calls the delegate method for ending editing on enter', ->
+      type('enter').into(field)
+      expect(field.delegate().textFieldDidEndEditing).toHaveBeenCalledWith(field)
+
+    it 'calls the delegate method for ending editing on focus out', ->
+      field.becomeFirstResponder()
+      field.resignFirstResponder()
+      expect(field.delegate().textFieldDidEndEditing).toHaveBeenCalledWith(field)
