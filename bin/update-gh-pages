@@ -22,7 +22,11 @@ class Repo
   end
 
   def git(*args)
-    run 'git', "--git-dir=#{@path}/.git", "--work-tree=#{@path}", *args
+    if args.first != 'clone'
+      args = ["--git-dir=#{@path}/.git", "--work-tree=#{@path}", *args]
+    end
+
+    run 'git', *args
   end
 end
 
