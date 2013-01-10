@@ -28,7 +28,7 @@ class DelimitedTextFormatter extends Formatter
     newText = change.proposed.text
 
     if change.deleted.text is @delimiter
-      newText = newText.substring(0, newText.length - 1)
+      newText = newText.substring(0, change.deleted.start - 1) + newText.substring(change.deleted.end - 1)
 
     range = change.proposed.selectedRange
     hasSelection = range.length isnt 0
