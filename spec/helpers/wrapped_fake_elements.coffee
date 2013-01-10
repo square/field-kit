@@ -1,7 +1,6 @@
-{EventEmitter} = require 'events'
 Caret = require './caret'
 
-class WrappedFakeElements extends EventEmitter
+class WrappedFakeElements
   _elements: null
 
   constructor: (elements) ->
@@ -33,7 +32,13 @@ class WrappedFakeElements extends EventEmitter
       @_elements[0].getAttribute 'value'
 
   trigger: (args...) ->
-    @emit args...
+    @_elements[0]?.emit args...
+
+  on: (type, callback) ->
+    @_elements[0]?.on(type, callback)
+
+  off: (type, callback) ->
+    @_elements[0]?.off(type, callback)
 
   get: (index) ->
     @_elements[index]
@@ -44,5 +49,15 @@ class WrappedFakeElements extends EventEmitter
     else
       element.setAttribute attr, value for element in @_elements
       return this
+
+  blur: ->
+    @_elements[0]?.blur()
+
+  focus: ->
+    @_elements[0]?.focus()
+
+  select: ->
+    @_caret.start = 0
+    @_caret.end = @val().length
 
 module.exports = WrappedFakeElements
