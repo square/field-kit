@@ -227,7 +227,8 @@ roundHalfEven = (negative, integerPart, fractionPart, extraFractionPart) ->
   rounder = roundFloor
 
   if extraFractionPart[0] is '5'
-    rounder = if Number(fractionPart[-1..-1]) % 2 is 0 then roundFloor else roundCeiling
+    lastDigit = (if fractionPart.length is 0 then integerPart else fractionPart)[-1..-1]
+    rounder = if Number(lastDigit) % 2 is 0 then roundFloor else roundCeiling
 
   return rounder no, integerPart, fractionPart, extraFractionPart
 
