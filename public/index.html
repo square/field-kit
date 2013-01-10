@@ -296,7 +296,7 @@ interface Change
 interface TextState
 {
   attribute string text;
-  attribute Range caret;
+  attribute Range selectedRange;
 }
 
 interface TextChange
@@ -309,7 +309,7 @@ interface TextChange
 interface Range
 {
   attribute unsigned long start;
-  attribute unsigned long end;
+  attribute unsigned long length;
 }
 </code></pre>
 
@@ -347,15 +347,15 @@ field.setFormatter({
 
     <div class="row field-kit-example">
       <div class="offset2 span8">
-        <h4>Controlling the Caret</h4>
+        <h4>Controlling the Selection</h4>
 
         <p>
           Formatters not only have control over the editable text but also the
-          caret and selection, if they so choose. Formatters can exercise this
-          control by implementing the <code>#isChangeValid(change)</code>
-          method and changing the proposed caret. The example below does not
-          impose any restrictions on what can be typed or how to display the
-          value, but disables all selection.
+          selection, if they so choose. Formatters can exercise this control by
+          implementing the <code>#isChangeValid(change)</code> method and
+          changing the proposed selection. The example below does not impose
+          any restrictions on what can be typed or how to display the value,
+          but disables all selection.
         </p>
 
         <div class="docs-example">
@@ -371,18 +371,17 @@ field.setFormatter({
   parse: function(value){ return value; },
 
   isChangeValid: function(change) {
-    var caret = change.proposed.caret;
+    var range = change.proposed.selectedRange;
 
     // Check to see whether the user tried to select something.
-    if (caret.start !== caret.end) {
-      if (change.field.selectionAnchor === caret.end)
-        // Move to the beginning since the selection extended
-        // from the end toward the beginning (e.g. shift+left).
-        caret.end = caret.start;
-      else
+    if (range.length !== 0) {
+      if (change.field.selectionAnchor() === range.start) {
         // Move to the end since the selection extended
         // from the beginning toward the end (e.g. shift+right).
-        caret.start = caret.end;
+        range.start += range.length;
+      }
+
+      range.length = 0;
     }
 
     return true;
