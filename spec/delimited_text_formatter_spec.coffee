@@ -21,6 +21,7 @@ describe 'DelimitedTextFormatter', ->
 
   it 'backspaces both the space and the character before it', ->
     expectThatTyping('backspace').into(field).willChange('411-|').to('41|')
+    expectThatTyping('backspace').into(field).willChange('123-|4').to('12|4-')
 
   it 'allows backspacing a whole group of digits', ->
     expectThatTyping('alt+backspace').into(field).willChange('411-111-|').to('411-|')

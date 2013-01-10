@@ -205,7 +205,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       }
       newText = change.proposed.text;
       if (change.deleted.text === this.delimiter) {
-        newText = newText.substring(0, newText.length - 1);
+        newText = newText.substring(0, change.deleted.start - 1) + newText.substring(change.deleted.end - 1);
       }
       range = change.proposed.selectedRange;
       hasSelection = range.length !== 0;
