@@ -161,6 +161,14 @@ describe 'NumberFormatter', ->
           expect(formatter.format 0.35).toEqual('0.4')
           expect(formatter.format 0.25).toEqual('0.2')
 
+        describe 'rounding to integers', ->
+          beforeEach ->
+            formatter.setMaximumFractionDigits 0
+
+          it 'rounds toward even integers', ->
+            expect(formatter.format 0.5).toEqual('0')
+            expect(formatter.format 1.5).toEqual('2')
+
     describe 'given a negative number', ->
       describe 'with custom prefix and suffix', ->
         beforeEach ->
