@@ -202,6 +202,8 @@ class NumberFormatter extends Formatter
 ## Aliases
 
 NumberFormatter::numberFromString = NumberFormatter::parse
+NumberFormatter::minusSign = NumberFormatter::negativePrefix
+NumberFormatter::setMinusSign = NumberFormatter::setNegativePrefix
 
 
 ## Rounding
