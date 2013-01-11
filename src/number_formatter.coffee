@@ -21,6 +21,8 @@ class NumberFormatter extends Formatter
   _allowsFloats:                yes
   _alwaysShowsDecimalSeparator: no
   _decimalSeparator:            '.'
+  _groupingSeparator:           ','
+  _groupingSize:                3
   _maximumFractionDigits:       0
   _minimumFractionDigits:       0
   _maximumIntegerDigits:        null
@@ -28,11 +30,17 @@ class NumberFormatter extends Formatter
   _maximum:                     null
   _minimum:                     null
   _multiplier:                  null
+  _negativeInfinitySymbol:      '-∞'
   _negativePrefix:              '-'
   _negativeSuffix:              ''
+  _notANumberSymbol:            'NaN'
+  _nullSymbol:                  ''
+  _positiveInfinitySymbol:      '+∞'
   _positivePrefix:              ''
   _positiveSuffix:              ''
   _roundingMode:                HALF_EVEN
+  _usesGroupingSeparator:       no
+  _zeroSymbol:                  null
 
   # Gets whether this formatter will parse float number values. This value does
   # not apply to formatting. To prevent formatting floats, set
@@ -62,6 +70,18 @@ class NumberFormatter extends Formatter
   setDecimalSeparator: (decimalSeparator) ->
     @_decimalSeparator = decimalSeparator
     return this
+
+  groupingSeparator: ->
+    @_groupingSeparator
+
+  setGroupingSeparator: (groupingSeparator) ->
+    @_groupingSeparator = groupingSeparator
+
+  groupingSize: ->
+    @_groupingSize
+
+  setGroupingSize: (groupingSize) ->
+    @_groupingSize = groupingSize
 
   maximum: ->
     @_maximum
@@ -112,6 +132,12 @@ class NumberFormatter extends Formatter
     @_multiplier = multiplier
     return this
 
+  negativeInfinitySymbol: ->
+    @_negativeInfinitySymbol
+
+  setNegativeInfinitySymbol: (negativeInfinitySymbol) ->
+    @_negativeInfinitySymbol = negativeInfinitySymbol
+
   negativePrefix: ->
     @_negativePrefix
 
@@ -125,6 +151,24 @@ class NumberFormatter extends Formatter
   setNegativeSuffix: (prefix) ->
     @_negativeSuffix = prefix
     return this
+
+  notANumberSymbol: ->
+    @_notANumberSymbol
+
+  setNotANumberSymbol: (notANumberSymbol) ->
+    @_notANumberSymbol = notANumberSymbol
+
+  nullSymbol: ->
+    @_nullSymbol
+
+  setNullSymbol: (nullSymbol) ->
+    @_nullSymbol = nullSymbol
+
+  positiveInfinitySymbol: ->
+    @_positiveInfinitySymbol
+
+  setPositiveInfinitySymbol: (positiveInfinitySymbol) ->
+    @_positiveInfinitySymbol = positiveInfinitySymbol
 
   positivePrefix: ->
     @_positivePrefix
@@ -147,7 +191,34 @@ class NumberFormatter extends Formatter
     @_roundingMode = roundingMode
     return this
 
+  usesGroupingSeparator: ->
+    @_usesGroupingSeparator
+
+  setUsesGroupingSeparator: (usesGroupingSeparator) ->
+    @_usesGroupingSeparator = usesGroupingSeparator
+
+  zeroSymbol: ->
+    @_zeroSymbol
+
+  setZeroSymbol: (zeroSymbol) ->
+    @_zeroSymbol = zeroSymbol
+
   format: (number) ->
+    if @_zeroSymbol? and number is 0
+      return @_zeroSymbol
+
+    if @_nullSymbol? and number is null
+      return @_nullSymbol
+
+    if @_notANumberSymbol? and isNaN(number)
+      return @_notANumberSymbol
+
+    if @_positiveInfinitySymbol? and number is Infinity
+      return @_positiveInfinitySymbol
+
+    if @_negativeInfinitySymbol? and number is -Infinity
+      return @_negativeInfinitySymbol
+
     if @_multiplier?
       number *= @_multiplier
 
@@ -183,6 +254,18 @@ class NumberFormatter extends Formatter
     if fractionPart.length > 0 or @_alwaysShowsDecimalSeparator
       fractionPart = @_decimalSeparator + fractionPart
 
+    if @_usesGroupingSeparator
+      integerPartWithGroupingSeparators = ''
+      copiedCharacterCount = 0
+
+      for i in [integerPart.length-1..0]
+        if copiedCharacterCount > 0 and copiedCharacterCount % @_groupingSize is 0
+          integerPartWithGroupingSeparators = @_groupingSeparator + integerPartWithGroupingSeparators
+        integerPartWithGroupingSeparators = integerPart[i] + integerPartWithGroupingSeparators
+        copiedCharacterCount++
+
+      integerPart = integerPartWithGroupingSeparators
+
     result = integerPart + fractionPart
 
     # surround with the appropriate prefix and suffix
@@ -203,16 +286,32 @@ class NumberFormatter extends Formatter
       when HALF_EVEN then roundHalfEven
 
   parse: (string, error) ->
+    if @_zeroSymbol? and string is @_zeroSymbol
+      return 0
+
+    if @_nullSymbol? and string is @_nullSymbol
+      return null
+
+    if @_notANumberSymbol? and string is @_notANumberSymbol
+      return NaN
+
+    if @_positiveInfinitySymbol? and string is @_positiveInfinitySymbol
+      return Infinity
+
+    if @_negativeInfinitySymbol? and string is @_negativeInfinitySymbol
+      return -Infinity
+
     if startsWith(@_negativePrefix, string) and endsWith(@_negativeSuffix, string)
-      result = @parse(string[@_negativePrefix.length...(string.length-@_negativeSuffix.length)], error)
+      result = @_parseAbsoluteValue(string[@_negativePrefix.length...(string.length-@_negativeSuffix.length)], error)
       result *= -1 if result?
       return result
     else if startsWith(@_positivePrefix, string) and endsWith(@_positiveSuffix, string)
-      string = string[@_positivePrefix.length...(string.length-@_positiveSuffix.length)]
+      @_parseAbsoluteValue string[@_positivePrefix.length...(string.length-@_positiveSuffix.length)], error
     else
       error? 'number-formatter.invalid-format'
       return null
 
+  _parseAbsoluteValue: (string, error) ->
     parts = string.split(@_decimalSeparator)
     if parts.length > 2
       error? 'number-formatter.invalid-format'
@@ -247,6 +346,7 @@ class NumberFormatter extends Formatter
 
 ## Aliases
 
+NumberFormatter::stringFromNumber = NumberFormatter::format
 NumberFormatter::numberFromString = NumberFormatter::parse
 NumberFormatter::minusSign = NumberFormatter::negativePrefix
 NumberFormatter::setMinusSign = NumberFormatter::setNegativePrefix
@@ -268,14 +368,16 @@ roundFloor = (negative, integerPart, fractionPart, extraFractionPart) ->
   [integerPart, fractionPart]
 
 roundHalfEven = (negative, integerPart, fractionPart, extraFractionPart) ->
-  # FIXME: I don't think this is quite right.
-  rounder = roundFloor
+  switch extraFractionPart[0]
+    when '1', '2', '3', '4'
+      rounder = roundFloor
+    when '5'
+      lastDigit = (if fractionPart.length is 0 then integerPart else fractionPart)[-1..-1]
+      rounder = if (Number(lastDigit) % 2 is 0) ^ negative then roundFloor else roundCeiling
+    else
+      rounder = roundCeiling
 
-  if extraFractionPart[0] is '5'
-    lastDigit = (if fractionPart.length is 0 then integerPart else fractionPart)[-1..-1]
-    rounder = if Number(lastDigit) % 2 is 0 then roundFloor else roundCeiling
-
-  return rounder no, integerPart, fractionPart, extraFractionPart
+  return rounder negative, integerPart, fractionPart, extraFractionPart
 
 incrementFormattedParts = (integerPart, fractionPart) ->
   [fractionCarryOver, fractionPart] = incrementFormattedNumber fractionPart

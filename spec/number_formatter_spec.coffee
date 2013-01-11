@@ -41,9 +41,37 @@ describe 'NumberFormatter', ->
     it 'has a maximumIntegerDigits', ->
       expect(formatter.minimumIntegerDigits()).toEqual(0)
 
+    it 'does not use a grouping separator', ->
+      expect(formatter.usesGroupingSeparator()).toBeFalsy()
+
+    it 'has US-standard grouping separator', ->
+      expect(formatter.groupingSeparator()).toEqual(',')
+
+    it 'has US-standard grouping size', ->
+      expect(formatter.groupingSize()).toEqual(3)
+
+    it 'has no custom zero symbol', ->
+      expect(formatter.zeroSymbol()).toBeNull()
+
+    it 'has empty string as the null symbol', ->
+      expect(formatter.nullSymbol()).toEqual('')
+
+    it 'has NaN as the not a number symbol', ->
+      expect(formatter.notANumberSymbol()).toEqual('NaN')
+
+    it 'has US-standard symbol for positive infinity', ->
+      expect(formatter.positiveInfinitySymbol()).toEqual('+∞')
+
+    it 'has US-standard symbol for negative infinity', ->
+      expect(formatter.negativeInfinitySymbol()).toEqual('-∞')
+
   describe '#numberFromString', ->
     it 'is an alias for #parse', ->
       expect(formatter.numberFromString).toBe(formatter.parse)
+
+  describe '#stringFromNumber', ->
+    it 'is an alias for #format', ->
+      expect(formatter.stringFromNumber).toBe(formatter.format)
 
   describe '#minusSign', ->
     it 'is an alias for #negativePrefix', ->
@@ -51,6 +79,46 @@ describe 'NumberFormatter', ->
       expect(formatter.setMinusSign).toBe(formatter.setNegativePrefix)
 
   describe '#format', ->
+    describe 'given zero', ->
+      describe 'and a custom zero symbol', ->
+        beforeEach ->
+          formatter.setZeroSymbol '#'
+
+        it 'uses the custom zero symbol', ->
+          expect(formatter.format 0).toEqual('#')
+
+    describe 'given null', ->
+      describe 'and a custom null symbol', ->
+        beforeEach ->
+          formatter.setNullSymbol 'NUL'
+
+        it 'uses the custom null symbol', ->
+          expect(formatter.format null).toEqual('NUL')
+
+    describe 'given NaN', ->
+      describe 'and a custom not a number symbol', ->
+        beforeEach ->
+          formatter.setNotANumberSymbol 'WHA?'
+
+        it 'uses the custom not a number symbol', ->
+          expect(formatter.format NaN).toEqual('WHA?')
+
+    describe 'given infinity', ->
+      describe 'and a custom infinity symbol', ->
+        beforeEach ->
+          formatter.setPositiveInfinitySymbol 'INF'
+
+        it 'uses the custom infinity symbol', ->
+          expect(formatter.format Infinity).toEqual('INF')
+
+    describe 'given negative infinity', ->
+      describe 'and a custom negative infinity symbol', ->
+        beforeEach ->
+          formatter.setNegativeInfinitySymbol '-INF'
+
+        it 'uses the custom negative infinity symbol', ->
+          expect(formatter.format -Infinity).toEqual('-INF')
+
     describe 'given a positive number', ->
       describe 'with custom prefix and suffix', ->
         beforeEach ->
@@ -68,7 +136,7 @@ describe 'NumberFormatter', ->
           expect(formatter.format 50).toEqual('50')
 
         it 'formats floats without a fractional part', ->
-          expect(formatter.format 50.8).toEqual('50')
+          expect(formatter.format 50.8).toEqual('51')
 
       describe 'with maximumFractionDigits = 1', ->
         beforeEach ->
@@ -77,9 +145,9 @@ describe 'NumberFormatter', ->
         it 'formats integers without a fractional part', ->
           expect(formatter.format 50).toEqual('50')
 
-        it 'formats floats truncating the fractional part if needed', ->
+        it 'formats floats rounding the fractional part if needed', ->
           expect(formatter.format 50.8).toEqual('50.8')
-          expect(formatter.format 50.87).toEqual('50.8')
+          expect(formatter.format 50.87).toEqual('50.9')
 
       describe 'with maximumFractionDigits > 1', ->
         beforeEach ->
@@ -206,6 +274,30 @@ describe 'NumberFormatter', ->
           expect(formatter.format 123).toEqual('23')
           expect(formatter.format 23).toEqual('23')
 
+      describe 'using a grouping separator', ->
+        beforeEach ->
+          formatter.setUsesGroupingSeparator yes
+
+        it 'formats integer parts with fewer digits than the grouping size as normal', ->
+          expect(formatter.format 123).toEqual('123')
+
+        it 'formats integer parts with more digits than the grouping size with separators', ->
+          expect(formatter.format 1234567).toEqual('1,234,567')
+
+        describe 'with a custom grouping size', ->
+          beforeEach ->
+            formatter.setGroupingSize 1
+
+          it 'formats integer parts with more digits than the grouping size with separators', ->
+            expect(formatter.format 123).toEqual('1,2,3')
+
+        describe 'with a custom grouping separator', ->
+          beforeEach ->
+            formatter.setGroupingSeparator 'SEP'
+
+          it 'formats integer parts with more digits than the grouping size with separators', ->
+            expect(formatter.format 1234567).toEqual('1SEP234SEP567')
+
     describe 'given a negative number', ->
       describe 'with custom prefix and suffix', ->
         beforeEach ->
@@ -228,6 +320,14 @@ describe 'NumberFormatter', ->
 
         it 'rounds floats with non-zero digits past the maximum', ->
           expect(formatter.format -3.19).toEqual('-3.1')
+
+        describe 'when rounded to 0', ->
+          beforeEach ->
+            formatter.setMaximumFractionDigits 0
+
+          # This is up for debate.
+          it 'shows zero with a negative sign', ->
+            expect(formatter.format -0.1).toEqual('-0')
 
       describe 'with floor rounding', ->
         beforeEach ->
@@ -261,107 +361,152 @@ describe 'NumberFormatter', ->
           expect(formatter.format -0.35).toEqual('-0.4')
           expect(formatter.format -0.25).toEqual('-0.2')
 
-    describe '#parse', ->
-      it 'parses normal positive numbers', ->
-        expect(formatter.parse '8').toEqual(8)
+  describe '#parse', ->
+    it 'parses normal positive numbers', ->
+      expect(formatter.parse '8').toEqual(8)
 
-      it 'parses normal negative numbers', ->
-        expect(formatter.parse '-8').toEqual(-8)
+    it 'parses normal negative numbers', ->
+      expect(formatter.parse '-8').toEqual(-8)
 
-      describe 'with a minimum value', ->
-        beforeEach ->
-          formatter.setMinimum 1
+    describe 'with a custom zero symbol', ->
+      beforeEach ->
+        formatter.setZeroSymbol '#'
 
-        it 'fails to parse the string when below the minimum', ->
-          expect(formatter.parse '0').toBeNull()
+      it 'parses that symbol by itself as zero', ->
+        expect(formatter.parse '#').toEqual(0)
 
-        it 'has a specific error type when the string is below the minimum', ->
-          errorCallback = jasmine.createSpy('errorCallback')
-          formatter.parse '0', errorCallback
-          expect(errorCallback).toHaveBeenCalledWith('number-formatter.out-of-bounds.below-minimum')
+      it 'fails to parse that symbol preceded by a valid negative suffix', ->
+        errorCallback = jasmine.createSpy('errorCallback')
+        expect(formatter.parse '-#', errorCallback).toBeNull()
+        expect(errorCallback).toHaveBeenCalledWith('number-formatter.invalid-format')
 
-        it 'parses the string when above the minimum', ->
-          expect(formatter.parse '2').toEqual(2)
+    describe 'with a custom null symbol', ->
+      beforeEach ->
+        formatter.setNullSymbol 'NUL'
 
-      describe 'with a maximum value', ->
-        beforeEach ->
-          formatter.setMaximum 5
+      it 'parses that symbol by itself as null', ->
+        errorCallback = jasmine.createSpy('errorCallback')
+        expect(formatter.parse 'NUL', errorCallback).toBeNull()
+        expect(errorCallback).not.toHaveBeenCalled()
 
-        it 'fails to parse the string when above the maximum', ->
-          expect(formatter.parse '7').toBeNull()
+    describe 'with a custom NaN symbol', ->
+      beforeEach ->
+        formatter.setNotANumberSymbol 'WHA?'
 
-        it 'has a specific error type when the string is above the maximum', ->
-          errorCallback = jasmine.createSpy('errorCallback')
-          formatter.parse '7', errorCallback
-          expect(errorCallback).toHaveBeenCalledWith('number-formatter.out-of-bounds.above-maximum')
+      it 'parses that symbol by itself as not a number', ->
+        expect(isNaN(formatter.parse 'WHA?')).toBeTruthy()
 
-        it 'parses the string when below the maximum', ->
-          expect(formatter.parse '2').toEqual(2)
+    describe 'with a custom infinity symbol', ->
+      beforeEach ->
+        formatter.setPositiveInfinitySymbol 'INF'
 
-      describe 'with allowsFloats = true', ->
-        beforeEach ->
-          formatter.setAllowsFloats yes
+      it 'parses that symbol by itself as infinity', ->
+        expect(formatter.parse 'INF').toEqual(Infinity)
 
-        it 'parses integers', ->
-          expect(formatter.parse '4').toEqual(4)
+    describe 'with a custom negative infinity symbol', ->
+      beforeEach ->
+        formatter.setNegativeInfinitySymbol '-INF'
 
-        it 'parses floats', ->
-          expect(formatter.parse '2.5').toEqual(2.5)
+      it 'parses that symbol by itself as negative infinity', ->
+        expect(formatter.parse '-INF').toEqual(-Infinity)
 
-      describe 'with allowsFloats = false', ->
-        beforeEach ->
-          formatter.setAllowsFloats no
+    describe 'with a minimum value', ->
+      beforeEach ->
+        formatter.setMinimum 1
 
-        it 'parses integers', ->
-          expect(formatter.parse '4').toEqual(4)
+      it 'fails to parse the string when below the minimum', ->
+        expect(formatter.parse '0').toBeNull()
 
-        it 'fails to parse floats', ->
-          expect(formatter.parse '2.5').toBeNull()
+      it 'has a specific error type when the string is below the minimum', ->
+        errorCallback = jasmine.createSpy('errorCallback')
+        formatter.parse '0', errorCallback
+        expect(errorCallback).toHaveBeenCalledWith('number-formatter.out-of-bounds.below-minimum')
 
-        it 'has a specific error type when trying to parse floats', ->
-          errorCallback = jasmine.createSpy('errorCallback')
-          formatter.parse '2.5', errorCallback
-          expect(errorCallback).toHaveBeenCalledWith('number-formatter.floats-not-allowed')
+      it 'parses the string when above the minimum', ->
+        expect(formatter.parse '2').toEqual(2)
 
-      describe 'with a custom decimal separator', ->
-        beforeEach ->
-          formatter.setDecimalSeparator 'SEP'
+    describe 'with a maximum value', ->
+      beforeEach ->
+        formatter.setMaximum 5
 
-        it 'parses floats with the custom decimal separator', ->
-          expect(formatter.parse '2SEP5').toEqual(2.5)
+      it 'fails to parse the string when above the maximum', ->
+        expect(formatter.parse '7').toBeNull()
 
-        it 'fails to parse strings with multiple decimal separators', ->
-          errorCallback = jasmine.createSpy('errorCallback')
-          expect(formatter.parse '1SEP3SEP5', errorCallback).toBeNull()
-          expect(errorCallback).toHaveBeenCalledWith('number-formatter.invalid-format')
+      it 'has a specific error type when the string is above the maximum', ->
+        errorCallback = jasmine.createSpy('errorCallback')
+        formatter.parse '7', errorCallback
+        expect(errorCallback).toHaveBeenCalledWith('number-formatter.out-of-bounds.above-maximum')
 
-      describe 'with a custom positive prefix and suffix', ->
-        beforeEach ->
-          formatter.setPositivePrefix('+').setPositiveSuffix('=)')
+      it 'parses the string when below the maximum', ->
+        expect(formatter.parse '2').toEqual(2)
 
-        it 'fails to parse the "typical" positive format', ->
-          errorCallback = jasmine.createSpy('errorCallback')
-          expect(formatter.parse '3', errorCallback).toBeNull()
-          expect(errorCallback).toHaveBeenCalledWith('number-formatter.invalid-format')
+    describe 'with allowsFloats = true', ->
+      beforeEach ->
+        formatter.setAllowsFloats yes
 
-        it 'parses strings with the custom positive prefix and suffix', ->
-          expect(formatter.parse '+3=)').toEqual(3)
+      it 'parses integers', ->
+        expect(formatter.parse '4').toEqual(4)
 
-      describe 'with a custom negative prefix and suffix', ->
-        beforeEach ->
-          formatter.setNegativePrefix('(').setNegativeSuffix(')')
+      it 'parses floats', ->
+        expect(formatter.parse '2.5').toEqual(2.5)
 
-        it 'fails to parse the "typical" negative format', ->
-          errorCallback = jasmine.createSpy('errorCallback')
-          expect(formatter.parse '-3', errorCallback).toBeNull()
-          expect(errorCallback).toHaveBeenCalledWith('number-formatter.invalid-format')
+    describe 'with allowsFloats = false', ->
+      beforeEach ->
+        formatter.setAllowsFloats no
 
-        it 'parses strings with the custom negative prefix and suffix', ->
-          expect(formatter.parse '(3)').toEqual(-3)
+      it 'parses integers', ->
+        expect(formatter.parse '4').toEqual(4)
 
-      describe 'with a multiplier', ->
-        beforeEach ->
-          formatter.setMultipler .01
+      it 'fails to parse floats', ->
+        expect(formatter.parse '2.5').toBeNull()
 
-        it 'multiplies numeric values for display', ->
-          expect(formatter.parse '50').toEqual(5000)
+      it 'has a specific error type when trying to parse floats', ->
+        errorCallback = jasmine.createSpy('errorCallback')
+        formatter.parse '2.5', errorCallback
+        expect(errorCallback).toHaveBeenCalledWith('number-formatter.floats-not-allowed')
+
+    describe 'with a custom decimal separator', ->
+      beforeEach ->
+        formatter.setDecimalSeparator 'SEP'
+
+      it 'parses floats with the custom decimal separator', ->
+        expect(formatter.parse '2SEP5').toEqual(2.5)
+
+      it 'fails to parse strings with multiple decimal separators', ->
+        errorCallback = jasmine.createSpy('errorCallback')
+        expect(formatter.parse '1SEP3SEP5', errorCallback).toBeNull()
+        expect(errorCallback).toHaveBeenCalledWith('number-formatter.invalid-format')
+
+    describe 'with a custom positive prefix and suffix', ->
+      beforeEach ->
+        formatter.setPositivePrefix('+').setPositiveSuffix('=)')
+
+      it 'fails to parse the "typical" positive format', ->
+        errorCallback = jasmine.createSpy('errorCallback')
+        expect(formatter.parse '3', errorCallback).toBeNull()
+        expect(errorCallback).toHaveBeenCalledWith('number-formatter.invalid-format')
+
+      it 'parses strings with the custom positive prefix and suffix', ->
+        expect(formatter.parse '+3=)').toEqual(3)
+
+    describe 'with a custom negative prefix and suffix', ->
+      beforeEach ->
+        formatter.setNegativePrefix('(').setNegativeSuffix(')')
+
+      it 'fails to parse the "typical" negative format', ->
+        errorCallback = jasmine.createSpy('errorCallback')
+        expect(formatter.parse '-3', errorCallback).toBeNull()
+        expect(errorCallback).toHaveBeenCalledWith('number-formatter.invalid-format')
+
+      it 'parses strings with the custom negative prefix and suffix', ->
+        expect(formatter.parse '(3)').toEqual(-3)
+
+      it 'fails to parse nested negative separators', ->
+        expect(formatter.parse '((3))').toBeNull()
+
+    describe 'with a multiplier', ->
+      beforeEach ->
+        formatter.setMultipler .01
+
+      it 'multiplies numeric values for display', ->
+        expect(formatter.parse '50').toEqual(5000)
