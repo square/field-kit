@@ -78,6 +78,11 @@ describe 'NumberFormatter', ->
       expect(formatter.minusSign).toBe(formatter.negativePrefix)
       expect(formatter.setMinusSign).toBe(formatter.setNegativePrefix)
 
+  describe '#plusSign', ->
+    it 'is an alias for #positivePrefix', ->
+      expect(formatter.plusSign).toBe(formatter.positivePrefix)
+      expect(formatter.setPlusSign).toBe(formatter.setPositivePrefix)
+
   describe '#format', ->
     describe 'given zero', ->
       describe 'and a custom zero symbol', ->
@@ -416,6 +421,7 @@ describe 'NumberFormatter', ->
 
       it 'fails to parse the string when below the minimum', ->
         expect(formatter.parse '0').toBeNull()
+        expect(formatter.parse formatter.negativeInfinitySymbol()).toBeNull()
 
       it 'has a specific error type when the string is below the minimum', ->
         errorCallback = jasmine.createSpy('errorCallback')
@@ -431,6 +437,7 @@ describe 'NumberFormatter', ->
 
       it 'fails to parse the string when above the maximum', ->
         expect(formatter.parse '7').toBeNull()
+        expect(formatter.parse formatter.positiveInfinitySymbol()).toBeNull()
 
       it 'has a specific error type when the string is above the maximum', ->
         errorCallback = jasmine.createSpy('errorCallback')
