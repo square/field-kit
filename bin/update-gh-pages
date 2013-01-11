@@ -21,6 +21,10 @@ class Repo
     File.exist?(path)
   end
 
+  def branches
+    git('branch').output.split($/).map {|b| b[2..-1] }
+  end
+
   def git(*args)
     if args.first != 'clone'
       args = ["--git-dir=#{@path}/.git", "--work-tree=#{@path}", *args]
@@ -65,6 +69,10 @@ class CommandResult
   def output
     @output
   end
+end
+
+if not root.branches.include?(PAGES_BRANCH)
+  root.git('branch', PAGES_BRANCH, "origin/#{PAGES_BRANCH}")
 end
 
 # clone copy as pages repo
