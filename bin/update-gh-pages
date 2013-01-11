@@ -82,6 +82,7 @@ if not pages.exist?
 end
 
 step 'Update pages repo…'
+pages.git('fetch').success? || die("Failed to fetch changes from local origin!")
 pages.git('checkout', PAGES_BRANCH).success? || die("Failed to checkout '#{PAGES_BRANCH}' branch!")
 pages.git('pull', '--rebase').success? || die("Failed to update '#{PAGES_BRANCH}' repo!")
 
