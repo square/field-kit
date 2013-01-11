@@ -32,6 +32,15 @@ describe 'NumberFormatter', ->
     it 'has no maximum', ->
       expect(formatter.maximum()).toBeNull()
 
+    it 'has no multiplier', ->
+      expect(formatter.multiplier()).toBeNull()
+
+    it 'has no maximumIntegerDigits', ->
+      expect(formatter.maximumIntegerDigits()).toBeNull()
+
+    it 'has a maximumIntegerDigits', ->
+      expect(formatter.minimumIntegerDigits()).toEqual(0)
+
   describe '#numberFromString', ->
     it 'is an alias for #parse', ->
       expect(formatter.numberFromString).toBe(formatter.parse)
@@ -174,6 +183,29 @@ describe 'NumberFormatter', ->
             expect(formatter.format 0.5).toEqual('0')
             expect(formatter.format 1.5).toEqual('2')
 
+      describe 'with a multiplier', ->
+        beforeEach ->
+          formatter.setMultipler .01
+
+        it 'multiplies numeric values for display', ->
+          expect(formatter.format 5000).toEqual('50')
+
+      describe 'with minimumIntegerDigits', ->
+        beforeEach ->
+          formatter.setMinimumIntegerDigits 2
+
+        it 'left-pads the integer part if necessary', ->
+          expect(formatter.format 1).toEqual('01')
+          expect(formatter.format 12).toEqual('12')
+
+      describe 'with maximumIntegerDigits', ->
+        beforeEach ->
+          formatter.setMaximumIntegerDigits 2
+
+        it 'left-truncates the integer part if necessary', ->
+          expect(formatter.format 123).toEqual('23')
+          expect(formatter.format 23).toEqual('23')
+
     describe 'given a negative number', ->
       describe 'with custom prefix and suffix', ->
         beforeEach ->
@@ -210,6 +242,9 @@ describe 'NumberFormatter', ->
 
         it 'rounds floats with non-zero digits past the maximum', ->
           expect(formatter.format -3.11).toEqual('-3.2')
+
+        it 'carries the one', ->
+          expect(formatter.format -3.91).toEqual('-4')
 
       describe 'with half-even rounding', ->
         beforeEach ->
@@ -323,3 +358,10 @@ describe 'NumberFormatter', ->
 
         it 'parses strings with the custom negative prefix and suffix', ->
           expect(formatter.parse '(3)').toEqual(-3)
+
+      describe 'with a multiplier', ->
+        beforeEach ->
+          formatter.setMultipler .01
+
+        it 'multiplies numeric values for display', ->
+          expect(formatter.parse '50').toEqual(5000)
