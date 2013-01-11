@@ -287,29 +287,40 @@ class NumberFormatter extends Formatter
 
   parse: (string, error) ->
     if @_zeroSymbol? and string is @_zeroSymbol
-      return 0
+      result = 0
 
-    if @_nullSymbol? and string is @_nullSymbol
-      return null
+    else if @_nullSymbol? and string is @_nullSymbol
+      result = null
 
-    if @_notANumberSymbol? and string is @_notANumberSymbol
-      return NaN
+    else if @_notANumberSymbol? and string is @_notANumberSymbol
+      result = NaN
 
-    if @_positiveInfinitySymbol? and string is @_positiveInfinitySymbol
-      return Infinity
+    else if @_positiveInfinitySymbol? and string is @_positiveInfinitySymbol
+      result = Infinity
 
-    if @_negativeInfinitySymbol? and string is @_negativeInfinitySymbol
-      return -Infinity
+    else if @_negativeInfinitySymbol? and string is @_negativeInfinitySymbol
+      result = -Infinity
 
-    if startsWith(@_negativePrefix, string) and endsWith(@_negativeSuffix, string)
-      result = @_parseAbsoluteValue(string[@_negativePrefix.length...(string.length-@_negativeSuffix.length)], error)
-      result *= -1 if result?
-      return result
-    else if startsWith(@_positivePrefix, string) and endsWith(@_positiveSuffix, string)
-      @_parseAbsoluteValue string[@_positivePrefix.length...(string.length-@_positiveSuffix.length)], error
-    else
-      error? 'number-formatter.invalid-format'
-      return null
+    else if not result?
+      if startsWith(@_negativePrefix, string) and endsWith(@_negativeSuffix, string)
+        result = @_parseAbsoluteValue(string[@_negativePrefix.length...(string.length-@_negativeSuffix.length)], error)
+        result *= -1 if result?
+      else if startsWith(@_positivePrefix, string) and endsWith(@_positiveSuffix, string)
+        result = @_parseAbsoluteValue string[@_positivePrefix.length...(string.length-@_positiveSuffix.length)], error
+      else
+        error? 'number-formatter.invalid-format'
+        return null
+
+    if result?
+      if @_minimum? and result < @_minimum
+        error? 'number-formatter.out-of-bounds.below-minimum'
+        return null
+
+      if @_maximum? and result > @_maximum
+        error? 'number-formatter.out-of-bounds.above-maximum'
+        return null
+
+    return result
 
   _parseAbsoluteValue: (string, error) ->
     parts = string.split(@_decimalSeparator)
@@ -330,14 +341,6 @@ class NumberFormatter extends Formatter
       error? 'number-formatter.floats-not-allowed'
       return null
 
-    if @_minimum? and number < @_minimum
-      error? 'number-formatter.out-of-bounds.below-minimum'
-      return null
-
-    if @_maximum? and number > @_maximum
-      error? 'number-formatter.out-of-bounds.above-maximum'
-      return null
-
     if @_multiplier?
       number /= @_multiplier
 
@@ -350,6 +353,8 @@ NumberFormatter::stringFromNumber = NumberFormatter::format
 NumberFormatter::numberFromString = NumberFormatter::parse
 NumberFormatter::minusSign = NumberFormatter::negativePrefix
 NumberFormatter::setMinusSign = NumberFormatter::setNegativePrefix
+NumberFormatter::plusSign = NumberFormatter::positivePrefix
+NumberFormatter::setPlusSign = NumberFormatter::setPositivePrefix
 
 
 ## Rounding
