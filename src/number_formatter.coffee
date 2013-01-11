@@ -1,12 +1,18 @@
 Formatter = require './formatter'
 
-CEILING   = 0
-FLOOR     = 1
-DOWN      = 2
-HALF_EVEN = 3
-UP        = 4
-HALF_DOWN = 5
-HALF_UP   = 6
+# Rounding
+CEILING    = 0
+FLOOR      = 1
+DOWN       = 2
+HALF_EVEN  = 3
+UP         = 4
+HALF_DOWN  = 5
+HALF_UP    = 6
+
+# Style
+NONE       = 0
+CURRENCY   = 1
+PERCENT    = 2
 
 isDigits = (string) ->
   /^\d*$/.test string
@@ -20,7 +26,6 @@ endsWith = (suffix, string) ->
 class NumberFormatter extends Formatter
   _allowsFloats:                yes
   _alwaysShowsDecimalSeparator: no
-  _decimalSeparator:            '.'
   _groupingSeparator:           ','
   _groupingSize:                3
   _maximumFractionDigits:       0
@@ -30,17 +35,15 @@ class NumberFormatter extends Formatter
   _maximum:                     null
   _minimum:                     null
   _multiplier:                  null
-  _negativeInfinitySymbol:      '-∞'
-  _negativePrefix:              '-'
-  _negativeSuffix:              ''
   _notANumberSymbol:            'NaN'
   _nullSymbol:                  ''
-  _positiveInfinitySymbol:      '+∞'
-  _positivePrefix:              ''
-  _positiveSuffix:              ''
+  _numberStyle:                 NONE
   _roundingMode:                HALF_EVEN
   _usesGroupingSeparator:       no
   _zeroSymbol:                  null
+
+  constructor: ->
+    @_regionDefaults = RegionDefaults.US
 
   # Gets whether this formatter will parse float number values. This value does
   # not apply to formatting. To prevent formatting floats, set
@@ -65,7 +68,7 @@ class NumberFormatter extends Formatter
     return this
 
   decimalSeparator: ->
-    @_decimalSeparator
+    @_get 'decimalSeparator'
 
   setDecimalSeparator: (decimalSeparator) ->
     @_decimalSeparator = decimalSeparator
@@ -126,27 +129,27 @@ class NumberFormatter extends Formatter
     return this
 
   multiplier: ->
-    @_multiplier
+    @_multiplier ? @_styleDefaults?.multiplier?() ? null
 
-  setMultipler: (multiplier) ->
+  setMultiplier: (multiplier) ->
     @_multiplier = multiplier
     return this
 
   negativeInfinitySymbol: ->
-    @_negativeInfinitySymbol
+    @_get 'negativeInfinitySymbol'
 
   setNegativeInfinitySymbol: (negativeInfinitySymbol) ->
     @_negativeInfinitySymbol = negativeInfinitySymbol
 
   negativePrefix: ->
-    @_negativePrefix
+    @_get 'negativePrefix'
 
   setNegativePrefix: (prefix) ->
     @_negativePrefix = prefix
     return this
 
   negativeSuffix: ->
-    @_negativeSuffix
+    @_get 'negativeSuffix'
 
   setNegativeSuffix: (prefix) ->
     @_negativeSuffix = prefix
@@ -164,21 +167,41 @@ class NumberFormatter extends Formatter
   setNullSymbol: (nullSymbol) ->
     @_nullSymbol = nullSymbol
 
+  numberStyle: ->
+    @_numberStyle
+
+  setNumberStyle: (numberStyle) ->
+    @_numberStyle = numberStyle
+    switch @_numberStyle
+      when PERCENT
+        @_styleDefaults = StyleDefaults.PERCENT
+      else
+        @_styleDefaults = null
+    return this
+
+  percentSymbol: ->
+    @_get 'percentSymbol'
+
+  setPercentSymbol: (percentSymbol) ->
+    @_percentSymbol = percentSymbol
+    return this
+
   positiveInfinitySymbol: ->
-    @_positiveInfinitySymbol
+    @_get 'positiveInfinitySymbol'
 
   setPositiveInfinitySymbol: (positiveInfinitySymbol) ->
     @_positiveInfinitySymbol = positiveInfinitySymbol
+    return this
 
   positivePrefix: ->
-    @_positivePrefix
+    @_get 'positivePrefix'
 
   setPositivePrefix: (prefix) ->
     @_positivePrefix = prefix
     return this
 
   positiveSuffix: ->
-    @_positiveSuffix
+    @_get 'positiveSuffix'
 
   setPositiveSuffix: (prefix) ->
     @_positiveSuffix = prefix
@@ -203,6 +226,9 @@ class NumberFormatter extends Formatter
   setZeroSymbol: (zeroSymbol) ->
     @_zeroSymbol = zeroSymbol
 
+  _get: (attr) ->
+    @["_#{attr}"] ? @_styleDefaults?[attr]?(this) ? @_regionDefaults?[attr]?(this) ? null
+
   format: (number) ->
     if @_zeroSymbol? and number is 0
       return @_zeroSymbol
@@ -219,8 +245,8 @@ class NumberFormatter extends Formatter
     if @_negativeInfinitySymbol? and number is -Infinity
       return @_negativeInfinitySymbol
 
-    if @_multiplier?
-      number *= @_multiplier
+    if (multiplier = @multiplier())?
+      number *= multiplier
 
     negative = number < 0
     string = "#{Math.abs(number)}"
@@ -252,7 +278,7 @@ class NumberFormatter extends Formatter
 
     # add the decimal separator
     if fractionPart.length > 0 or @_alwaysShowsDecimalSeparator
-      fractionPart = @_decimalSeparator + fractionPart
+      fractionPart = @decimalSeparator() + fractionPart
 
     if @_usesGroupingSeparator
       integerPartWithGroupingSeparators = ''
@@ -270,9 +296,9 @@ class NumberFormatter extends Formatter
 
     # surround with the appropriate prefix and suffix
     if negative
-      result = @_negativePrefix + result + @_negativeSuffix
+      result = @negativePrefix() + result + @negativeSuffix()
     else
-      result = @_positivePrefix + result + @_positiveSuffix
+      result = @positivePrefix() + result + @positiveSuffix()
 
     return result
 
@@ -302,11 +328,11 @@ class NumberFormatter extends Formatter
       result = -Infinity
 
     else if not result?
-      if startsWith(@_negativePrefix, string) and endsWith(@_negativeSuffix, string)
-        result = @_parseAbsoluteValue(string[@_negativePrefix.length...(string.length-@_negativeSuffix.length)], error)
+      if startsWith(@negativePrefix(), string) and endsWith(@negativeSuffix(), string)
+        result = @_parseAbsoluteValue(string[@negativePrefix().length...(string.length-@negativeSuffix().length)], error)
         result *= -1 if result?
-      else if startsWith(@_positivePrefix, string) and endsWith(@_positiveSuffix, string)
-        result = @_parseAbsoluteValue string[@_positivePrefix.length...(string.length-@_positiveSuffix.length)], error
+      else if startsWith(@positivePrefix(), string) and endsWith(@positiveSuffix(), string)
+        result = @_parseAbsoluteValue string[@positivePrefix().length...(string.length-@positiveSuffix().length)], error
       else
         error? 'number-formatter.invalid-format'
         return null
@@ -323,7 +349,11 @@ class NumberFormatter extends Formatter
     return result
 
   _parseAbsoluteValue: (string, error) ->
-    parts = string.split(@_decimalSeparator)
+    if string.length is 0
+      error? 'number-formatter.invalid-format'
+      return null
+
+    parts = string.split(@decimalSeparator())
     if parts.length > 2
       error? 'number-formatter.invalid-format'
       return null
@@ -341,8 +371,8 @@ class NumberFormatter extends Formatter
       error? 'number-formatter.floats-not-allowed'
       return null
 
-    if @_multiplier?
-      number /= @_multiplier
+    if (multiplier = @multiplier())?
+      number /= multiplier
 
     return number
 
@@ -418,6 +448,29 @@ NumberFormatter.Rounding = {
   HALF_DOWN
   HALF_UP
 }
+
+NumberFormatter.Style = {
+  NONE
+  CURRENCY
+  PERCENT
+}
+
+StyleDefaults =
+  PERCENT:
+    multiplier: -> 100
+    positiveSuffix: (formatter) -> formatter.percentSymbol()
+    negativeSuffix: (formatter) -> formatter.percentSymbol()
+
+RegionDefaults =
+  US:
+    decimalSeparator:       -> '.'
+    negativeInfinitySymbol: -> '-∞'
+    negativePrefix:         -> '-'
+    negativeSuffix:         -> ''
+    percentSymbol:          -> '%'
+    positiveInfinitySymbol: -> '+∞'
+    positivePrefix:         -> ''
+    positiveSuffix:         -> ''
 
 
 module.exports = NumberFormatter
