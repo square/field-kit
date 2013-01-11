@@ -36,6 +36,11 @@ describe 'NumberFormatter', ->
     it 'is an alias for #parse', ->
       expect(formatter.numberFromString).toBe(formatter.parse)
 
+  describe '#minusSign', ->
+    it 'is an alias for #negativePrefix', ->
+      expect(formatter.minusSign).toBe(formatter.negativePrefix)
+      expect(formatter.setMinusSign).toBe(formatter.setNegativePrefix)
+
   describe '#format', ->
     describe 'given a positive number', ->
       describe 'with custom prefix and suffix', ->
