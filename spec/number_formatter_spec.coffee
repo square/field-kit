@@ -65,6 +65,12 @@ describe 'NumberFormatter', ->
     it 'has US-standard symbol for negative infinity', ->
       expect(formatter.negativeInfinitySymbol()).toEqual('-∞')
 
+    it 'has US-standard symbol for percent', ->
+      expect(formatter.percentSymbol()).toEqual('%')
+
+    it 'has no number style', ->
+      expect(formatter.numberStyle()).toEqual(NumberFormatter.Style.NONE)
+
   describe '#numberFromString', ->
     it 'is an alias for #parse', ->
       expect(formatter.numberFromString).toBe(formatter.parse)
@@ -258,7 +264,7 @@ describe 'NumberFormatter', ->
 
       describe 'with a multiplier', ->
         beforeEach ->
-          formatter.setMultipler .01
+          formatter.setMultiplier .01
 
         it 'multiplies numeric values for display', ->
           expect(formatter.format 5000).toEqual('50')
@@ -365,6 +371,28 @@ describe 'NumberFormatter', ->
         it 'rounds floats with non-zero digits past the maximum', ->
           expect(formatter.format -0.35).toEqual('-0.4')
           expect(formatter.format -0.25).toEqual('-0.2')
+
+    describe 'with the percent style', ->
+      beforeEach ->
+        formatter.setNumberStyle NumberFormatter.Style.PERCENT
+
+      it 'formats numbers as percents', ->
+        expect(formatter.format 4.21).toEqual('421%')
+        expect(formatter.format -4.21).toEqual('-421%')
+
+      describe 'with a custom percent symbol', ->
+        beforeEach ->
+          formatter.setPercentSymbol 'PER'
+
+        it 'formats using the custom symbol', ->
+          expect(formatter.format .2).toEqual('20PER')
+
+    describe 'switching styles', ->
+      it 'resets values back to their original defaults', ->
+        multiplier = formatter.multiplier()
+        formatter.setNumberStyle NumberFormatter.Style.PERCENT
+        formatter.setNumberStyle NumberFormatter.Style.NONE
+        expect(formatter.multiplier()).toEqual(multiplier)
 
   describe '#parse', ->
     it 'parses normal positive numbers', ->
@@ -496,6 +524,11 @@ describe 'NumberFormatter', ->
       it 'parses strings with the custom positive prefix and suffix', ->
         expect(formatter.parse '+3=)').toEqual(3)
 
+      it 'fails to parse just the prefix and suffix', ->
+        errorCallback = jasmine.createSpy('errorCallback')
+        expect(formatter.parse '+=)', errorCallback).toBeNull()
+        expect(errorCallback).toHaveBeenCalledWith('number-formatter.invalid-format')
+
     describe 'with a custom negative prefix and suffix', ->
       beforeEach ->
         formatter.setNegativePrefix('(').setNegativeSuffix(')')
@@ -513,7 +546,7 @@ describe 'NumberFormatter', ->
 
     describe 'with a multiplier', ->
       beforeEach ->
-        formatter.setMultipler .01
+        formatter.setMultiplier .01
 
       it 'multiplies numeric values for display', ->
         expect(formatter.parse '50').toEqual(5000)
