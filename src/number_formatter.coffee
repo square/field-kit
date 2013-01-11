@@ -23,8 +23,11 @@ class NumberFormatter extends Formatter
   _decimalSeparator:            '.'
   _maximumFractionDigits:       0
   _minimumFractionDigits:       0
+  _maximumIntegerDigits:        null
+  _minimumIntegerDigits:        0
   _maximum:                     null
   _minimum:                     null
+  _multiplier:                  null
   _negativePrefix:              '-'
   _negativeSuffix:              ''
   _positivePrefix:              ''
@@ -88,6 +91,27 @@ class NumberFormatter extends Formatter
     @_minimumFractionDigits = minimumFractionDigits
     return this
 
+  maximumIntegerDigits: ->
+    @_maximumIntegerDigits
+
+  setMaximumIntegerDigits: (maximumIntegerDigits) ->
+    @_maximumIntegerDigits = maximumIntegerDigits
+    return this
+
+  minimumIntegerDigits: ->
+    @_minimumIntegerDigits
+
+  setMinimumIntegerDigits: (minimumIntegerDigits) ->
+    @_minimumIntegerDigits = minimumIntegerDigits
+    return this
+
+  multiplier: ->
+    @_multiplier
+
+  setMultipler: (multiplier) ->
+    @_multiplier = multiplier
+    return this
+
   negativePrefix: ->
     @_negativePrefix
 
@@ -124,25 +148,44 @@ class NumberFormatter extends Formatter
     return this
 
   format: (number) ->
+    if @_multiplier?
+      number *= @_multiplier
+
     negative = number < 0
     string = "#{Math.abs(number)}"
     [integerPart, fractionPart] = string.split('.')
 
     fractionPart ||= ''
 
+    # right-pad fraction zeros up to the minimum length
     while fractionPart.length < @_minimumFractionDigits
       fractionPart += '0'
 
+    # left-pad integer zeros up to the minimum length
+    while integerPart.length < @_minimumIntegerDigits
+      integerPart = '0' + integerPart
+
+    # round fraction part to the maximum length
     if fractionPart.length > @_maximumFractionDigits
       extraFractionPart = fractionPart[@_maximumFractionDigits..]
       fractionPart = fractionPart[0...@_maximumFractionDigits]
       [integerPart, fractionPart] = @_round negative, integerPart, fractionPart, extraFractionPart
 
+    # eat any unneeded trailing zeros
+    while fractionPart.length > @_minimumFractionDigits and fractionPart[-1..-1] is '0'
+      fractionPart = fractionPart[0...-1]
+
+    # left-truncate any integer digits over the maximum length
+    if @_maximumIntegerDigits? and integerPart.length > @_maximumIntegerDigits
+      integerPart = integerPart[-@_maximumIntegerDigits..]
+
+    # add the decimal separator
     if fractionPart.length > 0 or @_alwaysShowsDecimalSeparator
       fractionPart = @_decimalSeparator + fractionPart
 
     result = integerPart + fractionPart
 
+    # surround with the appropriate prefix and suffix
     if negative
       result = @_negativePrefix + result + @_negativeSuffix
     else
@@ -196,6 +239,9 @@ class NumberFormatter extends Formatter
       error? 'number-formatter.out-of-bounds.above-maximum'
       return null
 
+    if @_multiplier?
+      number /= @_multiplier
+
     return number
 
 
@@ -212,10 +258,7 @@ roundCeiling = (negative, integerPart, fractionPart, extraFractionPart) ->
   return roundFloor !negative, integerPart, fractionPart, extraFractionPart if negative
 
   if /[1-9]/.test extraFractionPart
-    if fractionPart.length is 0
-      integerPart = "#{Number(integerPart) + 1}"
-    else
-      fractionPart = "#{fractionPart[0...-1]}#{Number(fractionPart[-1..-1]) + 1}"
+    [integerPart, fractionPart] = incrementFormattedParts integerPart, fractionPart
 
   return [integerPart, fractionPart]
 
@@ -233,6 +276,31 @@ roundHalfEven = (negative, integerPart, fractionPart, extraFractionPart) ->
     rounder = if Number(lastDigit) % 2 is 0 then roundFloor else roundCeiling
 
   return rounder no, integerPart, fractionPart, extraFractionPart
+
+incrementFormattedParts = (integerPart, fractionPart) ->
+  [fractionCarryOver, fractionPart] = incrementFormattedNumber fractionPart
+  while fractionCarryOver--
+    [integerCarryOver, integerPart] = incrementFormattedNumber integerPart
+    integerPart = integerCarryOver + integerPart if integerCarryOver
+  return [integerPart, fractionPart]
+
+incrementFormattedNumber = (string) ->
+  # add a place to the left so we don't lose any zeros
+  string = "1#{string}"
+  # increment the number
+  number = Number(string) + 1
+  # put it back to a string with an extra place
+  string = "#{number}"
+  # check the extra place to see if we have to keep it
+  switch string[0]
+    when '1'
+      # it wasn't incremented so we don't need to keep it
+      return [0, string[1..]]
+    when '2'
+      # it was incremented, so keep it as a '1'
+      return [1, string[1..]]
+    else
+      throw new Error("unexpected carry over value '#{string[0]}', expected '1' or '2'")
 
 NumberFormatter.Rounding = {
   CEILING
