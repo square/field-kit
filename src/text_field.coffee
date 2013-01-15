@@ -39,7 +39,7 @@ findFieldPreceding = (element) ->
   return result.iterateNext()
 
 makeFirstResponder = (field, event) ->
-  if textField = $(field).data('field-kit-text-field')
+  if textField = field.data('field-kit-text-field')
     textField.becomeFirstResponder event
   else
     field.focus?()
@@ -68,6 +68,7 @@ class TextField
     return null
 
   constructor: (@element) ->
+    @_jQuery = @element.constructor
     @element.on 'keydown', @keyDown
     @element.on 'keypress', @keyPress
     @element.on 'keyup', @keyUp
@@ -114,7 +115,7 @@ class TextField
   beforeInterceptorKeyUp: (event) =>
     if event.keyCode is KEYS.TAB and event.shiftKey
       if previousField = findFieldPreceding event.target
-        makeFirstResponder previousField
+        makeFirstResponder @_jQuery(previousField)
 
   # Internal: Handles keyup events in the input that intercepts tab-induced
   # focus events after this one.
@@ -125,7 +126,7 @@ class TextField
   afterInterceptorKeyUp: (event) =>
     if event.keyCode is KEYS.TAB and not event.shiftKey
       if nextField = findFieldFollowing event.target
-        makeFirstResponder nextField
+        makeFirstResponder @_jQuery(nextField)
 
   # Handles a key event that is trying to insert a character.
   #
