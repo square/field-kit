@@ -533,7 +533,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
 
   makeFirstResponder = function(field, event) {
     var textField;
-    if (textField = $(field).data('field-kit-text-field')) {
+    if (textField = field.data('field-kit-text-field')) {
       return textField.becomeFirstResponder(event);
     } else {
       if (typeof field.focus === "function") {
@@ -578,6 +578,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
 
       this.beforeInterceptorKeyUp = __bind(this.beforeInterceptorKeyUp, this);
 
+      this._jQuery = this.element.constructor;
       this.element.on('keydown', this.keyDown);
       this.element.on('keypress', this.keyPress);
       this.element.on('keyup', this.keyUp);
@@ -620,7 +621,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       var previousField;
       if (event.keyCode === KEYS.TAB && event.shiftKey) {
         if (previousField = findFieldPreceding(event.target)) {
-          return makeFirstResponder(previousField);
+          return makeFirstResponder(this._jQuery(previousField));
         }
       }
     };
@@ -629,7 +630,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       var nextField;
       if (event.keyCode === KEYS.TAB && !event.shiftKey) {
         if (nextField = findFieldFollowing(event.target)) {
-          return makeFirstResponder(nextField);
+          return makeFirstResponder(this._jQuery(nextField));
         }
       }
     };
