@@ -19,7 +19,7 @@ class DelimitedTextFormatter extends Formatter
     result
 
   parse: (text, error) ->
-    return null unless text
+    return '' unless text
     (char for char in text when char isnt @delimiter).join('')
 
   isChangeValid: (change, error) ->
