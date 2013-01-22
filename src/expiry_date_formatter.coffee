@@ -16,7 +16,7 @@ class ExpiryDateFormatter extends DelimitedTextFormatter
     return '' unless value
 
     { month, year } = value
-    year = year % 10
+    year = year % 100
 
     super zpad2(month) + zpad2(year)
 
