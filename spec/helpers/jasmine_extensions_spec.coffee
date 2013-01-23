@@ -8,3 +8,13 @@ jasmine.StringPrettyPrinter.prototype.emitObject = (obj) ->
     @append obj.inspect()
   else
     originalEmitObject.call this, obj
+
+beforeEach ->
+  @addMatchers
+    toBeAnInstanceOf: (constructor) ->
+      @message = =>
+        [
+          "Expected " + @actual?.constructor?.name + " to be an instance of " + constructor.name
+          "Expected " + @actual?.constructor?.name + " not to be an instance of " + constructor.name
+        ]
+      return @actual instanceof constructor

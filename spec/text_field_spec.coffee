@@ -330,7 +330,9 @@ describe 'TextField', ->
 
     beforeEach ->
       field = buildField()
-      field.setDelegate textFieldDidEndEditing: jasmine.createSpy('delegate.textFieldDidEndEditing')
+      field.setDelegate
+        textFieldDidEndEditing: jasmine.createSpy('delegate.textFieldDidEndEditing')
+        textDidChange: jasmine.createSpy('delegate.textDidChange')
       expect(field.delegate().textFieldDidEndEditing).not.toHaveBeenCalled()
 
     it 'calls the delegate method for ending editing on enter', ->
@@ -341,3 +343,17 @@ describe 'TextField', ->
       field.becomeFirstResponder()
       field.resignFirstResponder()
       expect(field.delegate().textFieldDidEndEditing).toHaveBeenCalledWith(field)
+
+    it 'does not call the delegate method for text change when moving the cursor', ->
+      field.setText('abc')
+      field.setSelectedRange(start: 0, length: 0)
+      type('left').into(field)
+      expect(field.delegate().textDidChange).not.toHaveBeenCalled()
+
+    it 'calls the delegate method for text change on any change', ->
+      type('a').into(field)
+      expect(field.delegate().textDidChange).toHaveBeenCalledWith(field)
+
+    it 'does not call the delegate method for ending editing on a change', ->
+      type('a').into(field)
+      expect(field.delegate().textFieldDidEndEditing).not.toHaveBeenCalled()

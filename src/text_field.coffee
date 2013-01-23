@@ -1151,13 +1151,14 @@ class TextField
         @setText change.proposed.text
         @setSelectedRange change.proposed.selectedRange
       else
-        @_delegate?.textFieldDidFailToValidateChange?(this, change, errorType)
+        @delegate()?.textFieldDidFailToValidateChange?(this, change, errorType)
         @setText change.current.text
         @setSelectedRange change.current.selectedRange
         return result # change is rejected, don't do undo processing
 
     if change.inserted.text.length or change.deleted.text.length
       @undoManager().proxyFor(this)._applyChangeFromUndoManager(change)
+      @delegate()?.textDidChange?(this)
 
     return result
 
