@@ -8,17 +8,23 @@ class DelimitedTextFormatter extends Formatter
     if @delimiter?.length isnt 1
       throw new Error('delimiter must have just one character')
 
-  format: (text) ->
-    return '' unless text
+  format: (value) ->
+    @_textFromValue value
+
+  _textFromValue: (value) ->
+    return '' unless value
 
     result = ''
-    for char in text
+    for char in value
       result += @delimiter if @hasDelimiterAtIndex result.length
       result += char
       result += @delimiter if @hasDelimiterAtIndex result.length
     result
 
   parse: (text, error) ->
+    @_valueFromText text
+
+  _valueFromText: (text) ->
     return '' unless text
     (char for char in text when char isnt @delimiter).join('')
 
@@ -54,12 +60,12 @@ class DelimitedTextFormatter extends Formatter
 
     isChangeValid = yes
 
-    object = @parse newText, (args...) ->
+    value = @_valueFromText newText, (args...) ->
       isChangeValid = no
       error args...
 
     if isChangeValid
-      change.proposed.text = @format object
+      change.proposed.text = @_textFromValue value
 
     return isChangeValid
 

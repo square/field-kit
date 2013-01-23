@@ -1,5 +1,6 @@
 DefaultCardFormatter = require '../lib/default_card_formatter'
 {buildField} = require './helpers/builders'
+{type} = require './helpers/typing'
 {expectThatTyping} = require './helpers/expectations'
 
 describe 'DefaultCardFormatter', ->
@@ -39,3 +40,26 @@ describe 'DefaultCardFormatter', ->
   it 'selects past spaces as if they are not there', ->
     expectThatTyping('shift+left').into(field).willChange('4111 |1').to('411<1| 1')
     expectThatTyping('shift+left').into(field).willChange('4111 <1|1').to('411<1 1|1')
+
+  describe 'error checking', ->
+    textFieldDidFailToParseString = null
+
+    beforeEach ->
+      textFieldDidFailToParseString = jasmine.createSpy('textFieldDidFailToParseString')
+      field.setDelegate { textFieldDidFailToParseString }
+
+    it 'fails to parse a number that is too short', ->
+      type('4').into(field)
+      expect(field.value()).toEqual('4')
+      expect(textFieldDidFailToParseString).toHaveBeenCalledWith(field, '4', 'card-formatter.number-too-short')
+
+    it 'successfully parses a number that is the right length and passes the luhn check', ->
+      type('4111 1111 1111 1111'.split('')...).into(field)
+      expect(field.value()).toEqual('4111111111111111')
+      expect(textFieldDidFailToParseString).not.toHaveBeenCalled()
+
+    it 'fails to parse a number that is the right length but fails the luhn check', ->
+      type('4111 1111 1111 1112'.split('')...).into(field)
+      expect(field.value()).toEqual('4111111111111112')
+      expect(textFieldDidFailToParseString).toHaveBeenCalledWith(field, '4111 1111 1111 1112', 'card-formatter.invalid-number')
+

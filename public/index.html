@@ -26,6 +26,11 @@
       top: 23px;
     }
 
+    #card-type {
+      position: relative;
+      top: 20px;
+    }
+
     #ssn {
       width: 120px;
       position: relative;
@@ -224,9 +229,14 @@ field.setFormatter(new FieldKit.ExpiryDateFormatter());</code></pre>
           </div>
         </div>
 
-        <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="card-number" placeholder="1234 5678 9012 3456"&gt;</code></pre>
-        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField($('#card-number'));
-field.setFormatter(new FieldKit.AdaptiveCardFormatter());</code></pre>
+        <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="card-number" placeholder="1234 5678 9012 3456"&gt;
+&lt;div id="card-type"&gt;Card type: &lt;span&gt;unknown&lt;/span&gt;&lt;/div&gt;</code></pre>
+        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.CardTextField($('#card-number'));
+field.setDelegate({
+  textDidChange: function() {
+    $('#card-type span').text(field.cardType() || 'unknown');
+  }
+});</code></pre>
       </div>
     </div>
 
