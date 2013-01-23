@@ -183,7 +183,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     DelimitedTextFormatter.prototype.parse = function(text, error) {
       var char;
       if (!text) {
-        return null;
+        return '';
       }
       return ((function() {
         var _i, _len, _results;
@@ -291,7 +291,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
         return '';
       }
       month = value.month, year = value.year;
-      year = year % 10;
+      year = year % 100;
       return ExpiryDateFormatter.__super__.format.call(this, zpad2(month) + zpad2(year));
     };
 
