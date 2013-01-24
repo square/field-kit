@@ -32,8 +32,8 @@ class AdaptiveCardFormatter
   format: (pan) ->
     @formatter.format pan
 
-  parse: (text) ->
-    @formatter.parse text
+  parse: (text, error) ->
+    @formatter.parse text, error
 
   isChangeValid: (change) ->
     if determineCardType(change.proposed.text.replace(/[^\d]+/g, '')) is AMEX
