@@ -48,6 +48,11 @@
       border: none;
     }
 
+    #form-test input[type=text] {
+      display: inline;
+      margin-right: 20px;
+    }
+
   /* Base class */
   .docs-example {
     position: relative;
@@ -155,7 +160,7 @@
 
         <div class="docs-example">
           <div class="row">
-            <div class="span3"></div>
+            <div class="html span3"></div>
           </div>
         </div>
 
@@ -186,7 +191,7 @@ field.setUnfocusedPlaceholder('First Name');</code></pre>
 
         <div class="docs-example">
           <div class="row">
-            <div class="span3"></div>
+            <div class="html span3"></div>
 
             <div class="span4">
               <pre class="tryout">&ldquo;4&rdquo; &rarr; &ldquo;04/&rdquo;
@@ -219,7 +224,7 @@ field.setFormatter(new FieldKit.ExpiryDateFormatter());</code></pre>
 
         <div class="docs-example">
           <div class="row">
-            <div class="span3"></div>
+            <div class="html span3"></div>
 
             <div class="span4">
               <pre class="tryout">&ldquo;411111111&rdquo; &rarr; &ldquo;4111 1111 1&rdquo;  # visa
@@ -258,7 +263,7 @@ field.setDelegate({
 
         <div class="docs-example">
           <div class="row">
-            <div class="span3"></div>
+            <div class="html span3"></div>
 
             <div class="span4">
               <pre class="tryout">&ldquo;1234&rdquo; &rarr; &ldquo;123-4&rdquo;
@@ -332,7 +337,7 @@ interface Range
 
         <div class="docs-example">
           <div class="row">
-            <div class="span3"></div>
+            <div class="html span3"></div>
 
             <div class="span4">
               <pre class="tryout">&ldquo;Hot tub&rdquo; &rarr; &ldquo;Hot tua&rdquo;
@@ -370,7 +375,7 @@ field.setFormatter({
 
         <div class="docs-example">
           <div class="row">
-            <div class="span3"></div>
+            <div class="html span3"></div>
           </div>
         </div>
 
@@ -397,6 +402,31 @@ field.setFormatter({
     return true;
   }
 });</code></pre>
+      </div>
+    </div>
+
+    <div class="row field-kit-example">
+      <div class="offset2 span8">
+        <h4>Form Interaction</h4>
+
+        <p>
+          FieldKit text fields should behave essentially as expected with
+          regard to forms. Tabbing from one field to the next should work.
+          Pressing ENTER should submit the form. Etc.
+        </p>
+
+        <div class="docs-example">
+          <div class="row">
+            <div class="html span7"></div>
+          </div>
+        </div>
+
+        <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;form id="form-test"&gt;&lt;input type="text" placeholder="first name"&gt;&lt;input type="text" placeholder="last name"&gt;&lt;input type="submit" class="btn btn-primary"&gt;&lt;/form&gt;</code></pre>
+        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var fields = $('#form-test :text').map(function(){ return new FieldKit.TextField($(this)); });
+$('#form-test').submit(function() {
+  alert("Hello, " + fields[0].value() + " " + fields[1].value());
+  return false;
+});
       </div>
     </div>
 

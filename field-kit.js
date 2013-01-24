@@ -1382,10 +1382,12 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
 
     TextField.prototype.keyPress = function(event) {
       var _this = this;
-      event.preventDefault();
-      return this.rollbackInvalidChanges(function() {
-        return _this.insertText(String.fromCharCode(event.charCode));
-      });
+      if (event.keyCode !== KEYS.ENTER) {
+        event.preventDefault();
+        return this.rollbackInvalidChanges(function() {
+          return _this.insertText(String.fromCharCode(event.charCode));
+        });
+      }
     };
 
     TextField.prototype.keyUp = function(event) {
