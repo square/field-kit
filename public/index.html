@@ -421,8 +421,14 @@ field.setFormatter({
           </div>
         </div>
 
-        <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;form id="form-test"&gt;&lt;input type="text" placeholder="first name"&gt;&lt;input type="text" placeholder="last name"&gt;&lt;input type="submit" class="btn btn-primary"&gt;&lt;/form&gt;</code></pre>
-        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var fields = $('#form-test :text').map(function(){ return new FieldKit.TextField($(this)); });
+        <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;form id="form-test"&gt;
+  &lt;input type="text" placeholder="first name"&gt;
+  &lt;input type="text" placeholder="last name"&gt;
+  &lt;input type="submit" class="btn btn-primary"&gt;
+&lt;/form&gt;</code></pre>
+        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var fields = $('#form-test :text').map(function() {
+  return new FieldKit.TextField($(this));
+});
 $('#form-test').submit(function() {
   alert("Hello, " + fields[0].value() + " " + fields[1].value());
   return false;
