@@ -1114,10 +1114,12 @@ class TextField
   #
   # Returns nothing.
   keyPress: (event) =>
-    event.preventDefault()
-
-    @rollbackInvalidChanges =>
-      @insertText String.fromCharCode(event.charCode)
+    # We handle all the keypresses ourselves below EXCEPT enter so that
+    # submitting forms with enter just works.
+    if event.keyCode isnt KEYS.ENTER
+      event.preventDefault()
+      @rollbackInvalidChanges =>
+        @insertText String.fromCharCode(event.charCode)
 
   # Internal: Handles keyup events.
   #
