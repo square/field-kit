@@ -1,4 +1,5 @@
 {buildField} = require './helpers/builders'
+FakeEvent = require './helpers/fake_event'
 {expectThatTyping, expectThatPasting} = require './helpers/expectations'
 {type} = require './helpers/typing'
 PassthroughFormatter = require './helpers/passthrough_formatter'
@@ -156,6 +157,13 @@ describe 'TextField', ->
       expectThatTyping('meta+down').willChange('41|11').to('4111|')
       expectThatTyping('shift+meta+down').willChange('4<1|11').to('4|111>')
       expectThatTyping('shift+meta+down').willChange('41|11').to('41|11>')
+
+  describe 'pressing enter', ->
+    it 'is allowed to use the default action on keyPress so form submission works', ->
+      field = buildField()
+      event = FakeEvent.withKey('enter')
+      field.keyPress(event)
+      expect(event.isDefaultPrevented()).toBeFalsy()
 
   describe 'selecting everything', ->
     ['ctrl', 'meta'].forEach (modifier) ->
