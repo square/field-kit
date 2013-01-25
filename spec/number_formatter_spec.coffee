@@ -71,6 +71,9 @@ describe 'NumberFormatter', ->
     it 'has no number style', ->
       expect(formatter.numberStyle()).toEqual(NumberFormatter.Style.NONE)
 
+    it 'has US-standard symbol for currency', ->
+      expect(formatter.currencySymbol()).toEqual('$')
+
   describe '#numberFromString', ->
     it 'is an alias for #parse', ->
       expect(formatter.numberFromString).toBe(formatter.parse)
@@ -386,6 +389,21 @@ describe 'NumberFormatter', ->
 
         it 'formats using the custom symbol', ->
           expect(formatter.format .2).toEqual('20PER')
+
+    describe 'with the currency style', ->
+      beforeEach ->
+        formatter.setNumberStyle NumberFormatter.Style.CURRENCY
+
+      it 'formats numbers as currencies', ->
+        expect(formatter.format 4.21).toEqual('$4.21')
+        expect(formatter.format -4.21).toEqual('($4.21)')
+
+      describe 'with a custom currency symbol', ->
+        beforeEach ->
+          formatter.setCurrencySymbol 'CUR'
+
+        it 'formats using the custom symbol', ->
+          expect(formatter.format 1.2).toEqual('CUR1.20')
 
     describe 'switching styles', ->
       it 'resets values back to their original defaults', ->

@@ -28,22 +28,23 @@ class NumberFormatter extends Formatter
   _alwaysShowsDecimalSeparator: no
   _groupingSeparator:           ','
   _groupingSize:                3
-  _maximumFractionDigits:       0
-  _minimumFractionDigits:       0
+  _maximumFractionDigits:       null
+  _minimumFractionDigits:       null
   _maximumIntegerDigits:        null
-  _minimumIntegerDigits:        0
+  _minimumIntegerDigits:        null
   _maximum:                     null
   _minimum:                     null
   _multiplier:                  null
   _notANumberSymbol:            'NaN'
   _nullSymbol:                  ''
-  _numberStyle:                 NONE
+  _numberStyle:                 null
   _roundingMode:                HALF_EVEN
   _usesGroupingSeparator:       no
   _zeroSymbol:                  null
 
   constructor: ->
     @_regionDefaults = RegionDefaults.US
+    @setNumberStyle NONE
 
   # Gets whether this formatter will parse float number values. This value does
   # not apply to formatting. To prevent formatting floats, set
@@ -65,6 +66,13 @@ class NumberFormatter extends Formatter
 
   setAlwaysShowsDecimalSeparator: (alwaysShowsDecimalSeparator) ->
     @_alwaysShowsDecimalSeparator = alwaysShowsDecimalSeparator
+    return this
+
+  currencySymbol: ->
+    @_get 'currencySymbol'
+
+  setCurrencySymbol: (currencySymbol) ->
+    @_currencySymbol = currencySymbol
     return this
 
   decimalSeparator: ->
@@ -101,28 +109,28 @@ class NumberFormatter extends Formatter
     return this
 
   maximumFractionDigits: ->
-    @_maximumFractionDigits
+    @_get 'maximumFractionDigits'
 
   setMaximumFractionDigits: (maximumFractionDigits) ->
     @_maximumFractionDigits = maximumFractionDigits
     return this
 
   minimumFractionDigits: ->
-    @_minimumFractionDigits
+    @_get 'minimumFractionDigits'
 
   setMinimumFractionDigits: (minimumFractionDigits) ->
     @_minimumFractionDigits = minimumFractionDigits
     return this
 
   maximumIntegerDigits: ->
-    @_maximumIntegerDigits
+    @_get 'maximumIntegerDigits'
 
   setMaximumIntegerDigits: (maximumIntegerDigits) ->
     @_maximumIntegerDigits = maximumIntegerDigits
     return this
 
   minimumIntegerDigits: ->
-    @_minimumIntegerDigits
+    @_get 'minimumIntegerDigits'
 
   setMinimumIntegerDigits: (minimumIntegerDigits) ->
     @_minimumIntegerDigits = minimumIntegerDigits
@@ -173,8 +181,12 @@ class NumberFormatter extends Formatter
   setNumberStyle: (numberStyle) ->
     @_numberStyle = numberStyle
     switch @_numberStyle
+      when NONE
+        @_styleDefaults = StyleDefaults.NONE
       when PERCENT
         @_styleDefaults = StyleDefaults.PERCENT
+      when CURRENCY
+        @_styleDefaults = StyleDefaults.CURRENCY
       else
         @_styleDefaults = null
     return this
@@ -227,7 +239,7 @@ class NumberFormatter extends Formatter
     @_zeroSymbol = zeroSymbol
 
   _get: (attr) ->
-    @["_#{attr}"] ? @_styleDefaults?[attr]?(this) ? @_regionDefaults?[attr]?(this) ? null
+    @["_#{attr}"] ? @_styleDefaults?[attr]?(this, @_regionDefaults) ? @_regionDefaults?[attr]?(this, @_styleDefaults) ? null
 
   format: (number) ->
     if @_zeroSymbol? and number is 0
@@ -255,26 +267,31 @@ class NumberFormatter extends Formatter
     fractionPart ||= ''
 
     # right-pad fraction zeros up to the minimum length
-    while fractionPart.length < @_minimumFractionDigits
+    minimumFractionDigits = @minimumFractionDigits()
+    while fractionPart.length < minimumFractionDigits
       fractionPart += '0'
 
     # left-pad integer zeros up to the minimum length
-    while integerPart.length < @_minimumIntegerDigits
+    minimumIntegerDigits = @minimumIntegerDigits()
+    while integerPart.length < minimumIntegerDigits
       integerPart = '0' + integerPart
 
     # round fraction part to the maximum length
-    if fractionPart.length > @_maximumFractionDigits
-      extraFractionPart = fractionPart[@_maximumFractionDigits..]
-      fractionPart = fractionPart[0...@_maximumFractionDigits]
+    maximumFractionDigits = @maximumFractionDigits()
+    if fractionPart.length > maximumFractionDigits
+      extraFractionPart = fractionPart[maximumFractionDigits..]
+      fractionPart = fractionPart[0...maximumFractionDigits]
       [integerPart, fractionPart] = @_round negative, integerPart, fractionPart, extraFractionPart
 
     # eat any unneeded trailing zeros
-    while fractionPart.length > @_minimumFractionDigits and fractionPart[-1..-1] is '0'
+    minimumFractionDigits = @minimumFractionDigits()
+    while fractionPart.length > minimumFractionDigits and fractionPart[-1..-1] is '0'
       fractionPart = fractionPart[0...-1]
 
     # left-truncate any integer digits over the maximum length
-    if @_maximumIntegerDigits? and integerPart.length > @_maximumIntegerDigits
-      integerPart = integerPart[-@_maximumIntegerDigits..]
+    maximumIntegerDigits = @maximumIntegerDigits()
+    if maximumIntegerDigits? and integerPart.length > maximumIntegerDigits
+      integerPart = integerPart[-maximumIntegerDigits..]
 
     # add the decimal separator
     if fractionPart.length > 0 or @_alwaysShowsDecimalSeparator
@@ -456,21 +473,42 @@ NumberFormatter.Style = {
 }
 
 StyleDefaults =
+  NONE:
+    minimumFractionDigits: -> 0
+    maximumFractionDigits: -> 0
+    minimumIntegerDigits:  -> 0
   PERCENT:
-    multiplier: -> 100
+    multiplier:            -> 100
+    minimumFractionDigits: -> 0
+    maximumFractionDigits: -> 0
+    minimumIntegerDigits:  -> 0
     positiveSuffix: (formatter) -> formatter.percentSymbol()
     negativeSuffix: (formatter) -> formatter.percentSymbol()
+  CURRENCY:
+    positivePrefix:        (formatter) -> formatter.currencySymbol()
+    negativePrefix:        (formatter, region) -> region?.negativeCurrencyPrefix?(formatter, this)
+    negativeSuffix:        (formatter, region) -> region?.negativeCurrencySuffix?(formatter, this)
+    minimumFractionDigits: (formatter, region) -> region?.minimumCurrencyFractionDigits?(formatter, this)
+    maximumFractionDigits: (formatter, region) -> region?.maximumCurrencyFractionDigits?(formatter, this)
+    minimumIntegerDigits:  (formatter, region) -> region?.minimumCurrencyIntegerDigits?(formatter, this)
+    maximumIntegerDigits:  (formatter, region) -> region?.maximumCurrencyIntegerDigits?(formatter, this)
 
 RegionDefaults =
   US:
-    decimalSeparator:       -> '.'
-    negativeInfinitySymbol: -> '-∞'
-    negativePrefix:         -> '-'
-    negativeSuffix:         -> ''
-    percentSymbol:          -> '%'
-    positiveInfinitySymbol: -> '+∞'
-    positivePrefix:         -> ''
-    positiveSuffix:         -> ''
-
+    decimalSeparator:              -> '.'
+    negativeInfinitySymbol:        -> '-∞'
+    negativePrefix:                -> '-'
+    negativeSuffix:                -> ''
+    percentSymbol:                 -> '%'
+    positiveInfinitySymbol:        -> '+∞'
+    positivePrefix:                -> ''
+    positiveSuffix:                -> ''
+    currencySymbol:                -> '$'
+    positiveCurrencyPrefix:        (formatter) -> formatter.currencySymbol()
+    negativeCurrencyPrefix:        (formatter) -> "(#{formatter.currencySymbol()}"
+    negativeCurrencySuffix:        (formatter) -> ')'
+    minimumCurrencyFractionDigits: -> 2
+    maximumCurrencyFractionDigits: -> 2
+    minimumCurrencyIntegerDigits:  -> 1
 
 module.exports = NumberFormatter
