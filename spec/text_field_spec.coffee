@@ -165,6 +165,25 @@ describe 'TextField', ->
       field.keyPress(event)
       expect(event.isDefaultPrevented()).toBeFalsy()
 
+  describe 'pressing tab', ->
+    it 'is allowed to use the default action on keyPress so tabbing between fields', ->
+      field = buildField()
+      event = FakeEvent.withKey('tab')
+      field.keyPress(event)
+      expect(event.isDefaultPrevented()).toBeFalsy()
+
+  describe 'commands', ->
+    it 'are not prevented', ->
+      field = buildField()
+
+      event = FakeEvent.withKey('meta+r')
+      field.keyPress(event)
+      expect(event.isDefaultPrevented()).toBeFalsy()
+
+      event = FakeEvent.withKey('ctrl+r')
+      field.keyPress(event)
+      expect(event.isDefaultPrevented()).toBeFalsy()
+
   describe 'selecting everything', ->
     ['ctrl', 'meta'].forEach (modifier) ->
       describe "with the #{modifier} key", ->

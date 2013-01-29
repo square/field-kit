@@ -17,6 +17,7 @@ KEYS =
   "⌫":        8
   DELETE:    46
   ENTER:     13
+  TAB:        9
 
   PRINTABLE: [32..126]
 
