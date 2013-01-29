@@ -28,7 +28,8 @@ AFFINITY =
 
 isWordChar = (char) -> char and /^\w$/.test(char)
 
-XPATH_FOCUSABLE_FIELD = '*[name(.)="input" or name(.)="select"][not(type="hidden")][not(contains(@class, "field-kit-text-field-interceptor"))]'
+XPATH_LOWER_CASE = (expr) -> "translate(#{expr}, \"ABCDEFGHIJKLMNOPQRSTUVWXYZ\", \"abcdefghijklmnopqrstuvwxyz\")"
+XPATH_FOCUSABLE_FIELD = """*[#{XPATH_LOWER_CASE 'name(.)'}="input" or #{XPATH_LOWER_CASE 'name(.)'}="select"][not(type="hidden")][not(contains(@class, "field-kit-text-field-interceptor"))]"""
 
 findFieldFollowing = (element) ->
   result = document.evaluate "following::#{XPATH_FOCUSABLE_FIELD}", element, null, XPathResult.ANY_TYPE, null
@@ -1114,9 +1115,9 @@ class TextField
   #
   # Returns nothing.
   keyPress: (event) =>
-    # We handle all the keypresses ourselves below EXCEPT enter so that
-    # submitting forms with enter just works.
-    if event.keyCode isnt KEYS.ENTER
+    # We handle all the keypresses ourselves below EXCEPT enter and tab so that
+    # submitting forms with enter just works and tabbing between fields works.
+    if event.keyCode not in [KEYS.ENTER, KEYS.TAB]
       event.preventDefault()
       @rollbackInvalidChanges =>
         @insertText String.fromCharCode(event.charCode)
