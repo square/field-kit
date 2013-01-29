@@ -1361,7 +1361,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     TextField.prototype.keyPress = function(event) {
       var _ref,
         _this = this;
-      if ((_ref = event.keyCode) !== KEYS.ENTER && _ref !== KEYS.TAB) {
+      if (!event.metaKey && !event.ctrlKey && ((_ref = event.keyCode) !== KEYS.ENTER && _ref !== KEYS.TAB)) {
         event.preventDefault();
         return this.rollbackInvalidChanges(function() {
           return _this.insertText(String.fromCharCode(event.charCode));

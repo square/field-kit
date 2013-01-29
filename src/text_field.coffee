@@ -1115,9 +1115,8 @@ class TextField
   #
   # Returns nothing.
   keyPress: (event) =>
-    # We handle all the keypresses ourselves below EXCEPT enter and tab so that
-    # submitting forms with enter just works and tabbing between fields works.
-    if event.keyCode not in [KEYS.ENTER, KEYS.TAB]
+    # Only handle keypresses that look like insertable text.
+    if not event.metaKey and not event.ctrlKey and event.keyCode not in [KEYS.ENTER, KEYS.TAB]
       event.preventDefault()
       @rollbackInvalidChanges =>
         @insertText String.fromCharCode(event.charCode)
