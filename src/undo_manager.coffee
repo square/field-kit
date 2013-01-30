@@ -1,3 +1,8 @@
+hasGetter = (object, property) ->
+  if object?.constructor?.prototype
+    return yes if Object.getOwnPropertyDescriptor(object.constructor.prototype, property)?.get
+  return Object.getOwnPropertyDescriptor(object, property)?.get?
+
 # UndoManager is a general-purpose recorder of operations for undo and redo.
 #
 # Registering an undo action is done by specifying the changed object, along
@@ -107,8 +112,7 @@ class UndoManager
     proxy = {}
     for selector of target
       # don't trigger anything that has a getter
-      propertyDescriptor = Object.getOwnPropertyDescriptor(target, selector)
-      continue if propertyDescriptor && propertyDescriptor.get
+      continue if hasGetter(target, selector)
       # don't try to proxy properties that aren't functions
       continue if typeof target[selector] isnt 'function'
       # set up a proxy function to register an undo
