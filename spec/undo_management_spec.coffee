@@ -3,6 +3,10 @@ UndoManager = require '../lib/undo_manager'
 class Shoe
   _size: 0
 
+  constructor: ->
+    # This is here so our test can omit getters on the object.
+    @__defineGetter__ 'getterOnObject', -> -> 99
+
   size: ->
     @_size
 
@@ -15,6 +19,9 @@ class Shoe
 
   setUndoManager: (@_undoManager) ->
     @_undoProxy = @_undoManager.proxyFor(this)
+
+  # This is here so our test can omit getters in the prototype.
+  @::__defineGetter__ 'getterOnPrototype', -> -> 42
 
 describe 'UndoManager', ->
   undoManager = null
@@ -92,3 +99,11 @@ describe 'UndoManager', ->
         expect(shoe.size()).toEqual(0)
         undoManager.redo()
         expect(shoe.size()).toEqual(20)
+
+  describe '#proxyFor', ->
+    it 'proxies all properties that are not functions or getters', ->
+      proxy = undoManager.proxyFor(shoe)
+      expect(proxy.size).toBeDefined()
+      expect(proxy.setSize).toBeDefined()
+      expect(proxy.getterOnPrototype).not.toBeDefined()
+      expect(proxy.getterOnObject).not.toBeDefined()
