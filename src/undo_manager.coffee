@@ -107,7 +107,8 @@ class UndoManager
     proxy = {}
     for selector of target
       # don't trigger anything that has a getter
-      continue if target.__lookupGetter__(selector)
+      propertyDescriptor = Object.getOwnPropertyDescriptor(target, selector)
+      continue if propertyDescriptor && propertyDescriptor.get
       # don't try to proxy properties that aren't functions
       continue if typeof target[selector] isnt 'function'
       # set up a proxy function to register an undo
