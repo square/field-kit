@@ -16,6 +16,10 @@ describe 'TextField', ->
         expectThatTyping('backspace').willChange('12<34|5').to('12|5')
         expectThatTyping('backspace').willChange('12|34>5').to('12|5')
 
+        expectThatTyping('shift+backspace').willChange('12|34|5').to('12|5')
+        expectThatTyping('shift+backspace').willChange('12<34|5').to('12|5')
+        expectThatTyping('shift+backspace').willChange('12|34>5').to('12|5')
+
         expectThatTyping('alt+backspace').willChange('12|3 4|5').to('12|5')
         expectThatTyping('alt+backspace').willChange('12<3 4|5').to('12|5')
         expectThatTyping('alt+backspace').willChange('12|3 4>5').to('12|5')

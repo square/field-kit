@@ -1083,7 +1083,7 @@ class TextField
       # ⌫
       else if keyCode is KEYS.BACKSPACE
         switch modifiers
-          when ''
+          when '', 'shift'
             @deleteBackward event
           when 'alt', 'alt+shift'
             @deleteWordBackward event
