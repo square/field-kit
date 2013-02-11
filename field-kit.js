@@ -1322,6 +1322,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
         } else if (keyCode === KEYS.BACKSPACE) {
           switch (modifiers) {
             case '':
+            case 'shift':
               _this.deleteBackward(event);
               break;
             case 'alt':
