@@ -9,16 +9,19 @@ class AdaptiveCardFormatter
     @formatter = @defaultCardFormatter
 
   format: (pan) ->
-    @formatter.format pan
+    @_formatterForPan(pan).format pan
 
   parse: (text, error) ->
     @formatter.parse text, error
 
   isChangeValid: (change) ->
-    if determineCardType(change.proposed.text.replace(/[^\d]+/g, '')) is AMEX
-      @formatter = @amexCardFormatter
-    else
-      @formatter = @defaultCardFormatter
+    @formatter = @_formatterForPan(change.proposed.text)
     @formatter.isChangeValid(change)
+
+  _formatterForPan: (pan) ->
+    if determineCardType(pan.replace(/[^\d]+/g, '')) is AMEX
+      @amexCardFormatter
+    else
+      @defaultCardFormatter
 
 module.exports = AdaptiveCardFormatter

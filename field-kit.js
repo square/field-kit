@@ -19,7 +19,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     }
 
     AdaptiveCardFormatter.prototype.format = function(pan) {
-      return this.formatter.format(pan);
+      return this._formatterForPan(pan).format(pan);
     };
 
     AdaptiveCardFormatter.prototype.parse = function(text, error) {
@@ -27,12 +27,16 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     };
 
     AdaptiveCardFormatter.prototype.isChangeValid = function(change) {
-      if (determineCardType(change.proposed.text.replace(/[^\d]+/g, '')) === AMEX) {
-        this.formatter = this.amexCardFormatter;
-      } else {
-        this.formatter = this.defaultCardFormatter;
-      }
+      this.formatter = this._formatterForPan(change.proposed.text);
       return this.formatter.isChangeValid(change);
+    };
+
+    AdaptiveCardFormatter.prototype._formatterForPan = function(pan) {
+      if (determineCardType(pan.replace(/[^\d]+/g, '')) === AMEX) {
+        return this.amexCardFormatter;
+      } else {
+        return this.defaultCardFormatter;
+      }
     };
 
     return AdaptiveCardFormatter;
