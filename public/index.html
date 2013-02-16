@@ -210,16 +210,17 @@ field.setFormatter(new FieldKit.ExpiryDateFormatter());</code></pre>
 
     <div class="row">
       <div class="offset2 span8">
-        <h3>AdaptiveCardFormatter</h3>
+        <h3>CardTextField / AdaptiveCardFormatter</h3>
       </div>
     </div>
 
     <div class="row field-kit-example">
       <div class="offset2 span8">
         <p>
-          The <code>AdaptiveCardFormatter</code> provides formatting for credit card
-          PANs, preventing the input of non-digit characters and automatically breaking
-          into digit groups according to the rules for the entered card type.
+          The <code>CardTextField</code> and <code>AdaptiveCardFormatter</code>
+          provide formatting for credit card PANs, preventing the input of
+          non-digit characters and automatically breaking into digit groups
+          according to the rules for the entered card type.
         </p>
 
         <div class="docs-example">
@@ -237,6 +238,7 @@ field.setFormatter(new FieldKit.ExpiryDateFormatter());</code></pre>
         <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="card-number" placeholder="1234 5678 9012 3456"&gt;
 &lt;div id="card-type"&gt;Card type: &lt;span&gt;unknown&lt;/span&gt;&lt;/div&gt;</code></pre>
         <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.CardTextField($('#card-number'));
+field.setCardMaskStrategy(FieldKit.CardTextField.CardMaskStrategy.DoneEditing);
 field.setDelegate({
   textDidChange: function() {
     $('#card-type span').text(field.cardType() || 'unknown');

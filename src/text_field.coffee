@@ -144,7 +144,39 @@ class TextField
     @setSelectedRange range
 
   insertNewline: (event) ->
+    @_textFieldDidEndEditing()
+    @_didEndEditingButKeptFocus = yes
+
+  # Internal: Performs actions necessary for ending editing.
+  #
+  # Returns nothing.
+  _textFieldDidEndEditing: ->
+    @textFieldDidEndEditing()
     @_delegate?.textFieldDidEndEditing?(this)
+
+  # Internal: Called when the user has in some way declared that they are done
+  # editing, such as leaving the field or perhaps pressing enter.
+  #
+  # Can be used in subclasses to perform actions suitable for this event.
+  #
+  # Returns nothing.
+  textFieldDidEndEditing: ->
+
+  # Internal: Performs actions necessary for beginning editing.
+  #
+  # Returns nothing.
+  _textFieldDidBeginEditing: ->
+    @textFieldDidBeginEditing()
+    @_delegate?.textFieldDidBeginEditing?(this)
+
+  # Internal: Called when the user has in some way declared that they are
+  # starting editing, such as entering the field or perhaps a key after
+  # pressing enter.
+  #
+  # Can be used in subclasses to perform actions suitable for this event.
+  #
+  # Returns nothing.
+  textFieldDidBeginEditing: ->
 
   # Moves the cursor up, which because this is a single-line text field, means
   # moving to the beginning of the value.
@@ -1001,6 +1033,10 @@ class TextField
     modifiers.push 'shift' if shiftKey
     modifiers = modifiers.join '+'
 
+    if @_didEndEditingButKeptFocus
+      @_textFieldDidBeginEditing()
+      @_didEndEditingButKeptFocus = no
+
     if keyCode is KEYS.Z and modifiers in ['meta', 'ctrl']
       @undoManager().undo() if @undoManager().canUndo()
       event.preventDefault()
@@ -1193,14 +1229,14 @@ class TextField
   #
   # Returns an Object containing the parsed value of the field.
   value: ->
-    value = @element.val()
+    value = @text()
     return value unless @_formatter
     @_formatter.parse value, (errorType) => @_delegate?.textFieldDidFailToParseString?(this, value, errorType)
 
   # Sets the object value of the field.
   setValue: (value) ->
     value = @_formatter.format(value) if @_formatter
-    @element.val "#{value}"
+    @setText "#{value}"
     @element.trigger 'change'
 
   # Gets the current formatter. Formatters are used to translate between #text
@@ -1311,11 +1347,14 @@ class TextField
     @element.get(0).ownerDocument.activeElement is @element.get(0)
 
   _focus: (event) =>
+    @_textFieldDidBeginEditing()
     @_syncPlaceholder()
 
   _blur: (event) =>
-    @_delegate?.textFieldDidEndEditing?(this)
+    @_textFieldDidEndEditing()
     @_syncPlaceholder()
+
+  _didEndEditingButKeptFocus: no
 
   # Removes focus from this field if it has focus.
   #
@@ -1383,7 +1422,7 @@ class TextField
   ##
 
   inspect: ->
-    "#<TextField text=#{@text()}>"
+    "#<TextField text=\"#{@text()}\">"
 
 
 class TextFieldStateChange

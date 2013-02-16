@@ -362,6 +362,7 @@ describe 'TextField', ->
     beforeEach ->
       field = buildField()
       field.setDelegate
+        textFieldDidBeginEditing: jasmine.createSpy('delegate.textFieldDidBeginEditing')
         textFieldDidEndEditing: jasmine.createSpy('delegate.textFieldDidEndEditing')
         textDidChange: jasmine.createSpy('delegate.textDidChange')
       expect(field.delegate().textFieldDidEndEditing).not.toHaveBeenCalled()
@@ -388,3 +389,18 @@ describe 'TextField', ->
     it 'does not call the delegate method for ending editing on a change', ->
       type('a').into(field)
       expect(field.delegate().textFieldDidEndEditing).not.toHaveBeenCalled()
+
+    it 'calls the delegate method for beginning editing on focus', ->
+      field.becomeFirstResponder()
+      expect(field.delegate().textFieldDidBeginEditing).toHaveBeenCalledWith(field)
+
+    it 'calls the delegate method for beginning editing on keydown after pressing enter', ->
+      field.becomeFirstResponder()
+      field.delegate().textFieldDidBeginEditing.reset()
+
+      expect(field.delegate().textFieldDidEndEditing).not.toHaveBeenCalled()
+      type('enter').into(field)
+      expect(field.delegate().textFieldDidEndEditing).toHaveBeenCalledWith(field)
+
+      type('a').into(field)
+      expect(field.delegate().textFieldDidBeginEditing).toHaveBeenCalledWith(field)

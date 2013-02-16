@@ -1,9 +1,12 @@
 AdaptiveCardFormatter = require '../lib/adaptive_card_formatter'
-CardTextField = require '../lib/card_text_field'
-{buildField} = require './helpers/builders'
+CardTextField         = require '../lib/card_text_field'
+{buildField}          = require './helpers/builders'
+{type}                = require './helpers/typing'
+{expectThatTyping}    = require './helpers/expectations'
 
 describe 'CardTextField', ->
   textField = null
+  visa = '4111 1111 1111 1111'
 
   beforeEach ->
     textField = buildField CardTextField
@@ -27,3 +30,46 @@ describe 'CardTextField', ->
     it 'is AMEX when the card number matches', ->
       textField.setValue('34')
       expect(textField.cardType()).toEqual('amex')
+
+  describe '#cardMaskStrategy', ->
+    describe 'when set to None (the default)', ->
+      beforeEach ->
+        textField.setCardMaskStrategy(CardTextField.CardMaskStrategy.None)
+
+      it 'does not change the displayed card number on end editing', ->
+        type(visa.split('')...).into(textField)
+        textField.textFieldDidEndEditing()
+        expect(textField.element.val()).toEqual(visa)
+
+    describe 'when set to DoneEditing', ->
+      beforeEach ->
+        textField.setCardMaskStrategy(CardTextField.CardMaskStrategy.DoneEditing)
+        type(visa.split('')...).into(textField)
+
+      it 'does not change the displayed card number while typing', ->
+        expect(textField.element.val()).toEqual(visa)
+
+      it 'masks the displayed card number on end editing', ->
+        textField.textFieldDidEndEditing()
+        expect(textField.element.val()).toEqual('•••• •••• •••• 1111')
+
+      it 'does not change the selected range on end editing', ->
+        expectThatTyping('enter').into(textField).willChange("|#{visa}>").to('|•••• •••• •••• 1111>')
+
+      it 'restores the original value on beginning editing', ->
+        textField.textFieldDidEndEditing()
+        textField.textFieldDidBeginEditing()
+        expect(textField.element.val()).toEqual(visa)
+
+      # it 'restores the original value when disabling masking', ->
+      #   textField.textFieldDidEndEditing()
+      #   textField.setCardMaskStrategy(CardTextField.CardMaskStrategy.None)
+      #   expect(textField.element.val()).toEqual(visa)
+
+      # it 'masks the value when enabling masking', ->
+      #   textField.textFieldDidEndEditing()
+      #   textField.setCardMaskStrategy(CardTextField.CardMaskStrategy.None)
+      #   console.log _masked: textField._masked, _unmaskedText: textField._unmaskedText
+      #   textField.setCardMaskStrategy(CardTextField.CardMaskStrategy.DoneEditing)
+      #   console.log _masked: textField._masked, _unmaskedText: textField._unmaskedText
+      #   expect(textField.element.val()).toEqual('•••• •••• •••• 1111')
