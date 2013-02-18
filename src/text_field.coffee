@@ -28,24 +28,6 @@ AFFINITY =
 
 isWordChar = (char) -> char and /^\w$/.test(char)
 
-XPATH_LOWER_CASE = (expr) -> "translate(#{expr}, \"ABCDEFGHIJKLMNOPQRSTUVWXYZ\", \"abcdefghijklmnopqrstuvwxyz\")"
-XPATH_FOCUSABLE_FIELD = """*[#{XPATH_LOWER_CASE 'name(.)'}="input" or #{XPATH_LOWER_CASE 'name(.)'}="select"][not(type="hidden")][not(contains(@class, "field-kit-text-field-interceptor"))]"""
-
-findFieldFollowing = (element) ->
-  result = document.evaluate "following::#{XPATH_FOCUSABLE_FIELD}", element, null, XPathResult.ANY_TYPE, null
-  return result.iterateNext()
-
-findFieldPreceding = (element) ->
-  result = document.evaluate "preceding::#{XPATH_FOCUSABLE_FIELD}", element, null, XPathResult.ANY_TYPE, null
-  return result.iterateNext()
-
-makeFirstResponder = (field, event) ->
-  if textField = field.data('field-kit-text-field')
-    textField.becomeFirstResponder event
-  else
-    field.focus?()
-    field.select?()
-
 class TextField
   # Internal: Contains one of the AFFINITY enum to indicate the preferred
   # direction of selection.
@@ -78,56 +60,6 @@ class TextField
     @element.on 'focus', @_focus
     @element.on 'blur', @_blur
     @element.data 'field-kit-text-field', this
-    @createTabInterceptors()
-
-  # Internal: Creates phantom input elements that intercept tab / shift+tab
-  # navigation so we can handle them appropriately.
-  createTabInterceptors: ->
-    input = @element.get(0)
-
-    createInterceptor = ->
-      interceptor = input.ownerDocument.createElement 'input'
-      interceptor.style.position = 'absolute'
-      interceptor.style.top = '0'
-      interceptor.style.left = '0'
-      interceptor.style.opacity = 0
-      interceptor.style.zIndex = -9999
-      interceptor.style.pointerEvents = 'none'
-      interceptor.className = 'field-kit-text-field-interceptor'
-      interceptor
-
-    beforeInterceptor = createInterceptor()
-    beforeInterceptor.onkeyup = @beforeInterceptorKeyUp
-    input.parentNode.insertBefore beforeInterceptor, input
-
-    afterInterceptor = createInterceptor()
-    afterInterceptor.onkeyup = @afterInterceptorKeyUp
-    if input.nextSibling
-      input.parentNode.insertBefore afterInterceptor, input.nextSibling
-    else
-      input.parentNode.appendChild afterInterceptor
-
-  # Internal: Handles keyup events in the input that intercepts tab-induced
-  # focus events before this one.
-  #
-  # TODO: Test this somehow.
-  #
-  # Returns nothing.
-  beforeInterceptorKeyUp: (event) =>
-    if event.keyCode is KEYS.TAB and event.shiftKey
-      if previousField = findFieldPreceding event.target
-        makeFirstResponder @_jQuery(previousField)
-
-  # Internal: Handles keyup events in the input that intercepts tab-induced
-  # focus events after this one.
-  #
-  # TODO: Test this somehow.
-  #
-  # Returns nothing.
-  afterInterceptorKeyUp: (event) =>
-    if event.keyCode is KEYS.TAB and not event.shiftKey
-      if nextField = findFieldFollowing event.target
-        makeFirstResponder @_jQuery(nextField)
 
   # Handles a key event that is trying to insert a character.
   #
