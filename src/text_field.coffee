@@ -1115,20 +1115,21 @@ class TextField
     change    = TextFieldStateChange.build this, -> result = callback()
     error     = (type) -> errorType = type
 
-    if typeof @formatter()?.isChangeValid is 'function'
-      if @formatter().isChangeValid(change, error)
-        change.recomputeDiff()
-        @setText change.proposed.text
-        @setSelectedRange change.proposed.selectedRange
-      else
-        @delegate()?.textFieldDidFailToValidateChange?(this, change, errorType)
-        @setText change.current.text
-        @setSelectedRange change.current.selectedRange
-        return result # change is rejected, don't do undo processing
+    if change.hasChanges()
+      if typeof @formatter()?.isChangeValid is 'function'
+        if @formatter().isChangeValid(change, error)
+          change.recomputeDiff()
+          @setText change.proposed.text
+          @setSelectedRange change.proposed.selectedRange
+        else
+          @delegate()?.textFieldDidFailToValidateChange?(this, change, errorType)
+          @setText change.current.text
+          @setSelectedRange change.current.selectedRange
+          return result # change is rejected, don't do undo processing
 
-    if change.inserted.text.length or change.deleted.text.length
-      @undoManager().proxyFor(this)._applyChangeFromUndoManager(change)
-      @delegate()?.textDidChange?(this)
+      if change.inserted.text.length or change.deleted.text.length
+        @undoManager().proxyFor(this)._applyChangeFromUndoManager(change)
+        @delegate()?.textDidChange?(this)
 
     return result
 
@@ -1371,6 +1372,12 @@ class TextFieldStateChange
     change.proposed = text: field.text(), selectedRange: field.selectedRange()
     change.recomputeDiff()
     return change
+
+  hasChanges: ->
+    @recomputeDiff()
+    @current.text isnt @proposed.text or
+      @current.selectedRange.start isnt @proposed.selectedRange.start or
+      @current.selectedRange.length isnt @proposed.selectedRange.length
 
   recomputeDiff: ->
     if @proposed.text isnt @current.text
