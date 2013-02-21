@@ -17,7 +17,7 @@ describe 'DelimitedTextFormatter', ->
     expectThatTyping('1').into(field).willChange('41|').to('411-|')
 
   it 'groups digits into four groups of four separated by spaces', ->
-    expectThatTyping('abcdef'.split('')...).into(field).willChange('|').to('abc-def-|')
+    expectThatTyping('abcdef').into(field).willChange('|').to('abc-def-|')
 
   it 'backspaces both the space and the character before it', ->
     expectThatTyping('backspace').into(field).willChange('411-|').to('41|')

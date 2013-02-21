@@ -9,8 +9,7 @@ class Type
     return this
 
   perform: ->
-    for key in @keys
-      event = FakeEvent.withKey(key)
+    for event in FakeEvent.eventsForKeys(@keys...)
       event.type = 'keydown'
       @field.keyDown event
       if not event.isDefaultPrevented()

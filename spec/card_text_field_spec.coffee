@@ -37,14 +37,14 @@ describe 'CardTextField', ->
         textField.setCardMaskStrategy(CardTextField.CardMaskStrategy.None)
 
       it 'does not change the displayed card number on end editing', ->
-        type(visa.split('')...).into(textField)
+        type(visa).into(textField)
         textField.textFieldDidEndEditing()
         expect(textField.element.val()).toEqual(visa)
 
     describe 'when set to DoneEditing', ->
       beforeEach ->
         textField.setCardMaskStrategy(CardTextField.CardMaskStrategy.DoneEditing)
-        type(visa.split('')...).into(textField)
+        type(visa).into(textField)
 
       it 'does not change the displayed card number while typing', ->
         expect(textField.element.val()).toEqual(visa)
