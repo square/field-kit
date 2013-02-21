@@ -403,6 +403,15 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
           range.length--;
         }
       }
+      if (this.hasDelimiterAtIndex(0) && range.start === 1) {
+        if (startMovedLeft) {
+          range.start--;
+          range.length++;
+        } else {
+          range.start++;
+          range.length--;
+        }
+      }
       if (hasSelection) {
         if (this.hasDelimiterAtIndex(range.start + range.length - 1)) {
           if (startMovedLeft || endMovedLeft) {
