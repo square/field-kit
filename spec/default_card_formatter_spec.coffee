@@ -14,7 +14,7 @@ describe 'DefaultCardFormatter', ->
     expectThatTyping('1').into(field).willChange('411|').to('4111 |')
 
   it 'groups digits into four groups of four separated by spaces', ->
-    expectThatTyping('4111111111111111'.split('')...).into(field).willChange('|').to('4111 1111 1111 1111|')
+    expectThatTyping('4111111111111111').into(field).willChange('|').to('4111 1111 1111 1111|')
 
   it 'prevents entering more digits than are allowed', ->
     expectThatTyping('1').into(field).willNotChange('4111 1111 1111 1111|')
@@ -54,12 +54,12 @@ describe 'DefaultCardFormatter', ->
       expect(textFieldDidFailToParseString).toHaveBeenCalledWith(field, '4', 'card-formatter.number-too-short')
 
     it 'successfully parses a number that is the right length and passes the luhn check', ->
-      type('4111 1111 1111 1111'.split('')...).into(field)
+      type('4111 1111 1111 1111').into(field)
       expect(field.value()).toEqual('4111111111111111')
       expect(textFieldDidFailToParseString).not.toHaveBeenCalled()
 
     it 'fails to parse a number that is the right length but fails the luhn check', ->
-      type('4111 1111 1111 1112'.split('')...).into(field)
+      type('4111 1111 1111 1112').into(field)
       expect(field.value()).toEqual('4111111111111112')
       expect(textFieldDidFailToParseString).toHaveBeenCalledWith(field, '4111 1111 1111 1112', 'card-formatter.invalid-number')
 

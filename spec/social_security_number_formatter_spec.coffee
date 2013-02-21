@@ -10,7 +10,7 @@ describe 'SocialSecurityNumberFormatter', ->
     field.setFormatter new SocialSecurityNumberFormatter()
 
   it 'places dashes in the right places', ->
-    expectThatTyping('123456789'.split('')...).into(field).willChange('|').to('123-45-6789|')
+    expectThatTyping('123456789').into(field).willChange('|').to('123-45-6789|')
 
   it 'prevents extra digits from being entered', ->
     expectThatTyping('0').into(field).willNotChange('123-45-6789|')

@@ -6,20 +6,22 @@ KEYS =
   ZERO:      48
   NINE:      57
   LEFT:      37
-  "←":       37
   RIGHT:     39
-  "→":       39
   UP:        38
-  "↑":       38
   DOWN:      40
-  "↓":       40
   BACKSPACE:  8
-  "⌫":        8
   DELETE:    46
   ENTER:     13
   TAB:        9
 
   PRINTABLE: [32..126]
+
+MODIFIERS = [
+  'meta'
+  'alt'
+  'shift'
+  'ctrl'
+]
 
 class FakeEvent
   keyCode: 0
@@ -46,6 +48,40 @@ class FakeEvent
   @::__defineSetter__ 'charCode', (charCode) ->
     @_charCode = charCode
 
+  @eventsForKeys: (keys...) ->
+    events = []
+    for key in keys
+      if event = @withKey key
+        events.push(event)
+      else
+        events.push(@eventsForKeys(key.split('')...)...)
+    return events
+
+  @withKey: (key) ->
+    event = @withSimpleKey key
+    return event if event?
+
+    # try to parse it as e.g. ctrl+shift+a
+    [modifiers..., key] = key.split('+')
+    modifiersAreReal = yes
+    modifiersAreReal &&= modifier in MODIFIERS for modifier in modifiers
+
+    if modifiersAreReal
+      event = @withSimpleKey key
+
+    # return early if we can't parse it
+    return null unless modifiersAreReal and event?
+
+    for modifier in modifiers
+      event["#{modifier}Key"] = yes
+    return event
+
+  @withSimpleKey: (key) ->
+    if key.length is 1
+      @withKeyCode(key.charCodeAt(0))
+    else if key.toUpperCase() of KEYS
+      @withKeyCode(KEYS[key.toUpperCase()])
+
   @withKeyCode: (keyCode) ->
     event = new @()
     charCode = keyCode
@@ -58,26 +94,6 @@ class FakeEvent
 
     event.keyCode = keyCode
     event.charCode = charCode
-    return event
-
-  @withKey: (character) ->
-    event = new @()
-    modifiers = []
-
-    if character.length > 1
-      modifiers = character.split('+')
-      character = modifiers.pop()
-
-    if character.length > 1
-      keyCode = KEYS[character.toUpperCase()]
-    else
-      keyCode = character.charCodeAt(0)
-
-    event = @withKeyCode keyCode
-
-    for modifier in modifiers
-      event["#{modifier}Key"] = yes
-
     return event
 
   @pasteEventWithData: (data) ->
