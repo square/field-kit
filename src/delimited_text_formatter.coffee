@@ -49,6 +49,14 @@ class DelimitedTextFormatter extends Formatter
         range.start++
         range.length--
 
+    if @hasDelimiterAtIndex(0) and range.start == 1
+      if startMovedLeft
+        range.start--
+        range.length++
+      else
+        range.start++
+        range.length--
+
     if hasSelection
       if @hasDelimiterAtIndex range.start + range.length - 1
         if startMovedLeft or endMovedLeft
