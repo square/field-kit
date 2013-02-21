@@ -386,6 +386,30 @@ describe 'TextField', ->
       type('a').into(field)
       expect(field.delegate().textDidChange).toHaveBeenCalledWith(field)
 
+    it 'calls the delegate method for text change when a change is undone by the user', ->
+      type('a').into(field)
+      field.delegate().textDidChange.reset()
+      type('meta+z').into(field)
+      expect(field.delegate().textDidChange).toHaveBeenCalledWith(field)
+
+    it 'calls the delegate method for text change when a change is redone by the user', ->
+      type('a', 'meta+z').into(field)
+      field.delegate().textDidChange.reset()
+      type('meta+shift+z').into(field)
+      expect(field.delegate().textDidChange).toHaveBeenCalledWith(field)
+
+    it 'calls the delegate method for text change when a change is undone manually', ->
+      type('a').into(field)
+      field.delegate().textDidChange.reset()
+      field.undoManager().undo()
+      expect(field.delegate().textDidChange).toHaveBeenCalledWith(field)
+
+    it 'calls the delegate method for text change when a change is redone manually', ->
+      type('a', 'meta+z').into(field)
+      field.delegate().textDidChange.reset()
+      field.undoManager().redo()
+      expect(field.delegate().textDidChange).toHaveBeenCalledWith(field)
+
     it 'does not call the delegate method for ending editing on a change', ->
       type('a').into(field)
       expect(field.delegate().textFieldDidEndEditing).not.toHaveBeenCalled()

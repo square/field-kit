@@ -760,6 +760,14 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       return this._didEndEditingButKeptFocus = true;
     };
 
+    TextField.prototype._textDidChange = function() {
+      var _ref;
+      this.textDidChange();
+      return (_ref = this._delegate) != null ? typeof _ref.textDidChange === "function" ? _ref.textDidChange(this) : void 0 : void 0;
+    };
+
+    TextField.prototype.textDidChange = function() {};
+
     TextField.prototype._textFieldDidEndEditing = function() {
       var _ref;
       this.textFieldDidEndEditing();
@@ -1405,7 +1413,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     };
 
     TextField.prototype.rollbackInvalidChanges = function(callback) {
-      var change, error, errorType, result, _ref, _ref1, _ref2;
+      var change, error, errorType, result, _ref, _ref1;
       result = null;
       errorType = null;
       change = TextFieldStateChange.build(this, function() {
@@ -1433,11 +1441,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
         }
         if (change.inserted.text.length || change.deleted.text.length) {
           this.undoManager().proxyFor(this)._applyChangeFromUndoManager(change);
-          if ((_ref2 = this.delegate()) != null) {
-            if (typeof _ref2.textDidChange === "function") {
-              _ref2.textDidChange(this);
-            }
-          }
+          this._textDidChange();
         }
       }
       return result;
@@ -1553,11 +1557,12 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       this.undoManager().proxyFor(this)._applyChangeFromUndoManager(change);
       if (this.undoManager().isUndoing()) {
         this.setText(change.current.text);
-        return this.setSelectedRange(change.current.selectedRange);
+        this.setSelectedRange(change.current.selectedRange);
       } else {
         this.setText(change.proposed.text);
-        return this.setSelectedRange(change.proposed.selectedRange);
+        this.setSelectedRange(change.proposed.selectedRange);
       }
+      return this._textDidChange();
     };
 
     TextField.prototype._enabled = true;
