@@ -79,6 +79,20 @@ class TextField
     @_textFieldDidEndEditing()
     @_didEndEditingButKeptFocus = yes
 
+  # Internal: Performs actions necessary for text change.
+  #
+  # Returns nothing.
+  _textDidChange: ->
+    @textDidChange()
+    @_delegate?.textDidChange?(this)
+
+  # Internal: Called when the user has changed the text of the field.
+  #
+  # Can be used in subclasses to perform actions suitable for this event.
+  #
+  # Returns nothing.
+  textDidChange: ->
+
   # Internal: Performs actions necessary for ending editing.
   #
   # Returns nothing.
@@ -1129,7 +1143,7 @@ class TextField
 
       if change.inserted.text.length or change.deleted.text.length
         @undoManager().proxyFor(this)._applyChangeFromUndoManager(change)
-        @delegate()?.textDidChange?(this)
+        @_textDidChange()
 
     return result
 
@@ -1258,6 +1272,8 @@ class TextField
     else
       @setText change.proposed.text
       @setSelectedRange change.proposed.selectedRange
+
+    @_textDidChange()
 
   ##
   ## Enabled/disabled support
