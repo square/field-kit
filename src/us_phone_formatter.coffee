@@ -8,6 +8,8 @@ class UsPhoneFormatter extends DelimitedTextFormatter
     5: ' '
     9: '-'
 
+  maximumLength: 10 + 4
+
   isDelimiter: (char) ->
     char in for index, delimiter of @delimiterHash
       delimiter
@@ -19,5 +21,11 @@ class UsPhoneFormatter extends DelimitedTextFormatter
 
   hasDelimiterAtIndex: (index) ->
     !!@delimiterAt(index)
+
+  isChangeValid: (change, error) ->
+    if /^\d*$/.test change.inserted.text
+      super change, error
+    else
+      return no
 
 module.exports = UsPhoneFormatter
