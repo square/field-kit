@@ -48,3 +48,9 @@ describe 'UsPhoneFormatter', ->
     expectThatTyping('(').into(field).willNotChange('(|')
     expectThatTyping(' ').into(field).willNotChange('(123) |')
     expectThatTyping('-').into(field).willNotChange('(123) 456-|')
+
+  it 'only allows digits', ->
+    expectThatTyping('a').into(field).willNotChange('|')
+
+  it 'does not allow more than 10 digits', ->
+    expectThatTyping('3').into(field).willNotChange('(415) 555-1212|')

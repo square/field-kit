@@ -1978,6 +1978,8 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       9: '-'
     };
 
+    UsPhoneFormatter.prototype.maximumLength = 10 + 4;
+
     UsPhoneFormatter.prototype.isDelimiter = function(char) {
       var delimiter, index;
       return __indexOf.call((function() {
@@ -2000,6 +2002,14 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
 
     UsPhoneFormatter.prototype.hasDelimiterAtIndex = function(index) {
       return !!this.delimiterAt(index);
+    };
+
+    UsPhoneFormatter.prototype.isChangeValid = function(change, error) {
+      if (/^\d*$/.test(change.inserted.text)) {
+        return UsPhoneFormatter.__super__.isChangeValid.call(this, change, error);
+      } else {
+        return false;
+      }
     };
 
     return UsPhoneFormatter;
