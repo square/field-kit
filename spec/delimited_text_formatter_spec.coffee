@@ -2,16 +2,20 @@ DelimitedTextFormatter = require '../lib/delimited_text_formatter'
 {buildField} = require './helpers/builders'
 {expectThatTyping} = require './helpers/expectations'
 
-class TestDelimiter extends DelimitedTextFormatter
+class LeadingDelimiterFormatter extends DelimitedTextFormatter
   hasDelimiterAtIndex: (index) ->
-    (index) % 4 is 0 # 0, 4, 8, 12, …
+    index % 4 is 0 # 0, 4, 8, 12, …
 
-describe 'DelimitedTextFormatter', ->
+class ConsecutiveDelimiterFormatter extends DelimitedTextFormatter
+  hasDelimiterAtIndex: (index) ->
+    index in [0,2,3,6,7]
+
+describe 'LeadingDelimiterFormatter', ->
   field = null
 
   beforeEach ->
     field = buildField()
-    field.setFormatter new TestDelimiter('-')
+    field.setFormatter new LeadingDelimiterFormatter('-')
 
   it 'adds a delimiter before the first character', ->
     expectThatTyping('1').into(field).willChange('|').to('-1|')
@@ -44,7 +48,23 @@ describe 'DelimitedTextFormatter', ->
 
   it 'selects past delimiters as if they are not there', ->
     expectThatTyping('shift+left').into(field).willChange('-411-|1').to('-41<1|-1')
+    expectThatTyping('shift+right').into(field).willChange('-411|-1').to('-411-|1>')
     expectThatTyping('shift+left').into(field).willChange('-411-<1|1').to('-41<1-1|1')
 
   it 'prevents entering the delimiter character', ->
     expectThatTyping('-').into(field).willNotChange('-123-456-|')
+
+describe 'ConsecutiveDelimiterFormatter', ->
+  field = null
+
+  beforeEach ->
+    field = buildField()
+    field.setFormatter new ConsecutiveDelimiterFormatter('-')
+
+  it 'adds consecutive delimiters where needed', ->
+    expectThatTyping('3').into(field).willChange('|').to('-3--|')
+    expectThatTyping('3').into(field).willChange('-1--2|').to('-1--23--|')
+
+  it 'backspaces character and all consecutive delimiters', ->
+    expectThatTyping('backspace').into(field).willChange('-3--|').to('|')
+    expectThatTyping('backspace').into(field).willChange('-1--23--|').to('-1--2|')
