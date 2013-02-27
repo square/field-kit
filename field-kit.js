@@ -797,7 +797,6 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       this.element.on('paste', this.paste);
       this.element.on('focus', this._focus);
       this.element.on('blur', this._blur);
-      this.element.data('field-kit-text-field', this);
     }
 
     TextField.prototype.insertText = function(text) {
