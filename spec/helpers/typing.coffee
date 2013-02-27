@@ -16,8 +16,8 @@ class Type
         event.type = 'keypress'
         if event.charCode
           @field.keyPress event
-        event.type = 'keyup'
-        @field.keyUp event
+      event.type = 'keyup'
+      @field.keyUp event
 
 type = (keys...) ->
   new Type(keys...)
