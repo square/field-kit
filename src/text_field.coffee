@@ -59,7 +59,6 @@ class TextField
     @element.on 'paste', @paste
     @element.on 'focus', @_focus
     @element.on 'blur', @_blur
-    @element.data 'field-kit-text-field', this
 
   # Handles a key event that is trying to insert a character.
   #
