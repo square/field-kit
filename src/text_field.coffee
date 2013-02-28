@@ -50,7 +50,7 @@ class TextField
     @_delegate = delegate
     return null
 
-  constructor: (@element) ->
+  constructor: (@element, @_formatter) ->
     @_jQuery = @element.constructor
     @element.on 'keydown', @keyDown
     @element.on 'keypress', @keyPress

@@ -206,8 +206,7 @@ field.setUnfocusedPlaceholder('First Name');</code></pre>
         </div>
 
         <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="expiry" placeholder="mm/yy"&gt;</code></pre>
-        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField($('#expiry'));
-field.setFormatter(new FieldKit.ExpiryDateFormatter());</code></pre>
+        <pre class="prettyprint docs-example-code docs-example-code-js"><code>new FieldKit.TextField($('#expiry'), new FieldKit.ExpiryDateFormatter());</code></pre>
       </div>
     </div>
 
@@ -279,8 +278,7 @@ field.setDelegate({
         </div>
 
         <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="ssn" placeholder="123-45-6789"&gt;</code></pre>
-        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField($('#ssn'));
-field.setFormatter(new FieldKit.SocialSecurityNumberFormatter());</code></pre>
+        <pre class="prettyprint docs-example-code docs-example-code-js"><code>new FieldKit.TextField($('#ssn'), new FieldKit.SocialSecurityNumberFormatter());</code></pre>
       </div>
     </div>
 
@@ -310,8 +308,7 @@ field.setFormatter(new FieldKit.SocialSecurityNumberFormatter());</code></pre>
         </div>
 
         <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="tel" id="us-phone" placeholder="(415) 555-1212"&gt;</code></pre>
-        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField($('#us-phone'));
-field.setFormatter(new FieldKit.UsPhoneFormatter());</code></pre>
+        <pre class="prettyprint docs-example-code docs-example-code-js"><code>new FieldKit.TextField($('#us-phone'), new FieldKit.UsPhoneFormatter());</code></pre>
       </div>
     </div>
 

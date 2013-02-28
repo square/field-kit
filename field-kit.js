@@ -99,8 +99,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     __extends(CardTextField, _super);
 
     function CardTextField(element) {
-      CardTextField.__super__.constructor.call(this, element);
-      this.setFormatter(new AdaptiveCardFormatter());
+      CardTextField.__super__.constructor.call(this, element, new AdaptiveCardFormatter());
       this.setCardMaskStrategy(CardMaskStrategy.None);
     }
 
@@ -773,8 +772,9 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       return null;
     };
 
-    function TextField(element) {
+    function TextField(element, _formatter) {
       this.element = element;
+      this._formatter = _formatter;
       this._blur = __bind(this._blur, this);
 
       this._focus = __bind(this._focus, this);

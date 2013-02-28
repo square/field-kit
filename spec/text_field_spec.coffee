@@ -1,10 +1,24 @@
-{buildField} = require './helpers/builders'
+TextField = require '../lib/text_field'
+{buildField, buildInput} = require './helpers/builders'
 FakeEvent = require './helpers/fake_event'
 {expectThatTyping, expectThatPasting} = require './helpers/expectations'
 {type} = require './helpers/typing'
 PassthroughFormatter = require './helpers/passthrough_formatter'
 
 describe 'TextField', ->
+  describe 'constructor', ->
+    it 'allows setting the formatter', ->
+      formatter = new PassthroughFormatter()
+      field = buildField({ formatter })
+      expect(field.formatter()).toBe(formatter)
+
+    it 'does not attempt to reformat existing text', ->
+      formatter = format: (text) -> text + '!'
+      $input = buildInput()
+      $input.val('hey')
+      field = new TextField($input, formatter)
+      expect(field.text()).toEqual('hey')
+
   describe 'typing a character into an empty field', ->
     it 'allows the character to be inserted', ->
       expectThatTyping('a').willChange('|').to('a|')

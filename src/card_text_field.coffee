@@ -8,8 +8,7 @@ CardMaskStrategy =
 
 class CardTextField extends TextField
   constructor: (element) ->
-    super element
-    @setFormatter new AdaptiveCardFormatter()
+    super element, new AdaptiveCardFormatter()
     @setCardMaskStrategy CardMaskStrategy.None
 
   # Public: Gets the card type for the current value.
