@@ -8,7 +8,7 @@
   <link rel="stylesheet" media="screen" href="bootstrap.min.css" />
   <link rel="stylesheet" media="screen" href="google-code-prettify/prettify.css" />
   <style type="text/css" media="screen">
-    input[type=text], input[type=password] {
+    input[type=text], input[type=password], input[type=tel] {
       width: 230px;
       height: 30px;
       font-size: 20px;
@@ -35,6 +35,10 @@
       width: 120px;
       position: relative;
       top: 12px;
+    }
+
+    #us-phone {
+      width: 150px;
     }
 
     #b-to-a {
@@ -196,7 +200,7 @@ field.setUnfocusedPlaceholder('First Name');</code></pre>
             <div class="span4">
               <pre class="tryout">&ldquo;4&rdquo; &rarr; &ldquo;04/&rdquo;
 &ldquo;1212&rdquo; &rarr; &ldquo;12/12&rdquo;
-&ldquo;12/&rdquo; + backspace &rarr; &ldquo;1&rdquo;
+&ldquo;12/&rdquo; + backspace &rarr; &ldquo;1&rdquo;</pre>
             </div>
           </div>
         </div>
@@ -230,7 +234,7 @@ field.setFormatter(new FieldKit.ExpiryDateFormatter());</code></pre>
             <div class="span4">
               <pre class="tryout">&ldquo;411111111&rdquo; &rarr; &ldquo;4111 1111 1&rdquo;  # visa
 &ldquo;3725123456&rdquo; &rarr; &ldquo;3725 123456&rdquo; # amex
-&ldquo;4111 &rdquo; + backspace &rarr; &ldquo;411&rdquo;
+&ldquo;4111 &rdquo; + backspace &rarr; &ldquo;411&rdquo;</pre>
             </div>
           </div>
         </div>
@@ -269,7 +273,7 @@ field.setDelegate({
 
             <div class="span4">
               <pre class="tryout">&ldquo;1234&rdquo; &rarr; &ldquo;123-4&rdquo;
-&ldquo;123-45-&rdquo; + backspace &rarr; &ldquo;123-4&rdquo;
+&ldquo;123-45-&rdquo; + backspace &rarr; &ldquo;123-4&rdquo;</pre>
             </div>
           </div>
         </div>
@@ -277,6 +281,37 @@ field.setDelegate({
         <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="ssn" placeholder="123-45-6789"&gt;</code></pre>
         <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField($('#ssn'));
 field.setFormatter(new FieldKit.SocialSecurityNumberFormatter());</code></pre>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="offset2 span8">
+        <h3>UsPhoneFormatter</h3>
+      </div>
+    </div>
+
+    <div class="row field-kit-example">
+      <div class="offset2 span8">
+        <p>
+          The <code>UsPhoneFormatter</code> provides formatting for
+          US phone numbers, preventing the input of non-digit characters
+          and automatically formatting like
+          <code>(NNN) NNN-NNNN</code>.
+        </p>
+
+        <div class="docs-example">
+          <div class="row">
+            <div class="html span3"></div>
+
+            <div class="span4">
+              <pre class="tryout">&ldquo;4155&rdquo; &rarr; &ldquo;(415) 5&rdquo;</pre>
+            </div>
+          </div>
+        </div>
+
+        <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="tel" id="us-phone" placeholder="(415) 555-1212"&gt;</code></pre>
+        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField($('#us-phone'));
+field.setFormatter(new FieldKit.UsPhoneFormatter());</code></pre>
       </div>
     </div>
 

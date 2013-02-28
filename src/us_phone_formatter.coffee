@@ -1,26 +1,28 @@
 DelimitedTextFormatter = require './delimited_text_formatter'
 
-class UsPhoneFormatter extends DelimitedTextFormatter
-  # (415) 555-1212
-  delimiterHash:
-    0: '('
-    4: ')'
-    5: ' '
-    9: '-'
+# (415) 555-1212
+UsPhoneDelimiter =
+  0: '('
+  4: ')'
+  5: ' '
+  9: '-'
 
+class UsPhoneFormatter extends DelimitedTextFormatter
   maximumLength: 10 + 4
 
+  constructor: ->
+    if arguments.length isnt 0
+      throw new Error("were you trying to set a delimiter (#{arguments[0]})?")
+
   isDelimiter: (char) ->
-    char in for index, delimiter of @delimiterHash
+    char in for index, delimiter of UsPhoneDelimiter
       delimiter
 
-  constructor: ->
-
   delimiterAt: (index) ->
-    @delimiterHash[index] || ''
+    UsPhoneDelimiter[index]
 
   hasDelimiterAtIndex: (index) ->
-    !!@delimiterAt(index)
+    @delimiterAt(index)?
 
   isChangeValid: (change, error) ->
     if /^\d*$/.test change.inserted.text
