@@ -4,7 +4,7 @@ class DelimitedTextFormatter extends Formatter
   delimiter: null
 
   delimiterAt: (index) ->
-    return '' unless @hasDelimiterAtIndex index
+    return null unless @hasDelimiterAtIndex index
     @delimiter
 
   isDelimiter: (char) ->

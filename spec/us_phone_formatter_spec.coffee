@@ -11,6 +11,9 @@ describe 'UsPhoneFormatter', ->
     formatter = new UsPhoneFormatter()
     field.setFormatter formatter
 
+  it 'does not allow initializing with a delimiter', ->
+    expect(-> new UsPhoneFormatter('-')).toThrow()
+
   it 'adds a ( before the first digit', ->
     expectThatTyping('4').into(field).willChange('|').to('(4|')
     expectThatTyping('1').into(field).willChange('(4|').to('(41|')
@@ -24,9 +27,9 @@ describe 'UsPhoneFormatter', ->
   it 'groups digits into four groups of four separated by spaces', ->
     expectThatTyping('415555'.split('')...).into(field).willChange('|').to('(415) 555-|')
 
-  it 'backspaces both the space and the character before it', ->
-    expectThatTyping('backspace').into(field).willChange('(415)|').to('(41|')
-    expectThatTyping('backspace').into(field).willChange('(123)|4 ').to('(12|4) ')
+  it 'backspaces all delimiters and the character before it', ->
+    expectThatTyping('backspace').into(field).willChange('(415) |').to('(41|')
+    expectThatTyping('backspace').into(field).willChange('(123) |4 ').to('(12|4) ')
 
   it 'allows backspacing a whole group of digits', ->
     expectThatTyping('alt+backspace').into(field).willChange('(411) 111-|').to('(411) |')
