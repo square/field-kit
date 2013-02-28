@@ -325,6 +325,17 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
 
     DelimitedTextFormatter.prototype.delimiter = null;
 
+    DelimitedTextFormatter.prototype.delimiterAt = function(index) {
+      if (!this.hasDelimiterAtIndex(index)) {
+        return null;
+      }
+      return this.delimiter;
+    };
+
+    DelimitedTextFormatter.prototype.isDelimiter = function(char) {
+      return char === this.delimiter;
+    };
+
     function DelimitedTextFormatter(delimiter) {
       var _ref;
       if (delimiter == null) {
@@ -341,19 +352,19 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     };
 
     DelimitedTextFormatter.prototype._textFromValue = function(value) {
-      var char, result, _i, _len;
+      var char, delimiter, result, _i, _len;
       if (!value) {
         return '';
       }
       result = '';
       for (_i = 0, _len = value.length; _i < _len; _i++) {
         char = value[_i];
-        if (this.hasDelimiterAtIndex(result.length)) {
-          result += this.delimiter;
+        while (delimiter = this.delimiterAt(result.length)) {
+          result += delimiter;
         }
         result += char;
-        if (this.hasDelimiterAtIndex(result.length)) {
-          result += this.delimiter;
+        while (delimiter = this.delimiterAt(result.length)) {
+          result += delimiter;
         }
       }
       return result;
@@ -373,7 +384,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
         _results = [];
         for (_i = 0, _len = text.length; _i < _len; _i++) {
           char = text[_i];
-          if (char !== this.delimiter) {
+          if (!this.isDelimiter(char)) {
             _results.push(char);
           }
         }
@@ -382,32 +393,77 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     };
 
     DelimitedTextFormatter.prototype.isChangeValid = function(change, error) {
-      var endMovedLeft, hasSelection, isChangeValid, newText, range, startMovedLeft, value;
+      var endMovedLeft, endMovedOverADelimiter, endMovedRight, hasSelection, isChangeValid, newCursorPosition, newText, range, startMovedLeft, startMovedOverADelimiter, startMovedRight, value;
       if (!DelimitedTextFormatter.__super__.isChangeValid.call(this, change, error)) {
         return false;
       }
       newText = change.proposed.text;
-      if (change.deleted.text === this.delimiter) {
-        newText = newText.substring(0, change.deleted.start - 1) + newText.substring(change.deleted.end - 1);
-      }
       range = change.proposed.selectedRange;
       hasSelection = range.length !== 0;
       startMovedLeft = range.start < change.current.selectedRange.start;
+      startMovedRight = range.start > change.current.selectedRange.start;
       endMovedLeft = (range.start + range.length) < (change.current.selectedRange.start + change.current.selectedRange.length);
-      if (this.hasDelimiterAtIndex(range.start)) {
-        if (startMovedLeft) {
+      endMovedRight = (range.start + range.length) > (change.current.selectedRange.start + change.current.selectedRange.length);
+      startMovedOverADelimiter = startMovedLeft && this.hasDelimiterAtIndex(range.start) || startMovedRight && this.hasDelimiterAtIndex(range.start - 1);
+      endMovedOverADelimiter = endMovedLeft && this.hasDelimiterAtIndex(range.start + range.length) || endMovedRight && this.hasDelimiterAtIndex(range.start + range.length - 1);
+      if (this.isDelimiter(change.deleted.text)) {
+        newCursorPosition = change.deleted.start - 1;
+        while (this.isDelimiter(newText.charAt(newCursorPosition))) {
+          newText = newText.substring(0, newCursorPosition) + newText.substring(newCursorPosition + 1);
+          newCursorPosition--;
+        }
+        newText = newText.substring(0, newCursorPosition) + newText.substring(newCursorPosition + 1);
+      }
+      if (startMovedLeft && startMovedOverADelimiter) {
+        while (this.delimiterAt(range.start - 1)) {
           range.start--;
           range.length++;
-        } else {
+        }
+        range.start--;
+        range.length++;
+      }
+      if (startMovedRight) {
+        while (this.delimiterAt(range.start)) {
           range.start++;
           range.length--;
         }
+        if (startMovedOverADelimiter) {
+          range.start++;
+          range.length--;
+          while (this.delimiterAt(range.start)) {
+            range.start++;
+            range.length--;
+          }
+        }
       }
       if (hasSelection) {
-        if (this.hasDelimiterAtIndex(range.start + range.length - 1)) {
+        if (endMovedOverADelimiter) {
+          if (endMovedLeft) {
+            while (this.delimiterAt(range.start + range.length - 1)) {
+              range.length--;
+            }
+            range.length--;
+          }
+          if (endMovedRight) {
+            while (this.delimiterAt(range.start + range.length)) {
+              range.length++;
+            }
+            range.length++;
+          }
+        }
+        while (this.hasDelimiterAtIndex(range.start + range.length - 1)) {
           if (startMovedLeft || endMovedLeft) {
             range.length--;
           } else {
+            range.length++;
+          }
+        }
+        while (this.hasDelimiterAtIndex(range.start)) {
+          if (startMovedRight || endMovedRight) {
+            range.start++;
+            range.length--;
+          } else {
+            range.start--;
             range.length++;
           }
         }
@@ -612,7 +668,8 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     Formatter: require('./formatter'),
     SocialSecurityNumberFormatter: require('./social_security_number_formatter'),
     TextField: require('./text_field'),
-    UndoManager: require('./undo_manager')
+    UndoManager: require('./undo_manager'),
+    UsPhoneFormatter: require('./us_phone_formatter')
   };
 
   module.exports = FieldKit;
@@ -1903,6 +1960,71 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
   })();
 
   module.exports = UndoManager;
+
+}).call(this);
+},
+"us_phone_formatter.js": function(module, exports, require){// Generated by CoffeeScript 1.4.0
+(function() {
+  var DelimitedTextFormatter, UsPhoneDelimiter, UsPhoneFormatter,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+
+  DelimitedTextFormatter = require('./delimited_text_formatter');
+
+  UsPhoneDelimiter = {
+    0: '(',
+    4: ')',
+    5: ' ',
+    9: '-'
+  };
+
+  UsPhoneFormatter = (function(_super) {
+
+    __extends(UsPhoneFormatter, _super);
+
+    UsPhoneFormatter.prototype.maximumLength = 10 + 4;
+
+    function UsPhoneFormatter() {
+      if (arguments.length !== 0) {
+        throw new Error("were you trying to set a delimiter (" + arguments[0] + ")?");
+      }
+    }
+
+    UsPhoneFormatter.prototype.isDelimiter = function(char) {
+      var delimiter, index;
+      return __indexOf.call((function() {
+        var _results;
+        _results = [];
+        for (index in UsPhoneDelimiter) {
+          delimiter = UsPhoneDelimiter[index];
+          _results.push(delimiter);
+        }
+        return _results;
+      })(), char) >= 0;
+    };
+
+    UsPhoneFormatter.prototype.delimiterAt = function(index) {
+      return UsPhoneDelimiter[index];
+    };
+
+    UsPhoneFormatter.prototype.hasDelimiterAtIndex = function(index) {
+      return this.delimiterAt(index) != null;
+    };
+
+    UsPhoneFormatter.prototype.isChangeValid = function(change, error) {
+      if (/^\d*$/.test(change.inserted.text)) {
+        return UsPhoneFormatter.__super__.isChangeValid.call(this, change, error);
+      } else {
+        return false;
+      }
+    };
+
+    return UsPhoneFormatter;
+
+  })(DelimitedTextFormatter);
+
+  module.exports = UsPhoneFormatter;
 
 }).call(this);
 }};
