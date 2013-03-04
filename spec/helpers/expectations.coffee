@@ -1,6 +1,7 @@
 FakeEvent = require './fake_event'
 Caret = require './caret'
-{buildField} = require './builders'
+TextField = require '../../lib/text_field'
+{buildInput} = require './builders'
 {type} = require './typing'
 
 class FieldExpectationBase
@@ -27,6 +28,18 @@ class FieldExpectationBase
   withError: (errorType) ->
     expect(@actualErrorType).toEqual(errorType)
 
+  onOSX: ->
+    @withUserAgent 'osx.chrome.latest'
+
+  onWindows: ->
+    @withUserAgent 'windows.chrome.latest'
+
+  onAndroid: ->
+    @withUserAgent 'android.chrome.latest'
+
+  withUserAgent: (@userAgent) ->
+    this
+
   applyDescription: ->
     { caret, affinity, value } = Caret.parseDescription @currentDescription
     @field.element.val value
@@ -52,7 +65,11 @@ class FieldExpectationBase
     expect(actual).toEqual(@expectedDescription)
 
   @::__defineGetter__ 'field', ->
-    @_field ||= buildField()
+    @_field ||= do =>
+      input = buildInput()
+      if @userAgent
+        input.get(0).ownerDocument.defaultView.navigator.userAgent = @userAgent
+      new TextField(input)
 
   @::__defineSetter__ 'field', (field) ->
     @_field = field
