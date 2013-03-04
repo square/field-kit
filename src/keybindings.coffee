@@ -28,10 +28,10 @@ KEYS = {
   ENTER
 
   isDigit: (keyCode) ->
-    @ZERO <= keyCode <= @NINE
+    ZERO <= keyCode <= NINE
 
   isDirectional: (keyCode) ->
-    keyCode in [@LEFT, @RIGHT, @UP, @DOWN]
+    keyCode in [LEFT, RIGHT, UP, DOWN]
 }
 
 CTRL  = 1 << 0
