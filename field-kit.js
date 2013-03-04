@@ -721,10 +721,10 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     TAB: TAB,
     ENTER: ENTER,
     isDigit: function(keyCode) {
-      return (this.ZERO <= keyCode && keyCode <= this.NINE);
+      return (ZERO <= keyCode && keyCode <= NINE);
     },
     isDirectional: function(keyCode) {
-      return keyCode === this.LEFT || keyCode === this.RIGHT || keyCode === this.UP || keyCode === this.DOWN;
+      return keyCode === LEFT || keyCode === RIGHT || keyCode === UP || keyCode === DOWN;
     }
   };
 
