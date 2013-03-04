@@ -51,7 +51,7 @@ describe 'TextField', ->
         expectThatTyping('alt+backspace').willChange('12 3|4').to('12 |4')
         expectThatTyping('alt+backspace').willChange('12 |34').to('|34')
 
-        expectThatTyping('meta+backspace').willChange('12 34 |56').to('|56')
+        expectThatTyping('meta+backspace').onOSX().willChange('12 34 |56').to('|56')
 
   describe 'typing forward delete', ->
     describe 'with a non-empty selection', ->
@@ -94,10 +94,10 @@ describe 'TextField', ->
       expectThatTyping('shift+alt+left').willChange('4111 11|11').to('4111 <11|11')
       expectThatTyping('shift+alt+left', 'shift+alt+left').willChange('4111 11|11').to('<4111 11|11')
 
-      expectThatTyping('meta+left').willChange('41|11').to('|4111')
-      expectThatTyping('shift+meta+left').willChange('41|11').to('<41|11')
-      expectThatTyping('shift+meta+left').willChange('41|1>1').to('<411|1')
-      expectThatTyping('shift+meta+left').willNotChange('|4111')
+      expectThatTyping('meta+left').onOSX().willChange('41|11').to('|4111')
+      expectThatTyping('shift+meta+left').onOSX().willChange('41|11').to('<41|11')
+      expectThatTyping('shift+meta+left').onOSX().willChange('41|1>1').to('<411|1')
+      expectThatTyping('shift+meta+left').onOSX().willNotChange('|4111')
 
   describe 'typing a right arrow', ->
     it 'works as expected', ->
@@ -119,10 +119,10 @@ describe 'TextField', ->
       expectThatTyping('shift+alt+right').willChange('41|11 1111').to('41|11> 1111')
       expectThatTyping('shift+alt+right', 'shift+alt+right').willChange('41|11 1111').to('41|11 1111>')
 
-      expectThatTyping('meta+right').willChange('41|11').to('4111|')
-      expectThatTyping('shift+meta+right').willChange('41|11').to('41|11>')
-      expectThatTyping('shift+meta+right').willChange('<41|11').to('|4111>')
-      expectThatTyping('shift+meta+right').willNotChange('4111|')
+      expectThatTyping('meta+right').onOSX().willChange('41|11').to('4111|')
+      expectThatTyping('shift+meta+right').onOSX().willChange('41|11').to('41|11>')
+      expectThatTyping('shift+meta+right').onOSX().willChange('<41|11').to('|4111>')
+      expectThatTyping('shift+meta+right').onOSX().willNotChange('4111|')
 
   describe 'typing an up arrow', ->
     it 'works as expected', ->
@@ -203,19 +203,19 @@ describe 'TextField', ->
       expect(event.isDefaultPrevented()).toBeFalsy()
 
   describe 'selecting everything', ->
-    ['ctrl', 'meta'].forEach (modifier) ->
-      describe "with the #{modifier} key", ->
+    for own ctrl, platform of { ctrl: 'Windows', meta: 'OSX' }
+      describe "with the #{ctrl} key", ->
       it 'works without an existing selection', ->
-        expectThatTyping("#{modifier}+a").willChange('123|4567').to('|1234567|')
+        expectThatTyping("#{ctrl}+a")["on#{platform}"]().willChange('123|4567').to('|1234567|')
 
       it 'works with an undirected selection', ->
-        expectThatTyping("#{modifier}+a").willChange('|123|4567').to('|1234567|')
+        expectThatTyping("#{ctrl}+a")["on#{platform}"]().willChange('|123|4567').to('|1234567|')
 
       it 'works with a right-directed selection and resets the direction', ->
-        expectThatTyping("#{modifier}+a").willChange('|123>4567').to('|1234567|')
+        expectThatTyping("#{ctrl}+a")["on#{platform}"]().willChange('|123>4567').to('|1234567|')
 
       it 'works with a left-directed selection and resets the direction', ->
-        expectThatTyping("#{modifier}+a").willChange('<123|4567').to('|1234567|')
+        expectThatTyping("#{ctrl}+a")["on#{platform}"]().willChange('<123|4567').to('|1234567|')
 
   it 'allows the formatter to prevent changes', ->
     field = buildField()
@@ -258,18 +258,21 @@ describe 'TextField', ->
 
   describe 'undo and redo', ->
     it 'undoes the last change', ->
-      expectThatTyping('a', 'meta+z').willNotChange('1|')
+      expectThatTyping('a', 'meta+z').onOSX().willNotChange('1|')
+
+    it 'only undoes when the right platform-specific key is pressed', ->
+      expectThatTyping('a', 'meta+z').onWindows().willChange('1|').to('1a|')
 
     it 'can be done sequentially to effectively cancel each other', ->
-      expectThatTyping('a', 'meta+z', 'meta+shift+z').willChange('1|').to('1a|')
+      expectThatTyping('a', 'meta+z', 'meta+shift+z').onOSX().willChange('1|').to('1a|')
 
     it 'work with selections', ->
-      expectThatTyping('a', 'meta+z').willChange('a|b>c').to('a|b|c')
-      expectThatTyping('a', 'meta+z', 'ctrl+y').willChange('a|b>c').to('aa|c')
+      expectThatTyping('a', 'ctrl+z').onWindows().willChange('a|b>c').to('a|b|c')
+      expectThatTyping('a', 'ctrl+z', 'ctrl+y').onWindows().willChange('a|b>c').to('aa|c')
 
     it 'have no effect when they run out of actions', ->
-      expectThatTyping('meta+z').willNotChange('abc|')
-      expectThatTyping('meta+shift+z').willNotChange('abc|')
+      expectThatTyping('meta+z').onOSX().willNotChange('abc|')
+      expectThatTyping('meta+shift+z').onOSX().willNotChange('abc|')
 
     describe 'when the formatter rejects a change', ->
       formatter = null

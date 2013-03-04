@@ -1,25 +1,5 @@
 UndoManager = require './undo_manager'
-
-KEYS =
-  A:         65
-  Y:         89
-  Z:         90
-  ZERO:      48
-  NINE:      57
-  LEFT:      37
-  RIGHT:     39
-  UP:        38
-  DOWN:      40
-  BACKSPACE:  8
-  DELETE:    46
-  TAB:        9
-  ENTER:     13
-
-KEYS.isDigit = (keyCode) ->
-  @ZERO <= keyCode <= @NINE
-
-KEYS.isDirectional = (keyCode) ->
-  keyCode in [@LEFT, @RIGHT, @UP, @DOWN]
+{ KEYS, keyBindingsForPlatform } = require './keybindings'
 
 AFFINITY =
   UPSTREAM:   0
@@ -59,6 +39,7 @@ class TextField
     @element.on 'paste', @paste
     @element.on 'focus', @_focus
     @element.on 'blur', @_blur
+    @_buildKeybindings()
 
   # Handles a key event that is trying to insert a character.
   #
@@ -970,127 +951,20 @@ class TextField
   #
   # Returns nothing.
   keyDown: (event) =>
-    {keyCode, metaKey, ctrlKey, shiftKey, altKey} = event
-    modifiers = []
-    modifiers.push 'alt' if altKey
-    modifiers.push 'ctrl' if ctrlKey
-    modifiers.push 'meta' if metaKey
-    modifiers.push 'shift' if shiftKey
-    modifiers = modifiers.join '+'
-
     if @_didEndEditingButKeptFocus
       @_textFieldDidBeginEditing()
       @_didEndEditingButKeptFocus = no
 
-    if keyCode is KEYS.Z and modifiers in ['meta', 'ctrl']
-      @undoManager().undo() if @undoManager().canUndo()
-      event.preventDefault()
-    else if (keyCode is KEYS.Z and modifiers is 'meta+shift') or (keyCode is KEYS.Y and modifiers is 'ctrl')
-      @undoManager().redo() if @undoManager().canRedo()
-      event.preventDefault()
-
-    @rollbackInvalidChanges =>
-      if (metaKey or ctrlKey) and keyCode is KEYS.A
-        @selectAll event
-
-      else if keyCode is KEYS.LEFT
-        switch modifiers
-          when ''
-            @moveLeft event
-          when 'alt'
-            @moveWordLeft event
-          when 'shift'
-            @moveLeftAndModifySelection event
-          when 'alt+shift'
-            @moveWordLeftAndModifySelection event
-          when 'meta'
-            @moveToBeginningOfLine event
-          when 'meta+shift'
-            @moveToBeginningOfLineAndModifySelection event
-          else
-            throw new Error("unhandled left+#{modifiers}")
-
-      else if keyCode is KEYS.RIGHT
-        switch modifiers
-          when ''
-            @moveRight event
-          when 'alt'
-            @moveWordRight event
-          when 'shift'
-            @moveRightAndModifySelection event
-          when 'alt+shift'
-            @moveWordRightAndModifySelection event
-          when 'meta'
-            @moveToEndOfLine event
-          when 'meta+shift'
-            @moveToEndOfLineAndModifySelection event
-          else
-            throw new Error("unhandled right+#{modifiers}")
-
-      else if keyCode is KEYS.UP
-        switch modifiers
-          when ''
-            @moveUp event
-          when 'alt'
-            @moveToBeginningOfParagraph event
-          when 'shift'
-            @moveUpAndModifySelection event
-          when 'alt+shift'
-            @moveParagraphBackwardAndModifySelection event
-          when 'meta'
-            @moveToBeginningOfDocument event
-          when 'meta+shift'
-            @moveToBeginningOfDocumentAndModifySelection event
-          else
-            throw new Error("unhandled up+#{modifiers}")
-
-      else if keyCode is KEYS.DOWN
-        switch modifiers
-          when ''
-            @moveDown event
-          when 'alt'
-            @moveToEndOfParagraph event
-          when 'shift'
-            @moveDownAndModifySelection event
-          when 'alt+shift'
-            @moveParagraphForwardAndModifySelection event
-          when 'meta'
-            @moveToEndOfDocument event
-          when 'meta+shift'
-            @moveToEndOfDocumentAndModifySelection event
-          else
-            throw new Error("unhandled down+#{modifiers}")
-
-      # ⌫
-      else if keyCode is KEYS.BACKSPACE
-        switch modifiers
-          when '', 'shift'
-            @deleteBackward event
-          when 'alt', 'alt+shift'
-            @deleteWordBackward event
-          when 'ctrl', 'ctrl+shift'
-            @deleteBackwardByDecomposingPreviousCharacter event
-          when 'meta', 'meta+shift'
-            @deleteBackwardToBeginningOfLine event
-          else
-            throw new Error("unhandled backspace+#{modifiers}")
-
-      else if keyCode is KEYS.DELETE
-        if altKey
-          @deleteWordForward event
+    if action = @_bindings.actionForEvent(event)
+      switch action
+        when 'undo', 'redo'
+          # We exempt these two because it can get hairy trying to validate
+          # these kinds of changes and presumably we're going to a state that
+          # was validated anyway.
+          @[action](event)
         else
-          @deleteForward event
-
-      else if keyCode is KEYS.TAB
-        if shiftKey
-          @insertBackTab event
-        else
-          @insertTab event
-
-      else if keyCode is KEYS.ENTER
-        @insertNewline event
-
-      return null
+          @rollbackInvalidChanges =>
+            @[action](event)
 
   # Internal: Handles inserting characters based on the typed key.
   #
@@ -1239,6 +1113,20 @@ class TextField
   ## Undo support
   ##
 
+  # Triggers an undo in the underlying UndoManager, if applicable.
+  #
+  # Returns nothing.
+  undo: (event) ->
+    @undoManager().undo() if @undoManager().canUndo()
+    event.preventDefault()
+
+  # Triggers a redo in the underlying UndoManager, if applicable.
+  #
+  # Returns nothing.
+  redo: (event) ->
+    @undoManager().redo() if @undoManager().canRedo()
+    event.preventDefault()
+
   # Gets the UndoManager for this text field.
   #
   # Returns an instance of UndoManager.
@@ -1364,6 +1252,15 @@ class TextField
       @setPlaceholder @_focusedPlaceholder if @_focusedPlaceholder?
     else
       @setPlaceholder @_unfocusedPlaceholder if @_unfocusedPlaceholder?
+
+  ##
+  ## Keybindings
+  ##
+
+  _buildKeybindings: ->
+    userAgent = @element.get(0).ownerDocument.defaultView.navigator.userAgent
+    osx = /^Mozilla\/[\d\.]+ \(Macintosh/.test(userAgent)
+    @_bindings = keyBindingsForPlatform(if osx then 'OSX' else 'Default')
 
   ##
   ## Debug support
