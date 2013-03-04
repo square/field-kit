@@ -1,5 +1,6 @@
 FakeElement = require './fake_element'
-FakeInput = require './fake_input'
+FakeInput   = require './fake_input'
+FakeWindow  = require './fake_window'
 
 class FakeDocument
   activeElement: null
@@ -11,6 +12,7 @@ class FakeDocument
     html.appendChild @createElement('head')
     html.appendChild @body = @createElement('body')
     @documentElement = html
+    @defaultView = new FakeWindow(this)
 
   createElement: (tagName) ->
     switch tagName
