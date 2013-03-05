@@ -260,11 +260,23 @@ class NumberFormatter extends Formatter
     if (multiplier = @multiplier())?
       number *= multiplier
 
-    negative = number < 0
-    string = "#{Math.abs(number)}"
-    [integerPart, fractionPart] = string.split('.')
+    integerPart  = null
+    fractionPart = null
+    string       = null
+    negative     = number < 0
 
-    fractionPart ||= ''
+    splitNumber = ->
+      string = "#{Math.abs(number)}"
+      [integerPart, fractionPart] = string.split('.')
+      fractionPart ||= ''
+
+    splitNumber()
+
+    # round fraction part to the maximum length
+    maximumFractionDigits = @maximumFractionDigits()
+    if fractionPart.length > maximumFractionDigits
+      number = @_round number
+      splitNumber()
 
     # right-pad fraction zeros up to the minimum length
     minimumFractionDigits = @minimumFractionDigits()
@@ -275,13 +287,6 @@ class NumberFormatter extends Formatter
     minimumIntegerDigits = @minimumIntegerDigits()
     while integerPart.length < minimumIntegerDigits
       integerPart = '0' + integerPart
-
-    # round fraction part to the maximum length
-    maximumFractionDigits = @maximumFractionDigits()
-    if fractionPart.length > maximumFractionDigits
-      extraFractionPart = fractionPart[maximumFractionDigits..]
-      fractionPart = fractionPart[0...maximumFractionDigits]
-      [integerPart, fractionPart] = @_round negative, integerPart, fractionPart, extraFractionPart
 
     # eat any unneeded trailing zeros
     minimumFractionDigits = @minimumFractionDigits()
@@ -319,8 +324,8 @@ class NumberFormatter extends Formatter
 
     return result
 
-  _round: (args...) ->
-    @_rounder() args...
+  _round: (number) ->
+    @_rounder() number, @maximumFractionDigits()
 
   _rounder: ->
     switch @_roundingMode
@@ -406,55 +411,30 @@ NumberFormatter::setPlusSign = NumberFormatter::setPositivePrefix
 
 ## Rounding
 
-roundCeiling = (negative, integerPart, fractionPart, extraFractionPart) ->
-  return roundFloor !negative, integerPart, fractionPart, extraFractionPart if negative
+roundCeiling = (number, maximumFractionDigits) ->
+  return roundFloor -number, maximumFractionDigits if number < 0
+  multiplier = Math.pow(10, maximumFractionDigits)
+  (~~(number * multiplier) + 1) / multiplier
 
-  if /[1-9]/.test extraFractionPart
-    [integerPart, fractionPart] = incrementFormattedParts integerPart, fractionPart
+roundFloor = (number, maximumFractionDigits) ->
+  return roundCeiling -number, maximumFractionDigits if number < 0
+  multiplier = Math.pow(10, maximumFractionDigits)
+  ~~(number * multiplier) / multiplier
 
-  return [integerPart, fractionPart]
+roundHalfEven = (number, maximumFractionDigits) ->
+  multiplier = Math.pow(10, maximumFractionDigits)
+  percentFromFloor = Math.abs((number * (multiplier * 100)) % 100)
 
-
-roundFloor = (negative, integerPart, fractionPart, extraFractionPart) ->
-  return roundCeiling !negative, integerPart, fractionPart, extraFractionPart if negative
-  [integerPart, fractionPart]
-
-roundHalfEven = (negative, integerPart, fractionPart, extraFractionPart) ->
-  switch extraFractionPart[0]
-    when '1', '2', '3', '4'
-      rounder = roundFloor
-    when '5'
-      lastDigit = (if fractionPart.length is 0 then integerPart else fractionPart)[-1..-1]
-      rounder = if (Number(lastDigit) % 2 is 0) ^ negative then roundFloor else roundCeiling
+  if percentFromFloor < 50
+    roundFloor number, maximumFractionDigits
+  else if percentFromFloor > 50
+    roundCeiling number, maximumFractionDigits
+  else
+    lastDigit = ~~Math.abs(number * multiplier) % 10
+    if (lastDigit % 2 is 0) ^ (number < 0)
+      roundFloor number, maximumFractionDigits
     else
-      rounder = roundCeiling
-
-  return rounder negative, integerPart, fractionPart, extraFractionPart
-
-incrementFormattedParts = (integerPart, fractionPart) ->
-  [fractionCarryOver, fractionPart] = incrementFormattedNumber fractionPart
-  while fractionCarryOver--
-    [integerCarryOver, integerPart] = incrementFormattedNumber integerPart
-    integerPart = integerCarryOver + integerPart if integerCarryOver
-  return [integerPart, fractionPart]
-
-incrementFormattedNumber = (string) ->
-  # add a place to the left so we don't lose any zeros
-  string = "1#{string}"
-  # increment the number
-  number = Number(string) + 1
-  # put it back to a string with an extra place
-  string = "#{number}"
-  # check the extra place to see if we have to keep it
-  switch string[0]
-    when '1'
-      # it wasn't incremented so we don't need to keep it
-      return [0, string[1..]]
-    when '2'
-      # it was incremented, so keep it as a '1'
-      return [1, string[1..]]
-    else
-      throw new Error("unexpected carry over value '#{string[0]}', expected '1' or '2'")
+      roundCeiling number, maximumFractionDigits
 
 NumberFormatter.Rounding = {
   CEILING
