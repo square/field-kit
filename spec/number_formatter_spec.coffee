@@ -308,10 +308,10 @@ describe 'NumberFormatter', ->
 
         describe 'with a custom grouping separator', ->
           beforeEach ->
-            formatter.setGroupingSeparator 'SEP'
+            formatter.setGroupingSeparator '**'
 
           it 'formats integer parts with more digits than the grouping size with separators', ->
-            expect(formatter.format 1234567).toEqual('1SEP234SEP567')
+            expect(formatter.format 1234567).toEqual('1**234**567')
 
     describe 'given a negative number', ->
       describe 'with custom prefix and suffix', ->
