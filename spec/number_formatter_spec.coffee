@@ -38,7 +38,7 @@ describe 'NumberFormatter', ->
     it 'has no maximumIntegerDigits', ->
       expect(formatter.maximumIntegerDigits()).toBeNull()
 
-    it 'has a maximumIntegerDigits', ->
+    it 'has a minimumIntegerDigits', ->
       expect(formatter.minimumIntegerDigits()).toEqual(0)
 
     it 'does not use a grouping separator', ->
