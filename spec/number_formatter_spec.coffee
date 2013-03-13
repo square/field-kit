@@ -158,6 +158,7 @@ describe 'NumberFormatter', ->
 
         it 'formats integers without a fractional part', ->
           expect(formatter.format 50).toEqual('50')
+          expect(formatter.format 50.0).toEqual('50')
 
         it 'formats floats rounding the fractional part if needed', ->
           expect(formatter.format 50.8).toEqual('50.8')
