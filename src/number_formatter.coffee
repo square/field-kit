@@ -30,6 +30,13 @@ splitLocaleComponents = (locale) ->
   match = locale.match(/^([a-z][a-z])(?:[-_]([a-z][a-z]))?$/i)
   { lang: match?[1]?.toLowerCase(), country: match?[2]?.toUpperCase() }
 
+# This simple property getter assumes that properties will never be functions
+# and so attempts to run those functions using the given args.
+get = (object, key, args...) ->
+  value = object?[key]
+  value = value(args...) if typeof value is 'function'
+  return value
+
 class NumberFormatter extends Formatter
   _allowsFloats:                null
   _alwaysShowsDecimalSeparator: null
@@ -38,6 +45,7 @@ class NumberFormatter extends Formatter
   _groupingSeparator:           null
   _groupingSize:                null
   _locale:                      null
+  _internationalCurrencySymbol: null
   _maximumFractionDigits:       null
   _minimumFractionDigits:       null
   _maximumIntegerDigits:        null
@@ -93,11 +101,19 @@ class NumberFormatter extends Formatter
     return this
 
   currencySymbol: ->
-    @_get 'currencySymbol'
+    if @_shouldShowNativeCurrencySymbol()
+      @_get 'currencySymbol'
+    else
+      @_get 'internationalCurrencySymbol'
 
   setCurrencySymbol: (currencySymbol) ->
     @_currencySymbol = currencySymbol
     return this
+
+  _shouldShowNativeCurrencySymbol: ->
+    regionDefaultCurrencyCode = @_regionDefaults().currencyCode
+    regionDefaultCurrencyCode = regionDefaultCurrencyCode?() ? regionDefaultCurrencyCode
+    return @currencyCode() is regionDefaultCurrencyCode
 
   decimalSeparator: ->
     @_get 'decimalSeparator'
@@ -118,6 +134,13 @@ class NumberFormatter extends Formatter
 
   setGroupingSize: (groupingSize) ->
     @_groupingSize = groupingSize
+    return this
+
+  internationalCurrencySymbol: ->
+    @_get 'internationalCurrencySymbol'
+
+  setInternationalCurrencySymbol: (internationalCurrencySymbol) ->
+    @_internationalCurrencySymbol = internationalCurrencySymbol
     return this
 
   locale: ->
@@ -279,20 +302,16 @@ class NumberFormatter extends Formatter
     localeDefaults = @_localeDefaults()
     regionDefaults = @_regionDefaults()
 
-    value = styleDefaults?[attr]
-    value = value?(this, localeDefaults) ? value
+    value = get styleDefaults, attr, this, localeDefaults
     return value if value?
 
-    value = localeDefaults?[attr]
-    value = value?(this, styleDefaults) ? value
+    value = get localeDefaults, attr, this, styleDefaults
     return value if value?
 
-    value = regionDefaults?[attr]
-    value = value?(this, styleDefaults) ? value
+    value = get regionDefaults, attr, this, styleDefaults
     return value if value?
 
-    value = @_currencyDefaults()?[attr]
-    value = value?(this, localeDefaults) ? value
+    value = get @_currencyDefaults(), attr, this, localeDefaults
     return value if value?
 
     return null
@@ -364,7 +383,6 @@ class NumberFormatter extends Formatter
 
       for i in [integerPart.length-1..0]
         if copiedCharacterCount > 0 and copiedCharacterCount % @groupingSize() is 0
-          console.log @groupingSeparator() if @locale() is 'fr-CA'
           integerPartWithGroupingSeparators = @groupingSeparator() + integerPartWithGroupingSeparators
         integerPartWithGroupingSeparators = integerPart[i] + integerPartWithGroupingSeparators
         copiedCharacterCount++
@@ -566,9 +584,10 @@ StyleDefaults =
     positiveSuffix: (formatter) -> formatter.percentSymbol()
     negativeSuffix: (formatter) -> formatter.percentSymbol()
   CURRENCY:
-    positivePrefix: (formatter) -> formatter.currencySymbol()
-    negativePrefix: (formatter, region) -> region?.negativeCurrencyPrefix?(formatter, this)
-    negativeSuffix: (formatter, region) -> region?.negativeCurrencySuffix?(formatter, this)
+    positivePrefix: (formatter, locale) -> get locale, 'positiveCurrencyPrefix', formatter, this
+    positiveSuffix: (formatter, locale) -> get locale, 'positiveCurrencySuffix', formatter, this
+    negativePrefix: (formatter, locale) -> get locale, 'negativeCurrencyPrefix', formatter, this
+    negativeSuffix: (formatter, locale) -> get locale, 'negativeCurrencySuffix', formatter, this
 
 LocaleDefaults =
   default:
@@ -588,12 +607,26 @@ LocaleDefaults =
     positiveSuffix:              ''
     roundingMode:                HALF_EVEN
     positiveCurrencyPrefix:      (formatter) -> formatter.currencySymbol()
+    positiveCurrencySuffix:      ''
     negativeCurrencyPrefix:      (formatter) -> "(#{formatter.currencySymbol()}"
     negativeCurrencySuffix:      (formatter) -> ')'
 
   fr:
-    percentSymbol:     ' %'
-    groupingSeparator: ' '
+    decimalSeparator:       ','
+    groupingSeparator:      ' ' # nbsp
+    percentSymbol:          ' %' # nbsp
+    positiveCurrencyPrefix: ''
+    positiveCurrencySuffix: (formatter) -> " #{formatter.currencySymbol()}" # nbsp
+    negativeCurrencyPrefix: (formatter) -> '('
+    negativeCurrencySuffix: (formatter) -> " #{formatter.currencySymbol()})" # nbsp
+
+  ja:
+    negativeCurrencyPrefix: (formatter) -> "-#{formatter.currencySymbol()}"
+    negativeCurrencySuffix: ''
+
+  'en-GB':
+    negativeCurrencyPrefix: (formatter) -> "-#{formatter.currencySymbol()}"
+    negativeCurrencySuffix: ''
 
 RegionDefaults =
   CA:
@@ -613,22 +646,28 @@ RegionDefaults =
 
 CurrencyDefaults =
   default:
-    currencySymbol:        (formatter) -> formatter.currencyCode()
-    minimumFractionDigits: 2
-    maximumFractionDigits: 2
-    minimumIntegerDigits:  1
-    usesGroupingSeparator: yes
+    currencySymbol:              (formatter) -> formatter.currencyCode()
+    internationalCurrencySymbol: (formatter) -> formatter.currencyCode()
+    minimumFractionDigits:       2
+    maximumFractionDigits:       2
+    minimumIntegerDigits:        1
+    usesGroupingSeparator:       yes
   CAD:
-    currencySymbol: '$'
+    currencySymbol:              '$'
+    internationalCurrencySymbol: 'CAD$'
   EUR:
-    currencySymbol: '€'
+    currencySymbol:              '€'
+    internationalCurrencySymbol: 'EUR€'
   GBP:
-    currencySymbol: '£'
+    currencySymbol:              '£'
+    internationalCurrencySymbol: 'GBP£'
   JPY:
-    currencySymbol: '¥'
-    minimumFractionDigits: 0
-    maximumFractionDigits: 0
+    currencySymbol:              '¥'
+    internationalCurrencySymbol: 'JPY¥'
+    minimumFractionDigits:       0
+    maximumFractionDigits:       0
   USD:
-    currencySymbol: '$'
+    currencySymbol:              '$'
+    internationalCurrencySymbol: 'USD$'
 
 module.exports = NumberFormatter
