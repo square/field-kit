@@ -426,13 +426,48 @@ describe 'NumberFormatter', ->
           expect(formatter.format 1.2).toEqual('CUR1.20')
 
       describe 'setting the currency code to something else', ->
-        it 'allows implicitly changing the currency symbol', ->
-          formatter.setCurrencyCode 'EUR'
-          expect(formatter.format 1.2).toEqual('€1.20')
+        it 'uses any overrides for prefix and suffix from the language defaults', ->
+          # A person in the US who speaks French looking at US Dollars.
+          formatter.setLocale 'fr'
+          formatter.setCountryCode 'US'
+          formatter.setCurrencyCode 'USD'
+          expect(formatter.format 1234.56).toEqual('1 234,56 $')
+          expect(formatter.format -1234.56).toEqual('(1 234,56 $)')
 
-        it 'allows implicitly changing the digit settings', ->
-          formatter.setCurrencyCode 'JPY'
-          expect(formatter.format 5840).toEqual('¥5,840')
+        describe 'and the country code matches the currency code', ->
+          it 'uses the native currency symbol for the currency code', ->
+            # A person in Germany who speaks American English looking at Euros.
+            formatter.setLocale 'en-US'
+            formatter.setCountryCode 'DE'
+            formatter.setCurrencyCode 'EUR'
+            expect(formatter.format 1234.56).toEqual('€1,234.56')
+            expect(formatter.format -1234.56).toEqual('(€1,234.56)')
+
+          it 'allows implicitly changing the digit settings', ->
+            # A person in Japan who speaks Japanese looking at Yen.
+            formatter.setLocale 'ja-JP'
+            formatter.setCountryCode 'JP'
+            formatter.setCurrencyCode 'JPY'
+            expect(formatter.format 5840).toEqual('¥5,840')
+            expect(formatter.format -5840).toEqual('-¥5,840')
+
+        describe 'and the country code does not match the currency code', ->
+          it 'uses the international currency symbol for the currency code', ->
+            # A person in Germany who speaks American English looking at US Dollars.
+            formatter.setLocale 'en-US'
+            formatter.setCountryCode 'DE'
+            formatter.setCurrencyCode 'USD'
+            expect(formatter.format 1.2).toEqual('USD$1.20')
+            expect(formatter.format -1.2).toEqual('(USD$1.20)')
+
+        describe 'and the full locale string overrides the settings for its base language', ->
+          it 'uses the defaults from the full locale string over the base', ->
+            # A person in Great Britain who speaks British English looking at British Pounds.
+            formatter.setLocale 'en-GB'
+            formatter.setCountryCode 'GB'
+            formatter.setCurrencyCode 'GBP'
+            expect(formatter.format 9189.30).toEqual('£9,189.30')
+            expect(formatter.format -9189.30).toEqual('-£9,189.30')
 
       describe 'setting the currency code to an unknown currency', ->
         beforeEach ->
