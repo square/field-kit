@@ -12,8 +12,8 @@
   "license": "BSD",
   "dependencies": {},
   "devDependencies": {
-    "coffee-script": "~1.4.0",
-    "jasmine-node": "~1.0.28",
+    "coffee-script": "~1.6.0",
+    "jasmine-node": "~1.4.0",
     "gluejs": "~0.2.0",
     "uglify-js": "~2.2.2"
   }
