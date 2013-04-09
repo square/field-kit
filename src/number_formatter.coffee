@@ -14,6 +14,9 @@ NONE       = 0
 CURRENCY   = 1
 PERCENT    = 2
 
+DEFAULT_LOCALE  = 'en-US'
+DEFAULT_COUNTRY = 'US'
+
 isDigits = (string) ->
   /^\d*$/.test string
 
@@ -23,11 +26,26 @@ startsWith = (prefix, string) ->
 endsWith = (suffix, string) ->
   string[(string.length - suffix.length)..] is suffix
 
+splitLocaleComponents = (locale) ->
+  match = locale.match(/^([a-z][a-z])(?:[-_]([a-z][a-z]))?$/i)
+  { lang: match?[1]?.toLowerCase(), country: match?[2]?.toUpperCase() }
+
+# This simple property getter assumes that properties will never be functions
+# and so attempts to run those functions using the given args.
+get = (object, key, args...) ->
+  value = object?[key]
+  value = value(args...) if typeof value is 'function'
+  return value
+
 class NumberFormatter extends Formatter
-  _allowsFloats:                yes
-  _alwaysShowsDecimalSeparator: no
-  _groupingSeparator:           ','
-  _groupingSize:                3
+  _allowsFloats:                null
+  _alwaysShowsDecimalSeparator: null
+  _countryCode:                 null
+  _currencyCode:                null
+  _groupingSeparator:           null
+  _groupingSize:                null
+  _locale:                      null
+  _internationalCurrencySymbol: null
   _maximumFractionDigits:       null
   _minimumFractionDigits:       null
   _maximumIntegerDigits:        null
@@ -35,15 +53,15 @@ class NumberFormatter extends Formatter
   _maximum:                     null
   _minimum:                     null
   _multiplier:                  null
-  _notANumberSymbol:            'NaN'
-  _nullSymbol:                  ''
+  _notANumberSymbol:            null
+  _nullSymbol:                  null
   _numberStyle:                 null
-  _roundingMode:                HALF_EVEN
-  _usesGroupingSeparator:       no
+  _roundingMode:                null
+  _usesGroupingSeparator:       null
   _zeroSymbol:                  null
 
   constructor: ->
-    @_regionDefaults = RegionDefaults.US
+    @_locale = 'en'
     @setNumberStyle NONE
 
   # Gets whether this formatter will parse float number values. This value does
@@ -52,7 +70,7 @@ class NumberFormatter extends Formatter
   #
   # Returns true if parsing floats is allowed, false otherwise.
   allowsFloats: ->
-    @_allowsFloats
+    @_get 'allowsFloats'
 
   # Sets whether this formatter will parse float number values.
   #
@@ -62,18 +80,40 @@ class NumberFormatter extends Formatter
     return this
 
   alwaysShowsDecimalSeparator: ->
-    @_alwaysShowsDecimalSeparator
+    @_get 'alwaysShowsDecimalSeparator'
 
   setAlwaysShowsDecimalSeparator: (alwaysShowsDecimalSeparator) ->
     @_alwaysShowsDecimalSeparator = alwaysShowsDecimalSeparator
     return this
 
+  countryCode: ->
+    @_countryCode or DEFAULT_COUNTRY
+
+  setCountryCode: (countryCode) ->
+    @_countryCode = countryCode
+    return this
+
+  currencyCode: ->
+    @_get 'currencyCode'
+
+  setCurrencyCode: (currencyCode) ->
+    @_currencyCode = currencyCode
+    return this
+
   currencySymbol: ->
-    @_get 'currencySymbol'
+    if @_shouldShowNativeCurrencySymbol()
+      @_get 'currencySymbol'
+    else
+      @_get 'internationalCurrencySymbol'
 
   setCurrencySymbol: (currencySymbol) ->
     @_currencySymbol = currencySymbol
     return this
+
+  _shouldShowNativeCurrencySymbol: ->
+    regionDefaultCurrencyCode = @_regionDefaults().currencyCode
+    regionDefaultCurrencyCode = regionDefaultCurrencyCode?() ? regionDefaultCurrencyCode
+    return @currencyCode() is regionDefaultCurrencyCode
 
   decimalSeparator: ->
     @_get 'decimalSeparator'
@@ -83,16 +123,32 @@ class NumberFormatter extends Formatter
     return this
 
   groupingSeparator: ->
-    @_groupingSeparator
+    @_get 'groupingSeparator'
 
   setGroupingSeparator: (groupingSeparator) ->
     @_groupingSeparator = groupingSeparator
+    return this
 
   groupingSize: ->
-    @_groupingSize
+    @_get 'groupingSize'
 
   setGroupingSize: (groupingSize) ->
     @_groupingSize = groupingSize
+    return this
+
+  internationalCurrencySymbol: ->
+    @_get 'internationalCurrencySymbol'
+
+  setInternationalCurrencySymbol: (internationalCurrencySymbol) ->
+    @_internationalCurrencySymbol = internationalCurrencySymbol
+    return this
+
+  locale: ->
+    @_locale or DEFAULT_LOCALE
+
+  setLocale: (locale) ->
+    @_locale = locale
+    return this
 
   maximum: ->
     @_maximum
@@ -137,7 +193,7 @@ class NumberFormatter extends Formatter
     return this
 
   multiplier: ->
-    @_multiplier ? @_styleDefaults?.multiplier?() ? null
+    @_get 'multiplier'
 
   setMultiplier: (multiplier) ->
     @_multiplier = multiplier
@@ -164,13 +220,13 @@ class NumberFormatter extends Formatter
     return this
 
   notANumberSymbol: ->
-    @_notANumberSymbol
+    @_get 'notANumberSymbol'
 
   setNotANumberSymbol: (notANumberSymbol) ->
     @_notANumberSymbol = notANumberSymbol
 
   nullSymbol: ->
-    @_nullSymbol
+    @_get 'nullSymbol'
 
   setNullSymbol: (nullSymbol) ->
     @_nullSymbol = nullSymbol
@@ -220,42 +276,61 @@ class NumberFormatter extends Formatter
     return this
 
   roundingMode: ->
-    @_roundingMode
+    @_get 'roundingMode'
 
   setRoundingMode: (roundingMode) ->
     @_roundingMode = roundingMode
     return this
 
   usesGroupingSeparator: ->
-    @_usesGroupingSeparator
+    @_get 'usesGroupingSeparator'
 
   setUsesGroupingSeparator: (usesGroupingSeparator) ->
     @_usesGroupingSeparator = usesGroupingSeparator
 
   zeroSymbol: ->
-    @_zeroSymbol
+    @_get 'zeroSymbol'
 
   setZeroSymbol: (zeroSymbol) ->
     @_zeroSymbol = zeroSymbol
 
   _get: (attr) ->
-    @["_#{attr}"] ? @_styleDefaults?[attr]?(this, @_regionDefaults) ? @_regionDefaults?[attr]?(this, @_styleDefaults) ? null
+    value = @["_#{attr}"]
+    return value if value?
+
+    styleDefaults  = @_styleDefaults
+    localeDefaults = @_localeDefaults()
+    regionDefaults = @_regionDefaults()
+
+    value = get styleDefaults, attr, this, localeDefaults
+    return value if value?
+
+    value = get localeDefaults, attr, this, styleDefaults
+    return value if value?
+
+    value = get regionDefaults, attr, this, styleDefaults
+    return value if value?
+
+    value = get @_currencyDefaults(), attr, this, localeDefaults
+    return value if value?
+
+    return null
 
   format: (number) ->
-    if @_zeroSymbol? and number is 0
-      return @_zeroSymbol
+    if (zeroSymbol = @zeroSymbol())? and number is 0
+      return zeroSymbol
 
-    if @_nullSymbol? and number is null
-      return @_nullSymbol
+    if (nullSymbol = @nullSymbol())? and number is null
+      return nullSymbol
 
-    if @_notANumberSymbol? and isNaN(number)
-      return @_notANumberSymbol
+    if (notANumberSymbol = @notANumberSymbol())? and isNaN(number)
+      return notANumberSymbol
 
-    if @_positiveInfinitySymbol? and number is Infinity
-      return @_positiveInfinitySymbol
+    if (positiveInfinitySymbol = @positiveInfinitySymbol())? and number is Infinity
+      return positiveInfinitySymbol
 
-    if @_negativeInfinitySymbol? and number is -Infinity
-      return @_negativeInfinitySymbol
+    if (negativeInfinitySymbol = @negativeInfinitySymbol())? and number is -Infinity
+      return negativeInfinitySymbol
 
     if (multiplier = @multiplier())?
       number *= multiplier
@@ -299,16 +374,16 @@ class NumberFormatter extends Formatter
       integerPart = integerPart[-maximumIntegerDigits..]
 
     # add the decimal separator
-    if fractionPart.length > 0 or @_alwaysShowsDecimalSeparator
+    if fractionPart.length > 0 or @alwaysShowsDecimalSeparator()
       fractionPart = @decimalSeparator() + fractionPart
 
-    if @_usesGroupingSeparator
+    if @usesGroupingSeparator()
       integerPartWithGroupingSeparators = ''
       copiedCharacterCount = 0
 
       for i in [integerPart.length-1..0]
-        if copiedCharacterCount > 0 and copiedCharacterCount % @_groupingSize is 0
-          integerPartWithGroupingSeparators = @_groupingSeparator + integerPartWithGroupingSeparators
+        if copiedCharacterCount > 0 and copiedCharacterCount % @groupingSize() is 0
+          integerPartWithGroupingSeparators = @groupingSeparator() + integerPartWithGroupingSeparators
         integerPartWithGroupingSeparators = integerPart[i] + integerPartWithGroupingSeparators
         copiedCharacterCount++
 
@@ -328,25 +403,25 @@ class NumberFormatter extends Formatter
     @_rounder() number, @maximumFractionDigits()
 
   _rounder: ->
-    switch @_roundingMode
+    switch @roundingMode()
       when CEILING then roundCeiling
       when FLOOR then roundFloor
       when HALF_EVEN then roundHalfEven
 
   parse: (string, error) ->
-    if @_zeroSymbol? and string is @_zeroSymbol
+    if @zeroSymbol()? and string is @zeroSymbol()
       result = 0
 
-    else if @_nullSymbol? and string is @_nullSymbol
+    else if @nullSymbol()? and string is @nullSymbol()
       result = null
 
-    else if @_notANumberSymbol? and string is @_notANumberSymbol
+    else if @notANumberSymbol()? and string is @notANumberSymbol()
       result = NaN
 
-    else if @_positiveInfinitySymbol? and string is @_positiveInfinitySymbol
+    else if @positiveInfinitySymbol()? and string is @positiveInfinitySymbol()
       result = Infinity
 
-    else if @_negativeInfinitySymbol? and string is @_negativeInfinitySymbol
+    else if @negativeInfinitySymbol()? and string is @negativeInfinitySymbol()
       result = -Infinity
 
     else if not result?
@@ -389,7 +464,7 @@ class NumberFormatter extends Formatter
 
     number = Number(integerPart) + Number(".#{fractionPart or '0'}")
 
-    if not @_allowsFloats and number isnt ~~number
+    if not @allowsFloats() and number isnt ~~number
       error? 'number-formatter.floats-not-allowed'
       return null
 
@@ -397,6 +472,48 @@ class NumberFormatter extends Formatter
       number /= multiplier
 
     return number
+
+  _currencyDefaults: ->
+    result = {}
+
+    for own key, value of CurrencyDefaults.default
+      result[key] = value
+
+    for own key, value of CurrencyDefaults[@currencyCode()]
+      result[key] = value
+
+    return result
+
+  _regionDefaults: ->
+    result = {}
+
+    for own key, value of RegionDefaults.default
+      result[key] = value
+
+    for own key, value of RegionDefaults[@countryCode()]
+      result[key] = value
+
+    return result
+
+  _localeDefaults: ->
+    locale      = @locale()
+    countryCode = @countryCode()
+    { lang }    = splitLocaleComponents(locale)
+    result      = {}
+
+    defaultFallbacks = [
+      RegionDefaults.default
+      LocaleDefaults.default
+      RegionDefaults[countryCode]  # CA
+      LocaleDefaults[lang]         # fr
+      LocaleDefaults[locale]       # fr-CA
+    ]
+
+    for defaults in defaultFallbacks
+      for own key, value of defaults
+        result[key] = value
+
+    return result
 
 
 ## Aliases
@@ -454,41 +571,102 @@ NumberFormatter.Style = {
 
 StyleDefaults =
   NONE:
-    minimumFractionDigits: -> 0
-    maximumFractionDigits: -> 0
-    minimumIntegerDigits:  -> 0
+    usesGroupingSeparator: no
+    minimumFractionDigits: 0
+    maximumFractionDigits: 0
+    minimumIntegerDigits:  0
   PERCENT:
-    multiplier:            -> 100
-    minimumFractionDigits: -> 0
-    maximumFractionDigits: -> 0
-    minimumIntegerDigits:  -> 0
+    usesGroupingSeparator: no
+    multiplier:            100
+    minimumFractionDigits: 0
+    maximumFractionDigits: 0
+    minimumIntegerDigits:  0
     positiveSuffix: (formatter) -> formatter.percentSymbol()
     negativeSuffix: (formatter) -> formatter.percentSymbol()
   CURRENCY:
-    positivePrefix:        (formatter) -> formatter.currencySymbol()
-    negativePrefix:        (formatter, region) -> region?.negativeCurrencyPrefix?(formatter, this)
-    negativeSuffix:        (formatter, region) -> region?.negativeCurrencySuffix?(formatter, this)
-    minimumFractionDigits: (formatter, region) -> region?.minimumCurrencyFractionDigits?(formatter, this)
-    maximumFractionDigits: (formatter, region) -> region?.maximumCurrencyFractionDigits?(formatter, this)
-    minimumIntegerDigits:  (formatter, region) -> region?.minimumCurrencyIntegerDigits?(formatter, this)
-    maximumIntegerDigits:  (formatter, region) -> region?.maximumCurrencyIntegerDigits?(formatter, this)
+    positivePrefix: (formatter, locale) -> get locale, 'positiveCurrencyPrefix', formatter, this
+    positiveSuffix: (formatter, locale) -> get locale, 'positiveCurrencySuffix', formatter, this
+    negativePrefix: (formatter, locale) -> get locale, 'negativeCurrencyPrefix', formatter, this
+    negativeSuffix: (formatter, locale) -> get locale, 'negativeCurrencySuffix', formatter, this
+
+LocaleDefaults =
+  default:
+    allowsFloats:                yes
+    alwaysShowsDecimalSeparator: no
+    decimalSeparator:            '.'
+    groupingSeparator:           ','
+    groupingSize:                3
+    negativeInfinitySymbol:      '-∞'
+    negativePrefix:              '-'
+    negativeSuffix:              ''
+    notANumberSymbol:            'NaN'
+    nullSymbol:                  ''
+    percentSymbol:               '%'
+    positiveInfinitySymbol:      '+∞'
+    positivePrefix:              ''
+    positiveSuffix:              ''
+    roundingMode:                HALF_EVEN
+    positiveCurrencyPrefix:      (formatter) -> formatter.currencySymbol()
+    positiveCurrencySuffix:      ''
+    negativeCurrencyPrefix:      (formatter) -> "(#{formatter.currencySymbol()}"
+    negativeCurrencySuffix:      (formatter) -> ')'
+
+  fr:
+    decimalSeparator:       ','
+    groupingSeparator:      ' ' # nbsp
+    percentSymbol:          ' %' # nbsp
+    positiveCurrencyPrefix: ''
+    positiveCurrencySuffix: (formatter) -> " #{formatter.currencySymbol()}" # nbsp
+    negativeCurrencyPrefix: (formatter) -> '('
+    negativeCurrencySuffix: (formatter) -> " #{formatter.currencySymbol()})" # nbsp
+
+  ja:
+    negativeCurrencyPrefix: (formatter) -> "-#{formatter.currencySymbol()}"
+    negativeCurrencySuffix: ''
+
+  'en-GB':
+    negativeCurrencyPrefix: (formatter) -> "-#{formatter.currencySymbol()}"
+    negativeCurrencySuffix: ''
 
 RegionDefaults =
+  CA:
+    currencyCode: 'CAD'
+  DE:
+    currencyCode: 'EUR'
+  ES:
+    currencyCode: 'EUR'
+  FR:
+    currencyCode: 'EUR'
+  GB:
+    currencyCode: 'GBP'
+  JP:
+    currencyCode: 'JPY'
   US:
-    decimalSeparator:              -> '.'
-    negativeInfinitySymbol:        -> '-∞'
-    negativePrefix:                -> '-'
-    negativeSuffix:                -> ''
-    percentSymbol:                 -> '%'
-    positiveInfinitySymbol:        -> '+∞'
-    positivePrefix:                -> ''
-    positiveSuffix:                -> ''
-    currencySymbol:                -> '$'
-    positiveCurrencyPrefix:        (formatter) -> formatter.currencySymbol()
-    negativeCurrencyPrefix:        (formatter) -> "(#{formatter.currencySymbol()}"
-    negativeCurrencySuffix:        (formatter) -> ')'
-    minimumCurrencyFractionDigits: -> 2
-    maximumCurrencyFractionDigits: -> 2
-    minimumCurrencyIntegerDigits:  -> 1
+    currencyCode: 'USD'
+
+CurrencyDefaults =
+  default:
+    currencySymbol:              (formatter) -> formatter.currencyCode()
+    internationalCurrencySymbol: (formatter) -> formatter.currencyCode()
+    minimumFractionDigits:       2
+    maximumFractionDigits:       2
+    minimumIntegerDigits:        1
+    usesGroupingSeparator:       yes
+  CAD:
+    currencySymbol:              '$'
+    internationalCurrencySymbol: 'CA$'
+  EUR:
+    currencySymbol:              '€'
+  GBP:
+    currencySymbol:              '£'
+    internationalCurrencySymbol: 'GB£'
+  JPY:
+    currencySymbol:              '¥'
+    internationalCurrencySymbol: 'JP¥'
+    minimumFractionDigits:       0
+    maximumFractionDigits:       0
+  USD:
+    currencySymbol:              '$'
+    internationalCurrencySymbol: 'US$'
 
 module.exports = NumberFormatter

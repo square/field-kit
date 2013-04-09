@@ -7,7 +7,7 @@ describe 'NumberFormatter', ->
     formatter = new NumberFormatter()
 
   describe 'by default', ->
-    it 'has US-standard number prefixes and suffixes', ->
+    it 'has US English-standard number prefixes and suffixes', ->
       expect(formatter.positivePrefix()).toEqual("")
       expect(formatter.positiveSuffix()).toEqual("")
       expect(formatter.negativePrefix()).toEqual("-")
@@ -20,8 +20,11 @@ describe 'NumberFormatter', ->
     it 'does not always show the decimal separator', ->
       expect(formatter.alwaysShowsDecimalSeparator()).toBeFalsy()
 
-    it 'has the US-standard decimal separator', ->
+    it 'has the US English-standard decimal separator', ->
       expect(formatter.decimalSeparator()).toEqual('.')
+
+    it 'has USD currency code', ->
+      expect(formatter.currencyCode()).toEqual('USD')
 
     it 'rounds half even', ->
       expect(formatter.roundingMode()).toEqual(NumberFormatter.Rounding.HALF_EVEN)
@@ -44,10 +47,10 @@ describe 'NumberFormatter', ->
     it 'does not use a grouping separator', ->
       expect(formatter.usesGroupingSeparator()).toBeFalsy()
 
-    it 'has US-standard grouping separator', ->
+    it 'has US English-standard grouping separator', ->
       expect(formatter.groupingSeparator()).toEqual(',')
 
-    it 'has US-standard grouping size', ->
+    it 'has US English-standard grouping size', ->
       expect(formatter.groupingSize()).toEqual(3)
 
     it 'has no custom zero symbol', ->
@@ -59,19 +62,19 @@ describe 'NumberFormatter', ->
     it 'has NaN as the not a number symbol', ->
       expect(formatter.notANumberSymbol()).toEqual('NaN')
 
-    it 'has US-standard symbol for positive infinity', ->
+    it 'has US English-standard symbol for positive infinity', ->
       expect(formatter.positiveInfinitySymbol()).toEqual('+∞')
 
-    it 'has US-standard symbol for negative infinity', ->
+    it 'has US English-standard symbol for negative infinity', ->
       expect(formatter.negativeInfinitySymbol()).toEqual('-∞')
 
-    it 'has US-standard symbol for percent', ->
+    it 'has US English-standard symbol for percent', ->
       expect(formatter.percentSymbol()).toEqual('%')
 
     it 'has no number style', ->
       expect(formatter.numberStyle()).toEqual(NumberFormatter.Style.NONE)
 
-    it 'has US-standard symbol for currency', ->
+    it 'has US English-standard symbol for currency', ->
       expect(formatter.currencySymbol()).toEqual('$')
 
   describe '#numberFromString', ->
@@ -314,6 +317,13 @@ describe 'NumberFormatter', ->
           it 'formats integer parts with more digits than the grouping size with separators', ->
             expect(formatter.format 1234567).toEqual('1**234**567')
 
+        describe 'with a locale that customizes grouping', ->
+          beforeEach ->
+            formatter.setLocale 'fr-CA'
+
+          it 'uses the custom grouping settings for that locale', ->
+            expect(formatter.format 1234567).toEqual('1 234 567')
+
     describe 'given a negative number', ->
       describe 'with custom prefix and suffix', ->
         beforeEach ->
@@ -393,6 +403,13 @@ describe 'NumberFormatter', ->
         it 'formats using the custom symbol', ->
           expect(formatter.format .2).toEqual('20PER')
 
+      describe 'with a non-US English locale', ->
+        beforeEach ->
+          formatter.setLocale 'fr'
+
+        it 'formats using the custom symbol for that locale', ->
+          expect(formatter.format .2).toEqual('20 %')
+
     describe 'with the currency style', ->
       beforeEach ->
         formatter.setNumberStyle NumberFormatter.Style.CURRENCY
@@ -407,6 +424,57 @@ describe 'NumberFormatter', ->
 
         it 'formats using the custom symbol', ->
           expect(formatter.format 1.2).toEqual('CUR1.20')
+
+      describe 'setting the currency code to something else', ->
+        it 'uses any overrides for prefix and suffix from the language defaults', ->
+          # A person in the US who speaks French looking at US Dollars.
+          formatter.setLocale 'fr'
+          formatter.setCountryCode 'US'
+          formatter.setCurrencyCode 'USD'
+          expect(formatter.format 1234.56).toEqual('1 234,56 $')
+          expect(formatter.format -1234.56).toEqual('(1 234,56 $)')
+
+        describe 'and the country code matches the currency code', ->
+          it 'uses the native currency symbol for the currency code', ->
+            # A person in Germany who speaks American English looking at Euros.
+            formatter.setLocale 'en-US'
+            formatter.setCountryCode 'DE'
+            formatter.setCurrencyCode 'EUR'
+            expect(formatter.format 1234.56).toEqual('€1,234.56')
+            expect(formatter.format -1234.56).toEqual('(€1,234.56)')
+
+          it 'allows implicitly changing the digit settings', ->
+            # A person in Japan who speaks Japanese looking at Yen.
+            formatter.setLocale 'ja-JP'
+            formatter.setCountryCode 'JP'
+            formatter.setCurrencyCode 'JPY'
+            expect(formatter.format 5840).toEqual('¥5,840')
+            expect(formatter.format -5840).toEqual('-¥5,840')
+
+        describe 'and the country code does not match the currency code', ->
+          it 'uses the international currency symbol for the currency code', ->
+            # A person in Germany who speaks American English looking at US Dollars.
+            formatter.setLocale 'en-US'
+            formatter.setCountryCode 'DE'
+            formatter.setCurrencyCode 'USD'
+            expect(formatter.format 1.2).toEqual('US$1.20')
+            expect(formatter.format -1.2).toEqual('(US$1.20)')
+
+        describe 'and the full locale string overrides the settings for its base language', ->
+          it 'uses the defaults from the full locale string over the base', ->
+            # A person in Great Britain who speaks British English looking at British Pounds.
+            formatter.setLocale 'en-GB'
+            formatter.setCountryCode 'GB'
+            formatter.setCurrencyCode 'GBP'
+            expect(formatter.format 9189.30).toEqual('£9,189.30')
+            expect(formatter.format -9189.30).toEqual('-£9,189.30')
+
+      describe 'setting the currency code to an unknown currency', ->
+        beforeEach ->
+          formatter.setCurrencyCode 'XXX'
+
+        it 'formats using the currency code as the symbol', ->
+          expect(formatter.format 1.2).toEqual('XXX1.20')
 
     describe 'switching styles', ->
       it 'resets values back to their original defaults', ->
