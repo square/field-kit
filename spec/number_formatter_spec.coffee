@@ -7,7 +7,7 @@ describe 'NumberFormatter', ->
     formatter = new NumberFormatter()
 
   describe 'by default', ->
-    it 'has English-standard number prefixes and suffixes', ->
+    it 'has US English-standard number prefixes and suffixes', ->
       expect(formatter.positivePrefix()).toEqual("")
       expect(formatter.positiveSuffix()).toEqual("")
       expect(formatter.negativePrefix()).toEqual("-")
@@ -20,7 +20,7 @@ describe 'NumberFormatter', ->
     it 'does not always show the decimal separator', ->
       expect(formatter.alwaysShowsDecimalSeparator()).toBeFalsy()
 
-    it 'has the English-standard decimal separator', ->
+    it 'has the US English-standard decimal separator', ->
       expect(formatter.decimalSeparator()).toEqual('.')
 
     it 'has USD currency code', ->
@@ -47,10 +47,10 @@ describe 'NumberFormatter', ->
     it 'does not use a grouping separator', ->
       expect(formatter.usesGroupingSeparator()).toBeFalsy()
 
-    it 'has English-standard grouping separator', ->
+    it 'has US English-standard grouping separator', ->
       expect(formatter.groupingSeparator()).toEqual(',')
 
-    it 'has English-standard grouping size', ->
+    it 'has US English-standard grouping size', ->
       expect(formatter.groupingSize()).toEqual(3)
 
     it 'has no custom zero symbol', ->
@@ -62,19 +62,19 @@ describe 'NumberFormatter', ->
     it 'has NaN as the not a number symbol', ->
       expect(formatter.notANumberSymbol()).toEqual('NaN')
 
-    it 'has English-standard symbol for positive infinity', ->
+    it 'has US English-standard symbol for positive infinity', ->
       expect(formatter.positiveInfinitySymbol()).toEqual('+∞')
 
-    it 'has English-standard symbol for negative infinity', ->
+    it 'has US English-standard symbol for negative infinity', ->
       expect(formatter.negativeInfinitySymbol()).toEqual('-∞')
 
-    it 'has English-standard symbol for percent', ->
+    it 'has US English-standard symbol for percent', ->
       expect(formatter.percentSymbol()).toEqual('%')
 
     it 'has no number style', ->
       expect(formatter.numberStyle()).toEqual(NumberFormatter.Style.NONE)
 
-    it 'has English-standard symbol for currency', ->
+    it 'has US English-standard symbol for currency', ->
       expect(formatter.currencySymbol()).toEqual('$')
 
   describe '#numberFromString', ->
@@ -403,7 +403,7 @@ describe 'NumberFormatter', ->
         it 'formats using the custom symbol', ->
           expect(formatter.format .2).toEqual('20PER')
 
-      describe 'with a non-English locale', ->
+      describe 'with a non-US English locale', ->
         beforeEach ->
           formatter.setLocale 'fr'
 
