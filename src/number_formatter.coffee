@@ -654,20 +654,19 @@ CurrencyDefaults =
     usesGroupingSeparator:       yes
   CAD:
     currencySymbol:              '$'
-    internationalCurrencySymbol: 'CAD$'
+    internationalCurrencySymbol: 'CA$'
   EUR:
     currencySymbol:              '€'
-    internationalCurrencySymbol: 'EUR€'
   GBP:
     currencySymbol:              '£'
-    internationalCurrencySymbol: 'GBP£'
+    internationalCurrencySymbol: 'GB£'
   JPY:
     currencySymbol:              '¥'
-    internationalCurrencySymbol: 'JPY¥'
+    internationalCurrencySymbol: 'JP¥'
     minimumFractionDigits:       0
     maximumFractionDigits:       0
   USD:
     currencySymbol:              '$'
-    internationalCurrencySymbol: 'USD$'
+    internationalCurrencySymbol: 'US$'
 
 module.exports = NumberFormatter

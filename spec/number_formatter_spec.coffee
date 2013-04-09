@@ -457,8 +457,8 @@ describe 'NumberFormatter', ->
             formatter.setLocale 'en-US'
             formatter.setCountryCode 'DE'
             formatter.setCurrencyCode 'USD'
-            expect(formatter.format 1.2).toEqual('USD$1.20')
-            expect(formatter.format -1.2).toEqual('(USD$1.20)')
+            expect(formatter.format 1.2).toEqual('US$1.20')
+            expect(formatter.format -1.2).toEqual('(US$1.20)')
 
         describe 'and the full locale string overrides the settings for its base language', ->
           it 'uses the defaults from the full locale string over the base', ->
