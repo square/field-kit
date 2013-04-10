@@ -1,5 +1,6 @@
 AMEX        = 'amex'
 DISCOVER    = 'discover'
+JCB         = 'jcb'
 MASTERCARD  = 'mastercard'
 VISA        = 'visa'
 
@@ -15,6 +16,8 @@ determineCardType = (pan) ->
     VISA
   else if pan.slice(0, 4) is '6011' or firsttwo is 65 or (halfiin >= 664 && halfiin <= 649) or (iin >= 622126 and iin <= 622925)
     DISCOVER
+  else if pan.slice(0, 4) is '2131' or pan.slice(0, 4) is '1800' or firsttwo is 35
+    JCB
   else if firsttwo >= 51 and firsttwo <= 55
     MASTERCARD
   else if firsttwo in [34, 37]
@@ -35,9 +38,11 @@ validCardLength = (pan) ->
       pan.length in [13, 16]
     when DISCOVER, MASTERCARD
       pan.length is 16
+    when JCB
+      pan.length in [15, 16]
     when AMEX
       pan.length is 15
     else
       false
 
-module.exports = { determineCardType, luhnCheck, validCardLength, AMEX, DISCOVER, MASTERCARD, VISA }
+module.exports = { determineCardType, luhnCheck, validCardLength, AMEX, DISCOVER, JCB, MASTERCARD, VISA }
