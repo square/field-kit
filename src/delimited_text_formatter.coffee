@@ -7,8 +7,8 @@ class DelimitedTextFormatter extends Formatter
     return null unless @hasDelimiterAtIndex index
     @delimiter
 
-  isDelimiter: (char) ->
-    char is @delimiter
+  isDelimiter: (chr) ->
+    chr is @delimiter
 
   constructor: (delimiter=@delimiter) ->
     @delimiter = delimiter
@@ -22,9 +22,9 @@ class DelimitedTextFormatter extends Formatter
     return '' unless value
 
     result = ''
-    for char in value
+    for chr in value
       result += delimiter while delimiter = @delimiterAt result.length
-      result += char
+      result += chr
       result += delimiter while delimiter = @delimiterAt result.length
     result
 
@@ -33,7 +33,7 @@ class DelimitedTextFormatter extends Formatter
 
   _valueFromText: (text) ->
     return '' unless text
-    (char for char in text when not @isDelimiter(char)).join('')
+    (chr for chr in text when not @isDelimiter(chr)).join('')
 
   isChangeValid: (change, error) ->
     return no unless super change, error
