@@ -6,7 +6,7 @@ AFFINITY =
   DOWNSTREAM: 1
   NONE:       null
 
-isWordChar = (char) -> char and /^\w$/.test(char)
+isWordChar = (chr) -> chr and /^\w$/.test(chr)
 
 class TextField
   # Internal: Contains one of the AFFINITY enum to indicate the preferred

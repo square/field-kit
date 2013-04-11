@@ -18,33 +18,33 @@ class Caret
     valueIndex = 0
     parseIndex = 0
 
-    parseError = (char, msg) ->
-      throw new Error("unexpected '#{char}' in '#{description}' at character #{parseIndex}: #{msg}")
+    parseError = (chr, msg) ->
+      throw new Error("unexpected '#{chr}' in '#{description}' at character #{parseIndex}: #{msg}")
 
-    for char in description
-      if char in ['|', '<', '>']
+    for chr in description
+      if chr in ['|', '<', '>']
         # all of these caret markers are invalid if we already have an end
         if caret.end?
-          parseError char, "the selection has already ended"
+          parseError chr, "the selection has already ended"
 
         if caret.start?
-          if char is '<'
-            parseError char, "'#{char}' cannot be the end of a selection"
+          if chr is '<'
+            parseError chr, "'#{chr}' cannot be the end of a selection"
 
-          if affinity isnt null and char is '>'
-            parseError char, "'#{char}' cannot be the end of an already-leftward selection"
+          if affinity isnt null and chr is '>'
+            parseError chr, "'#{chr}' cannot be the end of an already-leftward selection"
 
           caret.end = valueIndex
-          affinity = 1 if char is '>'
+          affinity = 1 if chr is '>'
 
         else
-          if char is '>'
-            parseError char, "'#{char}' cannot be the start of a selection"
+          if chr is '>'
+            parseError chr, "'#{chr}' cannot be the start of a selection"
 
           caret.start = valueIndex
-          affinity = 0 if char is '<'
+          affinity = 0 if chr is '<'
       else
-        value += char
+        value += chr
         valueIndex++
 
       parseIndex++

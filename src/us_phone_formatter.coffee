@@ -14,8 +14,8 @@ class UsPhoneFormatter extends DelimitedTextFormatter
     if arguments.length isnt 0
       throw new Error("were you trying to set a delimiter (#{arguments[0]})?")
 
-  isDelimiter: (char) ->
-    char in for index, delimiter of UsPhoneDelimiter
+  isDelimiter: (chr) ->
+    chr in for index, delimiter of UsPhoneDelimiter
       delimiter
 
   delimiterAt: (index) ->

@@ -333,8 +333,8 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       return this.delimiter;
     };
 
-    DelimitedTextFormatter.prototype.isDelimiter = function(char) {
-      return char === this.delimiter;
+    DelimitedTextFormatter.prototype.isDelimiter = function(chr) {
+      return chr === this.delimiter;
     };
 
     function DelimitedTextFormatter(delimiter) {
@@ -354,18 +354,18 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     };
 
     DelimitedTextFormatter.prototype._textFromValue = function(value) {
-      var char, delimiter, result, _i, _len;
+      var chr, delimiter, result, _i, _len;
 
       if (!value) {
         return '';
       }
       result = '';
       for (_i = 0, _len = value.length; _i < _len; _i++) {
-        char = value[_i];
+        chr = value[_i];
         while (delimiter = this.delimiterAt(result.length)) {
           result += delimiter;
         }
-        result += char;
+        result += chr;
         while (delimiter = this.delimiterAt(result.length)) {
           result += delimiter;
         }
@@ -378,7 +378,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     };
 
     DelimitedTextFormatter.prototype._valueFromText = function(text) {
-      var char;
+      var chr;
 
       if (!text) {
         return '';
@@ -388,9 +388,9 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
 
         _results = [];
         for (_i = 0, _len = text.length; _i < _len; _i++) {
-          char = text[_i];
-          if (!this.isDelimiter(char)) {
-            _results.push(char);
+          chr = text[_i];
+          if (!this.isDelimiter(chr)) {
+            _results.push(chr);
           }
         }
         return _results;
@@ -1837,8 +1837,8 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
     NONE: null
   };
 
-  isWordChar = function(char) {
-    return char && /^\w$/.test(char);
+  isWordChar = function(chr) {
+    return chr && /^\w$/.test(chr);
   };
 
   TextField = (function() {
@@ -2994,7 +2994,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
       }
     }
 
-    UsPhoneFormatter.prototype.isDelimiter = function(char) {
+    UsPhoneFormatter.prototype.isDelimiter = function(chr) {
       var delimiter, index;
 
       return __indexOf.call((function() {
@@ -3006,7 +3006,7 @@ require.m[0] = { "adaptive_card_formatter.js": function(module, exports, require
           _results.push(delimiter);
         }
         return _results;
-      })(), char) >= 0;
+      })(), chr) >= 0;
     };
 
     UsPhoneFormatter.prototype.delimiterAt = function(index) {
