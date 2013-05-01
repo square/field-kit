@@ -7,9 +7,9 @@ FieldKit =
   ExpiryDateFormatter           : require './expiry_date_formatter'
   Formatter                     : require './formatter'
   NumberFormatter               : require './number_formatter'
+  PhoneFormatter                : require './phone_formatter'
   SocialSecurityNumberFormatter : require './social_security_number_formatter'
   TextField                     : require './text_field'
   UndoManager                   : require './undo_manager'
-  UsPhoneFormatter              : require './us_phone_formatter'
 
 module.exports = FieldKit

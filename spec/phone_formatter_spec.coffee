@@ -1,18 +1,18 @@
-UsPhoneFormatter = require '../lib/us_phone_formatter'
+PhoneFormatter = require '../lib/phone_formatter'
 {buildField} = require './helpers/builders'
 {expectThatTyping} = require './helpers/expectations'
 
-describe 'UsPhoneFormatter', ->
+describe 'PhoneFormatter', ->
   field = null
   formatter = null
 
   beforeEach ->
     field = buildField()
-    formatter = new UsPhoneFormatter()
+    formatter = new PhoneFormatter()
     field.setFormatter formatter
 
   it 'does not allow initializing with a delimiter', ->
-    expect(-> new UsPhoneFormatter('-')).toThrow()
+    expect(-> new PhoneFormatter('-')).toThrow()
 
   it 'adds a ( before the first digit', ->
     expectThatTyping('4').into(field).willChange('|').to('(4|')
