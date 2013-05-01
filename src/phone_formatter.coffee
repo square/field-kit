@@ -41,20 +41,33 @@ class PhoneFormatter extends DelimitedTextFormatter
   hasDelimiterAtIndex: (index) ->
     @delimiterAt(index)?
 
+  format: (value) ->
+    @guessFormatFromText value
+    super value
+
   isChangeValid: (change, error) ->
-    if change.proposed.text[0] is '+'
-      @delimiterMap = NANP_PHONE_DELIMITERS_WITH_PLUS
-      @maximumLength = 1 + 1 + 10 + 5
-    else if change.proposed.text[0] is '1'
-      @delimiterMap = NANP_PHONE_DELIMITERS_WITH_1
-      @maximumLength = 1 + 10 + 5
-    else
-      @delimiterMap = NANP_PHONE_DELIMITERS
-      @maximumLength = 10 + 4
+    @guessFormatFromText change.proposed.text
 
     if /^\d*$/.test(change.inserted.text) or change.proposed.text.indexOf('+') is 0
       super change, error
     else
       return no
+
+  # Internal: Re-configures this formatter to use the delimiters appropriate
+  # for the given text.
+  #
+  # text - A potentially formatted string containing a phone number.
+  #
+  # Returns nothing.
+  guessFormatFromText: (text) ->
+    if text[0] is '+'
+      @delimiterMap = NANP_PHONE_DELIMITERS_WITH_PLUS
+      @maximumLength = 1 + 1 + 10 + 5
+    else if text[0] is '1'
+      @delimiterMap = NANP_PHONE_DELIMITERS_WITH_1
+      @maximumLength = 1 + 10 + 5
+    else
+      @delimiterMap = NANP_PHONE_DELIMITERS
+      @maximumLength = 10 + 4
 
 module.exports = PhoneFormatter
