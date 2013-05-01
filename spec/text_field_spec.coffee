@@ -37,6 +37,7 @@ describe 'TextField', ->
         expectThatTyping('alt+backspace').willChange('12|3 4|5').to('12|5')
         expectThatTyping('alt+backspace').willChange('12<3 4|5').to('12|5')
         expectThatTyping('alt+backspace').willChange('12|3 4>5').to('12|5')
+        expectThatTyping('alt+backspace').willChange('+|').to('|')
 
         expectThatTyping('meta+backspace').willChange('12|3 4>5').to('12|5')
 
@@ -63,6 +64,8 @@ describe 'TextField', ->
         expectThatTyping('alt+delete').willChange('12|3 4|5').to('12|5')
         expectThatTyping('alt+delete').willChange('12<3 4|5').to('12|5')
         expectThatTyping('alt+delete').willChange('12|3 4>5').to('12|5')
+
+        expectThatTyping('alt+delete').willChange('|+').to('|')
 
     describe 'with an empty selection', ->
       it 'works as expected', ->
