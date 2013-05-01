@@ -6,7 +6,20 @@ AFFINITY =
   DOWNSTREAM: 1
   NONE:       null
 
-isWordChar = (chr) -> chr and /^\w$/.test(chr)
+isWordChar = (chr) ->
+  chr and /^\w$/.test(chr)
+
+hasLeftWordBreakAtIndex = (text, index) ->
+  if index is 0
+    yes
+  else
+    not isWordChar(text[index-1]) and isWordChar(text[index])
+
+hasRightWordBreakAtIndex = (text, index) ->
+  if index is text.length
+    yes
+  else
+    isWordChar(text[index]) and not isWordChar(text[index+1])
 
 class TextField
   # Internal: Contains one of the AFFINITY enum to indicate the preferred
@@ -847,7 +860,7 @@ class TextField
     text = @text()
 
     for i in [0..text.length-1]
-      result.push i if not isWordChar(text[i-1]) and isWordChar(text[i])
+      result.push i if hasLeftWordBreakAtIndex(text, i)
 
     return result
 
@@ -882,8 +895,8 @@ class TextField
     result = []
     text = @text()
 
-    for i in [0..text.length-1]
-      result.push i+1 if isWordChar(text[i]) and not isWordChar(text[i+1])
+    for i in [0..text.length]
+      result.push i+1 if hasRightWordBreakAtIndex(text, i)
 
     return result
 
