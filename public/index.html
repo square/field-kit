@@ -37,7 +37,7 @@
       top: 12px;
     }
 
-    #us-phone {
+    #phone {
       width: 150px;
     }
 
@@ -318,15 +318,15 @@ field.setDelegate({
 
     <div class="row">
       <div class="offset2 span8">
-        <h3>UsPhoneFormatter</h3>
+        <h3>PhoneFormatter</h3>
       </div>
     </div>
 
     <div class="row field-kit-example">
       <div class="offset2 span8">
         <p>
-          The <code>UsPhoneFormatter</code> provides formatting for
-          US phone numbers, preventing the input of non-digit characters
+          The <code>PhoneFormatter</code> provides formatting for
+          phone numbers, preventing the input of non-digit characters
           and automatically formatting like
           <code>(NNN) NNN-NNNN</code>.
         </p>
@@ -341,8 +341,8 @@ field.setDelegate({
           </div>
         </div>
 
-        <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="tel" id="us-phone" placeholder="(415) 555-1212"&gt;</code></pre>
-        <pre class="prettyprint docs-example-code docs-example-code-js"><code>new FieldKit.TextField($('#us-phone'), new FieldKit.UsPhoneFormatter());</code></pre>
+        <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="tel" id="phone" placeholder="(415) 555-1212"&gt;</code></pre>
+        <pre class="prettyprint docs-example-code docs-example-code-js"><code>new FieldKit.TextField($('#phone'), new FieldKit.PhoneFormatter());</code></pre>
       </div>
     </div>
 
