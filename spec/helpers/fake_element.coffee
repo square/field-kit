@@ -49,12 +49,12 @@ class FakeElement extends EventEmitter
 
     child.parentNode = this
 
-  @::__defineGetter__ 'nextSibling', ->
+  this::__defineGetter__ 'nextSibling', ->
     siblingsAndSelf = @parentNode.childNodes
     myIndex = siblingsAndSelf.indexOf(this)
     siblingsAndSelf[myIndex+1]
 
-  @::__defineGetter__ 'previousSibling', ->
+  this::__defineGetter__ 'previousSibling', ->
     siblingsAndSelf = @parentNode.childNodes
     myIndex = siblingsAndSelf.indexOf(this)
     siblingsAndSelf[myIndex-1]

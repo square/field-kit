@@ -295,7 +295,7 @@ class NumberFormatter extends Formatter
     @_zeroSymbol = zeroSymbol
 
   _get: (attr) ->
-    value = @["_#{attr}"]
+    value = this["_#{attr}"]
     return value if value?
 
     styleDefaults  = @_styleDefaults

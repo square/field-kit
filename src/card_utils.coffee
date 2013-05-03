@@ -24,13 +24,13 @@ determineCardType = (pan) ->
     AMEX
 
 luhnCheck = (pan) ->
-    sum = 0
-    flip = true
-    for i in [pan.length-1..0] when pan.charAt(i) isnt ' '
-      digit = parseInt(pan.charAt(i), 10)
-      sum += if (flip = not flip) then Math.floor((digit * 2) / 10) + Math.floor(digit * 2 % 10) else digit
+  sum = 0
+  flip = true
+  for i in [pan.length-1..0] when pan.charAt(i) isnt ' '
+    digit = parseInt(pan.charAt(i), 10)
+    sum += if (flip = not flip) then Math.floor((digit * 2) / 10) + Math.floor(digit * 2 % 10) else digit
 
-    return sum % 10 is 0
+  return sum % 10 is 0
 
 validCardLength = (pan) ->
   switch determineCardType(pan)

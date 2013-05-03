@@ -21,7 +21,7 @@ class Shoe
     @_undoProxy = @_undoManager.proxyFor(this)
 
   # This is here so our test can omit getters in the prototype.
-  @::__defineGetter__ 'getterOnPrototype', -> -> 42
+  this::__defineGetter__ 'getterOnPrototype', -> -> 42
 
 describe 'UndoManager', ->
   undoManager = null

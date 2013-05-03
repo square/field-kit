@@ -12,21 +12,21 @@ class FakeInput extends FakeElement
     @type = type
     @value = ''
 
-  attr @, 'value'
-  attr @, 'type'
+  attr this, 'value'
+  attr this, 'type'
 
-  @::__defineGetter__ 'selectionStart', ->
+  this::__defineGetter__ 'selectionStart', ->
     @_selectionStart
 
-  @::__defineSetter__ 'selectionStart', (selectionStart) ->
+  this::__defineSetter__ 'selectionStart', (selectionStart) ->
     selectionStart = 0 if selectionStart < 0
     selectionStart = @value.length if selectionStart > @value.length
     @_selectionStart = selectionStart
 
-  @::__defineGetter__ 'selectionEnd', ->
+  this::__defineGetter__ 'selectionEnd', ->
     @_selectionStart
 
-  @::__defineSetter__ 'selectionEnd', (selectionEnd) ->
+  this::__defineSetter__ 'selectionEnd', (selectionEnd) ->
     selectionEnd = 0 if selectionEnd < 0
     selectionEnd = @value.length if selectionEnd > @value.length
     @_selectionEnd = selectionEnd
