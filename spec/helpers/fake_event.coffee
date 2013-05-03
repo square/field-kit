@@ -39,13 +39,13 @@ class FakeEvent
   isDefaultPrevented: ->
     @_defaultPrevented
 
-  @::__defineGetter__ 'charCode', ->
+  this::__defineGetter__ 'charCode', ->
     if @type is 'keypress' and @keyCode in KEYS.PRINTABLE and not (@metaKey or @ctrlKey)
       @_charCode
     else
       0
 
-  @::__defineSetter__ 'charCode', (charCode) ->
+  this::__defineSetter__ 'charCode', (charCode) ->
     @_charCode = charCode
 
   @eventsForKeys: (keys...) ->
@@ -83,7 +83,7 @@ class FakeEvent
       @withKeyCode(KEYS[key.toUpperCase()])
 
   @withKeyCode: (keyCode) ->
-    event = new @()
+    event = new this()
     charCode = keyCode
 
     # specially handle A-Z and a-z
@@ -97,13 +97,13 @@ class FakeEvent
     return event
 
   @pasteEventWithData: (data) ->
-    event = new @()
+    event = new this()
     event.clipboardData = new ClipboardData(data)
     return event
 
   # jQuery has an originalEvent property to get the real DOM event, but since
   # we're already faking it we might as well just use ourselves.
-  @::__defineGetter__ 'originalEvent', ->
+  this::__defineGetter__ 'originalEvent', ->
     this
 
 class ClipboardData

@@ -57,21 +57,22 @@ class FieldExpectationBase
         currentDelegate?.textFieldDidFailToParseString?(change, errorType)
 
   assert: ->
-    actual = Caret.printDescription
-               caret: @field.element.caret()
-               affinity: @field.selectionAffinity
-               value: @field.element.val()
+    actual =
+      Caret.printDescription
+        caret: @field.element.caret()
+        affinity: @field.selectionAffinity
+        value: @field.element.val()
 
     expect(actual).toEqual(@expectedDescription)
 
-  @::__defineGetter__ 'field', ->
+  this::__defineGetter__ 'field', ->
     @_field ||= do =>
       input = buildInput()
       if @userAgent
         input.get(0).ownerDocument.defaultView.navigator.userAgent = @userAgent
       new TextField(input)
 
-  @::__defineSetter__ 'field', (field) ->
+  this::__defineSetter__ 'field', (field) ->
     @_field = field
 
 class ExpectThatTyping extends FieldExpectationBase

@@ -13,7 +13,7 @@ class FakeNavigator
   constructor: ->
     @userAgent = USER_AGENTS.osx.chrome.latest
 
-  Object.defineProperty @::, 'userAgent',
+  Object.defineProperty this::, 'userAgent',
     get: ->
       @_userAgent
 

@@ -974,10 +974,10 @@ class TextField
           # We exempt these two because it can get hairy trying to validate
           # these kinds of changes and presumably we're going to a state that
           # was validated anyway.
-          @[action](event)
+          this[action](event)
         else
           @rollbackInvalidChanges =>
-            @[action](event)
+            this[action](event)
 
   # Internal: Handles inserting characters based on the typed key.
   #
@@ -1291,7 +1291,7 @@ class TextFieldStateChange
   constructor: (@field) ->
 
   @build: (field, callback) ->
-    change = new @(field)
+    change = new this(field)
     change.current = text: field.text(), selectedRange: field.selectedRange()
     callback()
     change.proposed = text: field.text(), selectedRange: field.selectedRange()

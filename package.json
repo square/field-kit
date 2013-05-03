@@ -3,18 +3,19 @@
   "version": "0.0.0",
   "description": "Utilities to effectively manage text entry on the web.",
   "scripts": {
-    "build": "coffee -c -o lib/ src/",
-    "test": "npm run-script build && jasmine-node --coffee spec/helpers spec",
-    "package": "npm run-script test && gluejs --basepath lib --include . --out ../field-kit.js --global FieldKit && uglifyjs field-kit.js --mangle > field-kit.min.js"
+    "test": "grunt"
   },
   "repository": "",
   "author": "Square",
   "license": "BSD",
   "dependencies": {},
   "devDependencies": {
-    "coffee-script": "~1.6.0",
     "jasmine-node": "~1.7.0",
     "gluejs": "~0.2.0",
-    "uglify-js": "~2.2.2"
+    "grunt-coffeelint": "0.0.6",
+    "grunt-browserify": "~0.2.3",
+    "grunt-jasmine-node": "~0.1.0",
+    "grunt-contrib-coffee": "~0.7.0",
+    "grunt-contrib-uglify": "~0.2.0"
   }
 }

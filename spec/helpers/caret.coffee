@@ -4,7 +4,7 @@ class Caret
 
   constructor: (@input) ->
 
-  @::__defineGetter__ 'text', ->
+  this::__defineGetter__ 'text', ->
     @input.value.substring(@start, @end)
 
   replace: (string) ->
@@ -13,7 +13,7 @@ class Caret
 
   @parseDescription: (description) ->
     value = ''
-    caret = new @()
+    caret = new this()
     affinity = null
     valueIndex = 0
     parseIndex = 0
