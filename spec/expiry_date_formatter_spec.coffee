@@ -1,13 +1,15 @@
 ExpiryDateFormatter = require '../lib/expiry_date_formatter'
 {buildField} = require './helpers/builders'
 {expectThatTyping} = require './helpers/expectations'
+{freeze, reset} = require './helpers/time_helper'
 
 describe 'ExpiryDateFormatter', ->
   field = null
+  formatter = null
 
   beforeEach ->
     field = buildField()
-    field.setFormatter new ExpiryDateFormatter()
+    field.setFormatter formatter = new ExpiryDateFormatter()
 
   it 'adds a preceding zero and a succeeding slash if an unambiguous month is typed', ->
     expectThatTyping('4').into(field).willChange('|').to('04/|')
@@ -51,3 +53,19 @@ describe 'ExpiryDateFormatter', ->
     field.setText 'abc'
     expect(field.value()).toBeNull()
     expect(field.delegate().textFieldDidFailToParseString).toHaveBeenCalledWith(field, 'abc', 'expiry-date-formatter.invalid-date')
+
+  describe '#parse', ->
+    it 'parses high two digit years as happening in the 20th century', ->
+      freeze new Date(2013, 0)
+      expect(formatter.parse('04/99')).toEqual(month: 4, year: 1999)
+      reset()
+
+    it 'parses low two digit years as happening in the 21st century', ->
+      freeze new Date(2013, 0)
+      expect(formatter.parse('04/04')).toEqual(month: 4, year: 2004)
+      reset()
+
+    it 'when near the end of a century, parses low numbers as the beginning of the next century', ->
+      freeze new Date(2099, 0)
+      expect(formatter.parse('04/04')).toEqual(month: 4, year: 2104)
+      reset()
