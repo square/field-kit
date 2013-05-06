@@ -5,6 +5,13 @@ zpad2 = (n) ->
   result = "0#{result}" while result.length < 2
   result
 
+interpretTwoDigitYear = (year) ->
+  thisYear = new Date().getFullYear()
+  thisCentury = thisYear - (thisYear % 100)
+  centuries = [thisCentury, thisCentury - 100, thisCentury + 100].sort (a, b) ->
+    Math.abs(thisYear - (year + a)) - Math.abs(thisYear - (year + b))
+  year + centuries[0]
+
 class ExpiryDateFormatter extends DelimitedTextFormatter
   delimiter: '/'
   maximumLength: 5
@@ -23,7 +30,9 @@ class ExpiryDateFormatter extends DelimitedTextFormatter
   parse: (text, error) ->
     text = super text
     if match = text.match /^(0?[1-9]|1\d)(\d\d)$/
-      { month: Number(match[1]), year: Number(match[2]) }
+      month = Number(match[1])
+      year = interpretTwoDigitYear Number(match[2])
+      return { month, year }
     else
       error 'expiry-date-formatter.invalid-date'
       return null
