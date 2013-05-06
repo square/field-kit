@@ -96,10 +96,21 @@ class ExpectThatPasting extends FieldExpectationBase
     event = FakeEvent.pasteEventWithData Text: @text
     @field.paste event
 
+class ExpectThatLeaving extends FieldExpectationBase
+  constructor: (field) ->
+    @field = field
+
+  perform: ->
+    @field.element.focus()
+    @field.element.blur()
+
 expectThatTyping = (keys...) ->
   new ExpectThatTyping(keys...)
 
 expectThatPasting = (text) ->
   new ExpectThatPasting(text)
 
-module.exports = { expectThatTyping, expectThatPasting }
+expectThatLeaving = (field) ->
+  new ExpectThatLeaving(field)
+
+module.exports = { expectThatTyping, expectThatPasting, expectThatLeaving }

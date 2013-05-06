@@ -9,6 +9,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
     CardTextField: require('./card_text_field'),
     DefaultCardFormatter: require('./default_card_formatter'),
     DelimitedTextFormatter: require('./delimited_text_formatter'),
+    ExpiryDateField: require('./expiry_date_field'),
     ExpiryDateFormatter: require('./expiry_date_formatter'),
     Formatter: require('./formatter'),
     NumberFormatter: require('./number_formatter'),
@@ -22,7 +23,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./adaptive_card_formatter":2,"./amex_card_formatter":3,"./card_text_field":4,"./default_card_formatter":5,"./delimited_text_formatter":6,"./expiry_date_formatter":7,"./formatter":8,"./number_formatter":9,"./phone_formatter":10,"./social_security_number_formatter":11,"./text_field":12,"./undo_manager":13}],8:[function(require,module,exports){
+},{"./adaptive_card_formatter":2,"./amex_card_formatter":3,"./card_text_field":4,"./default_card_formatter":5,"./delimited_text_formatter":6,"./expiry_date_field":7,"./expiry_date_formatter":8,"./formatter":9,"./number_formatter":10,"./phone_formatter":11,"./social_security_number_formatter":12,"./text_field":13,"./undo_manager":14}],9:[function(require,module,exports){
 (function() {
   var Formatter;
 
@@ -77,7 +78,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 (function() {
   var UndoManager, hasGetter,
     __slice = [].slice;
@@ -265,7 +266,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./default_card_formatter":5,"./amex_card_formatter":3,"./card_utils":14}],3:[function(require,module,exports){
+},{"./amex_card_formatter":3,"./card_utils":15,"./default_card_formatter":5}],3:[function(require,module,exports){
 (function() {
   var AmexCardFormatter, DefaultCardFormatter, _ref,
     __hasProp = {}.hasOwnProperty,
@@ -400,7 +401,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./text_field":12,"./adaptive_card_formatter":2,"./card_utils":14}],5:[function(require,module,exports){
+},{"./adaptive_card_formatter":2,"./text_field":13,"./card_utils":15}],5:[function(require,module,exports){
 (function() {
   var DefaultCardFormatter, DelimitedTextFormatter, luhnCheck, validCardLength, _ref, _ref1,
     __hasProp = {}.hasOwnProperty,
@@ -455,119 +456,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./delimited_text_formatter":6,"./card_utils":14}],7:[function(require,module,exports){
-(function() {
-  var DelimitedTextFormatter, ExpiryDateFormatter, zpad2, _ref,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  DelimitedTextFormatter = require('./delimited_text_formatter');
-
-  zpad2 = function(n) {
-    var result;
-
-    result = "" + n;
-    while (result.length < 2) {
-      result = "0" + result;
-    }
-    return result;
-  };
-
-  ExpiryDateFormatter = (function(_super) {
-    __extends(ExpiryDateFormatter, _super);
-
-    function ExpiryDateFormatter() {
-      _ref = ExpiryDateFormatter.__super__.constructor.apply(this, arguments);
-      return _ref;
-    }
-
-    ExpiryDateFormatter.prototype.delimiter = '/';
-
-    ExpiryDateFormatter.prototype.maximumLength = 5;
-
-    ExpiryDateFormatter.prototype.hasDelimiterAtIndex = function(index) {
-      return index === 2;
-    };
-
-    ExpiryDateFormatter.prototype.format = function(value) {
-      var month, year;
-
-      if (!value) {
-        return '';
-      }
-      month = value.month, year = value.year;
-      year = year % 100;
-      return ExpiryDateFormatter.__super__.format.call(this, zpad2(month) + zpad2(year));
-    };
-
-    ExpiryDateFormatter.prototype.parse = function(text, error) {
-      var match;
-
-      text = ExpiryDateFormatter.__super__.parse.call(this, text);
-      if (match = text.match(/^(0?[1-9]|1\d)(\d\d)$/)) {
-        return {
-          month: Number(match[1]),
-          year: Number(match[2])
-        };
-      } else {
-        error('expiry-date-formatter.invalid-date');
-        return null;
-      }
-    };
-
-    ExpiryDateFormatter.prototype.isChangeValid = function(change, error) {
-      var isBackspace, match, newText;
-
-      isBackspace = change.proposed.text.length < change.current.text.length;
-      newText = change.proposed.text;
-      if (isBackspace) {
-        if (change.deleted.text === this.delimiter) {
-          newText = newText[0];
-        }
-        if (newText === '0') {
-          newText = '';
-        }
-      } else if (change.inserted.text === this.delimiter && change.current.text === '1') {
-        newText = "01" + this.delimiter;
-      } else if (change.inserted.text.length > 0 && !/^\d$/.test(change.inserted.text)) {
-        error('expiry-date-formatter.only-digits-allowed');
-        return false;
-      } else {
-        if (/^[2-9]$/.test(newText)) {
-          newText = '0' + newText;
-        }
-        if (/^1[3-9]$/.test(newText)) {
-          error('expiry-date-formatter.invalid-month');
-          return false;
-        }
-        if (newText === '00') {
-          error('expiry-date-formatter.invalid-month');
-          return false;
-        }
-        if (/^(0[1-9]|1[0-2])$/.test(newText)) {
-          newText += this.delimiter;
-        }
-        if ((match = newText.match(/^(\d\d)(.)(\d\d?).*$/)) && match[2] === this.delimiter) {
-          newText = match[1] + this.delimiter + match[3];
-        }
-      }
-      change.proposed.text = newText;
-      change.proposed.selectedRange = {
-        start: newText.length,
-        length: 0
-      };
-      return true;
-    };
-
-    return ExpiryDateFormatter;
-
-  })(DelimitedTextFormatter);
-
-  module.exports = ExpiryDateFormatter;
-
-}).call(this);
-
-},{"./delimited_text_formatter":6}],6:[function(require,module,exports){
+},{"./delimited_text_formatter":6,"./card_utils":15}],6:[function(require,module,exports){
 (function() {
   var DelimitedTextFormatter, Formatter,
     __hasProp = {}.hasOwnProperty,
@@ -753,111 +642,168 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./formatter":8}],10:[function(require,module,exports){
+},{"./formatter":9}],7:[function(require,module,exports){
 (function() {
-  var DelimitedTextFormatter, NANP_PHONE_DELIMITERS, NANP_PHONE_DELIMITERS_WITH_1, NANP_PHONE_DELIMITERS_WITH_PLUS, PhoneFormatter,
+  var ExpiryDateField, ExpiryDateFormatter, TextField,
     __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  DelimitedTextFormatter = require('./delimited_text_formatter');
+  TextField = require('./text_field');
 
-  NANP_PHONE_DELIMITERS = {
-    0: '(',
-    4: ')',
-    5: ' ',
-    9: '-'
-  };
+  ExpiryDateFormatter = require('./expiry_date_formatter');
 
-  NANP_PHONE_DELIMITERS_WITH_1 = {
-    1: ' ',
-    2: '(',
-    6: ')',
-    7: ' ',
-    11: '-'
-  };
+  ExpiryDateField = (function(_super) {
+    __extends(ExpiryDateField, _super);
 
-  NANP_PHONE_DELIMITERS_WITH_PLUS = {
-    2: ' ',
-    3: '(',
-    7: ')',
-    8: ' ',
-    12: '-'
-  };
-
-  PhoneFormatter = (function(_super) {
-    __extends(PhoneFormatter, _super);
-
-    PhoneFormatter.prototype.maximumLength = null;
-
-    PhoneFormatter.prototype.delimiterMap = null;
-
-    function PhoneFormatter() {
-      if (arguments.length !== 0) {
-        throw new Error("were you trying to set a delimiter (" + arguments[0] + ")?");
-      }
+    function ExpiryDateField(element) {
+      ExpiryDateField.__super__.constructor.call(this, element, new ExpiryDateFormatter());
     }
 
-    PhoneFormatter.prototype.isDelimiter = function(chr) {
-      var delimiter, index;
+    ExpiryDateField.prototype.textFieldDidEndEditing = function() {
+      var newText;
 
-      return __indexOf.call((function() {
-        var _ref, _results;
-
-        _ref = this.delimiterMap;
-        _results = [];
-        for (index in _ref) {
-          delimiter = _ref[index];
-          _results.push(delimiter);
-        }
-        return _results;
-      }).call(this), chr) >= 0;
+      newText = this.formatter().format(this.value());
+      this.setText(newText);
+      return this.setSelectedRange({
+        start: newText.length,
+        length: 0
+      });
     };
 
-    PhoneFormatter.prototype.delimiterAt = function(index) {
-      return this.delimiterMap[index];
-    };
+    return ExpiryDateField;
 
-    PhoneFormatter.prototype.hasDelimiterAtIndex = function(index) {
-      return this.delimiterAt(index) != null;
-    };
+  })(TextField);
 
-    PhoneFormatter.prototype.format = function(value) {
-      this.guessFormatFromText(value);
-      return PhoneFormatter.__super__.format.call(this, value);
-    };
-
-    PhoneFormatter.prototype.isChangeValid = function(change, error) {
-      this.guessFormatFromText(change.proposed.text);
-      if (/^\d*$/.test(change.inserted.text) || change.proposed.text.indexOf('+') === 0) {
-        return PhoneFormatter.__super__.isChangeValid.call(this, change, error);
-      } else {
-        return false;
-      }
-    };
-
-    PhoneFormatter.prototype.guessFormatFromText = function(text) {
-      if (text[0] === '+') {
-        this.delimiterMap = NANP_PHONE_DELIMITERS_WITH_PLUS;
-        return this.maximumLength = 1 + 1 + 10 + 5;
-      } else if (text[0] === '1') {
-        this.delimiterMap = NANP_PHONE_DELIMITERS_WITH_1;
-        return this.maximumLength = 1 + 10 + 5;
-      } else {
-        this.delimiterMap = NANP_PHONE_DELIMITERS;
-        return this.maximumLength = 10 + 4;
-      }
-    };
-
-    return PhoneFormatter;
-
-  })(DelimitedTextFormatter);
-
-  module.exports = PhoneFormatter;
+  module.exports = ExpiryDateField;
 
 }).call(this);
 
-},{"./delimited_text_formatter":6}],9:[function(require,module,exports){
+},{"./expiry_date_formatter":8,"./text_field":13}],8:[function(require,module,exports){
+(function() {
+  var DelimitedTextFormatter, ExpiryDateFormatter, interpretTwoDigitYear, zpad2, _ref,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  DelimitedTextFormatter = require('./delimited_text_formatter');
+
+  zpad2 = function(n) {
+    var result;
+
+    result = "" + n;
+    while (result.length < 2) {
+      result = "0" + result;
+    }
+    return result;
+  };
+
+  interpretTwoDigitYear = function(year) {
+    var centuries, thisCentury, thisYear;
+
+    thisYear = new Date().getFullYear();
+    thisCentury = thisYear - (thisYear % 100);
+    centuries = [thisCentury, thisCentury - 100, thisCentury + 100].sort(function(a, b) {
+      return Math.abs(thisYear - (year + a)) - Math.abs(thisYear - (year + b));
+    });
+    return year + centuries[0];
+  };
+
+  ExpiryDateFormatter = (function(_super) {
+    __extends(ExpiryDateFormatter, _super);
+
+    function ExpiryDateFormatter() {
+      _ref = ExpiryDateFormatter.__super__.constructor.apply(this, arguments);
+      return _ref;
+    }
+
+    ExpiryDateFormatter.prototype.delimiter = '/';
+
+    ExpiryDateFormatter.prototype.maximumLength = 5;
+
+    ExpiryDateFormatter.prototype.hasDelimiterAtIndex = function(index) {
+      return index === 2;
+    };
+
+    ExpiryDateFormatter.prototype.format = function(value) {
+      var month, year;
+
+      if (!value) {
+        return '';
+      }
+      month = value.month, year = value.year;
+      year = year % 100;
+      return ExpiryDateFormatter.__super__.format.call(this, zpad2(month) + zpad2(year));
+    };
+
+    ExpiryDateFormatter.prototype.parse = function(text, error) {
+      var month, year, _ref1;
+
+      _ref1 = text.split(this.delimiter), month = _ref1[0], year = _ref1[1];
+      if (month.match(/^(0?[1-9]|1\d)$/) && year.match(/^\d\d?$/)) {
+        month = Number(month);
+        year = interpretTwoDigitYear(Number(year));
+        return {
+          month: month,
+          year: year
+        };
+      } else {
+        error('expiry-date-formatter.invalid-date');
+        return null;
+      }
+    };
+
+    ExpiryDateFormatter.prototype.isChangeValid = function(change, error) {
+      var isBackspace, match, newText;
+
+      isBackspace = change.proposed.text.length < change.current.text.length;
+      newText = change.proposed.text;
+      if (isBackspace) {
+        if (change.deleted.text === this.delimiter) {
+          newText = newText[0];
+        }
+        if (newText === '0') {
+          newText = '';
+        }
+      } else if (change.inserted.text === this.delimiter && change.current.text === '1') {
+        newText = "01" + this.delimiter;
+      } else if (change.inserted.text.length > 0 && !/^\d$/.test(change.inserted.text)) {
+        error('expiry-date-formatter.only-digits-allowed');
+        return false;
+      } else {
+        if (/^[2-9]$/.test(newText)) {
+          newText = '0' + newText;
+        }
+        if (/^1[3-9]$/.test(newText)) {
+          error('expiry-date-formatter.invalid-month');
+          return false;
+        }
+        if (newText === '00') {
+          error('expiry-date-formatter.invalid-month');
+          return false;
+        }
+        if (/^(0[1-9]|1[0-2])$/.test(newText)) {
+          newText += this.delimiter;
+        }
+        if ((match = newText.match(/^(\d\d)(.)(\d\d?).*$/)) && match[2] === this.delimiter) {
+          newText = match[1] + this.delimiter + match[3];
+        }
+      }
+      change.proposed.text = newText;
+      change.proposed.selectedRange = {
+        start: newText.length,
+        length: 0
+      };
+      return true;
+    };
+
+    return ExpiryDateFormatter;
+
+  })(DelimitedTextFormatter);
+
+  module.exports = ExpiryDateFormatter;
+
+}).call(this);
+
+},{"./delimited_text_formatter":6}],10:[function(require,module,exports){
 (function() {
   var CEILING, CURRENCY, CurrencyDefaults, DEFAULT_COUNTRY, DEFAULT_LOCALE, DOWN, FLOOR, Formatter, HALF_DOWN, HALF_EVEN, HALF_UP, LocaleDefaults, NONE, NumberFormatter, PERCENT, RegionDefaults, StyleDefaults, UP, endsWith, get, isDigits, roundCeiling, roundFloor, roundHalfEven, splitLocaleComponents, startsWith,
     __slice = [].slice,
@@ -1752,7 +1698,111 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./formatter":8}],11:[function(require,module,exports){
+},{"./formatter":9}],11:[function(require,module,exports){
+(function() {
+  var DelimitedTextFormatter, NANP_PHONE_DELIMITERS, NANP_PHONE_DELIMITERS_WITH_1, NANP_PHONE_DELIMITERS_WITH_PLUS, PhoneFormatter,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+
+  DelimitedTextFormatter = require('./delimited_text_formatter');
+
+  NANP_PHONE_DELIMITERS = {
+    0: '(',
+    4: ')',
+    5: ' ',
+    9: '-'
+  };
+
+  NANP_PHONE_DELIMITERS_WITH_1 = {
+    1: ' ',
+    2: '(',
+    6: ')',
+    7: ' ',
+    11: '-'
+  };
+
+  NANP_PHONE_DELIMITERS_WITH_PLUS = {
+    2: ' ',
+    3: '(',
+    7: ')',
+    8: ' ',
+    12: '-'
+  };
+
+  PhoneFormatter = (function(_super) {
+    __extends(PhoneFormatter, _super);
+
+    PhoneFormatter.prototype.maximumLength = null;
+
+    PhoneFormatter.prototype.delimiterMap = null;
+
+    function PhoneFormatter() {
+      if (arguments.length !== 0) {
+        throw new Error("were you trying to set a delimiter (" + arguments[0] + ")?");
+      }
+    }
+
+    PhoneFormatter.prototype.isDelimiter = function(chr) {
+      var delimiter, index;
+
+      return __indexOf.call((function() {
+        var _ref, _results;
+
+        _ref = this.delimiterMap;
+        _results = [];
+        for (index in _ref) {
+          delimiter = _ref[index];
+          _results.push(delimiter);
+        }
+        return _results;
+      }).call(this), chr) >= 0;
+    };
+
+    PhoneFormatter.prototype.delimiterAt = function(index) {
+      return this.delimiterMap[index];
+    };
+
+    PhoneFormatter.prototype.hasDelimiterAtIndex = function(index) {
+      return this.delimiterAt(index) != null;
+    };
+
+    PhoneFormatter.prototype.format = function(value) {
+      this.guessFormatFromText(value);
+      return PhoneFormatter.__super__.format.call(this, value);
+    };
+
+    PhoneFormatter.prototype.isChangeValid = function(change, error) {
+      this.guessFormatFromText(change.proposed.text);
+      if (/^\d*$/.test(change.inserted.text) || change.proposed.text.indexOf('+') === 0) {
+        return PhoneFormatter.__super__.isChangeValid.call(this, change, error);
+      } else {
+        return false;
+      }
+    };
+
+    PhoneFormatter.prototype.guessFormatFromText = function(text) {
+      if (text[0] === '+') {
+        this.delimiterMap = NANP_PHONE_DELIMITERS_WITH_PLUS;
+        return this.maximumLength = 1 + 1 + 10 + 5;
+      } else if (text[0] === '1') {
+        this.delimiterMap = NANP_PHONE_DELIMITERS_WITH_1;
+        return this.maximumLength = 1 + 10 + 5;
+      } else {
+        this.delimiterMap = NANP_PHONE_DELIMITERS;
+        return this.maximumLength = 10 + 4;
+      }
+    };
+
+    return PhoneFormatter;
+
+  })(DelimitedTextFormatter);
+
+  module.exports = PhoneFormatter;
+
+}).call(this);
+
+},{"./delimited_text_formatter":6}],12:[function(require,module,exports){
 (function() {
   var DelimitedTextFormatter, SocialSecurityNumberFormatter, _ref,
     __hasProp = {}.hasOwnProperty,
@@ -1792,7 +1842,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./delimited_text_formatter":6}],12:[function(require,module,exports){
+},{"./delimited_text_formatter":6}],13:[function(require,module,exports){
 (function() {
   var AFFINITY, KEYS, TextField, TextFieldStateChange, UndoManager, hasLeftWordBreakAtIndex, hasRightWordBreakAtIndex, isWordChar, keyBindingsForPlatform, _ref,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -2812,7 +2862,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./undo_manager":13,"./keybindings":15}],14:[function(require,module,exports){
+},{"./keybindings":16,"./undo_manager":14}],15:[function(require,module,exports){
 (function() {
   var AMEX, DISCOVER, JCB, MASTERCARD, VISA, determineCardType, luhnCheck, validCardLength;
 
@@ -2895,7 +2945,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 (function() {
   var A, ALT, BACKSPACE, BindingSet, CTRL, DELETE, DOWN, ENTER, KEYS, LEFT, META, NINE, RIGHT, SHIFT, TAB, UP, Y, Z, ZERO, build, cache, keyBindingsForPlatform,
     __slice = [].slice;
