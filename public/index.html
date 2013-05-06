@@ -212,19 +212,20 @@ field.setValue((Math.random() &gt; 0.5 ? 1 : -1) * Math.random()*10);</code></pr
 
     <div class="row">
       <div class="offset2 span8">
-        <h3>ExpiryDateFormatter</h3>
+        <h3>ExpiryDateField / ExpiryDateFormatter</h3>
       </div>
     </div>
 
     <div class="row field-kit-example">
       <div class="offset2 span8">
         <p>
-          The <code>ExpiryDateFormatter</code> provides formatting for credit card
-          expiry dates, preventing the input of nonsense months or non-date characters.
-          It also adds the preceding zero and the slash between the month and year
-          automatically, but treats them as if they are not there. In order to do this
-          predictably it forces the cursor to remain at the end of the field and
-          prevents any kind of selection.
+          The <code>ExpiryDateField</code> wraps
+          <code>ExpiryDateFormatter</code> for credit card expiry
+          dates, preventing the input of nonsense months or non-date
+          characters.  It also adds the preceding zero and the slash between
+          the month and year automatically, but treats them as if they are not
+          there. In order to do this predictably it forces the cursor to remain
+          at the end of the field and prevents any kind of selection.
         </p>
 
         <div class="docs-example">
