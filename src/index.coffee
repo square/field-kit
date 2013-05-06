@@ -4,6 +4,7 @@ FieldKit =
   CardTextField                 : require './card_text_field'
   DefaultCardFormatter          : require './default_card_formatter'
   DelimitedTextFormatter        : require './delimited_text_formatter'
+  ExpiryDateField               : require './expiry_date_field'
   ExpiryDateFormatter           : require './expiry_date_formatter'
   Formatter                     : require './formatter'
   NumberFormatter               : require './number_formatter'
