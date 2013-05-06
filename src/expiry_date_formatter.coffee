@@ -28,10 +28,10 @@ class ExpiryDateFormatter extends DelimitedTextFormatter
     super zpad2(month) + zpad2(year)
 
   parse: (text, error) ->
-    text = super text
-    if match = text.match /^(0?[1-9]|1\d)(\d\d)$/
-      month = Number(match[1])
-      year = interpretTwoDigitYear Number(match[2])
+    [month, year] = text.split(@delimiter)
+    if month.match(/^(0?[1-9]|1\d)$/) and year.match(/^\d\d?$/)
+      month = Number(month)
+      year = interpretTwoDigitYear Number(year)
       return { month, year }
     else
       error 'expiry-date-formatter.invalid-date'
