@@ -29,7 +29,7 @@ class ExpiryDateFormatter extends DelimitedTextFormatter
 
   parse: (text, error) ->
     [month, year] = text.split(@delimiter)
-    if month.match(/^(0?[1-9]|1\d)$/) and year.match(/^\d\d?$/)
+    if month?.match(/^(0?[1-9]|1\d)$/) and year?.match(/^\d\d?$/)
       month = Number(month)
       year = interpretTwoDigitYear Number(year)
       return { month, year }
