@@ -23,7 +23,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./adaptive_card_formatter":2,"./amex_card_formatter":3,"./card_text_field":4,"./delimited_text_formatter":5,"./expiry_date_field":6,"./default_card_formatter":7,"./expiry_date_formatter":8,"./formatter":9,"./number_formatter":10,"./phone_formatter":11,"./social_security_number_formatter":12,"./text_field":13,"./undo_manager":14}],9:[function(require,module,exports){
+},{"./card_text_field":2,"./adaptive_card_formatter":3,"./amex_card_formatter":4,"./default_card_formatter":5,"./delimited_text_formatter":6,"./expiry_date_field":7,"./expiry_date_formatter":8,"./formatter":9,"./number_formatter":10,"./phone_formatter":11,"./social_security_number_formatter":12,"./text_field":13,"./undo_manager":14}],9:[function(require,module,exports){
 (function() {
   var Formatter;
 
@@ -222,6 +222,111 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 },{}],2:[function(require,module,exports){
 (function() {
+  var AdaptiveCardFormatter, CardMaskStrategy, CardTextField, TextField, determineCardType,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  TextField = require('./text_field');
+
+  AdaptiveCardFormatter = require('./adaptive_card_formatter');
+
+  determineCardType = require('./card_utils').determineCardType;
+
+  CardMaskStrategy = {
+    None: 'None',
+    DoneEditing: 'DoneEditing'
+  };
+
+  CardTextField = (function(_super) {
+    __extends(CardTextField, _super);
+
+    function CardTextField(element) {
+      CardTextField.__super__.constructor.call(this, element, new AdaptiveCardFormatter());
+      this.setCardMaskStrategy(CardMaskStrategy.None);
+    }
+
+    CardTextField.prototype.cardType = function() {
+      return determineCardType(this.value());
+    };
+
+    CardTextField.prototype.cardMaskStrategy = function() {
+      return this._cardMaskStrategy;
+    };
+
+    CardTextField.prototype.setCardMaskStrategy = function(cardMaskStrategy) {
+      if (cardMaskStrategy !== this._cardMaskStrategy) {
+        this._cardMaskStrategy = cardMaskStrategy;
+      }
+      return null;
+    };
+
+    CardTextField.prototype._masked = false;
+
+    CardTextField.prototype.text = function() {
+      if (this._masked) {
+        return this._unmaskedText;
+      } else {
+        return CardTextField.__super__.text.call(this);
+      }
+    };
+
+    CardTextField.prototype.setText = function(text) {
+      if (this._masked) {
+        this._unmaskedText = text;
+        text = this.cardMask();
+      }
+      return CardTextField.__super__.setText.call(this, text);
+    };
+
+    CardTextField.prototype.textFieldDidEndEditing = function() {
+      if (this.cardMaskStrategy() === CardMaskStrategy.DoneEditing) {
+        return this._enableMasking();
+      }
+    };
+
+    CardTextField.prototype.textFieldDidBeginEditing = function() {
+      if (this.cardMaskStrategy() === CardMaskStrategy.DoneEditing) {
+        return this._disableMasking();
+      }
+    };
+
+    CardTextField.prototype._enableMasking = function() {
+      if (!this._masked) {
+        this._unmaskedText = this.text();
+        this._masked = true;
+        return this.setText(this._unmaskedText);
+      }
+    };
+
+    CardTextField.prototype._disableMasking = function() {
+      if (this._masked) {
+        this._masked = false;
+        this.setText(this._unmaskedText);
+        return this._unmaskedText = null;
+      }
+    };
+
+    CardTextField.prototype.cardMask = function() {
+      var last4, text, toMask;
+
+      text = this.text();
+      toMask = text.slice(0, -4);
+      last4 = text.slice(-4);
+      return toMask.replace(/\d/g, '•') + last4;
+    };
+
+    return CardTextField;
+
+  })(TextField);
+
+  CardTextField.CardMaskStrategy = CardMaskStrategy;
+
+  module.exports = CardTextField;
+
+}).call(this);
+
+},{"./text_field":13,"./adaptive_card_formatter":3,"./card_utils":15}],3:[function(require,module,exports){
+(function() {
   var AMEX, AdaptiveCardFormatter, AmexCardFormatter, DefaultCardFormatter, determineCardType, _ref;
 
   AmexCardFormatter = require('./amex_card_formatter');
@@ -266,7 +371,92 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./amex_card_formatter":3,"./card_utils":15,"./default_card_formatter":7}],5:[function(require,module,exports){
+},{"./amex_card_formatter":4,"./card_utils":15,"./default_card_formatter":5}],4:[function(require,module,exports){
+(function() {
+  var AmexCardFormatter, DefaultCardFormatter, _ref,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  DefaultCardFormatter = require('./default_card_formatter');
+
+  AmexCardFormatter = (function(_super) {
+    __extends(AmexCardFormatter, _super);
+
+    function AmexCardFormatter() {
+      _ref = AmexCardFormatter.__super__.constructor.apply(this, arguments);
+      return _ref;
+    }
+
+    AmexCardFormatter.prototype.maximumLength = 15 + 2;
+
+    AmexCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
+      return index === 4 || index === 11;
+    };
+
+    return AmexCardFormatter;
+
+  })(DefaultCardFormatter);
+
+  module.exports = AmexCardFormatter;
+
+}).call(this);
+
+},{"./default_card_formatter":5}],5:[function(require,module,exports){
+(function() {
+  var DefaultCardFormatter, DelimitedTextFormatter, luhnCheck, validCardLength, _ref, _ref1,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  DelimitedTextFormatter = require('./delimited_text_formatter');
+
+  _ref = require('./card_utils'), validCardLength = _ref.validCardLength, luhnCheck = _ref.luhnCheck;
+
+  DefaultCardFormatter = (function(_super) {
+    __extends(DefaultCardFormatter, _super);
+
+    function DefaultCardFormatter() {
+      _ref1 = DefaultCardFormatter.__super__.constructor.apply(this, arguments);
+      return _ref1;
+    }
+
+    DefaultCardFormatter.prototype.delimiter = ' ';
+
+    DefaultCardFormatter.prototype.maximumLength = 16 + 3;
+
+    DefaultCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
+      return index === 4 || index === 9 || index === 14;
+    };
+
+    DefaultCardFormatter.prototype.parse = function(text, error) {
+      var value;
+
+      value = this._valueFromText(text);
+      if (!validCardLength(value)) {
+        if (typeof error === "function") {
+          error('card-formatter.number-too-short');
+        }
+      }
+      if (!luhnCheck(value)) {
+        if (typeof error === "function") {
+          error('card-formatter.invalid-number');
+        }
+      }
+      return DefaultCardFormatter.__super__.parse.call(this, text, error);
+    };
+
+    DefaultCardFormatter.prototype._valueFromText = function(text) {
+      return DefaultCardFormatter.__super__._valueFromText.call(this, (text != null ? text : '').replace(/[^\d]/g, ''));
+    };
+
+    return DefaultCardFormatter;
+
+  })(DelimitedTextFormatter);
+
+  module.exports = DefaultCardFormatter;
+
+}).call(this);
+
+},{"./delimited_text_formatter":6,"./card_utils":15}],6:[function(require,module,exports){
 (function() {
   var DelimitedTextFormatter, Formatter,
     __hasProp = {}.hasOwnProperty,
@@ -452,142 +642,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./formatter":9}],4:[function(require,module,exports){
-(function() {
-  var AdaptiveCardFormatter, CardMaskStrategy, CardTextField, TextField, determineCardType,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  TextField = require('./text_field');
-
-  AdaptiveCardFormatter = require('./adaptive_card_formatter');
-
-  determineCardType = require('./card_utils').determineCardType;
-
-  CardMaskStrategy = {
-    None: 'None',
-    DoneEditing: 'DoneEditing'
-  };
-
-  CardTextField = (function(_super) {
-    __extends(CardTextField, _super);
-
-    function CardTextField(element) {
-      CardTextField.__super__.constructor.call(this, element, new AdaptiveCardFormatter());
-      this.setCardMaskStrategy(CardMaskStrategy.None);
-    }
-
-    CardTextField.prototype.cardType = function() {
-      return determineCardType(this.value());
-    };
-
-    CardTextField.prototype.cardMaskStrategy = function() {
-      return this._cardMaskStrategy;
-    };
-
-    CardTextField.prototype.setCardMaskStrategy = function(cardMaskStrategy) {
-      if (cardMaskStrategy !== this._cardMaskStrategy) {
-        this._cardMaskStrategy = cardMaskStrategy;
-      }
-      return null;
-    };
-
-    CardTextField.prototype._masked = false;
-
-    CardTextField.prototype.text = function() {
-      if (this._masked) {
-        return this._unmaskedText;
-      } else {
-        return CardTextField.__super__.text.call(this);
-      }
-    };
-
-    CardTextField.prototype.setText = function(text) {
-      if (this._masked) {
-        this._unmaskedText = text;
-        text = this.cardMask();
-      }
-      return CardTextField.__super__.setText.call(this, text);
-    };
-
-    CardTextField.prototype.textFieldDidEndEditing = function() {
-      if (this.cardMaskStrategy() === CardMaskStrategy.DoneEditing) {
-        return this._enableMasking();
-      }
-    };
-
-    CardTextField.prototype.textFieldDidBeginEditing = function() {
-      if (this.cardMaskStrategy() === CardMaskStrategy.DoneEditing) {
-        return this._disableMasking();
-      }
-    };
-
-    CardTextField.prototype._enableMasking = function() {
-      if (!this._masked) {
-        this._unmaskedText = this.text();
-        this._masked = true;
-        return this.setText(this._unmaskedText);
-      }
-    };
-
-    CardTextField.prototype._disableMasking = function() {
-      if (this._masked) {
-        this._masked = false;
-        this.setText(this._unmaskedText);
-        return this._unmaskedText = null;
-      }
-    };
-
-    CardTextField.prototype.cardMask = function() {
-      var last4, text, toMask;
-
-      text = this.text();
-      toMask = text.slice(0, -4);
-      last4 = text.slice(-4);
-      return toMask.replace(/\d/g, '•') + last4;
-    };
-
-    return CardTextField;
-
-  })(TextField);
-
-  CardTextField.CardMaskStrategy = CardMaskStrategy;
-
-  module.exports = CardTextField;
-
-}).call(this);
-
-},{"./text_field":13,"./adaptive_card_formatter":2,"./card_utils":15}],3:[function(require,module,exports){
-(function() {
-  var AmexCardFormatter, DefaultCardFormatter, _ref,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  DefaultCardFormatter = require('./default_card_formatter');
-
-  AmexCardFormatter = (function(_super) {
-    __extends(AmexCardFormatter, _super);
-
-    function AmexCardFormatter() {
-      _ref = AmexCardFormatter.__super__.constructor.apply(this, arguments);
-      return _ref;
-    }
-
-    AmexCardFormatter.prototype.maximumLength = 15 + 2;
-
-    AmexCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
-      return index === 4 || index === 11;
-    };
-
-    return AmexCardFormatter;
-
-  })(DefaultCardFormatter);
-
-  module.exports = AmexCardFormatter;
-
-}).call(this);
-
-},{"./default_card_formatter":7}],6:[function(require,module,exports){
+},{"./formatter":9}],7:[function(require,module,exports){
 (function() {
   var ExpiryDateField, ExpiryDateFormatter, TextField,
     __hasProp = {}.hasOwnProperty,
@@ -621,62 +676,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./text_field":13,"./expiry_date_formatter":8}],7:[function(require,module,exports){
-(function() {
-  var DefaultCardFormatter, DelimitedTextFormatter, luhnCheck, validCardLength, _ref, _ref1,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  DelimitedTextFormatter = require('./delimited_text_formatter');
-
-  _ref = require('./card_utils'), validCardLength = _ref.validCardLength, luhnCheck = _ref.luhnCheck;
-
-  DefaultCardFormatter = (function(_super) {
-    __extends(DefaultCardFormatter, _super);
-
-    function DefaultCardFormatter() {
-      _ref1 = DefaultCardFormatter.__super__.constructor.apply(this, arguments);
-      return _ref1;
-    }
-
-    DefaultCardFormatter.prototype.delimiter = ' ';
-
-    DefaultCardFormatter.prototype.maximumLength = 16 + 3;
-
-    DefaultCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
-      return index === 4 || index === 9 || index === 14;
-    };
-
-    DefaultCardFormatter.prototype.parse = function(text, error) {
-      var value;
-
-      value = this._valueFromText(text);
-      if (!validCardLength(value)) {
-        if (typeof error === "function") {
-          error('card-formatter.number-too-short');
-        }
-      }
-      if (!luhnCheck(value)) {
-        if (typeof error === "function") {
-          error('card-formatter.invalid-number');
-        }
-      }
-      return DefaultCardFormatter.__super__.parse.call(this, text, error);
-    };
-
-    DefaultCardFormatter.prototype._valueFromText = function(text) {
-      return DefaultCardFormatter.__super__._valueFromText.call(this, (text != null ? text : '').replace(/[^\d]/g, ''));
-    };
-
-    return DefaultCardFormatter;
-
-  })(DelimitedTextFormatter);
-
-  module.exports = DefaultCardFormatter;
-
-}).call(this);
-
-},{"./delimited_text_formatter":5,"./card_utils":15}],8:[function(require,module,exports){
+},{"./text_field":13,"./expiry_date_formatter":8}],8:[function(require,module,exports){
 (function() {
   var DelimitedTextFormatter, ExpiryDateFormatter, interpretTwoDigitYear, zpad2, _ref,
     __hasProp = {}.hasOwnProperty,
@@ -801,7 +801,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./delimited_text_formatter":5}],10:[function(require,module,exports){
+},{"./delimited_text_formatter":6}],10:[function(require,module,exports){
 (function() {
   var CEILING, CURRENCY, CurrencyDefaults, DEFAULT_COUNTRY, DEFAULT_LOCALE, DOWN, FLOOR, Formatter, HALF_DOWN, HALF_EVEN, HALF_UP, LocaleDefaults, NONE, NumberFormatter, PERCENT, RegionDefaults, StyleDefaults, UP, endsWith, get, isDigits, roundCeiling, roundFloor, roundHalfEven, splitLocaleComponents, startsWith,
     __slice = [].slice,
@@ -1800,7 +1800,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./delimited_text_formatter":5}],12:[function(require,module,exports){
+},{"./delimited_text_formatter":6}],12:[function(require,module,exports){
 (function() {
   var DelimitedTextFormatter, SocialSecurityNumberFormatter, _ref,
     __hasProp = {}.hasOwnProperty,
@@ -1840,7 +1840,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./delimited_text_formatter":5}],13:[function(require,module,exports){
+},{"./delimited_text_formatter":6}],13:[function(require,module,exports){
 (function() {
   var AFFINITY, KEYS, TextField, TextFieldStateChange, UndoManager, hasLeftWordBreakAtIndex, hasRightWordBreakAtIndex, isWordChar, keyBindingsForPlatform, _ref,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
