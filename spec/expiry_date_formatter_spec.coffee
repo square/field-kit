@@ -69,3 +69,8 @@ describe 'ExpiryDateFormatter', ->
       freeze new Date(2099, 0)
       expect(formatter.parse('04/04')).toEqual(month: 4, year: 2104)
       reset()
+
+    it 'parses incomplete dates as formatted', ->
+      freeze new Date(2013, 0)
+      expect(formatter.parse('12/3')).toEqual(month: 12, year: 2003)
+      reset()
