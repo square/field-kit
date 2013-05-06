@@ -5,13 +5,12 @@ class ExpiryDateField extends TextField
   constructor: (element) ->
     super element, new ExpiryDateFormatter()
 
-  # Internal: Called by our superclass, used to prefix single digit years with zero .ie '4' => '04.
+  # Internal: Called by our superclass, used to post-process the text.
   #
   # Returns nothing.
   textFieldDidEndEditing: ->
-    newText = @formatter().format(@value())
-    @setText newText
-    @setSelectedRange start: newText.length, length: 0
-
+    value = @value()
+    if value
+      @setText @formatter().format(value)
 
 module.exports = ExpiryDateField
