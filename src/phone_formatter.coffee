@@ -41,6 +41,20 @@ class PhoneFormatter extends DelimitedTextFormatter
   hasDelimiterAtIndex: (index) ->
     @delimiterAt(index)?
 
+  parse: (text, error) ->
+    digits = @digitsWithoutCountryCode text
+    # Source: http://en.wikipedia.org/wiki/North_American_Numbering_Plan
+    #
+    # Area Code
+    error? 'phone-formatter.number-too-short' unless text.length >= 10
+    error? 'phone-formatter.area-code-zero' unless digits[0] isnt '0'
+    error? 'phone-formatter.area-code-one' unless digits[0] isnt '1'
+    error? 'phone-formatter.area-code-n9n' unless digits[1] isnt '9'
+    # Central Office Code
+    error? 'phone-formatter.central-office-one' unless digits[3] isnt '1'
+    error? 'phone-formatter.central-office-n11' unless digits[4..5] isnt '11'
+    super text, error
+
   format: (value) ->
     @guessFormatFromText value
     super value
@@ -69,5 +83,15 @@ class PhoneFormatter extends DelimitedTextFormatter
     else
       @delimiterMap = NANP_PHONE_DELIMITERS
       @maximumLength = 10 + 4
+
+  # Internal: Gives back just the phone number digits as a string without the
+  # country code. Future-proofing internationalization where the country code
+  # isn't just +1.
+  digitsWithoutCountryCode: (text) ->
+    digits = (text ? '').replace(/[^\d]/g, '')
+    extraDigits = digits.length - 10
+    if extraDigits > 0
+      digits = digits.substr(extraDigits)
+    return digits
 
 module.exports = PhoneFormatter
