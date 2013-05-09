@@ -23,7 +23,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./card_text_field":2,"./adaptive_card_formatter":3,"./amex_card_formatter":4,"./default_card_formatter":5,"./delimited_text_formatter":6,"./expiry_date_field":7,"./expiry_date_formatter":8,"./formatter":9,"./number_formatter":10,"./phone_formatter":11,"./social_security_number_formatter":12,"./text_field":13,"./undo_manager":14}],9:[function(require,module,exports){
+},{"./adaptive_card_formatter":2,"./amex_card_formatter":3,"./card_text_field":4,"./default_card_formatter":5,"./delimited_text_formatter":6,"./expiry_date_field":7,"./expiry_date_formatter":8,"./formatter":9,"./number_formatter":10,"./phone_formatter":11,"./social_security_number_formatter":12,"./text_field":13,"./undo_manager":14}],9:[function(require,module,exports){
 (function() {
   var Formatter;
 
@@ -222,6 +222,82 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 },{}],2:[function(require,module,exports){
 (function() {
+  var AMEX, AdaptiveCardFormatter, AmexCardFormatter, DefaultCardFormatter, determineCardType, _ref;
+
+  AmexCardFormatter = require('./amex_card_formatter');
+
+  DefaultCardFormatter = require('./default_card_formatter');
+
+  _ref = require('./card_utils'), determineCardType = _ref.determineCardType, AMEX = _ref.AMEX;
+
+  AdaptiveCardFormatter = (function() {
+    function AdaptiveCardFormatter() {
+      this.amexCardFormatter = new AmexCardFormatter();
+      this.defaultCardFormatter = new DefaultCardFormatter();
+      this.formatter = this.defaultCardFormatter;
+    }
+
+    AdaptiveCardFormatter.prototype.format = function(pan) {
+      return this._formatterForPan(pan).format(pan);
+    };
+
+    AdaptiveCardFormatter.prototype.parse = function(text, error) {
+      return this.formatter.parse(text, error);
+    };
+
+    AdaptiveCardFormatter.prototype.isChangeValid = function(change) {
+      this.formatter = this._formatterForPan(change.proposed.text);
+      return this.formatter.isChangeValid(change);
+    };
+
+    AdaptiveCardFormatter.prototype._formatterForPan = function(pan) {
+      if (determineCardType(pan.replace(/[^\d]+/g, '')) === AMEX) {
+        return this.amexCardFormatter;
+      } else {
+        return this.defaultCardFormatter;
+      }
+    };
+
+    return AdaptiveCardFormatter;
+
+  })();
+
+  module.exports = AdaptiveCardFormatter;
+
+}).call(this);
+
+},{"./amex_card_formatter":3,"./default_card_formatter":5,"./card_utils":15}],3:[function(require,module,exports){
+(function() {
+  var AmexCardFormatter, DefaultCardFormatter, _ref,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  DefaultCardFormatter = require('./default_card_formatter');
+
+  AmexCardFormatter = (function(_super) {
+    __extends(AmexCardFormatter, _super);
+
+    function AmexCardFormatter() {
+      _ref = AmexCardFormatter.__super__.constructor.apply(this, arguments);
+      return _ref;
+    }
+
+    AmexCardFormatter.prototype.maximumLength = 15 + 2;
+
+    AmexCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
+      return index === 4 || index === 11;
+    };
+
+    return AmexCardFormatter;
+
+  })(DefaultCardFormatter);
+
+  module.exports = AmexCardFormatter;
+
+}).call(this);
+
+},{"./default_card_formatter":5}],4:[function(require,module,exports){
+(function() {
   var AdaptiveCardFormatter, CardMaskStrategy, CardTextField, TextField, determineCardType,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -325,83 +401,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./text_field":13,"./adaptive_card_formatter":3,"./card_utils":15}],3:[function(require,module,exports){
-(function() {
-  var AMEX, AdaptiveCardFormatter, AmexCardFormatter, DefaultCardFormatter, determineCardType, _ref;
-
-  AmexCardFormatter = require('./amex_card_formatter');
-
-  DefaultCardFormatter = require('./default_card_formatter');
-
-  _ref = require('./card_utils'), determineCardType = _ref.determineCardType, AMEX = _ref.AMEX;
-
-  AdaptiveCardFormatter = (function() {
-    function AdaptiveCardFormatter() {
-      this.amexCardFormatter = new AmexCardFormatter();
-      this.defaultCardFormatter = new DefaultCardFormatter();
-      this.formatter = this.defaultCardFormatter;
-    }
-
-    AdaptiveCardFormatter.prototype.format = function(pan) {
-      return this._formatterForPan(pan).format(pan);
-    };
-
-    AdaptiveCardFormatter.prototype.parse = function(text, error) {
-      return this.formatter.parse(text, error);
-    };
-
-    AdaptiveCardFormatter.prototype.isChangeValid = function(change) {
-      this.formatter = this._formatterForPan(change.proposed.text);
-      return this.formatter.isChangeValid(change);
-    };
-
-    AdaptiveCardFormatter.prototype._formatterForPan = function(pan) {
-      if (determineCardType(pan.replace(/[^\d]+/g, '')) === AMEX) {
-        return this.amexCardFormatter;
-      } else {
-        return this.defaultCardFormatter;
-      }
-    };
-
-    return AdaptiveCardFormatter;
-
-  })();
-
-  module.exports = AdaptiveCardFormatter;
-
-}).call(this);
-
-},{"./amex_card_formatter":4,"./card_utils":15,"./default_card_formatter":5}],4:[function(require,module,exports){
-(function() {
-  var AmexCardFormatter, DefaultCardFormatter, _ref,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  DefaultCardFormatter = require('./default_card_formatter');
-
-  AmexCardFormatter = (function(_super) {
-    __extends(AmexCardFormatter, _super);
-
-    function AmexCardFormatter() {
-      _ref = AmexCardFormatter.__super__.constructor.apply(this, arguments);
-      return _ref;
-    }
-
-    AmexCardFormatter.prototype.maximumLength = 15 + 2;
-
-    AmexCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
-      return index === 4 || index === 11;
-    };
-
-    return AmexCardFormatter;
-
-  })(DefaultCardFormatter);
-
-  module.exports = AmexCardFormatter;
-
-}).call(this);
-
-},{"./default_card_formatter":5}],5:[function(require,module,exports){
+},{"./text_field":13,"./adaptive_card_formatter":2,"./card_utils":15}],5:[function(require,module,exports){
 (function() {
   var DefaultCardFormatter, DelimitedTextFormatter, luhnCheck, validCardLength, _ref, _ref1,
     __hasProp = {}.hasOwnProperty,
@@ -1765,6 +1765,43 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
       return this.delimiterAt(index) != null;
     };
 
+    PhoneFormatter.prototype.parse = function(text, error) {
+      var digits;
+
+      digits = this.digitsWithoutCountryCode(text);
+      if (!(text.length >= 10)) {
+        if (typeof error === "function") {
+          error('phone-formatter.number-too-short');
+        }
+      }
+      if (digits[0] === '0') {
+        if (typeof error === "function") {
+          error('phone-formatter.area-code-zero');
+        }
+      }
+      if (digits[0] === '1') {
+        if (typeof error === "function") {
+          error('phone-formatter.area-code-one');
+        }
+      }
+      if (digits[1] === '9') {
+        if (typeof error === "function") {
+          error('phone-formatter.area-code-n9n');
+        }
+      }
+      if (digits[3] === '1') {
+        if (typeof error === "function") {
+          error('phone-formatter.central-office-one');
+        }
+      }
+      if (digits.slice(4, 6) === '11') {
+        if (typeof error === "function") {
+          error('phone-formatter.central-office-n11');
+        }
+      }
+      return PhoneFormatter.__super__.parse.call(this, text, error);
+    };
+
     PhoneFormatter.prototype.format = function(value) {
       this.guessFormatFromText(value);
       return PhoneFormatter.__super__.format.call(this, value);
@@ -1790,6 +1827,17 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
         this.delimiterMap = NANP_PHONE_DELIMITERS;
         return this.maximumLength = 10 + 4;
       }
+    };
+
+    PhoneFormatter.prototype.digitsWithoutCountryCode = function(text) {
+      var digits, extraDigits;
+
+      digits = (text != null ? text : '').replace(/[^\d]/g, '');
+      extraDigits = digits.length - 10;
+      if (extraDigits > 0) {
+        digits = digits.substr(extraDigits);
+      }
+      return digits;
     };
 
     return PhoneFormatter;
