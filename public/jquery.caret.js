@@ -42,8 +42,7 @@
         range.collapse(true);
         range.moveStart('character', start);
         range.moveEnd('character', end - start);
-        range.select();
-        return range.focus();
+        return range.select();
       };
     } else {
       getCaret = function(element) {
