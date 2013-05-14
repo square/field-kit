@@ -37,6 +37,7 @@ describe 'CardTextField', ->
         textField.setCardMaskStrategy(CardTextField.CardMaskStrategy.None)
 
       it 'does not change the displayed card number on end editing', ->
+        textField.textFieldDidBeginEditing()
         type(visa).into(textField)
         textField.textFieldDidEndEditing()
         expect(textField.element.val()).toEqual(visa)
@@ -44,22 +45,33 @@ describe 'CardTextField', ->
     describe 'when set to DoneEditing', ->
       beforeEach ->
         textField.setCardMaskStrategy(CardTextField.CardMaskStrategy.DoneEditing)
-        type(visa).into(textField)
 
       it 'does not change the displayed card number while typing', ->
+        textField.textFieldDidBeginEditing()
+        type(visa).into(textField)
         expect(textField.element.val()).toEqual(visa)
 
       it 'masks the displayed card number on end editing', ->
+        textField.textFieldDidBeginEditing()
+        type(visa).into(textField)
         textField.textFieldDidEndEditing()
         expect(textField.element.val()).toEqual('•••• •••• •••• 1111')
 
       it 'does not change the selected range on end editing', ->
+        textField.textFieldDidBeginEditing()
+        type(visa).into(textField)
         expectThatTyping('enter').into(textField).willChange("|#{visa}>").to('|•••• •••• •••• 1111>')
 
       it 'restores the original value on beginning editing', ->
+        textField.textFieldDidBeginEditing()
+        type(visa).into(textField)
         textField.textFieldDidEndEditing()
         textField.textFieldDidBeginEditing()
         expect(textField.element.val()).toEqual(visa)
+
+      it 'masks when a value is set before editing', ->
+        textField.setValue('1234567890123456')
+        expect(textField.element.val()).toEqual('•••• •••• •••• 3456')
 
       # it 'restores the original value when disabling masking', ->
       #   textField.textFieldDidEndEditing()
