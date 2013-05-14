@@ -23,7 +23,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./card_text_field":2,"./adaptive_card_formatter":3,"./amex_card_formatter":4,"./default_card_formatter":5,"./delimited_text_formatter":6,"./expiry_date_field":7,"./expiry_date_formatter":8,"./formatter":9,"./number_formatter":10,"./phone_formatter":11,"./social_security_number_formatter":12,"./text_field":13,"./undo_manager":14}],9:[function(require,module,exports){
+},{"./adaptive_card_formatter":2,"./amex_card_formatter":3,"./card_text_field":4,"./default_card_formatter":5,"./delimited_text_formatter":6,"./expiry_date_field":7,"./expiry_date_formatter":8,"./formatter":9,"./number_formatter":10,"./phone_formatter":11,"./social_security_number_formatter":12,"./text_field":13,"./undo_manager":14}],9:[function(require,module,exports){
 (function() {
   var Formatter;
 
@@ -222,111 +222,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 },{}],2:[function(require,module,exports){
 (function() {
-  var AdaptiveCardFormatter, CardMaskStrategy, CardTextField, TextField, determineCardType,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  TextField = require('./text_field');
-
-  AdaptiveCardFormatter = require('./adaptive_card_formatter');
-
-  determineCardType = require('./card_utils').determineCardType;
-
-  CardMaskStrategy = {
-    None: 'None',
-    DoneEditing: 'DoneEditing'
-  };
-
-  CardTextField = (function(_super) {
-    __extends(CardTextField, _super);
-
-    function CardTextField(element) {
-      CardTextField.__super__.constructor.call(this, element, new AdaptiveCardFormatter());
-      this.setCardMaskStrategy(CardMaskStrategy.None);
-    }
-
-    CardTextField.prototype.cardType = function() {
-      return determineCardType(this.value());
-    };
-
-    CardTextField.prototype.cardMaskStrategy = function() {
-      return this._cardMaskStrategy;
-    };
-
-    CardTextField.prototype.setCardMaskStrategy = function(cardMaskStrategy) {
-      if (cardMaskStrategy !== this._cardMaskStrategy) {
-        this._cardMaskStrategy = cardMaskStrategy;
-      }
-      return null;
-    };
-
-    CardTextField.prototype._masked = false;
-
-    CardTextField.prototype.text = function() {
-      if (this._masked) {
-        return this._unmaskedText;
-      } else {
-        return CardTextField.__super__.text.call(this);
-      }
-    };
-
-    CardTextField.prototype.setText = function(text) {
-      if (this._masked) {
-        this._unmaskedText = text;
-        text = this.cardMask();
-      }
-      return CardTextField.__super__.setText.call(this, text);
-    };
-
-    CardTextField.prototype.textFieldDidEndEditing = function() {
-      if (this.cardMaskStrategy() === CardMaskStrategy.DoneEditing) {
-        return this._enableMasking();
-      }
-    };
-
-    CardTextField.prototype.textFieldDidBeginEditing = function() {
-      if (this.cardMaskStrategy() === CardMaskStrategy.DoneEditing) {
-        return this._disableMasking();
-      }
-    };
-
-    CardTextField.prototype._enableMasking = function() {
-      if (!this._masked) {
-        this._unmaskedText = this.text();
-        this._masked = true;
-        return this.setText(this._unmaskedText);
-      }
-    };
-
-    CardTextField.prototype._disableMasking = function() {
-      if (this._masked) {
-        this._masked = false;
-        this.setText(this._unmaskedText);
-        return this._unmaskedText = null;
-      }
-    };
-
-    CardTextField.prototype.cardMask = function() {
-      var last4, text, toMask;
-
-      text = this.text();
-      toMask = text.slice(0, -4);
-      last4 = text.slice(-4);
-      return toMask.replace(/\d/g, '•') + last4;
-    };
-
-    return CardTextField;
-
-  })(TextField);
-
-  CardTextField.CardMaskStrategy = CardMaskStrategy;
-
-  module.exports = CardTextField;
-
-}).call(this);
-
-},{"./text_field":13,"./adaptive_card_formatter":3,"./card_utils":15}],3:[function(require,module,exports){
-(function() {
   var AMEX, AdaptiveCardFormatter, AmexCardFormatter, DefaultCardFormatter, determineCardType, _ref;
 
   AmexCardFormatter = require('./amex_card_formatter');
@@ -371,7 +266,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./amex_card_formatter":4,"./card_utils":15,"./default_card_formatter":5}],4:[function(require,module,exports){
+},{"./amex_card_formatter":3,"./default_card_formatter":5,"./card_utils":15}],3:[function(require,module,exports){
 (function() {
   var AmexCardFormatter, DefaultCardFormatter, _ref,
     __hasProp = {}.hasOwnProperty,
@@ -401,7 +296,123 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./default_card_formatter":5}],5:[function(require,module,exports){
+},{"./default_card_formatter":5}],4:[function(require,module,exports){
+(function() {
+  var AdaptiveCardFormatter, CardMaskStrategy, CardTextField, TextField, determineCardType,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  TextField = require('./text_field');
+
+  AdaptiveCardFormatter = require('./adaptive_card_formatter');
+
+  determineCardType = require('./card_utils').determineCardType;
+
+  CardMaskStrategy = {
+    None: 'None',
+    DoneEditing: 'DoneEditing'
+  };
+
+  CardTextField = (function(_super) {
+    __extends(CardTextField, _super);
+
+    function CardTextField(element) {
+      CardTextField.__super__.constructor.call(this, element, new AdaptiveCardFormatter());
+      this.setCardMaskStrategy(CardMaskStrategy.None);
+    }
+
+    CardTextField.prototype.cardType = function() {
+      return determineCardType(this.value());
+    };
+
+    CardTextField.prototype.cardMaskStrategy = function() {
+      return this._cardMaskStrategy;
+    };
+
+    CardTextField.prototype.setCardMaskStrategy = function(cardMaskStrategy) {
+      if (cardMaskStrategy !== this._cardMaskStrategy) {
+        this._cardMaskStrategy = cardMaskStrategy;
+        this._syncMask();
+      }
+      return null;
+    };
+
+    CardTextField.prototype.cardMask = function() {
+      var last4, text, toMask;
+
+      text = this.text();
+      toMask = text.slice(0, -4);
+      last4 = text.slice(-4);
+      return toMask.replace(/\d/g, '•') + last4;
+    };
+
+    CardTextField.prototype._masked = false;
+
+    CardTextField.prototype._editing = false;
+
+    CardTextField.prototype.text = function() {
+      if (this._masked) {
+        return this._unmaskedText;
+      } else {
+        return CardTextField.__super__.text.call(this);
+      }
+    };
+
+    CardTextField.prototype.setText = function(text) {
+      if (this._masked) {
+        this._unmaskedText = text;
+        text = this.cardMask();
+      }
+      return CardTextField.__super__.setText.call(this, text);
+    };
+
+    CardTextField.prototype.textFieldDidEndEditing = function() {
+      this._editing = false;
+      return this._syncMask();
+    };
+
+    CardTextField.prototype.textFieldDidBeginEditing = function() {
+      this._editing = true;
+      return this._syncMask();
+    };
+
+    CardTextField.prototype._enableMasking = function() {
+      if (!this._masked) {
+        this._unmaskedText = this.text();
+        this._masked = true;
+        return this.setText(this._unmaskedText);
+      }
+    };
+
+    CardTextField.prototype._disableMasking = function() {
+      if (this._masked) {
+        this._masked = false;
+        this.setText(this._unmaskedText);
+        return this._unmaskedText = null;
+      }
+    };
+
+    CardTextField.prototype._syncMask = function() {
+      if (this.cardMaskStrategy() === CardMaskStrategy.DoneEditing) {
+        if (this._editing) {
+          return this._disableMasking();
+        } else {
+          return this._enableMasking();
+        }
+      }
+    };
+
+    return CardTextField;
+
+  })(TextField);
+
+  CardTextField.CardMaskStrategy = CardMaskStrategy;
+
+  module.exports = CardTextField;
+
+}).call(this);
+
+},{"./text_field":13,"./adaptive_card_formatter":2,"./card_utils":15}],5:[function(require,module,exports){
 (function() {
   var DefaultCardFormatter, DelimitedTextFormatter, luhnCheck, validCardLength, _ref, _ref1,
     __hasProp = {}.hasOwnProperty,
@@ -676,7 +687,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./text_field":13,"./expiry_date_formatter":8}],8:[function(require,module,exports){
+},{"./expiry_date_formatter":8,"./text_field":13}],8:[function(require,module,exports){
 (function() {
   var DelimitedTextFormatter, ExpiryDateFormatter, interpretTwoDigitYear, zpad2, _ref,
     __hasProp = {}.hasOwnProperty,
