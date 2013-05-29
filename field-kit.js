@@ -23,7 +23,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./adaptive_card_formatter":2,"./amex_card_formatter":3,"./card_text_field":4,"./default_card_formatter":5,"./delimited_text_formatter":6,"./expiry_date_field":7,"./expiry_date_formatter":8,"./formatter":9,"./number_formatter":10,"./phone_formatter":11,"./social_security_number_formatter":12,"./text_field":13,"./undo_manager":14}],9:[function(require,module,exports){
+},{"./adaptive_card_formatter":2,"./amex_card_formatter":3,"./card_text_field":4,"./default_card_formatter":5,"./delimited_text_formatter":6,"./expiry_date_formatter":7,"./expiry_date_field":8,"./formatter":9,"./number_formatter":10,"./social_security_number_formatter":11,"./phone_formatter":12,"./text_field":13,"./undo_manager":14}],9:[function(require,module,exports){
 (function() {
   var Formatter;
 
@@ -84,8 +84,14 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
     __slice = [].slice;
 
   hasGetter = function(object, property) {
-    var _ref, _ref1, _ref2;
+    var e, _ref, _ref1, _ref2;
 
+    try {
+      Object.getOwnPropertyDescriptor({}, 'sq');
+    } catch (_error) {
+      e = _error;
+      return;
+    }
     if (object != null ? (_ref = object.constructor) != null ? _ref.prototype : void 0 : void 0) {
       if ((_ref1 = Object.getOwnPropertyDescriptor(object.constructor.prototype, property)) != null ? _ref1.get : void 0) {
         return true;
@@ -655,40 +661,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 },{"./formatter":9}],7:[function(require,module,exports){
 (function() {
-  var ExpiryDateField, ExpiryDateFormatter, TextField,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  TextField = require('./text_field');
-
-  ExpiryDateFormatter = require('./expiry_date_formatter');
-
-  ExpiryDateField = (function(_super) {
-    __extends(ExpiryDateField, _super);
-
-    function ExpiryDateField(element) {
-      ExpiryDateField.__super__.constructor.call(this, element, new ExpiryDateFormatter());
-    }
-
-    ExpiryDateField.prototype.textFieldDidEndEditing = function() {
-      var value;
-
-      value = this.value();
-      if (value) {
-        return this.setText(this.formatter().format(value));
-      }
-    };
-
-    return ExpiryDateField;
-
-  })(TextField);
-
-  module.exports = ExpiryDateField;
-
-}).call(this);
-
-},{"./expiry_date_formatter":8,"./text_field":13}],8:[function(require,module,exports){
-(function() {
   var DelimitedTextFormatter, ExpiryDateFormatter, interpretTwoDigitYear, zpad2, _ref,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -812,7 +784,41 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./delimited_text_formatter":6}],10:[function(require,module,exports){
+},{"./delimited_text_formatter":6}],8:[function(require,module,exports){
+(function() {
+  var ExpiryDateField, ExpiryDateFormatter, TextField,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  TextField = require('./text_field');
+
+  ExpiryDateFormatter = require('./expiry_date_formatter');
+
+  ExpiryDateField = (function(_super) {
+    __extends(ExpiryDateField, _super);
+
+    function ExpiryDateField(element) {
+      ExpiryDateField.__super__.constructor.call(this, element, new ExpiryDateFormatter());
+    }
+
+    ExpiryDateField.prototype.textFieldDidEndEditing = function() {
+      var value;
+
+      value = this.value();
+      if (value) {
+        return this.setText(this.formatter().format(value));
+      }
+    };
+
+    return ExpiryDateField;
+
+  })(TextField);
+
+  module.exports = ExpiryDateField;
+
+}).call(this);
+
+},{"./text_field":13,"./expiry_date_formatter":7}],10:[function(require,module,exports){
 (function() {
   var CEILING, CURRENCY, CurrencyDefaults, DEFAULT_COUNTRY, DEFAULT_LOCALE, DOWN, FLOOR, Formatter, HALF_DOWN, HALF_EVEN, HALF_UP, LocaleDefaults, NONE, NumberFormatter, PERCENT, RegionDefaults, StyleDefaults, UP, endsWith, get, isDigits, roundCeiling, roundFloor, roundHalfEven, splitLocaleComponents, startsWith,
     __slice = [].slice,
@@ -1709,6 +1715,46 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 },{"./formatter":9}],11:[function(require,module,exports){
 (function() {
+  var DelimitedTextFormatter, SocialSecurityNumberFormatter, _ref,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  DelimitedTextFormatter = require('./delimited_text_formatter');
+
+  SocialSecurityNumberFormatter = (function(_super) {
+    __extends(SocialSecurityNumberFormatter, _super);
+
+    function SocialSecurityNumberFormatter() {
+      _ref = SocialSecurityNumberFormatter.__super__.constructor.apply(this, arguments);
+      return _ref;
+    }
+
+    SocialSecurityNumberFormatter.prototype.delimiter = '-';
+
+    SocialSecurityNumberFormatter.prototype.maximumLength = 9 + 2;
+
+    SocialSecurityNumberFormatter.prototype.hasDelimiterAtIndex = function(index) {
+      return index === 3 || index === 6;
+    };
+
+    SocialSecurityNumberFormatter.prototype.isChangeValid = function(change) {
+      if (/^\d*$/.test(change.inserted.text)) {
+        return SocialSecurityNumberFormatter.__super__.isChangeValid.call(this, change);
+      } else {
+        return false;
+      }
+    };
+
+    return SocialSecurityNumberFormatter;
+
+  })(DelimitedTextFormatter);
+
+  module.exports = SocialSecurityNumberFormatter;
+
+}).call(this);
+
+},{"./delimited_text_formatter":6}],12:[function(require,module,exports){
+(function() {
   var DelimitedTextFormatter, NANP_PHONE_DELIMITERS, NANP_PHONE_DELIMITERS_WITH_1, NANP_PHONE_DELIMITERS_WITH_PLUS, PhoneFormatter,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
@@ -1808,46 +1854,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
   })(DelimitedTextFormatter);
 
   module.exports = PhoneFormatter;
-
-}).call(this);
-
-},{"./delimited_text_formatter":6}],12:[function(require,module,exports){
-(function() {
-  var DelimitedTextFormatter, SocialSecurityNumberFormatter, _ref,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  DelimitedTextFormatter = require('./delimited_text_formatter');
-
-  SocialSecurityNumberFormatter = (function(_super) {
-    __extends(SocialSecurityNumberFormatter, _super);
-
-    function SocialSecurityNumberFormatter() {
-      _ref = SocialSecurityNumberFormatter.__super__.constructor.apply(this, arguments);
-      return _ref;
-    }
-
-    SocialSecurityNumberFormatter.prototype.delimiter = '-';
-
-    SocialSecurityNumberFormatter.prototype.maximumLength = 9 + 2;
-
-    SocialSecurityNumberFormatter.prototype.hasDelimiterAtIndex = function(index) {
-      return index === 3 || index === 6;
-    };
-
-    SocialSecurityNumberFormatter.prototype.isChangeValid = function(change) {
-      if (/^\d*$/.test(change.inserted.text)) {
-        return SocialSecurityNumberFormatter.__super__.isChangeValid.call(this, change);
-      } else {
-        return false;
-      }
-    };
-
-    return SocialSecurityNumberFormatter;
-
-  })(DelimitedTextFormatter);
-
-  module.exports = SocialSecurityNumberFormatter;
 
 }).call(this);
 
@@ -2449,13 +2455,14 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
     };
 
     TextField.prototype.keyPress = function(event) {
-      var _ref1,
+      var charCode, _ref1,
         _this = this;
 
       if (!event.metaKey && !event.ctrlKey && ((_ref1 = event.keyCode) !== KEYS.ENTER && _ref1 !== KEYS.TAB && _ref1 !== KEYS.BACKSPACE)) {
         event.preventDefault();
+        charCode = event.charCode || event.keyCode;
         return this.rollbackInvalidChanges(function() {
-          return _this.insertText(String.fromCharCode(event.charCode));
+          return _this.insertText(String.fromCharCode(charCode));
         });
       }
     };
@@ -2765,9 +2772,11 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
     };
 
     TextField.prototype._buildKeybindings = function() {
-      var osx, userAgent;
+      var doc, osx, userAgent, win;
 
-      userAgent = this.element.get(0).ownerDocument.defaultView.navigator.userAgent;
+      doc = this.element.get(0).ownerDocument;
+      win = doc.defaultView || doc.parentWindow;
+      userAgent = win.navigator.userAgent;
       osx = /^Mozilla\/[\d\.]+ \(Macintosh/.test(userAgent);
       return this._bindings = keyBindingsForPlatform(osx ? 'OSX' : 'Default');
     };

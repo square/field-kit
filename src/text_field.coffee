@@ -986,8 +986,9 @@ class TextField
     # Only handle keypresses that look like insertable text.
     if not event.metaKey and not event.ctrlKey and event.keyCode not in [KEYS.ENTER, KEYS.TAB, KEYS.BACKSPACE]
       event.preventDefault()
+      charCode = event.charCode or event.keyCode
       @rollbackInvalidChanges =>
-        @insertText String.fromCharCode(event.charCode)
+        @insertText String.fromCharCode(charCode)
 
   # Internal: Handles keyup events.
   #
@@ -1271,7 +1272,9 @@ class TextField
   ##
 
   _buildKeybindings: ->
-    userAgent = @element.get(0).ownerDocument.defaultView.navigator.userAgent
+    doc = @element.get(0).ownerDocument
+    win = doc.defaultView or doc.parentWindow
+    userAgent = win.navigator.userAgent
     osx = /^Mozilla\/[\d\.]+ \(Macintosh/.test(userAgent)
     @_bindings = keyBindingsForPlatform(if osx then 'OSX' else 'Default')
 
