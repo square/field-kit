@@ -1,4 +1,10 @@
 hasGetter = (object, property) ->
+  # Skip if getOwnPropertyDescriptor throws (IE8)
+  try
+    Object.getOwnPropertyDescriptor({}, 'sq')
+  catch e
+    return
+
   if object?.constructor?.prototype
     return yes if Object.getOwnPropertyDescriptor(object.constructor.prototype, property)?.get
   return Object.getOwnPropertyDescriptor(object, property)?.get?
