@@ -1,6 +1,7 @@
 PhoneFormatter = require '../lib/phone_formatter'
 {buildField} = require './helpers/builders'
 {expectThatTyping} = require './helpers/expectations'
+{type} = require './helpers/typing'
 
 describe 'PhoneFormatter', ->
   field = null
@@ -18,6 +19,16 @@ describe 'PhoneFormatter', ->
 
   it 'does not allow initializing with a delimiter', ->
     expect(-> new PhoneFormatter('-')).toThrow()
+
+  it 'can strip formatting and remove country code digits', ->
+    # Formatting only
+    expect(formatter.digitsWithoutCountryCode("(206) 829-0752")).toEqual('2068290752')
+    expect(formatter.digitsWithoutCountryCode("206.829.0752")).toEqual('2068290752')
+    # Country Code only
+    expect(formatter.digitsWithoutCountryCode("12068290752")).toEqual('2068290752')
+    expect(formatter.digitsWithoutCountryCode("442068290752")).toEqual('2068290752')  # 2 digit
+    # Both formatting and country (dial) code
+    expect(formatter.digitsWithoutCountryCode("+44 7570 127892")).toEqual('7570127892')
 
   it 'adds a ( before the first digit', ->
     expectThatTyping('4').into(field).willChange('|').to('(4|')
@@ -138,3 +149,51 @@ describe 'PhoneFormatter', ->
       expectThatTyping('backspace').into(field).willChange('+1 (3|').to('+1 (|')
       expectThatTyping('backspace').into(field).willChange('+1 (|').to('+|')
       expectThatTyping('backspace').into(field).willChange('+|').to('|')
+
+  describe 'error checking', ->
+    textFieldDidFailToParseString = null
+
+    beforeEach ->
+      textFieldDidFailToParseString = jasmine.createSpy('textFieldDidFailToParseString')
+      field.setDelegate { textFieldDidFailToParseString }
+
+    it 'fails to parse a number that is too short', ->
+      type('206').into(field)
+      expect(field.value()).toEqual('206')
+      expect(textFieldDidFailToParseString).toHaveBeenCalledWith(field, '(206) ', 'phone-formatter.number-too-short')
+
+    it 'fails to parse a number when area code starts with zero', ->
+      type('062 659 0912').into(field)
+      expect(field.value()).toEqual('0626590912')
+      expect(textFieldDidFailToParseString).toHaveBeenCalledWith(field, '(062) 659-0912', 'phone-formatter.area-code-zero')
+
+    it 'fails to parse a number when area code starts with 1', ->
+      type('162 659 0912').into(field)
+      expect(field.value()).toEqual('1626590912')
+      # Note how the +1 country code screws up formatting too
+      expect(textFieldDidFailToParseString).toHaveBeenCalledWith(field, '1 (626) 590-912', 'phone-formatter.area-code-one')
+
+    it 'fails to parse a number when area code is like N9N', ->
+      type('898 659 0912').into(field)
+      expect(field.value()).toEqual('8986590912')
+      expect(textFieldDidFailToParseString).toHaveBeenCalledWith(field, '(898) 659-0912', 'phone-formatter.area-code-n9n')
+
+    it 'fails to parse a number when central office code starts with 1', ->
+      type('206 123 0912').into(field)
+      expect(field.value()).toEqual('2061230912')
+      expect(textFieldDidFailToParseString).toHaveBeenCalledWith(field, '(206) 123-0912', 'phone-formatter.central-office-one')
+
+    it 'fails to parse a number when central office code is like N11', ->
+      type('206 911 0912').into(field)
+      expect(field.value()).toEqual('2069110912')
+      expect(textFieldDidFailToParseString).toHaveBeenCalledWith(field, '(206) 911-0912', 'phone-formatter.central-office-n11')
+
+    it 'ignores country codes for area code', ->
+      type('1 051 659 0712').into(field)  # Area code starts with zero.
+      expect(field.value()).toEqual('10516590712')
+      expect(textFieldDidFailToParseString).toHaveBeenCalledWith(field, '1 (051) 659-0712', 'phone-formatter.area-code-zero')
+
+    it 'ignores country codes for central office', ->
+      type('1 206 123 0712').into(field)  # Central office code starts with 1
+      expect(field.value()).toEqual('12061230712')
+      expect(textFieldDidFailToParseString).toHaveBeenCalledWith(field, '1 (206) 123-0712', 'phone-formatter.central-office-one')
