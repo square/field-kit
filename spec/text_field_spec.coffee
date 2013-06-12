@@ -1,9 +1,9 @@
-TextField = require '../lib/text_field'
-{buildField, buildInput} = require './helpers/builders'
-FakeEvent = require './helpers/fake_event'
+TextField                             = require '../lib/text_field'
+{buildField, buildInput}              = require './helpers/builders'
+FakeEvent                             = require './helpers/fake_event'
 {expectThatTyping, expectThatPasting} = require './helpers/expectations'
-{type} = require './helpers/typing'
-PassthroughFormatter = require './helpers/passthrough_formatter'
+{type}                                = require './helpers/typing'
+PassthroughFormatter                  = require './helpers/passthrough_formatter'
 
 describe 'TextField', ->
   describe 'constructor', ->
@@ -18,6 +18,11 @@ describe 'TextField', ->
       $input.val('hey')
       field = new TextField($input, formatter)
       expect(field.text()).toEqual('hey')
+
+    it 'throws if there is already a TextField attached to the input', ->
+      $input = buildInput()
+      new TextField($input)
+      expect(-> new TextField($input)).toThrow("already attached a TextField to this element")
 
   describe 'typing a character into an empty field', ->
     it 'allows the character to be inserted', ->
@@ -448,3 +453,16 @@ describe 'TextField', ->
 
       type('a').into(field)
       expect(field.delegate().textFieldDidBeginEditing).toHaveBeenCalledWith(field)
+
+  describe '#destroy', ->
+    it 'removes observers from the attached input', ->
+      $input = buildInput()
+      field1 = buildField(input: $input)
+
+      type('a').into($input)
+      expect($input.val()).toEqual('a')
+
+      field1.destroy()
+      field2 = buildField(input: $input)
+      type('b').into($input)
+      expect($input.val()).toEqual('ab')
