@@ -1,11 +1,15 @@
-Caret = require './caret'
+Caret  = require './caret'
+events = require './events'
 
 class WrappedFakeElements
   _elements: null
+  _data: null
+  _events: null
 
   constructor: (elements) ->
     @_elements = elements.slice()
     @_data = {}
+    @_events = {}
 
   caret: (caret) ->
     @_caret ||= new Caret(@_elements[0])
@@ -31,14 +35,22 @@ class WrappedFakeElements
     else
       @_elements[0].getAttribute 'value'
 
+  each: (iterator) ->
+    for element, i in @_elements
+      iterator.call element, i, element
+    return this
+
   trigger: (args...) ->
-    @_elements[0]?.emit args...
+    @each (_, element) ->
+      element.emit args...
 
   on: (type, callback) ->
-    @_elements[0]?.on(type, callback)
+    @each (_, element) ->
+      events.add element, type, callback
 
   off: (type, callback) ->
-    @_elements[0]?.off(type, callback)
+    @each (_, element) ->
+      events.remove element, type, callback
 
   get: (index) ->
     @_elements[index]

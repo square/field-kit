@@ -44,15 +44,25 @@ class TextField
     return null
 
   constructor: (@element, @_formatter) ->
+    if @element.data 'field-kit-text-field'
+      throw new Error("already attached a TextField to this element")
+    else
+      @element.data 'field-kit-text-field', this
+
     @_jQuery = @element.constructor
-    @element.on 'keydown', @keyDown
-    @element.on 'keypress', @keyPress
-    @element.on 'keyup', @keyUp
-    @element.on 'click', @click
-    @element.on 'paste', @paste
-    @element.on 'focus', @_focus
-    @element.on 'blur', @_blur
+    @element.on 'keydown.field-kit', @keyDown
+    @element.on 'keypress.field-kit', @keyPress
+    @element.on 'keyup.field-kit', @keyUp
+    @element.on 'click.field-kit', @click
+    @element.on 'paste.field-kit', @paste
+    @element.on 'focus.field-kit', @_focus
+    @element.on 'blur.field-kit', @_blur
     @_buildKeybindings()
+
+  destroy: ->
+    @element.off '.field-kit'
+    @element.data 'field-kit-text-field', null
+    return null
 
   # Handles a key event that is trying to insert a character.
   #
