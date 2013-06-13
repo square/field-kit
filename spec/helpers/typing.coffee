@@ -1,23 +1,27 @@
 FakeEvent = require './fake_event'
+TextField = require '../../lib/text_field'
 
 class Type
   constructor: (keys...) ->
     @keys = keys
 
-  into: (@field) ->
+  into: (element) ->
+    if element instanceof TextField
+      element = element.element
+    @element = element
     @perform()
     return this
 
   perform: ->
     for event in FakeEvent.eventsForKeys(@keys...)
       event.type = 'keydown'
-      @field.keyDown event
+      @element.trigger event.type, event
       if not event.isDefaultPrevented()
         event.type = 'keypress'
         if event.charCode
-          @field.keyPress event
+          @element.trigger event.type, event
       event.type = 'keyup'
-      @field.keyUp event
+      @element.trigger event.type, event
 
 type = (keys...) ->
   new Type(keys...)

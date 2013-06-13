@@ -23,7 +23,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./adaptive_card_formatter":2,"./amex_card_formatter":3,"./default_card_formatter":4,"./card_text_field":5,"./delimited_text_formatter":6,"./expiry_date_field":7,"./expiry_date_formatter":8,"./formatter":9,"./number_formatter":10,"./phone_formatter":11,"./social_security_number_formatter":12,"./text_field":13,"./undo_manager":14}],9:[function(require,module,exports){
+},{"./adaptive_card_formatter":2,"./amex_card_formatter":3,"./card_text_field":4,"./default_card_formatter":5,"./delimited_text_formatter":6,"./expiry_date_field":7,"./expiry_date_formatter":8,"./formatter":9,"./number_formatter":10,"./phone_formatter":11,"./social_security_number_formatter":12,"./text_field":13,"./undo_manager":14}],9:[function(require,module,exports){
 (function() {
   var Formatter;
 
@@ -272,7 +272,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./amex_card_formatter":3,"./default_card_formatter":4,"./card_utils":15}],3:[function(require,module,exports){
+},{"./amex_card_formatter":3,"./default_card_formatter":5,"./card_utils":15}],3:[function(require,module,exports){
 (function() {
   var AmexCardFormatter, DefaultCardFormatter, _ref,
     __hasProp = {}.hasOwnProperty,
@@ -302,7 +302,123 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./default_card_formatter":4}],4:[function(require,module,exports){
+},{"./default_card_formatter":5}],4:[function(require,module,exports){
+(function() {
+  var AdaptiveCardFormatter, CardMaskStrategy, CardTextField, TextField, determineCardType,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  TextField = require('./text_field');
+
+  AdaptiveCardFormatter = require('./adaptive_card_formatter');
+
+  determineCardType = require('./card_utils').determineCardType;
+
+  CardMaskStrategy = {
+    None: 'None',
+    DoneEditing: 'DoneEditing'
+  };
+
+  CardTextField = (function(_super) {
+    __extends(CardTextField, _super);
+
+    function CardTextField(element) {
+      CardTextField.__super__.constructor.call(this, element, new AdaptiveCardFormatter());
+      this.setCardMaskStrategy(CardMaskStrategy.None);
+    }
+
+    CardTextField.prototype.cardType = function() {
+      return determineCardType(this.value());
+    };
+
+    CardTextField.prototype.cardMaskStrategy = function() {
+      return this._cardMaskStrategy;
+    };
+
+    CardTextField.prototype.setCardMaskStrategy = function(cardMaskStrategy) {
+      if (cardMaskStrategy !== this._cardMaskStrategy) {
+        this._cardMaskStrategy = cardMaskStrategy;
+        this._syncMask();
+      }
+      return null;
+    };
+
+    CardTextField.prototype.cardMask = function() {
+      var last4, text, toMask;
+
+      text = this.text();
+      toMask = text.slice(0, -4);
+      last4 = text.slice(-4);
+      return toMask.replace(/\d/g, '•') + last4;
+    };
+
+    CardTextField.prototype._masked = false;
+
+    CardTextField.prototype._editing = false;
+
+    CardTextField.prototype.text = function() {
+      if (this._masked) {
+        return this._unmaskedText;
+      } else {
+        return CardTextField.__super__.text.call(this);
+      }
+    };
+
+    CardTextField.prototype.setText = function(text) {
+      if (this._masked) {
+        this._unmaskedText = text;
+        text = this.cardMask();
+      }
+      return CardTextField.__super__.setText.call(this, text);
+    };
+
+    CardTextField.prototype.textFieldDidEndEditing = function() {
+      this._editing = false;
+      return this._syncMask();
+    };
+
+    CardTextField.prototype.textFieldDidBeginEditing = function() {
+      this._editing = true;
+      return this._syncMask();
+    };
+
+    CardTextField.prototype._enableMasking = function() {
+      if (!this._masked) {
+        this._unmaskedText = this.text();
+        this._masked = true;
+        return this.setText(this._unmaskedText);
+      }
+    };
+
+    CardTextField.prototype._disableMasking = function() {
+      if (this._masked) {
+        this._masked = false;
+        this.setText(this._unmaskedText);
+        return this._unmaskedText = null;
+      }
+    };
+
+    CardTextField.prototype._syncMask = function() {
+      if (this.cardMaskStrategy() === CardMaskStrategy.DoneEditing) {
+        if (this._editing) {
+          return this._disableMasking();
+        } else {
+          return this._enableMasking();
+        }
+      }
+    };
+
+    return CardTextField;
+
+  })(TextField);
+
+  CardTextField.CardMaskStrategy = CardMaskStrategy;
+
+  module.exports = CardTextField;
+
+}).call(this);
+
+},{"./text_field":13,"./adaptive_card_formatter":2,"./card_utils":15}],5:[function(require,module,exports){
 (function() {
   var DefaultCardFormatter, DelimitedTextFormatter, luhnCheck, validCardLength, _ref, _ref1,
     __hasProp = {}.hasOwnProperty,
@@ -543,123 +659,41 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./formatter":9}],5:[function(require,module,exports){
+},{"./formatter":9}],7:[function(require,module,exports){
 (function() {
-  var AdaptiveCardFormatter, CardMaskStrategy, CardTextField, TextField, determineCardType,
+  var ExpiryDateField, ExpiryDateFormatter, TextField,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   TextField = require('./text_field');
 
-  AdaptiveCardFormatter = require('./adaptive_card_formatter');
+  ExpiryDateFormatter = require('./expiry_date_formatter');
 
-  determineCardType = require('./card_utils').determineCardType;
+  ExpiryDateField = (function(_super) {
+    __extends(ExpiryDateField, _super);
 
-  CardMaskStrategy = {
-    None: 'None',
-    DoneEditing: 'DoneEditing'
-  };
-
-  CardTextField = (function(_super) {
-    __extends(CardTextField, _super);
-
-    function CardTextField(element) {
-      CardTextField.__super__.constructor.call(this, element, new AdaptiveCardFormatter());
-      this.setCardMaskStrategy(CardMaskStrategy.None);
+    function ExpiryDateField(element) {
+      ExpiryDateField.__super__.constructor.call(this, element, new ExpiryDateFormatter());
     }
 
-    CardTextField.prototype.cardType = function() {
-      return determineCardType(this.value());
-    };
+    ExpiryDateField.prototype.textFieldDidEndEditing = function() {
+      var value;
 
-    CardTextField.prototype.cardMaskStrategy = function() {
-      return this._cardMaskStrategy;
-    };
-
-    CardTextField.prototype.setCardMaskStrategy = function(cardMaskStrategy) {
-      if (cardMaskStrategy !== this._cardMaskStrategy) {
-        this._cardMaskStrategy = cardMaskStrategy;
-        this._syncMask();
-      }
-      return null;
-    };
-
-    CardTextField.prototype.cardMask = function() {
-      var last4, text, toMask;
-
-      text = this.text();
-      toMask = text.slice(0, -4);
-      last4 = text.slice(-4);
-      return toMask.replace(/\d/g, '•') + last4;
-    };
-
-    CardTextField.prototype._masked = false;
-
-    CardTextField.prototype._editing = false;
-
-    CardTextField.prototype.text = function() {
-      if (this._masked) {
-        return this._unmaskedText;
-      } else {
-        return CardTextField.__super__.text.call(this);
+      value = this.value();
+      if (value) {
+        return this.setText(this.formatter().format(value));
       }
     };
 
-    CardTextField.prototype.setText = function(text) {
-      if (this._masked) {
-        this._unmaskedText = text;
-        text = this.cardMask();
-      }
-      return CardTextField.__super__.setText.call(this, text);
-    };
-
-    CardTextField.prototype.textFieldDidEndEditing = function() {
-      this._editing = false;
-      return this._syncMask();
-    };
-
-    CardTextField.prototype.textFieldDidBeginEditing = function() {
-      this._editing = true;
-      return this._syncMask();
-    };
-
-    CardTextField.prototype._enableMasking = function() {
-      if (!this._masked) {
-        this._unmaskedText = this.text();
-        this._masked = true;
-        return this.setText(this._unmaskedText);
-      }
-    };
-
-    CardTextField.prototype._disableMasking = function() {
-      if (this._masked) {
-        this._masked = false;
-        this.setText(this._unmaskedText);
-        return this._unmaskedText = null;
-      }
-    };
-
-    CardTextField.prototype._syncMask = function() {
-      if (this.cardMaskStrategy() === CardMaskStrategy.DoneEditing) {
-        if (this._editing) {
-          return this._disableMasking();
-        } else {
-          return this._enableMasking();
-        }
-      }
-    };
-
-    return CardTextField;
+    return ExpiryDateField;
 
   })(TextField);
 
-  CardTextField.CardMaskStrategy = CardMaskStrategy;
-
-  module.exports = CardTextField;
+  module.exports = ExpiryDateField;
 
 }).call(this);
 
-},{"./adaptive_card_formatter":2,"./text_field":13,"./card_utils":15}],8:[function(require,module,exports){
+},{"./text_field":13,"./expiry_date_formatter":8}],8:[function(require,module,exports){
 (function() {
   var DelimitedTextFormatter, ExpiryDateFormatter, interpretTwoDigitYear, zpad2, _ref,
     __hasProp = {}.hasOwnProperty,
@@ -784,41 +818,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./delimited_text_formatter":6}],7:[function(require,module,exports){
-(function() {
-  var ExpiryDateField, ExpiryDateFormatter, TextField,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  TextField = require('./text_field');
-
-  ExpiryDateFormatter = require('./expiry_date_formatter');
-
-  ExpiryDateField = (function(_super) {
-    __extends(ExpiryDateField, _super);
-
-    function ExpiryDateField(element) {
-      ExpiryDateField.__super__.constructor.call(this, element, new ExpiryDateFormatter());
-    }
-
-    ExpiryDateField.prototype.textFieldDidEndEditing = function() {
-      var value;
-
-      value = this.value();
-      if (value) {
-        return this.setText(this.formatter().format(value));
-      }
-    };
-
-    return ExpiryDateField;
-
-  })(TextField);
-
-  module.exports = ExpiryDateField;
-
-}).call(this);
-
-},{"./text_field":13,"./expiry_date_formatter":8}],10:[function(require,module,exports){
+},{"./delimited_text_formatter":6}],10:[function(require,module,exports){
 (function() {
   var CEILING, CURRENCY, CurrencyDefaults, DEFAULT_COUNTRY, DEFAULT_LOCALE, DOWN, FLOOR, Formatter, HALF_DOWN, HALF_EVEN, HALF_UP, LocaleDefaults, NONE, NumberFormatter, PERCENT, RegionDefaults, StyleDefaults, UP, endsWith, get, isDigits, roundCeiling, roundFloor, roundHalfEven, splitLocaleComponents, startsWith,
     __slice = [].slice,
@@ -1965,16 +1965,27 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
       this.keyUp = __bind(this.keyUp, this);
       this.keyPress = __bind(this.keyPress, this);
       this.keyDown = __bind(this.keyDown, this);
+      if (this.element.data('field-kit-text-field')) {
+        throw new Error("already attached a TextField to this element");
+      } else {
+        this.element.data('field-kit-text-field', this);
+      }
       this._jQuery = this.element.constructor;
-      this.element.on('keydown', this.keyDown);
-      this.element.on('keypress', this.keyPress);
-      this.element.on('keyup', this.keyUp);
-      this.element.on('click', this.click);
-      this.element.on('paste', this.paste);
-      this.element.on('focus', this._focus);
-      this.element.on('blur', this._blur);
+      this.element.on('keydown.field-kit', this.keyDown);
+      this.element.on('keypress.field-kit', this.keyPress);
+      this.element.on('keyup.field-kit', this.keyUp);
+      this.element.on('click.field-kit', this.click);
+      this.element.on('paste.field-kit', this.paste);
+      this.element.on('focus.field-kit', this._focus);
+      this.element.on('blur.field-kit', this._blur);
       this._buildKeybindings();
     }
+
+    TextField.prototype.destroy = function() {
+      this.element.off('.field-kit');
+      this.element.data('field-kit-text-field', null);
+      return null;
+    };
 
     TextField.prototype.insertText = function(text) {
       var range;
@@ -2928,7 +2939,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./keybindings":16,"./undo_manager":14}],15:[function(require,module,exports){
+},{"./undo_manager":14,"./keybindings":16}],15:[function(require,module,exports){
 (function() {
   var AMEX, DISCOVER, JCB, MASTERCARD, VISA, determineCardType, luhnCheck, validCardLength;
 
