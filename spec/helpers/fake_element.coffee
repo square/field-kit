@@ -71,10 +71,10 @@ class FakeElement extends EventEmitter
     @emit 'focus'
 
   addEventListener: (type, callback, capture) ->
-    @on type, callback
+    @addListener type, callback
 
   removeEventListener: (type, callback, capture) ->
-    @off type, callback
+    @removeListener type, callback
 
   toString: ->
     result = "<#{@tagName}"

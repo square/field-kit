@@ -10,7 +10,7 @@ buildField = (textFieldClass=TextField, options={}) ->
       options = textFieldClass
       textFieldClass = TextField
 
-  wrapper = buildInput()
+  wrapper = options.input or buildInput()
 
   if options.formatter
     # formatter is specified, so use it as part of the constructor
