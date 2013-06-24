@@ -1,3 +1,4 @@
+Formatter   = require './formatter'
 UndoManager = require './undo_manager'
 { KEYS, keyBindingsForPlatform } = require './keybindings'
 
@@ -1074,8 +1075,8 @@ class TextField
   # Returns an Object containing the parsed value of the field.
   value: ->
     value = @text()
-    return value unless @_formatter
-    @_formatter.parse value, (errorType) => @_delegate?.textFieldDidFailToParseString?(this, value, errorType)
+    return value unless @formatter()
+    @formatter().parse value, (errorType) => @_delegate?.textFieldDidFailToParseString?(this, value, errorType)
 
   # Sets the object value of the field.
   setValue: (value) ->
@@ -1084,9 +1085,13 @@ class TextField
     @element.trigger 'change'
 
   # Gets the current formatter. Formatters are used to translate between #text
-  # and #value propertiees of the field.
+  # and #value properties of the field.
   formatter: ->
-    @_formatter
+    @_formatter ||= do =>
+      formatter = new Formatter()
+      if (maximumLengthString = @element.attr 'maxlength')?
+        formatter.maximumLength = parseInt(maximumLengthString, 10)
+      formatter
 
   # Sets the current formatter.
   setFormatter: (formatter) ->
