@@ -1,4 +1,5 @@
 TextField                             = require '../lib/text_field'
+Formatter                             = require '../lib/formatter'
 {buildField, buildInput}              = require './helpers/builders'
 FakeEvent                             = require './helpers/fake_event'
 {expectThatTyping, expectThatPasting} = require './helpers/expectations'
@@ -466,3 +467,16 @@ describe 'TextField', ->
       field2 = buildField(input: $input)
       type('b').into($input)
       expect($input.val()).toEqual('ab')
+
+  describe 'without a formatter', ->
+    it 'uses a default formatter', ->
+      field = buildField()
+      field.setFormatter null
+      expect(field.formatter() instanceof Formatter).toBeTruthy()
+
+    it 'respects maxlength set on the element', ->
+      field = buildField()
+      field.element.attr 'maxlength', '2'
+      field.setFormatter null
+      expectThatTyping('abc').into(field).willChange('|').to('ab|')
+

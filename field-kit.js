@@ -23,7 +23,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./adaptive_card_formatter":2,"./amex_card_formatter":3,"./card_text_field":4,"./default_card_formatter":5,"./delimited_text_formatter":6,"./expiry_date_field":7,"./expiry_date_formatter":8,"./formatter":9,"./number_formatter":10,"./phone_formatter":11,"./social_security_number_formatter":12,"./text_field":13,"./undo_manager":14}],9:[function(require,module,exports){
+},{"./adaptive_card_formatter":2,"./amex_card_formatter":3,"./default_card_formatter":4,"./card_text_field":5,"./delimited_text_formatter":6,"./expiry_date_field":7,"./expiry_date_formatter":8,"./formatter":9,"./number_formatter":10,"./phone_formatter":11,"./social_security_number_formatter":12,"./text_field":13,"./undo_manager":14}],9:[function(require,module,exports){
 (function() {
   var Formatter;
 
@@ -54,7 +54,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     Formatter.prototype.isChangeValid = function(change, error) {
       var available, newText, selectedRange, text, truncatedLength, _ref;
-
       _ref = change.proposed, selectedRange = _ref.selectedRange, text = _ref.text;
       if ((this.maximumLength != null) && text.length > this.maximumLength) {
         available = this.maximumLength - (text.length - change.inserted.text.length);
@@ -85,7 +84,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
   hasGetter = function(object, property) {
     var e, _ref, _ref1, _ref2;
-
     try {
       Object.getOwnPropertyDescriptor({}, 'sq');
     } catch (_error) {
@@ -132,7 +130,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     UndoManager.prototype.registerUndo = function() {
       var args, selector, target;
-
       target = arguments[0], selector = arguments[1], args = 3 <= arguments.length ? __slice.call(arguments, 2) : [];
       if (this._isUndoing) {
         this._appendRedo.apply(this, [target, selector].concat(__slice.call(args)));
@@ -147,7 +144,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     UndoManager.prototype._appendUndo = function() {
       var args, selector, target;
-
       target = arguments[0], selector = arguments[1], args = 3 <= arguments.length ? __slice.call(arguments, 2) : [];
       return this._undos.push({
         target: target,
@@ -158,7 +154,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     UndoManager.prototype._appendRedo = function() {
       var args, selector, target;
-
       target = arguments[0], selector = arguments[1], args = 3 <= arguments.length ? __slice.call(arguments, 2) : [];
       return this._redos.push({
         target: target,
@@ -169,7 +164,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     UndoManager.prototype.undo = function() {
       var args, selector, target, _ref;
-
       if (!this.canUndo()) {
         throw new Error('there are no registered undos');
       }
@@ -182,7 +176,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     UndoManager.prototype.redo = function() {
       var args, selector, target, _ref;
-
       if (!this.canRedo()) {
         throw new Error('there are no registered redos');
       }
@@ -196,12 +189,10 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
     UndoManager.prototype.proxyFor = function(target) {
       var proxy, selector, _fn,
         _this = this;
-
       proxy = {};
       _fn = function(selector) {
         return proxy[selector] = function() {
           var args;
-
           args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
           return _this.registerUndo.apply(_this, [target, selector].concat(__slice.call(args)));
         };
@@ -272,7 +263,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./amex_card_formatter":3,"./default_card_formatter":5,"./card_utils":15}],3:[function(require,module,exports){
+},{"./amex_card_formatter":3,"./card_utils":15,"./default_card_formatter":4}],3:[function(require,module,exports){
 (function() {
   var AmexCardFormatter, DefaultCardFormatter, _ref,
     __hasProp = {}.hasOwnProperty,
@@ -302,7 +293,61 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./default_card_formatter":5}],4:[function(require,module,exports){
+},{"./default_card_formatter":4}],4:[function(require,module,exports){
+(function() {
+  var DefaultCardFormatter, DelimitedTextFormatter, luhnCheck, validCardLength, _ref, _ref1,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  DelimitedTextFormatter = require('./delimited_text_formatter');
+
+  _ref = require('./card_utils'), validCardLength = _ref.validCardLength, luhnCheck = _ref.luhnCheck;
+
+  DefaultCardFormatter = (function(_super) {
+    __extends(DefaultCardFormatter, _super);
+
+    function DefaultCardFormatter() {
+      _ref1 = DefaultCardFormatter.__super__.constructor.apply(this, arguments);
+      return _ref1;
+    }
+
+    DefaultCardFormatter.prototype.delimiter = ' ';
+
+    DefaultCardFormatter.prototype.maximumLength = 16 + 3;
+
+    DefaultCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
+      return index === 4 || index === 9 || index === 14;
+    };
+
+    DefaultCardFormatter.prototype.parse = function(text, error) {
+      var value;
+      value = this._valueFromText(text);
+      if (!validCardLength(value)) {
+        if (typeof error === "function") {
+          error('card-formatter.number-too-short');
+        }
+      }
+      if (!luhnCheck(value)) {
+        if (typeof error === "function") {
+          error('card-formatter.invalid-number');
+        }
+      }
+      return DefaultCardFormatter.__super__.parse.call(this, text, error);
+    };
+
+    DefaultCardFormatter.prototype._valueFromText = function(text) {
+      return DefaultCardFormatter.__super__._valueFromText.call(this, (text != null ? text : '').replace(/[^\d]/g, ''));
+    };
+
+    return DefaultCardFormatter;
+
+  })(DelimitedTextFormatter);
+
+  module.exports = DefaultCardFormatter;
+
+}).call(this);
+
+},{"./delimited_text_formatter":6,"./card_utils":15}],5:[function(require,module,exports){
 (function() {
   var AdaptiveCardFormatter, CardMaskStrategy, CardTextField, TextField, determineCardType,
     __hasProp = {}.hasOwnProperty,
@@ -345,7 +390,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     CardTextField.prototype.cardMask = function() {
       var last4, text, toMask;
-
       text = this.text();
       toMask = text.slice(0, -4);
       last4 = text.slice(-4);
@@ -418,62 +462,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./text_field":13,"./adaptive_card_formatter":2,"./card_utils":15}],5:[function(require,module,exports){
-(function() {
-  var DefaultCardFormatter, DelimitedTextFormatter, luhnCheck, validCardLength, _ref, _ref1,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  DelimitedTextFormatter = require('./delimited_text_formatter');
-
-  _ref = require('./card_utils'), validCardLength = _ref.validCardLength, luhnCheck = _ref.luhnCheck;
-
-  DefaultCardFormatter = (function(_super) {
-    __extends(DefaultCardFormatter, _super);
-
-    function DefaultCardFormatter() {
-      _ref1 = DefaultCardFormatter.__super__.constructor.apply(this, arguments);
-      return _ref1;
-    }
-
-    DefaultCardFormatter.prototype.delimiter = ' ';
-
-    DefaultCardFormatter.prototype.maximumLength = 16 + 3;
-
-    DefaultCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
-      return index === 4 || index === 9 || index === 14;
-    };
-
-    DefaultCardFormatter.prototype.parse = function(text, error) {
-      var value;
-
-      value = this._valueFromText(text);
-      if (!validCardLength(value)) {
-        if (typeof error === "function") {
-          error('card-formatter.number-too-short');
-        }
-      }
-      if (!luhnCheck(value)) {
-        if (typeof error === "function") {
-          error('card-formatter.invalid-number');
-        }
-      }
-      return DefaultCardFormatter.__super__.parse.call(this, text, error);
-    };
-
-    DefaultCardFormatter.prototype._valueFromText = function(text) {
-      return DefaultCardFormatter.__super__._valueFromText.call(this, (text != null ? text : '').replace(/[^\d]/g, ''));
-    };
-
-    return DefaultCardFormatter;
-
-  })(DelimitedTextFormatter);
-
-  module.exports = DefaultCardFormatter;
-
-}).call(this);
-
-},{"./delimited_text_formatter":6,"./card_utils":15}],6:[function(require,module,exports){
+},{"./text_field":13,"./adaptive_card_formatter":2,"./card_utils":15}],6:[function(require,module,exports){
 (function() {
   var DelimitedTextFormatter, Formatter,
     __hasProp = {}.hasOwnProperty,
@@ -500,7 +489,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     function DelimitedTextFormatter(delimiter) {
       var _ref;
-
       if (delimiter == null) {
         delimiter = this.delimiter;
       }
@@ -516,7 +504,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     DelimitedTextFormatter.prototype._textFromValue = function(value) {
       var chr, delimiter, result, _i, _len;
-
       if (!value) {
         return '';
       }
@@ -540,13 +527,11 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     DelimitedTextFormatter.prototype._valueFromText = function(text) {
       var chr;
-
       if (!text) {
         return '';
       }
       return ((function() {
         var _i, _len, _results;
-
         _results = [];
         for (_i = 0, _len = text.length; _i < _len; _i++) {
           chr = text[_i];
@@ -560,7 +545,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     DelimitedTextFormatter.prototype.isChangeValid = function(change, error) {
       var endMovedLeft, endMovedOverADelimiter, endMovedRight, hasSelection, isChangeValid, newCursorPosition, newText, range, startMovedLeft, startMovedOverADelimiter, startMovedRight, value;
-
       if (!DelimitedTextFormatter.__super__.isChangeValid.call(this, change, error)) {
         return false;
       }
@@ -640,7 +624,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
       isChangeValid = true;
       value = this._valueFromText(newText, function() {
         var args;
-
         args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
         isChangeValid = false;
         return error.apply(null, args);
@@ -678,7 +661,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     ExpiryDateField.prototype.textFieldDidEndEditing = function() {
       var value;
-
       value = this.value();
       if (value) {
         return this.setText(this.formatter().format(value));
@@ -703,7 +685,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
   zpad2 = function(n) {
     var result;
-
     result = "" + n;
     while (result.length < 2) {
       result = "0" + result;
@@ -713,7 +694,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
   interpretTwoDigitYear = function(year) {
     var centuries, thisCentury, thisYear;
-
     thisYear = new Date().getFullYear();
     thisCentury = thisYear - (thisYear % 100);
     centuries = [thisCentury, thisCentury - 100, thisCentury + 100].sort(function(a, b) {
@@ -740,7 +720,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     ExpiryDateFormatter.prototype.format = function(value) {
       var month, year;
-
       if (!value) {
         return '';
       }
@@ -751,7 +730,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     ExpiryDateFormatter.prototype.parse = function(text, error) {
       var month, year, _ref1;
-
       _ref1 = text.split(this.delimiter), month = _ref1[0], year = _ref1[1];
       if ((month != null ? month.match(/^(0?[1-9]|1\d)$/) : void 0) && (year != null ? year.match(/^\d\d?$/) : void 0)) {
         month = Number(month);
@@ -768,7 +746,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     ExpiryDateFormatter.prototype.isChangeValid = function(change, error) {
       var isBackspace, match, newText;
-
       isBackspace = change.proposed.text.length < change.current.text.length;
       newText = change.proposed.text;
       if (isBackspace) {
@@ -865,7 +842,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
   splitLocaleComponents = function(locale) {
     var match, _ref, _ref1;
-
     match = locale.match(/^([a-z][a-z])(?:[-_]([a-z][a-z]))?$/i);
     return {
       lang: match != null ? (_ref = match[1]) != null ? _ref.toLowerCase() : void 0 : void 0,
@@ -875,7 +851,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
   get = function() {
     var args, key, object, value;
-
     object = arguments[0], key = arguments[1], args = 3 <= arguments.length ? __slice.call(arguments, 2) : [];
     value = object != null ? object[key] : void 0;
     if (typeof value === 'function') {
@@ -985,7 +960,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     NumberFormatter.prototype._shouldShowNativeCurrencySymbol = function() {
       var regionDefaultCurrencyCode, _ref;
-
       regionDefaultCurrencyCode = this._regionDefaults().currencyCode;
       regionDefaultCurrencyCode = (_ref = typeof regionDefaultCurrencyCode === "function" ? regionDefaultCurrencyCode() : void 0) != null ? _ref : regionDefaultCurrencyCode;
       return this.currencyCode() === regionDefaultCurrencyCode;
@@ -1226,7 +1200,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     NumberFormatter.prototype._get = function(attr) {
       var localeDefaults, regionDefaults, styleDefaults, value;
-
       value = this["_" + attr];
       if (value != null) {
         return value;
@@ -1255,7 +1228,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     NumberFormatter.prototype.format = function(number) {
       var copiedCharacterCount, fractionPart, i, integerPart, integerPartWithGroupingSeparators, maximumFractionDigits, maximumIntegerDigits, minimumFractionDigits, minimumIntegerDigits, multiplier, negative, negativeInfinitySymbol, notANumberSymbol, nullSymbol, positiveInfinitySymbol, result, splitNumber, string, zeroSymbol, _i, _ref;
-
       if (((zeroSymbol = this.zeroSymbol()) != null) && number === 0) {
         return zeroSymbol;
       }
@@ -1280,7 +1252,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
       negative = number < 0;
       splitNumber = function() {
         var _ref;
-
         string = "" + (Math.abs(number));
         _ref = string.split('.'), integerPart = _ref[0], fractionPart = _ref[1];
         return fractionPart || (fractionPart = '');
@@ -1348,7 +1319,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     NumberFormatter.prototype.parse = function(string, error) {
       var result;
-
       if ((this.zeroSymbol() != null) && string === this.zeroSymbol()) {
         result = 0;
       } else if ((this.nullSymbol() != null) && string === this.nullSymbol()) {
@@ -1393,7 +1363,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     NumberFormatter.prototype._parseAbsoluteValue = function(string, error) {
       var fractionPart, integerPart, multiplier, number, parts;
-
       if (string.length === 0) {
         if (typeof error === "function") {
           error('number-formatter.invalid-format');
@@ -1430,7 +1399,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     NumberFormatter.prototype._currencyDefaults = function() {
       var key, result, value, _ref, _ref1;
-
       result = {};
       _ref = CurrencyDefaults["default"];
       for (key in _ref) {
@@ -1449,7 +1417,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     NumberFormatter.prototype._regionDefaults = function() {
       var key, result, value, _ref, _ref1;
-
       result = {};
       _ref = RegionDefaults["default"];
       for (key in _ref) {
@@ -1468,7 +1435,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     NumberFormatter.prototype._localeDefaults = function() {
       var countryCode, defaultFallbacks, defaults, key, lang, locale, result, value, _i, _len;
-
       locale = this.locale();
       countryCode = this.countryCode();
       lang = splitLocaleComponents(locale).lang;
@@ -1503,7 +1469,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
   roundCeiling = function(number, maximumFractionDigits) {
     var multiplier;
-
     if (number < 0) {
       return roundFloor(-number, maximumFractionDigits);
     }
@@ -1513,7 +1478,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
   roundFloor = function(number, maximumFractionDigits) {
     var multiplier;
-
     if (number < 0) {
       return roundCeiling(-number, maximumFractionDigits);
     }
@@ -1523,7 +1487,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
   roundHalfEven = function(number, maximumFractionDigits) {
     var lastDigit, multiplier, percentFromFloor;
-
     multiplier = Math.pow(10, maximumFractionDigits);
     percentFromFloor = Math.abs((number * (multiplier * 100)) % 100);
     if (percentFromFloor < 50) {
@@ -1760,10 +1723,8 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     PhoneFormatter.prototype.isDelimiter = function(chr) {
       var delimiter, index;
-
       return __indexOf.call((function() {
         var _ref, _results;
-
         _ref = this.delimiterMap;
         _results = [];
         for (index in _ref) {
@@ -1784,7 +1745,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     PhoneFormatter.prototype.parse = function(text, error) {
       var digits;
-
       digits = this.digitsWithoutCountryCode(text);
       if (!(text.length >= 10)) {
         if (typeof error === "function") {
@@ -1848,7 +1808,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     PhoneFormatter.prototype.digitsWithoutCountryCode = function(text) {
       var digits, extraDigits;
-
       digits = (text != null ? text : '').replace(/[^\d]/g, '');
       extraDigits = digits.length - 10;
       if (extraDigits > 0) {
@@ -1907,9 +1866,11 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 },{"./delimited_text_formatter":6}],13:[function(require,module,exports){
 (function() {
-  var AFFINITY, KEYS, TextField, TextFieldStateChange, UndoManager, hasLeftWordBreakAtIndex, hasRightWordBreakAtIndex, isWordChar, keyBindingsForPlatform, _ref,
+  var AFFINITY, Formatter, KEYS, TextField, TextFieldStateChange, UndoManager, hasLeftWordBreakAtIndex, hasRightWordBreakAtIndex, isWordChar, keyBindingsForPlatform, _ref,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __slice = [].slice;
+
+  Formatter = require('./formatter');
 
   UndoManager = require('./undo_manager');
 
@@ -1989,7 +1950,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.insertText = function(text) {
       var range;
-
       if (this.hasSelection()) {
         this.clearSelection();
       }
@@ -2007,7 +1967,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype._textDidChange = function() {
       var _ref1;
-
       this.textDidChange();
       return (_ref1 = this._delegate) != null ? typeof _ref1.textDidChange === "function" ? _ref1.textDidChange(this) : void 0 : void 0;
     };
@@ -2016,7 +1975,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype._textFieldDidEndEditing = function() {
       var _ref1;
-
       this.textFieldDidEndEditing();
       return (_ref1 = this._delegate) != null ? typeof _ref1.textFieldDidEndEditing === "function" ? _ref1.textFieldDidEndEditing(this) : void 0 : void 0;
     };
@@ -2025,7 +1983,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype._textFieldDidBeginEditing = function() {
       var _ref1;
-
       this.textFieldDidBeginEditing();
       return (_ref1 = this._delegate) != null ? typeof _ref1.textFieldDidBeginEditing === "function" ? _ref1.textFieldDidBeginEditing(this) : void 0 : void 0;
     };
@@ -2046,7 +2003,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.moveUpAndModifySelection = function(event) {
       var range;
-
       event.preventDefault();
       range = this.selectedRange();
       switch (this.selectionAffinity) {
@@ -2064,7 +2020,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.moveParagraphBackwardAndModifySelection = function(event) {
       var range;
-
       event.preventDefault();
       range = this.selectedRange();
       switch (this.selectionAffinity) {
@@ -2085,7 +2040,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.moveToBeginningOfDocumentAndModifySelection = function(event) {
       var range;
-
       event.preventDefault();
       range = this.selectedRange();
       range.length += range.start;
@@ -2095,7 +2049,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.moveDown = function(event) {
       var range;
-
       event.preventDefault();
       range = {
         start: this.text().length,
@@ -2110,7 +2063,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.moveDownAndModifySelection = function(event) {
       var end, range;
-
       event.preventDefault();
       range = this.selectedRange();
       end = this.text().length;
@@ -2123,7 +2075,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.moveParagraphForwardAndModifySelection = function(event) {
       var range;
-
       event.preventDefault();
       range = this.selectedRange();
       switch (this.selectionAffinity) {
@@ -2144,7 +2095,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.moveToEndOfDocumentAndModifySelection = function(event) {
       var range;
-
       event.preventDefault();
       range = this.selectedRange();
       range.length = this.text().length - range.start;
@@ -2153,7 +2103,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.moveLeft = function(event) {
       var range;
-
       event.preventDefault();
       range = this.selectedRange();
       if (range.length !== 0) {
@@ -2166,7 +2115,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.moveLeftAndModifySelection = function(event) {
       var range;
-
       event.preventDefault();
       range = this.selectedRange();
       switch (this.selectionAffinity) {
@@ -2184,7 +2132,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.moveWordLeft = function(event) {
       var index;
-
       event.preventDefault();
       index = this.lastWordBreakBeforeIndex(this.selectedRange().start - 1);
       return this.setSelectedRange({
@@ -2195,7 +2142,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.moveWordLeftAndModifySelection = function(event) {
       var end, range, start;
-
       event.preventDefault();
       range = this.selectedRange();
       switch (this.selectionAffinity) {
@@ -2226,7 +2172,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.moveToBeginningOfLineAndModifySelection = function(event) {
       var range;
-
       event.preventDefault();
       range = this.selectedRange();
       range.length += range.start;
@@ -2236,7 +2181,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.moveRight = function(event) {
       var range;
-
       event.preventDefault();
       range = this.selectedRange();
       if (range.length !== 0) {
@@ -2250,7 +2194,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.moveRightAndModifySelection = function(event) {
       var range;
-
       event.preventDefault();
       range = this.selectedRange();
       switch (this.selectionAffinity) {
@@ -2268,7 +2211,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.moveWordRight = function(event) {
       var index, range;
-
       event.preventDefault();
       range = this.selectedRange();
       index = this.nextWordBreakAfterIndex(range.start + range.length);
@@ -2280,7 +2222,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.moveWordRightAndModifySelection = function(event) {
       var end, range, start;
-
       event.preventDefault();
       range = this.selectedRange();
       start = range.start;
@@ -2310,7 +2251,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.moveToEndOfLineAndModifySelection = function(event) {
       var range;
-
       event.preventDefault();
       range = this.selectedRange();
       range.length = this.text().length - range.start;
@@ -2319,7 +2259,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.deleteBackward = function(event) {
       var range;
-
       event.preventDefault();
       range = this.selectedRange();
       if (range.length === 0) {
@@ -2332,7 +2271,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.deleteWordBackward = function(event) {
       var range, start;
-
       if (this.hasSelection()) {
         return this.deleteBackward(event);
       }
@@ -2351,7 +2289,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.deleteBackwardToBeginningOfLine = function(event) {
       var range;
-
       if (this.hasSelection()) {
         return this.deleteBackward(event);
       }
@@ -2365,7 +2302,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.deleteForward = function(event) {
       var range;
-
       event.preventDefault();
       range = this.selectedRange();
       if (range.length === 0) {
@@ -2377,7 +2313,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.deleteWordForward = function(event) {
       var end, range;
-
       if (this.hasSelection()) {
         return this.deleteForward(event);
       }
@@ -2401,7 +2336,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.lastWordBreakBeforeIndex = function(index) {
       var indexes, result, wordBreakIndex, _i, _len;
-
       indexes = this.leftWordBreakIndexes();
       result = indexes[0];
       for (_i = 0, _len = indexes.length; _i < _len; _i++) {
@@ -2417,7 +2351,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.leftWordBreakIndexes = function() {
       var i, result, text, _i, _ref1;
-
       result = [];
       text = this.text();
       for (i = _i = 0, _ref1 = text.length - 1; 0 <= _ref1 ? _i <= _ref1 : _i >= _ref1; i = 0 <= _ref1 ? ++_i : --_i) {
@@ -2430,7 +2363,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.nextWordBreakAfterIndex = function(index) {
       var indexes, result, wordBreakIndex, _i, _len;
-
       indexes = this.rightWordBreakIndexes().reverse();
       result = indexes[0];
       for (_i = 0, _len = indexes.length; _i < _len; _i++) {
@@ -2446,7 +2378,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.rightWordBreakIndexes = function() {
       var i, result, text, _i, _ref1;
-
       result = [];
       text = this.text();
       for (i = _i = 0, _ref1 = text.length; 0 <= _ref1 ? _i <= _ref1 : _i >= _ref1; i = 0 <= _ref1 ? ++_i : --_i) {
@@ -2463,7 +2394,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.replaceSelection = function(replacement) {
       var end, range, text;
-
       range = this.selectedRange();
       end = range.start + range.length;
       text = this.text();
@@ -2483,7 +2413,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.readSelectionFromPasteboard = function(pasteboard) {
       var range, text;
-
       text = pasteboard.getData('Text');
       this.replaceSelection(text);
       range = this.selectedRange();
@@ -2495,7 +2424,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
     TextField.prototype.keyDown = function(event) {
       var action,
         _this = this;
-
       if (this._didEndEditingButKeptFocus) {
         this._textFieldDidBeginEditing();
         this._didEndEditingButKeptFocus = false;
@@ -2516,7 +2444,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
     TextField.prototype.keyPress = function(event) {
       var charCode, _ref1,
         _this = this;
-
       if (!event.metaKey && !event.ctrlKey && ((_ref1 = event.keyCode) !== KEYS.ENTER && _ref1 !== KEYS.TAB && _ref1 !== KEYS.BACKSPACE)) {
         event.preventDefault();
         charCode = event.charCode || event.keyCode;
@@ -2528,7 +2455,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.keyUp = function(event) {
       var _this = this;
-
       return this.rollbackInvalidChanges(function() {
         if (event.keyCode === KEYS.TAB) {
           return _this.selectAll(event);
@@ -2538,7 +2464,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.paste = function(event) {
       var _this = this;
-
       event.preventDefault();
       return this.rollbackInvalidChanges(function() {
         return _this.readSelectionFromPasteboard(event.originalEvent.clipboardData);
@@ -2547,7 +2472,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.rollbackInvalidChanges = function(callback) {
       var change, error, errorType, result, _ref1, _ref2;
-
       result = null;
       errorType = null;
       change = TextFieldStateChange.build(this, function() {
@@ -2587,14 +2511,12 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.on = function() {
       var args, _ref1;
-
       args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
       return (_ref1 = this.element).on.apply(_ref1, args);
     };
 
     TextField.prototype.off = function() {
       var args, _ref1;
-
       args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
       return (_ref1 = this.element).off.apply(_ref1, args);
     };
@@ -2610,14 +2532,12 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
     TextField.prototype.value = function() {
       var value,
         _this = this;
-
       value = this.text();
-      if (!this._formatter) {
+      if (!this.formatter()) {
         return value;
       }
-      return this._formatter.parse(value, function(errorType) {
+      return this.formatter().parse(value, function(errorType) {
         var _ref1;
-
         return (_ref1 = _this._delegate) != null ? typeof _ref1.textFieldDidFailToParseString === "function" ? _ref1.textFieldDidFailToParseString(_this, value, errorType) : void 0 : void 0;
       });
     };
@@ -2631,12 +2551,19 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
     };
 
     TextField.prototype.formatter = function() {
-      return this._formatter;
+      var _this = this;
+      return this._formatter || (this._formatter = (function() {
+        var formatter, maximumLengthString;
+        formatter = new Formatter();
+        if ((maximumLengthString = _this.element.attr('maxlength')) != null) {
+          formatter.maximumLength = parseInt(maximumLengthString, 10);
+        }
+        return formatter;
+      })());
     };
 
     TextField.prototype.setFormatter = function(formatter) {
       var value;
-
       value = this.value();
       this._formatter = formatter;
       return this.setValue(value);
@@ -2644,7 +2571,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.selectedRange = function() {
       var caret;
-
       caret = this.element.caret();
       return {
         start: caret.start,
@@ -2658,7 +2584,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.setSelectedRangeWithAffinity = function(range, affinity) {
       var caret, max, min;
-
       min = 0;
       max = this.text().length;
       caret = {
@@ -2671,7 +2596,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.selectionAnchor = function() {
       var range;
-
       range = this.selectedRange();
       switch (this.selectionAffinity) {
         case AFFINITY.UPSTREAM:
@@ -2751,7 +2675,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype.becomeFirstResponder = function(event) {
       var _this = this;
-
       this.element.focus();
       return this.rollbackInvalidChanges(function() {
         _this.element.select();
@@ -2832,7 +2755,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextField.prototype._buildKeybindings = function() {
       var doc, osx, userAgent, win;
-
       doc = this.element.get(0).ownerDocument;
       win = doc.defaultView || doc.parentWindow;
       userAgent = win.navigator.userAgent;
@@ -2861,7 +2783,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextFieldStateChange.build = function(field, callback) {
       var change;
-
       change = new this(field);
       change.current = {
         text: field.text(),
@@ -2883,7 +2804,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     TextFieldStateChange.prototype.recomputeDiff = function() {
       var ctext, deleted, i, inserted, minTextLength, ptext, sharedPrefixLength, sharedSuffixLength, _i, _j, _ref1;
-
       if (this.proposed.text !== this.current.text) {
         ctext = this.current.text;
         ptext = this.proposed.text;
@@ -2939,7 +2859,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./undo_manager":14,"./keybindings":16}],15:[function(require,module,exports){
+},{"./formatter":9,"./undo_manager":14,"./keybindings":16}],15:[function(require,module,exports){
 (function() {
   var AMEX, DISCOVER, JCB, MASTERCARD, VISA, determineCardType, luhnCheck, validCardLength;
 
@@ -2955,7 +2875,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
   determineCardType = function(pan) {
     var firsttwo, halfiin, iin;
-
     if (pan == null) {
       return null;
     }
@@ -2978,7 +2897,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
   luhnCheck = function(pan) {
     var digit, flip, i, sum, _i, _ref;
-
     sum = 0;
     flip = true;
     for (i = _i = _ref = pan.length - 1; _ref <= 0 ? _i <= 0 : _i >= 0; i = _ref <= 0 ? ++_i : --_i) {
@@ -2993,7 +2911,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
   validCardLength = function(pan) {
     var _ref, _ref1;
-
     switch (determineCardType(pan)) {
       case VISA:
         return (_ref = pan.length) === 13 || _ref === 16;
@@ -3087,7 +3004,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
   keyBindingsForPlatform = function(platform) {
     var ctrl, osx;
-
     osx = platform === 'OSX';
     ctrl = osx ? META : CTRL;
     return cache[platform] || (cache[platform] = build(platform, function(bind) {
@@ -3161,11 +3077,9 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
   build = function(platform, callback) {
     var result;
-
     result = new BindingSet(platform);
     callback(function() {
       var args;
-
       args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
       return result.bind.apply(result, args);
     });
@@ -3184,13 +3098,11 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     BindingSet.prototype.bind = function(keyCode, modifiers, action) {
       var _base;
-
       return ((_base = this.bindings)[keyCode] || (_base[keyCode] = {}))[modifiers || 0] = action;
     };
 
     BindingSet.prototype.actionForEvent = function(event) {
       var bindingsForKeyCode, modifiers;
-
       if (bindingsForKeyCode = this.bindings[event.keyCode]) {
         modifiers = 0;
         if (event.altKey) {
