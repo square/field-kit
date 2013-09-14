@@ -639,3 +639,26 @@ describe 'NumberFormatter', ->
 
       it 'multiplies numeric values for display', ->
         expect(formatter.parse '50').toEqual(5000)
+
+    describe 'when isLenient is set', ->
+      beforeEach ->
+        formatter.setLenient yes
+
+      it 'ignores whitespace in the input value', ->
+        expect(formatter.parse '  5  0. 7').toEqual(50.7)
+
+      it 'ignores whitespace in suffixes', ->
+        formatter.setPositiveSuffix ' %'
+        expect(formatter.parse '5%').toEqual(5)
+
+      it 'ignores missing suffixes', ->
+        formatter.setPositiveSuffix ' %'
+        expect(formatter.parse '5').toEqual(5)
+        expect(formatter.parse '-5').toEqual(-5)
+
+      it 'does not ignore missing prefixes', ->
+        formatter.setPositivePrefix '!'
+        expect(formatter.parse '5').toBeNull()
+
+      it 'does not allow complete garbage', ->
+        expect(formatter.parse '4##@238420@(!)@*)#!').toBeNull()
