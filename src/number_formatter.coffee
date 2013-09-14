@@ -26,6 +26,13 @@ startsWith = (prefix, string) ->
 endsWith = (suffix, string) ->
   string[(string.length - suffix.length)..] is suffix
 
+if ''.trim
+  trim = (string) ->
+    string.trim()
+else
+  trim = (string) ->
+    string.replace(/(^\s+|\s+$)/, '')
+
 splitLocaleComponents = (locale) ->
   match = locale.match(/^([a-z][a-z])(?:[-_]([a-z][a-z]))?$/i)
   { lang: match?[1]?.toLowerCase(), country: match?[2]?.toUpperCase() }
@@ -44,6 +51,7 @@ class NumberFormatter extends Formatter
   _currencyCode:                null
   _groupingSeparator:           null
   _groupingSize:                null
+  _lenient:                     no
   _locale:                      null
   _internationalCurrencySymbol: null
   _maximumFractionDigits:       null
@@ -141,6 +149,13 @@ class NumberFormatter extends Formatter
 
   setInternationalCurrencySymbol: (internationalCurrencySymbol) ->
     @_internationalCurrencySymbol = internationalCurrencySymbol
+    return this
+
+  isLenient: ->
+    @_lenient
+
+  setLenient: (lenient) ->
+    @_lenient = lenient
     return this
 
   locale: ->
@@ -409,6 +424,18 @@ class NumberFormatter extends Formatter
       when HALF_EVEN then roundHalfEven
 
   parse: (string, error) ->
+    positivePrefix = @positivePrefix()
+    negativePrefix = @negativePrefix()
+    positiveSuffix = @positiveSuffix()
+    negativeSuffix = @negativeSuffix()
+
+    if @isLenient()
+      string = string.replace(/\s/g, '')
+      positivePrefix = trim positivePrefix
+      negativePrefix = trim negativePrefix
+      positiveSuffix = trim positiveSuffix
+      negativeSuffix = trim negativeSuffix
+
     if @zeroSymbol()? and string is @zeroSymbol()
       result = 0
 
@@ -425,14 +452,23 @@ class NumberFormatter extends Formatter
       result = -Infinity
 
     else if not result?
-      if startsWith(@negativePrefix(), string) and endsWith(@negativeSuffix(), string)
-        result = @_parseAbsoluteValue(string[@negativePrefix().length...(string.length-@negativeSuffix().length)], error)
+      hasNegativePrefix = startsWith(negativePrefix, string)
+      hasNegativeSuffix = endsWith(negativeSuffix, string)
+      if hasNegativePrefix and (@isLenient() or hasNegativeSuffix)
+        innerString = string[negativePrefix.length...]
+        innerString = innerString[0...(innerString.length-negativeSuffix.length)] if hasNegativeSuffix
+        result = @_parseAbsoluteValue(innerString, error)
         result *= -1 if result?
-      else if startsWith(@positivePrefix(), string) and endsWith(@positiveSuffix(), string)
-        result = @_parseAbsoluteValue string[@positivePrefix().length...(string.length-@positiveSuffix().length)], error
       else
-        error? 'number-formatter.invalid-format'
-        return null
+        hasPositivePrefix = startsWith(positivePrefix, string)
+        hasPositiveSuffix = endsWith(positiveSuffix, string)
+        if hasPositivePrefix and (@isLenient() or hasPositiveSuffix)
+          innerString = string[positivePrefix.length...]
+          innerString = innerString[0...(innerString.length-positiveSuffix.length)] if hasPositiveSuffix
+          result = @_parseAbsoluteValue innerString, error
+        else
+          error? 'number-formatter.invalid-format'
+          return null
 
     if result?
       if @_minimum? and result < @_minimum
