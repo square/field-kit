@@ -656,9 +656,14 @@ describe 'NumberFormatter', ->
         expect(formatter.parse '5').toEqual(5)
         expect(formatter.parse '-5').toEqual(-5)
 
-      it 'does not ignore missing prefixes', ->
+      it 'correctly interprets negative prefixes', ->
+        formatter.setNegativePrefix '-'
+        expect(formatter.parse '5').toEqual(5)
+        expect(formatter.parse '-5').toEqual(-5)
+
+      it 'ignores missing positive prefixes', ->
         formatter.setPositivePrefix '!'
-        expect(formatter.parse '5').toBeNull()
+        expect(formatter.parse '5').toEqual(5)
 
       it 'does not allow complete garbage', ->
         expect(formatter.parse '4##@238420@(!)@*)#!').toBeNull()
