@@ -462,8 +462,9 @@ class NumberFormatter extends Formatter
       else
         hasPositivePrefix = startsWith(positivePrefix, string)
         hasPositiveSuffix = endsWith(positiveSuffix, string)
-        if hasPositivePrefix and (@isLenient() or hasPositiveSuffix)
-          innerString = string[positivePrefix.length...]
+        if @isLenient() or (hasPositivePrefix and hasPositiveSuffix)
+          innerString = string
+          innerString = innerString[positivePrefix.length...] if hasPositivePrefix
           innerString = innerString[0...(innerString.length-positiveSuffix.length)] if hasPositiveSuffix
           result = @_parseAbsoluteValue innerString, error
         else
