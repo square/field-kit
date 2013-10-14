@@ -14,14 +14,17 @@ class Type
 
   perform: ->
     for event in FakeEvent.eventsForKeys(@keys...)
-      event.type = 'keydown'
-      @element.trigger event.type, event
-      if not event.isDefaultPrevented()
+      @element.trigger 'keydown', event
+      if shouldFireKeypress(@element, event)
         event.type = 'keypress'
-        if event.charCode
-          @element.trigger event.type, event
-      event.type = 'keyup'
-      @element.trigger event.type, event
+        @element.trigger 'keypress', event
+      @element.trigger 'keyup', event
+
+shouldFireKeypress = (element, keyDownEvent) ->
+  document = element.get(0).ownerDocument
+  window   = document.defaultView
+  not keyDownEvent.isDefaultPrevented() or
+    window.navigator.FK_firesKeyPressWhenKeydownPrevented
 
 type = (keys...) ->
   new Type(keys...)
