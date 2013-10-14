@@ -997,9 +997,10 @@ class TextField
     # Only handle keypresses that look like insertable text.
     if not event.metaKey and not event.ctrlKey and event.keyCode not in [KEYS.ENTER, KEYS.TAB, KEYS.BACKSPACE]
       event.preventDefault()
-      charCode = event.charCode or event.keyCode
-      @rollbackInvalidChanges =>
-        @insertText String.fromCharCode(charCode)
+      if event.charCode isnt 0
+        charCode = event.charCode or event.keyCode
+        @rollbackInvalidChanges =>
+          @insertText String.fromCharCode(charCode)
 
   # Internal: Handles keyup events.
   #
