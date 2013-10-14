@@ -70,6 +70,14 @@ class FakeElement extends EventEmitter
     @emit 'focusin'
     @emit 'focus'
 
+  dispatchEvent: (event) ->
+    switch event.type
+      when 'keypress'
+        window = @ownerDocument.defaultView
+        return if event.charCode is 0 and
+          not window.navigator.FK_firesKeyPressWithoutCharCode
+    @emit event.type, event
+
   addEventListener: (type, callback, capture) ->
     @addListener type, callback
 
