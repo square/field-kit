@@ -16,6 +16,13 @@ KEYS =
 
   PRINTABLE: [32..126]
 
+KEYS.CHARCODE_ZERO = [
+  KEYS.LEFT
+  KEYS.RIGHT
+  KEYS.UP
+  KEYS.DOWN
+]
+
 MODIFIERS = [
   'meta'
   'alt'
@@ -40,7 +47,9 @@ class FakeEvent
     @_defaultPrevented
 
   this::__defineGetter__ 'charCode', ->
-    if @type is 'keypress' and @keyCode in KEYS.PRINTABLE and not (@metaKey or @ctrlKey)
+    if @keyCode in KEYS.CHARCODE_ZERO
+      0
+    else if @type is 'keypress' and @keyCode in KEYS.PRINTABLE and not (@metaKey or @ctrlKey)
       @_charCode
     else
       0

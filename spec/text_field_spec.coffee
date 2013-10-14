@@ -480,3 +480,6 @@ describe 'TextField', ->
       field.setFormatter null
       expectThatTyping('abc').into(field).willChange('|').to('ab|')
 
+  describe 'with a browser that sends keypress events for non-printable keys', ->
+    it 'ignores the keypress event', ->
+      expectThatTyping('left').withUserAgent('osx.firefox.v24').willChange('a|').to('|a')

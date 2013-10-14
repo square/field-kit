@@ -40,9 +40,11 @@ class WrappedFakeElements
       iterator.call element, i, element
     return this
 
-  trigger: (args...) ->
+  trigger: (type, event) ->
+    event ?= {}
+    event.type = type
     @each (_, element) ->
-      element.emit args...
+      element.dispatchEvent event
 
   on: (type, callback) ->
     @each (_, element) ->
