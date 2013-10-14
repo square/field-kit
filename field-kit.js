@@ -2495,10 +2495,12 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
         _this = this;
       if (!event.metaKey && !event.ctrlKey && ((_ref1 = event.keyCode) !== KEYS.ENTER && _ref1 !== KEYS.TAB && _ref1 !== KEYS.BACKSPACE)) {
         event.preventDefault();
-        charCode = event.charCode || event.keyCode;
-        return this.rollbackInvalidChanges(function() {
-          return _this.insertText(String.fromCharCode(charCode));
-        });
+        if (event.charCode !== 0) {
+          charCode = event.charCode || event.keyCode;
+          return this.rollbackInvalidChanges(function() {
+            return _this.insertText(String.fromCharCode(charCode));
+          });
+        }
       }
     };
 
