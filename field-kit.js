@@ -263,7 +263,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./amex_card_formatter":3,"./default_card_formatter":5,"./card_utils":15}],3:[function(require,module,exports){
+},{"./amex_card_formatter":3,"./card_utils":15,"./default_card_formatter":5}],3:[function(require,module,exports){
 (function() {
   var AmexCardFormatter, DefaultCardFormatter, _ref,
     __hasProp = {}.hasOwnProperty,
@@ -408,7 +408,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./text_field":13,"./adaptive_card_formatter":2,"./card_utils":15}],5:[function(require,module,exports){
+},{"./card_utils":15,"./adaptive_card_formatter":2,"./text_field":13}],5:[function(require,module,exports){
 (function() {
   var DefaultCardFormatter, DelimitedTextFormatter, luhnCheck, validCardLength, _ref, _ref1,
     __hasProp = {}.hasOwnProperty,
@@ -1411,7 +1411,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
     };
 
     NumberFormatter.prototype._parseAbsoluteValue = function(string, error) {
-      var fractionPart, integerPart, multiplier, number, parts;
+      var fractionPart, groupPart, groupParts, groupingSize, integerPart, multiplier, number, parts, _i, _len, _ref;
       if (string.length === 0) {
         if (typeof error === "function") {
           error('number-formatter.invalid-format');
@@ -1427,6 +1427,31 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
       }
       integerPart = parts[0];
       fractionPart = parts[1] || '';
+      if (this.usesGroupingSeparator()) {
+        groupingSize = this.groupingSize();
+        groupParts = integerPart.split(this.groupingSeparator());
+        if (!this.isLenient()) {
+          if (groupParts.length > 1) {
+            if (groupParts[0].length > groupingSize) {
+              if (typeof error === "function") {
+                error('number-formatter.invalid-format.grouping-size');
+              }
+              return null;
+            }
+            _ref = groupParts.slice(1);
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              groupPart = _ref[_i];
+              if (groupPart.length !== groupingSize) {
+                if (typeof error === "function") {
+                  error('number-formatter.invalid-format.grouping-size');
+                }
+                return null;
+              }
+            }
+          }
+        }
+        integerPart = groupParts.join('');
+      }
       if (!isDigits(integerPart) || !isDigits(fractionPart)) {
         if (typeof error === "function") {
           error('number-formatter.invalid-format');

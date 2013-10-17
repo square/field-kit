@@ -466,7 +466,7 @@ class NumberFormatter extends Formatter
           innerString = string
           innerString = innerString[positivePrefix.length...] if hasPositivePrefix
           innerString = innerString[0...(innerString.length-positiveSuffix.length)] if hasPositiveSuffix
-          result = @_parseAbsoluteValue innerString, error
+          result = @_parseAbsoluteValue(innerString, error)
         else
           error? 'number-formatter.invalid-format'
           return null
@@ -494,6 +494,26 @@ class NumberFormatter extends Formatter
 
     integerPart = parts[0]
     fractionPart = parts[1] or ''
+
+    if @usesGroupingSeparator()
+      groupingSize = @groupingSize()
+      groupParts = integerPart.split(@groupingSeparator())
+
+      unless @isLenient()
+        if groupParts.length > 1
+          # disallow 1000,000
+          if groupParts[0].length > groupingSize
+            error? 'number-formatter.invalid-format.grouping-size'
+            return null
+
+          # disallow 1,00
+          for groupPart in groupParts.slice(1)
+            if groupPart.length isnt groupingSize
+              error? 'number-formatter.invalid-format.grouping-size'
+              return null
+
+      # remove grouping separators
+      integerPart = groupParts.join('')
 
     if not isDigits(integerPart) or not isDigits(fractionPart)
       error? 'number-formatter.invalid-format'
