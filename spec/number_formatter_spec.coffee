@@ -564,6 +564,38 @@ describe 'NumberFormatter', ->
       it 'parses the string when below the maximum', ->
         expect(formatter.parse '2').toEqual(2)
 
+    describe 'with a grouping separator', ->
+      beforeEach ->
+        formatter.setUsesGroupingSeparator yes
+        formatter.setGroupingSeparator 'SEP'
+
+      it 'parses numbers with the grouping separator', ->
+        expect(formatter.parse '1SEP000').toEqual(1000)
+
+      it 'parses numbers without a grouping separator', ->
+        expect(formatter.parse '1000').toEqual(1000)
+
+      it 'parses numbers with multiple grouping separators', ->
+        expect(formatter.parse '1SEP000SEP000').toEqual(1000000)
+
+      it 'fails to parse a string with bad group sizes', ->
+        errorCallback = jasmine.createSpy('errorCallback')
+        expect(formatter.parse '1SEP00', errorCallback).toBeNull()
+        expect(errorCallback).toHaveBeenCalledWith('number-formatter.invalid-format.grouping-size')
+
+      it 'fails to parse a string which includes the grouping separator sometimes', ->
+        errorCallback = jasmine.createSpy('errorCallback')
+        expect(formatter.parse '1000SEP000', errorCallback).toBeNull()
+        expect(errorCallback).toHaveBeenCalledWith('number-formatter.invalid-format.grouping-size')
+
+      describe 'in lenient mode', ->
+        beforeEach ->
+          formatter.setLenient yes
+
+        it 'parses strings ignoring grouping separators and grouping size', ->
+          expect(formatter.parse '1000SEP00').toEqual(100000)
+          expect(formatter.parse 'SEP10SEP00SEP00SEP').toEqual(100000)
+
     describe 'with allowsFloats = true', ->
       beforeEach ->
         formatter.setAllowsFloats yes
