@@ -96,6 +96,11 @@ describe 'NumberFormatter', ->
       expect(formatter.setPlusSign).toBe(formatter.setPositivePrefix)
 
   describe '#format', ->
+    it 'works with 702', ->
+      formatter.setNumberStyle NumberFormatter.Style.CURRENCY
+      formatter.setMultiplier(0.01)
+      expect(formatter.format -702).toEqual('($7.02)')
+
     describe 'given zero', ->
       describe 'and a custom zero symbol', ->
         beforeEach ->
