@@ -15,6 +15,8 @@ floor = (number, maximumFractionDigits) ->
   Math.floor(number * multiplier) / multiplier
 
 halfEven = (number, maximumFractionDigits) ->
+  return -halfEven(-number, maximumFractionDigits) if number < 0
+
   multiplier = Math.pow(10, maximumFractionDigits)
   percentFromFloor = Math.abs((number * (multiplier * 100)) % 100)
 
