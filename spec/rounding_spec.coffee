@@ -15,6 +15,7 @@ describe 'rounding', ->
     it 'rounds "down" for negative numbers', ->
       expect(ceiling -1.9, 0).toEqual(-1)
       expect(ceiling -1.95, 1).toEqual(-1.9)
+      expect(ceiling -7.02, 0).toEqual(-7)
 
     it 'rounds properly for numbers with very small nonzero fractional part', ->
       expect(ceiling 7.020000005, 2).toEqual(7.03)
@@ -30,6 +31,7 @@ describe 'rounding', ->
     it 'rounds "up" for negative numbers', ->
       expect(floor -1.9, 0).toEqual(-2)
       expect(floor -1.85, 1).toEqual(-1.9)
+      expect(floor -7.02, 0).toEqual(-8)
 
     it 'rounds properly for numbers with very large nonzero fractional part', ->
       expect(floor 7.029999999999, 2).toEqual(7.02)
@@ -44,3 +46,6 @@ describe 'rounding', ->
 
     it 'rounds up for trailing digits greater than 50', ->
       expect(halfEven 7.02501, 2).toEqual(7.03)
+
+    it 'rounds properly for negative numbers', ->
+      expect(halfEven -7.02, 0).toEqual(-7)
