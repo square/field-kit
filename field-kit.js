@@ -263,7 +263,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./amex_card_formatter":3,"./card_utils":15,"./default_card_formatter":5}],3:[function(require,module,exports){
+},{"./amex_card_formatter":3,"./default_card_formatter":5,"./card_utils":15}],3:[function(require,module,exports){
 (function() {
   var AmexCardFormatter, DefaultCardFormatter, _ref,
     __hasProp = {}.hasOwnProperty,
@@ -408,7 +408,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./card_utils":15,"./adaptive_card_formatter":2,"./text_field":13}],5:[function(require,module,exports){
+},{"./text_field":13,"./adaptive_card_formatter":2,"./card_utils":15}],5:[function(require,module,exports){
 (function() {
   var DefaultCardFormatter, DelimitedTextFormatter, luhnCheck, validCardLength, _ref, _ref1,
     __hasProp = {}.hasOwnProperty,
@@ -642,40 +642,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./formatter":9}],7:[function(require,module,exports){
-(function() {
-  var ExpiryDateField, ExpiryDateFormatter, TextField,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  TextField = require('./text_field');
-
-  ExpiryDateFormatter = require('./expiry_date_formatter');
-
-  ExpiryDateField = (function(_super) {
-    __extends(ExpiryDateField, _super);
-
-    function ExpiryDateField(element) {
-      ExpiryDateField.__super__.constructor.call(this, element, new ExpiryDateFormatter());
-    }
-
-    ExpiryDateField.prototype.textFieldDidEndEditing = function() {
-      var value;
-      value = this.value();
-      if (value) {
-        return this.setText(this.formatter().format(value));
-      }
-    };
-
-    return ExpiryDateField;
-
-  })(TextField);
-
-  module.exports = ExpiryDateField;
-
-}).call(this);
-
-},{"./text_field":13,"./expiry_date_formatter":8}],8:[function(require,module,exports){
+},{"./formatter":9}],8:[function(require,module,exports){
 (function() {
   var DelimitedTextFormatter, ExpiryDateFormatter, interpretTwoDigitYear, zpad2, _ref,
     __hasProp = {}.hasOwnProperty,
@@ -795,28 +762,49 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./delimited_text_formatter":6}],10:[function(require,module,exports){
+},{"./delimited_text_formatter":6}],7:[function(require,module,exports){
 (function() {
-  var CEILING, CURRENCY, CurrencyDefaults, DEFAULT_COUNTRY, DEFAULT_LOCALE, DOWN, FLOOR, Formatter, HALF_DOWN, HALF_EVEN, HALF_UP, LocaleDefaults, NONE, NumberFormatter, PERCENT, RegionDefaults, StyleDefaults, UP, endsWith, get, isDigits, roundCeiling, roundFloor, roundHalfEven, splitLocaleComponents, startsWith, trim,
+  var ExpiryDateField, ExpiryDateFormatter, TextField,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  TextField = require('./text_field');
+
+  ExpiryDateFormatter = require('./expiry_date_formatter');
+
+  ExpiryDateField = (function(_super) {
+    __extends(ExpiryDateField, _super);
+
+    function ExpiryDateField(element) {
+      ExpiryDateField.__super__.constructor.call(this, element, new ExpiryDateFormatter());
+    }
+
+    ExpiryDateField.prototype.textFieldDidEndEditing = function() {
+      var value;
+      value = this.value();
+      if (value) {
+        return this.setText(this.formatter().format(value));
+      }
+    };
+
+    return ExpiryDateField;
+
+  })(TextField);
+
+  module.exports = ExpiryDateField;
+
+}).call(this);
+
+},{"./text_field":13,"./expiry_date_formatter":8}],10:[function(require,module,exports){
+(function() {
+  var CURRENCY, CurrencyDefaults, DEFAULT_COUNTRY, DEFAULT_LOCALE, Formatter, LocaleDefaults, NONE, NumberFormatter, PERCENT, RegionDefaults, StyleDefaults, endsWith, get, isDigits, rounding, splitLocaleComponents, startsWith, trim,
     __slice = [].slice,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   Formatter = require('./formatter');
 
-  CEILING = 0;
-
-  FLOOR = 1;
-
-  DOWN = 2;
-
-  HALF_EVEN = 3;
-
-  UP = 4;
-
-  HALF_DOWN = 5;
-
-  HALF_UP = 6;
+  rounding = require('./rounding');
 
   NONE = 0;
 
@@ -1329,12 +1317,12 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     NumberFormatter.prototype._rounder = function() {
       switch (this.roundingMode()) {
-        case CEILING:
-          return roundCeiling;
-        case FLOOR:
-          return roundFloor;
-        case HALF_EVEN:
-          return roundHalfEven;
+        case NumberFormatter.Rounding.CEILING:
+          return rounding.ceiling;
+        case NumberFormatter.Rounding.FLOOR:
+          return rounding.floor;
+        case NumberFormatter.Rounding.HALF_EVEN:
+          return rounding.halfEven;
       }
     };
 
@@ -1541,51 +1529,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
   NumberFormatter.prototype.setPlusSign = NumberFormatter.prototype.setPositivePrefix;
 
-  roundCeiling = function(number, maximumFractionDigits) {
-    var multiplier;
-    if (number < 0) {
-      return roundFloor(-number, maximumFractionDigits);
-    }
-    multiplier = Math.pow(10, maximumFractionDigits);
-    return (~~(number * multiplier) + 1) / multiplier;
-  };
-
-  roundFloor = function(number, maximumFractionDigits) {
-    var multiplier;
-    if (number < 0) {
-      return roundCeiling(-number, maximumFractionDigits);
-    }
-    multiplier = Math.pow(10, maximumFractionDigits);
-    return ~~(number * multiplier) / multiplier;
-  };
-
-  roundHalfEven = function(number, maximumFractionDigits) {
-    var lastDigit, multiplier, percentFromFloor;
-    multiplier = Math.pow(10, maximumFractionDigits);
-    percentFromFloor = Math.abs((number * (multiplier * 100)) % 100);
-    if (percentFromFloor < 50) {
-      return roundFloor(number, maximumFractionDigits);
-    } else if (percentFromFloor > 50) {
-      return roundCeiling(number, maximumFractionDigits);
-    } else {
-      lastDigit = ~~Math.abs(number * multiplier) % 10;
-      if ((lastDigit % 2 === 0) ^ (number < 0)) {
-        return roundFloor(number, maximumFractionDigits);
-      } else {
-        return roundCeiling(number, maximumFractionDigits);
-      }
-    }
-  };
-
-  NumberFormatter.Rounding = {
-    CEILING: CEILING,
-    FLOOR: FLOOR,
-    DOWN: DOWN,
-    HALF_EVEN: HALF_EVEN,
-    UP: UP,
-    HALF_DOWN: HALF_DOWN,
-    HALF_UP: HALF_UP
-  };
+  NumberFormatter.Rounding = rounding.Modes;
 
   NumberFormatter.Style = {
     NONE: NONE,
@@ -1645,7 +1589,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
       positiveInfinitySymbol: '+∞',
       positivePrefix: '',
       positiveSuffix: '',
-      roundingMode: HALF_EVEN,
+      roundingMode: NumberFormatter.Rounding.HALF_EVEN,
       positiveCurrencyPrefix: function(formatter) {
         return formatter.currencySymbol();
       },
@@ -1750,7 +1694,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./formatter":9}],11:[function(require,module,exports){
+},{"./formatter":9,"./rounding":16}],11:[function(require,module,exports){
 (function() {
   var DelimitedTextFormatter, NANP_PHONE_DELIMITERS, NANP_PHONE_DELIMITERS_WITH_1, NANP_PHONE_DELIMITERS_WITH_PLUS, PhoneFormatter,
     __hasProp = {}.hasOwnProperty,
@@ -2935,7 +2879,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./formatter":9,"./undo_manager":14,"./keybindings":16}],15:[function(require,module,exports){
+},{"./formatter":9,"./undo_manager":14,"./keybindings":17}],15:[function(require,module,exports){
 (function() {
   var AMEX, DISCOVER, JCB, MASTERCARD, VISA, determineCardType, luhnCheck, validCardLength;
 
@@ -3016,6 +2960,71 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 }).call(this);
 
 },{}],16:[function(require,module,exports){
+(function() {
+  var CEILING, DOWN, FLOOR, HALF_DOWN, HALF_EVEN, HALF_UP, UP, ceiling, floor, halfEven;
+
+  CEILING = 0;
+
+  FLOOR = 1;
+
+  DOWN = 2;
+
+  HALF_EVEN = 3;
+
+  UP = 4;
+
+  HALF_DOWN = 5;
+
+  HALF_UP = 6;
+
+  ceiling = function(number, maximumFractionDigits) {
+    var multiplier;
+    multiplier = Math.pow(10, maximumFractionDigits);
+    return Math.ceil(number * multiplier) / multiplier;
+  };
+
+  floor = function(number, maximumFractionDigits) {
+    var multiplier;
+    multiplier = Math.pow(10, maximumFractionDigits);
+    return Math.floor(number * multiplier) / multiplier;
+  };
+
+  halfEven = function(number, maximumFractionDigits) {
+    var lastDigit, multiplier, percentFromFloor;
+    multiplier = Math.pow(10, maximumFractionDigits);
+    percentFromFloor = Math.abs((number * (multiplier * 100)) % 100);
+    if (percentFromFloor < 50) {
+      return floor(number, maximumFractionDigits);
+    } else if (percentFromFloor > 50) {
+      return ceiling(number, maximumFractionDigits);
+    } else {
+      lastDigit = ~~Math.abs(number * multiplier) % 10;
+      if ((lastDigit % 2 === 0) ^ (number < 0)) {
+        return floor(number, maximumFractionDigits);
+      } else {
+        return ceiling(number, maximumFractionDigits);
+      }
+    }
+  };
+
+  module.exports = {
+    Modes: {
+      CEILING: CEILING,
+      FLOOR: FLOOR,
+      DOWN: DOWN,
+      HALF_EVEN: HALF_EVEN,
+      UP: UP,
+      HALF_DOWN: HALF_DOWN,
+      HALF_UP: HALF_UP
+    },
+    ceiling: ceiling,
+    floor: floor,
+    halfEven: halfEven
+  };
+
+}).call(this);
+
+},{}],17:[function(require,module,exports){
 (function() {
   var A, ALT, BACKSPACE, BindingSet, CTRL, DELETE, DOWN, ENTER, KEYS, LEFT, META, NINE, RIGHT, SHIFT, TAB, UP, Y, Z, ZERO, build, cache, keyBindingsForPlatform,
     __slice = [].slice;

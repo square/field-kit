@@ -1,13 +1,5 @@
 Formatter = require './formatter'
-
-# Rounding
-CEILING    = 0
-FLOOR      = 1
-DOWN       = 2
-HALF_EVEN  = 3
-UP         = 4
-HALF_DOWN  = 5
-HALF_UP    = 6
+rounding  = require './rounding'
 
 # Style
 NONE       = 0
@@ -419,9 +411,9 @@ class NumberFormatter extends Formatter
 
   _rounder: ->
     switch @roundingMode()
-      when CEILING then roundCeiling
-      when FLOOR then roundFloor
-      when HALF_EVEN then roundHalfEven
+      when NumberFormatter.Rounding.CEILING then rounding.ceiling
+      when NumberFormatter.Rounding.FLOOR then rounding.floor
+      when NumberFormatter.Rounding.HALF_EVEN then rounding.halfEven
 
   parse: (string, error) ->
     positivePrefix = @positivePrefix()
@@ -582,43 +574,7 @@ NumberFormatter::setMinusSign = NumberFormatter::setNegativePrefix
 NumberFormatter::plusSign = NumberFormatter::positivePrefix
 NumberFormatter::setPlusSign = NumberFormatter::setPositivePrefix
 
-
-## Rounding
-
-roundCeiling = (number, maximumFractionDigits) ->
-  return roundFloor -number, maximumFractionDigits if number < 0
-  multiplier = Math.pow(10, maximumFractionDigits)
-  (~~(number * multiplier) + 1) / multiplier
-
-roundFloor = (number, maximumFractionDigits) ->
-  return roundCeiling -number, maximumFractionDigits if number < 0
-  multiplier = Math.pow(10, maximumFractionDigits)
-  ~~(number * multiplier) / multiplier
-
-roundHalfEven = (number, maximumFractionDigits) ->
-  multiplier = Math.pow(10, maximumFractionDigits)
-  percentFromFloor = Math.abs((number * (multiplier * 100)) % 100)
-
-  if percentFromFloor < 50
-    roundFloor number, maximumFractionDigits
-  else if percentFromFloor > 50
-    roundCeiling number, maximumFractionDigits
-  else
-    lastDigit = ~~Math.abs(number * multiplier) % 10
-    if (lastDigit % 2 is 0) ^ (number < 0)
-      roundFloor number, maximumFractionDigits
-    else
-      roundCeiling number, maximumFractionDigits
-
-NumberFormatter.Rounding = {
-  CEILING
-  FLOOR
-  DOWN
-  HALF_EVEN
-  UP
-  HALF_DOWN
-  HALF_UP
-}
+NumberFormatter.Rounding = rounding.Modes
 
 NumberFormatter.Style = {
   NONE
@@ -662,7 +618,7 @@ LocaleDefaults =
     positiveInfinitySymbol:      '+∞'
     positivePrefix:              ''
     positiveSuffix:              ''
-    roundingMode:                HALF_EVEN
+    roundingMode:                NumberFormatter.Rounding.HALF_EVEN
     positiveCurrencyPrefix:      (formatter) -> formatter.currencySymbol()
     positiveCurrencySuffix:      ''
     negativeCurrencyPrefix:      (formatter) -> "(#{formatter.currencySymbol()}"
