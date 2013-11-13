@@ -390,7 +390,8 @@ describe 'NumberFormatter', ->
 
         it 'rounds floats with non-zero digits past the maximum', ->
           expect(formatter.format -0.35).toEqual('-0.4')
-          expect(formatter.format -0.351).toEqual('-0.3')
+          expect(formatter.format -0.349).toEqual('-0.3')
+          expect(formatter.format -0.351).toEqual('-0.4')
           expect(formatter.format -0.25).toEqual('-0.2')
 
     describe 'with the percent style', ->
