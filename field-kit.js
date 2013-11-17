@@ -23,7 +23,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./adaptive_card_formatter":2,"./amex_card_formatter":3,"./card_text_field":4,"./default_card_formatter":5,"./delimited_text_formatter":6,"./expiry_date_field":7,"./expiry_date_formatter":8,"./formatter":9,"./number_formatter":10,"./phone_formatter":11,"./social_security_number_formatter":12,"./text_field":13,"./undo_manager":14}],9:[function(require,module,exports){
+},{"./amex_card_formatter":2,"./adaptive_card_formatter":3,"./card_text_field":4,"./default_card_formatter":5,"./delimited_text_formatter":6,"./expiry_date_field":7,"./expiry_date_formatter":8,"./formatter":9,"./number_formatter":10,"./phone_formatter":11,"./social_security_number_formatter":12,"./text_field":13,"./undo_manager":14}],9:[function(require,module,exports){
 (function() {
   var Formatter;
 
@@ -219,6 +219,36 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 },{}],2:[function(require,module,exports){
 (function() {
+  var AmexCardFormatter, DefaultCardFormatter, _ref,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  DefaultCardFormatter = require('./default_card_formatter');
+
+  AmexCardFormatter = (function(_super) {
+    __extends(AmexCardFormatter, _super);
+
+    function AmexCardFormatter() {
+      _ref = AmexCardFormatter.__super__.constructor.apply(this, arguments);
+      return _ref;
+    }
+
+    AmexCardFormatter.prototype.maximumLength = 15 + 2;
+
+    AmexCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
+      return index === 4 || index === 11;
+    };
+
+    return AmexCardFormatter;
+
+  })(DefaultCardFormatter);
+
+  module.exports = AmexCardFormatter;
+
+}).call(this);
+
+},{"./default_card_formatter":5}],3:[function(require,module,exports){
+(function() {
   var AMEX, AdaptiveCardFormatter, AmexCardFormatter, DefaultCardFormatter, determineCardType, _ref;
 
   AmexCardFormatter = require('./amex_card_formatter');
@@ -263,37 +293,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./amex_card_formatter":3,"./card_utils":15,"./default_card_formatter":5}],3:[function(require,module,exports){
-(function() {
-  var AmexCardFormatter, DefaultCardFormatter, _ref,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  DefaultCardFormatter = require('./default_card_formatter');
-
-  AmexCardFormatter = (function(_super) {
-    __extends(AmexCardFormatter, _super);
-
-    function AmexCardFormatter() {
-      _ref = AmexCardFormatter.__super__.constructor.apply(this, arguments);
-      return _ref;
-    }
-
-    AmexCardFormatter.prototype.maximumLength = 15 + 2;
-
-    AmexCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
-      return index === 4 || index === 11;
-    };
-
-    return AmexCardFormatter;
-
-  })(DefaultCardFormatter);
-
-  module.exports = AmexCardFormatter;
-
-}).call(this);
-
-},{"./default_card_formatter":5}],4:[function(require,module,exports){
+},{"./default_card_formatter":5,"./amex_card_formatter":2,"./card_utils":15}],4:[function(require,module,exports){
 (function() {
   var AdaptiveCardFormatter, CardMaskStrategy, CardTextField, TextField, determineCardType,
     __hasProp = {}.hasOwnProperty,
@@ -408,7 +408,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./text_field":13,"./adaptive_card_formatter":2,"./card_utils":15}],5:[function(require,module,exports){
+},{"./text_field":13,"./adaptive_card_formatter":3,"./card_utils":15}],5:[function(require,module,exports){
 (function() {
   var DefaultCardFormatter, DelimitedTextFormatter, luhnCheck, validCardLength, _ref, _ref1,
     __hasProp = {}.hasOwnProperty,
@@ -2326,6 +2326,8 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     NumberFormatter.prototype._currencyCode = null;
 
+    NumberFormatter.prototype._exponent = null;
+
     NumberFormatter.prototype._groupingSeparator = null;
 
     NumberFormatter.prototype._groupingSize = null;
@@ -2347,8 +2349,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
     NumberFormatter.prototype._maximum = null;
 
     NumberFormatter.prototype._minimum = null;
-
-    NumberFormatter.prototype._multiplier = null;
 
     NumberFormatter.prototype._notANumberSymbol = null;
 
@@ -2531,12 +2531,12 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
       return this;
     };
 
-    NumberFormatter.prototype.multiplier = function() {
-      return this._get('multiplier');
+    NumberFormatter.prototype.exponent = function() {
+      return this._get('exponent');
     };
 
-    NumberFormatter.prototype.setMultiplier = function(multiplier) {
-      this._multiplier = multiplier;
+    NumberFormatter.prototype.setExponent = function(exponent) {
+      this._exponent = exponent;
       return this;
     };
 
@@ -2694,7 +2694,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
     };
 
     NumberFormatter.prototype.format = function(number) {
-      var copiedCharacterCount, fractionPart, i, integerPart, integerPartWithGroupingSeparators, maximumFractionDigits, maximumIntegerDigits, minimumFractionDigits, minimumIntegerDigits, multiplier, negative, negativeInfinitySymbol, notANumberSymbol, nullSymbol, positiveInfinitySymbol, result, splitNumber, string, zeroSymbol, _i, _ref;
+      var copiedCharacterCount, exponent, fractionPart, i, integerPart, integerPartWithGroupingSeparators, maximumFractionDigits, maximumIntegerDigits, minimumFractionDigits, minimumIntegerDigits, negative, negativeInfinitySymbol, notANumberSymbol, nullSymbol, positiveInfinitySymbol, result, splitNumber, string, zeroSymbol, _i, _ref;
       if (((zeroSymbol = this.zeroSymbol()) != null) && number === 0) {
         return zeroSymbol;
       }
@@ -2710,8 +2710,8 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
       if (((negativeInfinitySymbol = this.negativeInfinitySymbol()) != null) && number === -Infinity) {
         return negativeInfinitySymbol;
       }
-      if ((multiplier = this.multiplier()) != null) {
-        number *= multiplier;
+      if ((exponent = this.exponent()) != null) {
+        number *= Math.pow(10, exponent);
       }
       integerPart = null;
       fractionPart = null;
@@ -2846,7 +2846,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
     };
 
     NumberFormatter.prototype._parseAbsoluteValue = function(string, error) {
-      var fractionPart, groupPart, groupParts, groupingSize, integerPart, multiplier, number, parts, _i, _len, _ref;
+      var exponent, fractionPart, groupPart, groupParts, groupingSize, integerPart, number, parts, _i, _len, _ref;
       if (string.length === 0) {
         if (typeof error === "function") {
           error('number-formatter.invalid-format');
@@ -2900,8 +2900,8 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
         }
         return null;
       }
-      if ((multiplier = this.multiplier()) != null) {
-        number /= multiplier;
+      if ((exponent = this.exponent()) != null) {
+        number /= Math.pow(10, exponent);
       }
       return number;
     };
@@ -2993,7 +2993,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
     },
     PERCENT: {
       usesGroupingSeparator: false,
-      multiplier: 100,
+      exponent: 2,
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
       minimumIntegerDigits: 0,
