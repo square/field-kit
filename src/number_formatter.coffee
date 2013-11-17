@@ -1,5 +1,5 @@
 Formatter = require './formatter'
-rounding  = require './rounding'
+stround   = require 'stround'
 
 # Style
 NONE       = 0
@@ -407,13 +407,7 @@ class NumberFormatter extends Formatter
     return result
 
   _round: (number) ->
-    @_rounder() number, @maximumFractionDigits()
-
-  _rounder: ->
-    switch @roundingMode()
-      when NumberFormatter.Rounding.CEILING then rounding.ceiling
-      when NumberFormatter.Rounding.FLOOR then rounding.floor
-      when NumberFormatter.Rounding.HALF_EVEN then rounding.halfEven
+    stround.round number, @maximumFractionDigits(), @roundingMode()
 
   parse: (string, error) ->
     positivePrefix = @positivePrefix()
@@ -574,7 +568,7 @@ NumberFormatter::setMinusSign = NumberFormatter::setNegativePrefix
 NumberFormatter::plusSign = NumberFormatter::positivePrefix
 NumberFormatter::setPlusSign = NumberFormatter::setPositivePrefix
 
-NumberFormatter.Rounding = rounding.Modes
+NumberFormatter.Rounding = stround.modes
 
 NumberFormatter.Style = {
   NONE
