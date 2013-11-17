@@ -41,6 +41,7 @@ class NumberFormatter extends Formatter
   _alwaysShowsDecimalSeparator: null
   _countryCode:                 null
   _currencyCode:                null
+  _exponent:                    null
   _groupingSeparator:           null
   _groupingSize:                null
   _lenient:                     no
@@ -52,7 +53,6 @@ class NumberFormatter extends Formatter
   _minimumIntegerDigits:        null
   _maximum:                     null
   _minimum:                     null
-  _multiplier:                  null
   _notANumberSymbol:            null
   _nullSymbol:                  null
   _numberStyle:                 null
@@ -199,11 +199,11 @@ class NumberFormatter extends Formatter
     @_minimumIntegerDigits = minimumIntegerDigits
     return this
 
-  multiplier: ->
-    @_get 'multiplier'
+  exponent: ->
+    @_get 'exponent'
 
-  setMultiplier: (multiplier) ->
-    @_multiplier = multiplier
+  setExponent: (exponent) ->
+    @_exponent = exponent
     return this
 
   negativeInfinitySymbol: ->
@@ -339,8 +339,8 @@ class NumberFormatter extends Formatter
     if (negativeInfinitySymbol = @negativeInfinitySymbol())? and number is -Infinity
       return negativeInfinitySymbol
 
-    if (multiplier = @multiplier())?
-      number *= multiplier
+    if (exponent = @exponent())?
+      number *= Math.pow(10, exponent)
 
     integerPart  = null
     fractionPart = null
@@ -511,8 +511,8 @@ class NumberFormatter extends Formatter
       error? 'number-formatter.floats-not-allowed'
       return null
 
-    if (multiplier = @multiplier())?
-      number /= multiplier
+    if (exponent = @exponent())?
+      number /= Math.pow(10, exponent)
 
     return number
 
@@ -584,7 +584,7 @@ StyleDefaults =
     minimumIntegerDigits:  0
   PERCENT:
     usesGroupingSeparator: no
-    multiplier:            100
+    exponent:              2
     minimumFractionDigits: 0
     maximumFractionDigits: 0
     minimumIntegerDigits:  0
