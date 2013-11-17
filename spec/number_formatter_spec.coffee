@@ -35,8 +35,8 @@ describe 'NumberFormatter', ->
     it 'has no maximum', ->
       expect(formatter.maximum()).toBeNull()
 
-    it 'has no multiplier', ->
-      expect(formatter.multiplier()).toBeNull()
+    it 'has no exponent', ->
+      expect(formatter.exponent()).toBeNull()
 
     it 'has no maximumIntegerDigits', ->
       expect(formatter.maximumIntegerDigits()).toBeNull()
@@ -98,7 +98,7 @@ describe 'NumberFormatter', ->
   describe '#format', ->
     it 'works with 702', ->
       formatter.setNumberStyle NumberFormatter.Style.CURRENCY
-      formatter.setMultiplier(0.01)
+      formatter.setExponent(-2)
       expect(formatter.format -702).toEqual('($7.02)')
 
     describe 'given zero', ->
@@ -275,9 +275,9 @@ describe 'NumberFormatter', ->
             expect(formatter.format 0.5).toEqual('0')
             expect(formatter.format 1.5).toEqual('2')
 
-      describe 'with a multiplier', ->
+      describe 'with an exponent', ->
         beforeEach ->
-          formatter.setMultiplier .01
+          formatter.setExponent -2
 
         it 'multiplies numeric values for display', ->
           expect(formatter.format 5000).toEqual('50')
@@ -484,10 +484,10 @@ describe 'NumberFormatter', ->
 
     describe 'switching styles', ->
       it 'resets values back to their original defaults', ->
-        multiplier = formatter.multiplier()
+        exponent = formatter.exponent()
         formatter.setNumberStyle NumberFormatter.Style.PERCENT
         formatter.setNumberStyle NumberFormatter.Style.NONE
-        expect(formatter.multiplier()).toEqual(multiplier)
+        expect(formatter.exponent()).toEqual(exponent)
 
   describe '#parse', ->
     it 'parses normal positive numbers', ->
@@ -671,9 +671,9 @@ describe 'NumberFormatter', ->
       it 'fails to parse nested negative separators', ->
         expect(formatter.parse '((3))').toBeNull()
 
-    describe 'with a multiplier', ->
+    describe 'with an exponent', ->
       beforeEach ->
-        formatter.setMultiplier .01
+        formatter.setExponent -2
 
       it 'multiplies numeric values for display', ->
         expect(formatter.parse '50').toEqual(5000)
