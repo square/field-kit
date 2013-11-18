@@ -1,9 +1,5 @@
 DelimitedTextFormatter = require './delimited_text_formatter'
-
-zpad2 = (n) ->
-  result = "#{n}"
-  result = "0#{result}" while result.length < 2
-  result
+{ zpad2 } = require './utils'
 
 interpretTwoDigitYear = (year) ->
   thisYear = new Date().getFullYear()

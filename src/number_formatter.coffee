@@ -1,5 +1,6 @@
 Formatter = require './formatter'
-stround   = require 'stround'
+{ isDigits, startsWith, endsWith, trim, zpad } = require './utils'
+stround = require 'stround'
 
 # Style
 NONE       = 0
@@ -8,22 +9,6 @@ PERCENT    = 2
 
 DEFAULT_LOCALE  = 'en-US'
 DEFAULT_COUNTRY = 'US'
-
-isDigits = (string) ->
-  /^\d*$/.test string
-
-startsWith = (prefix, string) ->
-  string[0...prefix.length] is prefix
-
-endsWith = (suffix, string) ->
-  string[(string.length - suffix.length)..] is suffix
-
-if ''.trim
-  trim = (string) ->
-    string.trim()
-else
-  trim = (string) ->
-    string.replace(/(^\s+|\s+$)/, '')
 
 splitLocaleComponents = (locale) ->
   match = locale.match(/^([a-z][a-z])(?:[-_]([a-z][a-z]))?$/i)
@@ -339,26 +324,27 @@ class NumberFormatter extends Formatter
     if (negativeInfinitySymbol = @negativeInfinitySymbol())? and number is -Infinity
       return negativeInfinitySymbol
 
-    if (exponent = @exponent())?
-      number *= Math.pow(10, exponent)
-
     integerPart  = null
     fractionPart = null
     string       = null
     negative     = number < 0
 
-    splitNumber = ->
-      string = "#{Math.abs(number)}"
-      [integerPart, fractionPart] = string.split('.')
-      fractionPart ||= ''
+    [integerPart, fractionPart] = "#{Math.abs(number)}".split('.')
+    fractionPart ||= ''
 
-    splitNumber()
+    if (exponent = @exponent())?
+      [ negative, integerPart, fractionPart ] =
+        stround.shift([ negative, integerPart, fractionPart ], exponent)
+      integerPart = integerPart.slice(1) while integerPart[0] is '0'
 
     # round fraction part to the maximum length
     maximumFractionDigits = @maximumFractionDigits()
     if fractionPart.length > maximumFractionDigits
-      number = @_round number
-      splitNumber()
+      unrounded = "#{integerPart}.#{fractionPart}"
+      rounded = @_round if negative then "-#{unrounded}" else unrounded
+      rounded = rounded[1..] if rounded[0] is '-'
+      [ integerPart, fractionPart ] = rounded.split('.')
+      fractionPart ||= ''
 
     # right-pad fraction zeros up to the minimum length
     minimumFractionDigits = @minimumFractionDigits()
@@ -505,14 +491,15 @@ class NumberFormatter extends Formatter
       error? 'number-formatter.invalid-format'
       return null
 
+    if (exponent = @exponent())?
+      [ negative, integerPart, fractionPart ] =
+        stround.shift([ negative, integerPart, fractionPart ], -exponent)
+
     number = Number(integerPart) + Number(".#{fractionPart or '0'}")
 
     if not @allowsFloats() and number isnt ~~number
       error? 'number-formatter.floats-not-allowed'
       return null
-
-    if (exponent = @exponent())?
-      number /= Math.pow(10, exponent)
 
     return number
 
