@@ -23,7 +23,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./amex_card_formatter":2,"./adaptive_card_formatter":3,"./card_text_field":4,"./default_card_formatter":5,"./delimited_text_formatter":6,"./expiry_date_field":7,"./expiry_date_formatter":8,"./formatter":9,"./number_formatter":10,"./phone_formatter":11,"./social_security_number_formatter":12,"./text_field":13,"./undo_manager":14}],9:[function(require,module,exports){
+},{"./adaptive_card_formatter":2,"./amex_card_formatter":3,"./card_text_field":4,"./default_card_formatter":5,"./delimited_text_formatter":6,"./expiry_date_field":7,"./expiry_date_formatter":8,"./formatter":9,"./number_formatter":10,"./phone_formatter":11,"./social_security_number_formatter":12,"./text_field":13,"./undo_manager":14}],9:[function(require,module,exports){
 (function() {
   var Formatter;
 
@@ -219,36 +219,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 },{}],2:[function(require,module,exports){
 (function() {
-  var AmexCardFormatter, DefaultCardFormatter, _ref,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  DefaultCardFormatter = require('./default_card_formatter');
-
-  AmexCardFormatter = (function(_super) {
-    __extends(AmexCardFormatter, _super);
-
-    function AmexCardFormatter() {
-      _ref = AmexCardFormatter.__super__.constructor.apply(this, arguments);
-      return _ref;
-    }
-
-    AmexCardFormatter.prototype.maximumLength = 15 + 2;
-
-    AmexCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
-      return index === 4 || index === 11;
-    };
-
-    return AmexCardFormatter;
-
-  })(DefaultCardFormatter);
-
-  module.exports = AmexCardFormatter;
-
-}).call(this);
-
-},{"./default_card_formatter":5}],3:[function(require,module,exports){
-(function() {
   var AMEX, AdaptiveCardFormatter, AmexCardFormatter, DefaultCardFormatter, determineCardType, _ref;
 
   AmexCardFormatter = require('./amex_card_formatter');
@@ -293,7 +263,37 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./default_card_formatter":5,"./amex_card_formatter":2,"./card_utils":15}],4:[function(require,module,exports){
+},{"./default_card_formatter":5,"./amex_card_formatter":3,"./card_utils":15}],3:[function(require,module,exports){
+(function() {
+  var AmexCardFormatter, DefaultCardFormatter, _ref,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  DefaultCardFormatter = require('./default_card_formatter');
+
+  AmexCardFormatter = (function(_super) {
+    __extends(AmexCardFormatter, _super);
+
+    function AmexCardFormatter() {
+      _ref = AmexCardFormatter.__super__.constructor.apply(this, arguments);
+      return _ref;
+    }
+
+    AmexCardFormatter.prototype.maximumLength = 15 + 2;
+
+    AmexCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
+      return index === 4 || index === 11;
+    };
+
+    return AmexCardFormatter;
+
+  })(DefaultCardFormatter);
+
+  module.exports = AmexCardFormatter;
+
+}).call(this);
+
+},{"./default_card_formatter":5}],4:[function(require,module,exports){
 (function() {
   var AdaptiveCardFormatter, CardMaskStrategy, CardTextField, TextField, determineCardType,
     __hasProp = {}.hasOwnProperty,
@@ -408,7 +408,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./text_field":13,"./adaptive_card_formatter":3,"./card_utils":15}],5:[function(require,module,exports){
+},{"./text_field":13,"./adaptive_card_formatter":2,"./card_utils":15}],5:[function(require,module,exports){
 (function() {
   var DefaultCardFormatter, DelimitedTextFormatter, luhnCheck, validCardLength, _ref, _ref1,
     __hasProp = {}.hasOwnProperty,
@@ -675,7 +675,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./text_field":13,"./expiry_date_formatter":8}],8:[function(require,module,exports){
+},{"./expiry_date_formatter":8,"./text_field":13}],8:[function(require,module,exports){
 (function() {
   var DelimitedTextFormatter, ExpiryDateFormatter, interpretTwoDigitYear, zpad2, _ref,
     __hasProp = {}.hasOwnProperty,
@@ -683,14 +683,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
   DelimitedTextFormatter = require('./delimited_text_formatter');
 
-  zpad2 = function(n) {
-    var result;
-    result = "" + n;
-    while (result.length < 2) {
-      result = "0" + result;
-    }
-    return result;
-  };
+  zpad2 = require('./utils').zpad2;
 
   interpretTwoDigitYear = function(year) {
     var centuries, thisCentury, thisYear;
@@ -795,7 +788,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./delimited_text_formatter":6}],11:[function(require,module,exports){
+},{"./delimited_text_formatter":6,"./utils":16}],11:[function(require,module,exports){
 (function() {
   var DelimitedTextFormatter, NANP_PHONE_DELIMITERS, NANP_PHONE_DELIMITERS_WITH_1, NANP_PHONE_DELIMITERS_WITH_PLUS, PhoneFormatter,
     __hasProp = {}.hasOwnProperty,
@@ -1980,7 +1973,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./formatter":9,"./undo_manager":14,"./keybindings":16}],15:[function(require,module,exports){
+},{"./formatter":9,"./undo_manager":14,"./keybindings":17}],15:[function(require,module,exports){
 (function() {
   var AMEX, DISCOVER, JCB, MASTERCARD, VISA, determineCardType, luhnCheck, validCardLength;
 
@@ -2061,6 +2054,56 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 }).call(this);
 
 },{}],16:[function(require,module,exports){
+(function() {
+  var endsWith, isDigits, startsWith, trim, zpad, zpad2;
+
+  isDigits = function(string) {
+    return /^\d*$/.test(string);
+  };
+
+  startsWith = function(prefix, string) {
+    return string.slice(0, prefix.length) === prefix;
+  };
+
+  endsWith = function(suffix, string) {
+    return string.slice(string.length - suffix.length) === suffix;
+  };
+
+  if (''.trim) {
+    trim = function(string) {
+      return string.trim();
+    };
+  } else {
+    trim = function(string) {
+      return string.replace(/(^\s+|\s+$)/, '');
+    };
+  }
+
+  zpad = function(length, n) {
+    var result;
+    result = "" + n;
+    while (result.length < length) {
+      result = "0" + result;
+    }
+    return result;
+  };
+
+  zpad2 = function(n) {
+    return zpad(2, n);
+  };
+
+  module.exports = {
+    isDigits: isDigits,
+    startsWith: startsWith,
+    endsWith: endsWith,
+    trim: trim,
+    zpad: zpad,
+    zpad2: zpad2
+  };
+
+}).call(this);
+
+},{}],17:[function(require,module,exports){
 (function() {
   var A, ALT, BACKSPACE, BindingSet, CTRL, DELETE, DOWN, ENTER, KEYS, LEFT, META, NINE, RIGHT, SHIFT, TAB, UP, Y, Z, ZERO, build, cache, keyBindingsForPlatform,
     __slice = [].slice;
@@ -2255,12 +2298,14 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 },{}],10:[function(require,module,exports){
 (function() {
-  var CURRENCY, CurrencyDefaults, DEFAULT_COUNTRY, DEFAULT_LOCALE, Formatter, LocaleDefaults, NONE, NumberFormatter, PERCENT, RegionDefaults, StyleDefaults, endsWith, get, isDigits, splitLocaleComponents, startsWith, stround, trim,
+  var CURRENCY, CurrencyDefaults, DEFAULT_COUNTRY, DEFAULT_LOCALE, Formatter, LocaleDefaults, NONE, NumberFormatter, PERCENT, RegionDefaults, StyleDefaults, endsWith, get, isDigits, splitLocaleComponents, startsWith, stround, trim, zpad, _ref,
     __slice = [].slice,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   Formatter = require('./formatter');
+
+  _ref = require('./utils'), isDigits = _ref.isDigits, startsWith = _ref.startsWith, endsWith = _ref.endsWith, trim = _ref.trim, zpad = _ref.zpad;
 
   stround = require('stround');
 
@@ -2274,34 +2319,12 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
   DEFAULT_COUNTRY = 'US';
 
-  isDigits = function(string) {
-    return /^\d*$/.test(string);
-  };
-
-  startsWith = function(prefix, string) {
-    return string.slice(0, prefix.length) === prefix;
-  };
-
-  endsWith = function(suffix, string) {
-    return string.slice(string.length - suffix.length) === suffix;
-  };
-
-  if (''.trim) {
-    trim = function(string) {
-      return string.trim();
-    };
-  } else {
-    trim = function(string) {
-      return string.replace(/(^\s+|\s+$)/, '');
-    };
-  }
-
   splitLocaleComponents = function(locale) {
-    var match, _ref, _ref1;
+    var match, _ref1, _ref2;
     match = locale.match(/^([a-z][a-z])(?:[-_]([a-z][a-z]))?$/i);
     return {
-      lang: match != null ? (_ref = match[1]) != null ? _ref.toLowerCase() : void 0 : void 0,
-      country: match != null ? (_ref1 = match[2]) != null ? _ref1.toUpperCase() : void 0 : void 0
+      lang: match != null ? (_ref1 = match[1]) != null ? _ref1.toLowerCase() : void 0 : void 0,
+      country: match != null ? (_ref2 = match[2]) != null ? _ref2.toUpperCase() : void 0 : void 0
     };
   };
 
@@ -2417,9 +2440,9 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
     };
 
     NumberFormatter.prototype._shouldShowNativeCurrencySymbol = function() {
-      var regionDefaultCurrencyCode, _ref;
+      var regionDefaultCurrencyCode, _ref1;
       regionDefaultCurrencyCode = this._regionDefaults().currencyCode;
-      regionDefaultCurrencyCode = (_ref = typeof regionDefaultCurrencyCode === "function" ? regionDefaultCurrencyCode() : void 0) != null ? _ref : regionDefaultCurrencyCode;
+      regionDefaultCurrencyCode = (_ref1 = typeof regionDefaultCurrencyCode === "function" ? regionDefaultCurrencyCode() : void 0) != null ? _ref1 : regionDefaultCurrencyCode;
       return this.currencyCode() === regionDefaultCurrencyCode;
     };
 
@@ -2694,7 +2717,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
     };
 
     NumberFormatter.prototype.format = function(number) {
-      var copiedCharacterCount, exponent, fractionPart, i, integerPart, integerPartWithGroupingSeparators, maximumFractionDigits, maximumIntegerDigits, minimumFractionDigits, minimumIntegerDigits, negative, negativeInfinitySymbol, notANumberSymbol, nullSymbol, positiveInfinitySymbol, result, splitNumber, string, zeroSymbol, _i, _ref;
+      var copiedCharacterCount, exponent, fractionPart, i, integerPart, integerPartWithGroupingSeparators, maximumFractionDigits, maximumIntegerDigits, minimumFractionDigits, minimumIntegerDigits, negative, negativeInfinitySymbol, notANumberSymbol, nullSymbol, positiveInfinitySymbol, result, rounded, string, unrounded, zeroSymbol, _i, _ref1, _ref2, _ref3, _ref4;
       if (((zeroSymbol = this.zeroSymbol()) != null) && number === 0) {
         return zeroSymbol;
       }
@@ -2710,24 +2733,27 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
       if (((negativeInfinitySymbol = this.negativeInfinitySymbol()) != null) && number === -Infinity) {
         return negativeInfinitySymbol;
       }
-      if ((exponent = this.exponent()) != null) {
-        number *= Math.pow(10, exponent);
-      }
       integerPart = null;
       fractionPart = null;
       string = null;
       negative = number < 0;
-      splitNumber = function() {
-        var _ref;
-        string = "" + (Math.abs(number));
-        _ref = string.split('.'), integerPart = _ref[0], fractionPart = _ref[1];
-        return fractionPart || (fractionPart = '');
-      };
-      splitNumber();
+      _ref1 = ("" + (Math.abs(number))).split('.'), integerPart = _ref1[0], fractionPart = _ref1[1];
+      fractionPart || (fractionPart = '');
+      if ((exponent = this.exponent()) != null) {
+        _ref2 = stround.shift([negative, integerPart, fractionPart], exponent), negative = _ref2[0], integerPart = _ref2[1], fractionPart = _ref2[2];
+        while (integerPart[0] === '0') {
+          integerPart = integerPart.slice(1);
+        }
+      }
       maximumFractionDigits = this.maximumFractionDigits();
       if (fractionPart.length > maximumFractionDigits) {
-        number = this._round(number);
-        splitNumber();
+        unrounded = "" + integerPart + "." + fractionPart;
+        rounded = this._round(negative ? "-" + unrounded : unrounded);
+        if (rounded[0] === '-') {
+          rounded = rounded.slice(1);
+        }
+        _ref3 = rounded.split('.'), integerPart = _ref3[0], fractionPart = _ref3[1];
+        fractionPart || (fractionPart = '');
       }
       minimumFractionDigits = this.minimumFractionDigits();
       while (fractionPart.length < minimumFractionDigits) {
@@ -2751,7 +2777,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
       if (this.usesGroupingSeparator()) {
         integerPartWithGroupingSeparators = '';
         copiedCharacterCount = 0;
-        for (i = _i = _ref = integerPart.length - 1; _ref <= 0 ? _i <= 0 : _i >= 0; i = _ref <= 0 ? ++_i : --_i) {
+        for (i = _i = _ref4 = integerPart.length - 1; _ref4 <= 0 ? _i <= 0 : _i >= 0; i = _ref4 <= 0 ? ++_i : --_i) {
           if (copiedCharacterCount > 0 && copiedCharacterCount % this.groupingSize() === 0) {
             integerPartWithGroupingSeparators = this.groupingSeparator() + integerPartWithGroupingSeparators;
           }
@@ -2846,7 +2872,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
     };
 
     NumberFormatter.prototype._parseAbsoluteValue = function(string, error) {
-      var exponent, fractionPart, groupPart, groupParts, groupingSize, integerPart, number, parts, _i, _len, _ref;
+      var exponent, fractionPart, groupPart, groupParts, groupingSize, integerPart, negative, number, parts, _i, _len, _ref1, _ref2;
       if (string.length === 0) {
         if (typeof error === "function") {
           error('number-formatter.invalid-format');
@@ -2873,9 +2899,9 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
               }
               return null;
             }
-            _ref = groupParts.slice(1);
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              groupPart = _ref[_i];
+            _ref1 = groupParts.slice(1);
+            for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+              groupPart = _ref1[_i];
               if (groupPart.length !== groupingSize) {
                 if (typeof error === "function") {
                   error('number-formatter.invalid-format.grouping-size');
@@ -2893,6 +2919,9 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
         }
         return null;
       }
+      if ((exponent = this.exponent()) != null) {
+        _ref2 = stround.shift([negative, integerPart, fractionPart], -exponent), negative = _ref2[0], integerPart = _ref2[1], fractionPart = _ref2[2];
+      }
       number = Number(integerPart) + Number("." + (fractionPart || '0'));
       if (!this.allowsFloats() && number !== ~~number) {
         if (typeof error === "function") {
@@ -2900,43 +2929,40 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
         }
         return null;
       }
-      if ((exponent = this.exponent()) != null) {
-        number /= Math.pow(10, exponent);
-      }
       return number;
     };
 
     NumberFormatter.prototype._currencyDefaults = function() {
-      var key, result, value, _ref, _ref1;
+      var key, result, value, _ref1, _ref2;
       result = {};
-      _ref = CurrencyDefaults["default"];
-      for (key in _ref) {
-        if (!__hasProp.call(_ref, key)) continue;
-        value = _ref[key];
-        result[key] = value;
-      }
-      _ref1 = CurrencyDefaults[this.currencyCode()];
+      _ref1 = CurrencyDefaults["default"];
       for (key in _ref1) {
         if (!__hasProp.call(_ref1, key)) continue;
         value = _ref1[key];
+        result[key] = value;
+      }
+      _ref2 = CurrencyDefaults[this.currencyCode()];
+      for (key in _ref2) {
+        if (!__hasProp.call(_ref2, key)) continue;
+        value = _ref2[key];
         result[key] = value;
       }
       return result;
     };
 
     NumberFormatter.prototype._regionDefaults = function() {
-      var key, result, value, _ref, _ref1;
+      var key, result, value, _ref1, _ref2;
       result = {};
-      _ref = RegionDefaults["default"];
-      for (key in _ref) {
-        if (!__hasProp.call(_ref, key)) continue;
-        value = _ref[key];
-        result[key] = value;
-      }
-      _ref1 = RegionDefaults[this.countryCode()];
+      _ref1 = RegionDefaults["default"];
       for (key in _ref1) {
         if (!__hasProp.call(_ref1, key)) continue;
         value = _ref1[key];
+        result[key] = value;
+      }
+      _ref2 = RegionDefaults[this.countryCode()];
+      for (key in _ref2) {
+        if (!__hasProp.call(_ref2, key)) continue;
+        value = _ref2[key];
         result[key] = value;
       }
       return result;
@@ -3141,7 +3167,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./formatter":9,"stround":17}],17:[function(require,module,exports){
+},{"./formatter":9,"./utils":16,"stround":18}],18:[function(require,module,exports){
 /** @const */ var CEILING = 0;
 /** @const */ var FLOOR = 1;
 /** @const */ var DOWN = 2;
@@ -3199,6 +3225,127 @@ function increment(strint) {
 }
 
 /**
+ * Parses the given decimal string into its component parts.
+ *
+ *   parse('3.14');  // [false, '3', '14']
+ *   parse('-3.45'); // [true, '3', '45']
+ *
+ * @param {string} strnum
+ * @return {Array}
+ */
+function parse(strnum) {
+  switch (strnum) {
+    case 'NaN': case 'Infinity': case '-Infinity':
+      return strnum;
+  }
+
+  var match = strnum.match(NUMBER_PATTERN);
+
+  if (!match) {
+    throw new Error('cannot round malformed number: '+strnum);
+  }
+
+  return [
+    match[1] !== undefined,
+    match[2],
+    match[3] || ''
+  ];
+}
+
+/**
+ * Format the given number configuration as a number string.
+ *
+ *   format([false, '12', '34']); // '12.34'
+ *   format([true, '8', '']);     // '-8'
+ *   format([true, '', '7']);     // '-0.7'
+ *
+ * @param {Array} parts
+ * @return {string}
+ */
+function format(parts) {
+  var negative = parts[0];
+  var intPart = parts[1];
+  var fracPart = parts[2];
+
+  if (intPart.length === 0) {
+    intPart = '0';
+  } else {
+    var firstNonZeroIndex;
+    for (firstNonZeroIndex = 0; firstNonZeroIndex < intPart.length; firstNonZeroIndex++) {
+      if (intPart[firstNonZeroIndex] !== '0') {
+        break;
+      }
+    }
+
+    if (firstNonZeroIndex !== intPart.length) {
+      intPart = intPart.slice(firstNonZeroIndex);
+    }
+  }
+
+  return (negative ? NEG+intPart : intPart) + (fracPart.length ? SEP+fracPart : '');
+}
+
+/**
+ * Shift the exponent of the given number (as a string) by the given amount.
+ *
+ *   shift('12', 2);  // '1200'
+ *   shift('12', -2); // '0.12'
+ *
+ * @param {string|number|Array} strnum
+ * @param {number} exponent
+ * @return {string|Array}
+ */
+function shift(strnum, exponent) {
+  if (typeof strnum === 'number') {
+    strnum = ''+strnum;
+  }
+
+  var parsed;
+  var shouldFormatResult = true;
+
+  if (typeof strnum === 'string') {
+    parsed = parse(strnum);
+
+    if (typeof parsed === 'string') {
+      return strnum;
+    }
+
+  } else {
+    parsed = strnum;
+    shouldFormatResult = false;
+  }
+
+  var negative = parsed[0];
+  var intPart = parsed[1];
+  var fracPart = parsed[2];
+  var partToMove;
+
+  if (exponent > 0) {
+    partToMove = fracPart.slice(0, exponent);
+    while (partToMove.length < exponent) {
+      partToMove += '0';
+    }
+    intPart += partToMove;
+    fracPart = fracPart.slice(exponent);
+  } else if (exponent < 0) {
+    while (intPart.length < -exponent) {
+      intPart = '0' + intPart;
+    }
+    partToMove = intPart.slice(intPart.length + exponent);
+    fracPart = partToMove + fracPart;
+    intPart = intPart.slice(0, intPart.length - partToMove.length);
+  }
+
+  var result = [negative, intPart, fracPart];
+
+  if (shouldFormatResult) {
+    return format(result);
+  } else {
+    return result;
+  }
+}
+
+/**
  * Round the given number represented by a string according to the given
  * precision and mode.
  *
@@ -3228,29 +3375,19 @@ function round(strnum, precision, mode) {
     mode = HALF_EVEN;
   }
 
-  switch (strnum) {
-    case 'NaN': case 'Infinity': case '-Infinity':
-      return strnum;
+  var parsed = parse(strnum);
+
+  if (typeof parsed === 'string') {
+    return parsed;
   }
-
-  var match = strnum.match(NUMBER_PATTERN);
-
-  if (!match) {
-    throw new Error('cannot round malformed number: '+strnum);
-  }
-
-  var negative = match[1] !== undefined;
-  var intPart = match[2];
-  var fracPart = match[3] || '';
 
   if (precision > 0) {
-    var partToMove = fracPart.slice(0, precision);
-    while (partToMove.length < precision) {
-      partToMove += '0';
-    }
-    intPart += partToMove;
-    fracPart = fracPart.slice(precision);
+    parsed = shift(parsed, precision);
   }
+
+  var negative = parsed[0];
+  var intPart = parsed[1];
+  var fracPart = parsed[2];
 
   switch (mode) {
     case CEILING: case FLOOR: case UP:
@@ -3300,21 +3437,14 @@ function round(strnum, precision, mode) {
       break;
   }
 
-  if (negative) {
-    intPart = NEG + intPart;
-  }
-
-  if (precision === 0) {
-    return intPart;
-  } else {
-    var separatorIndex = intPart.length - precision;
-    return intPart.slice(0, separatorIndex) +
-           SEP +
-           intPart.slice(separatorIndex);
-  }
+  return format(shift([negative, intPart, ''], -precision));
 }
 
-module.exports = { round: round, modes: RoundingMode };
+module.exports = {
+  round: round,
+  shift: shift,
+  modes: RoundingMode
+};
 
 },{}]},{},[1])(1)
 });
