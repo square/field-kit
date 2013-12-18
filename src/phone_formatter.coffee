@@ -62,6 +62,26 @@ class PhoneFormatter extends DelimitedTextFormatter
   isChangeValid: (change, error) ->
     @guessFormatFromText change.proposed.text
 
+    if change.inserted.text.length > 1
+      # handle pastes
+      { text, selectedRange } = change.current
+      toInsert = change.inserted.text
+
+      # Replace the selection with the new text, remove non-digits, then format.
+      formatted = @format((
+        text.slice(0, selectedRange.start) +
+        toInsert +
+        text.slice(selectedRange.start+selectedRange.length)
+      ).replace(/[^\d]/g, ''))
+
+      change.proposed =
+        text: formatted
+        selectedRange:
+          start: formatted.length - (text.length - (selectedRange.start + selectedRange.length))
+          length: 0
+
+      return super(change, error)
+
     if /^\d*$/.test(change.inserted.text) or change.proposed.text.indexOf('+') is 0
       super change, error
     else

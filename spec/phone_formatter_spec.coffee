@@ -1,6 +1,6 @@
 PhoneFormatter = require '../lib/phone_formatter'
 {buildField} = require './helpers/builders'
-{expectThatTyping} = require './helpers/expectations'
+{expectThatTyping, expectThatPasting} = require './helpers/expectations'
 {type} = require './helpers/typing'
 
 describe 'PhoneFormatter', ->
@@ -149,6 +149,10 @@ describe 'PhoneFormatter', ->
       expectThatTyping('backspace').into(field).willChange('+1 (3|').to('+1 (|')
       expectThatTyping('backspace').into(field).willChange('+1 (|').to('+|')
       expectThatTyping('backspace').into(field).willChange('+|').to('|')
+
+    it 'can paste a number formatted differently', ->
+      expectThatPasting('314-555-1234').into(field).willChange('|').to('(314) 555-1234|')
+      expectThatPasting('555').into(field).willChange('(314) |123-4').to('(314) 555-|1234')
 
   describe 'error checking', ->
     textFieldDidFailToParseString = null
