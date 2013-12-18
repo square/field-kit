@@ -263,7 +263,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./default_card_formatter":5,"./amex_card_formatter":3,"./card_utils":15}],3:[function(require,module,exports){
+},{"./amex_card_formatter":3,"./card_utils":15,"./default_card_formatter":5}],3:[function(require,module,exports){
 (function() {
   var AmexCardFormatter, DefaultCardFormatter, _ref,
     __hasProp = {}.hasOwnProperty,
@@ -675,7 +675,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./expiry_date_formatter":8,"./text_field":13}],8:[function(require,module,exports){
+},{"./text_field":13,"./expiry_date_formatter":8}],8:[function(require,module,exports){
 (function() {
   var DelimitedTextFormatter, ExpiryDateFormatter, interpretTwoDigitYear, zpad2, _ref,
     __hasProp = {}.hasOwnProperty,
@@ -788,7 +788,47 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./delimited_text_formatter":6,"./utils":16}],11:[function(require,module,exports){
+},{"./delimited_text_formatter":6,"./utils":16}],12:[function(require,module,exports){
+(function() {
+  var DelimitedTextFormatter, SocialSecurityNumberFormatter, _ref,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  DelimitedTextFormatter = require('./delimited_text_formatter');
+
+  SocialSecurityNumberFormatter = (function(_super) {
+    __extends(SocialSecurityNumberFormatter, _super);
+
+    function SocialSecurityNumberFormatter() {
+      _ref = SocialSecurityNumberFormatter.__super__.constructor.apply(this, arguments);
+      return _ref;
+    }
+
+    SocialSecurityNumberFormatter.prototype.delimiter = '-';
+
+    SocialSecurityNumberFormatter.prototype.maximumLength = 9 + 2;
+
+    SocialSecurityNumberFormatter.prototype.hasDelimiterAtIndex = function(index) {
+      return index === 3 || index === 6;
+    };
+
+    SocialSecurityNumberFormatter.prototype.isChangeValid = function(change) {
+      if (/^\d*$/.test(change.inserted.text)) {
+        return SocialSecurityNumberFormatter.__super__.isChangeValid.call(this, change);
+      } else {
+        return false;
+      }
+    };
+
+    return SocialSecurityNumberFormatter;
+
+  })(DelimitedTextFormatter);
+
+  module.exports = SocialSecurityNumberFormatter;
+
+}).call(this);
+
+},{"./delimited_text_formatter":6}],11:[function(require,module,exports){
 (function() {
   var DelimitedTextFormatter, NANP_PHONE_DELIMITERS, NANP_PHONE_DELIMITERS_WITH_1, NANP_PHONE_DELIMITERS_WITH_PLUS, PhoneFormatter,
     __hasProp = {}.hasOwnProperty,
@@ -897,7 +937,21 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
     };
 
     PhoneFormatter.prototype.isChangeValid = function(change, error) {
+      var formatted, selectedRange, text, toInsert, _ref;
       this.guessFormatFromText(change.proposed.text);
+      if (change.inserted.text.length > 1) {
+        _ref = change.current, text = _ref.text, selectedRange = _ref.selectedRange;
+        toInsert = change.inserted.text;
+        formatted = this.format((text.slice(0, selectedRange.start) + toInsert + text.slice(selectedRange.start + selectedRange.length)).replace(/[^\d]/g, ''));
+        change.proposed = {
+          text: formatted,
+          selectedRange: {
+            start: formatted.length - (text.length - (selectedRange.start + selectedRange.length)),
+            length: 0
+          }
+        };
+        return PhoneFormatter.__super__.isChangeValid.call(this, change, error);
+      }
       if (/^\d*$/.test(change.inserted.text) || change.proposed.text.indexOf('+') === 0) {
         return PhoneFormatter.__super__.isChangeValid.call(this, change, error);
       } else {
@@ -933,46 +987,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
   })(DelimitedTextFormatter);
 
   module.exports = PhoneFormatter;
-
-}).call(this);
-
-},{"./delimited_text_formatter":6}],12:[function(require,module,exports){
-(function() {
-  var DelimitedTextFormatter, SocialSecurityNumberFormatter, _ref,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  DelimitedTextFormatter = require('./delimited_text_formatter');
-
-  SocialSecurityNumberFormatter = (function(_super) {
-    __extends(SocialSecurityNumberFormatter, _super);
-
-    function SocialSecurityNumberFormatter() {
-      _ref = SocialSecurityNumberFormatter.__super__.constructor.apply(this, arguments);
-      return _ref;
-    }
-
-    SocialSecurityNumberFormatter.prototype.delimiter = '-';
-
-    SocialSecurityNumberFormatter.prototype.maximumLength = 9 + 2;
-
-    SocialSecurityNumberFormatter.prototype.hasDelimiterAtIndex = function(index) {
-      return index === 3 || index === 6;
-    };
-
-    SocialSecurityNumberFormatter.prototype.isChangeValid = function(change) {
-      if (/^\d*$/.test(change.inserted.text)) {
-        return SocialSecurityNumberFormatter.__super__.isChangeValid.call(this, change);
-      } else {
-        return false;
-      }
-    };
-
-    return SocialSecurityNumberFormatter;
-
-  })(DelimitedTextFormatter);
-
-  module.exports = SocialSecurityNumberFormatter;
 
 }).call(this);
 
