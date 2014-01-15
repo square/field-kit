@@ -263,7 +263,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./amex_card_formatter":3,"./card_utils":15,"./default_card_formatter":5}],3:[function(require,module,exports){
+},{"./amex_card_formatter":3,"./default_card_formatter":5,"./card_utils":15}],3:[function(require,module,exports){
 (function() {
   var AmexCardFormatter, DefaultCardFormatter, _ref,
     __hasProp = {}.hasOwnProperty,
@@ -788,47 +788,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./delimited_text_formatter":6,"./utils":16}],12:[function(require,module,exports){
-(function() {
-  var DelimitedTextFormatter, SocialSecurityNumberFormatter, _ref,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  DelimitedTextFormatter = require('./delimited_text_formatter');
-
-  SocialSecurityNumberFormatter = (function(_super) {
-    __extends(SocialSecurityNumberFormatter, _super);
-
-    function SocialSecurityNumberFormatter() {
-      _ref = SocialSecurityNumberFormatter.__super__.constructor.apply(this, arguments);
-      return _ref;
-    }
-
-    SocialSecurityNumberFormatter.prototype.delimiter = '-';
-
-    SocialSecurityNumberFormatter.prototype.maximumLength = 9 + 2;
-
-    SocialSecurityNumberFormatter.prototype.hasDelimiterAtIndex = function(index) {
-      return index === 3 || index === 6;
-    };
-
-    SocialSecurityNumberFormatter.prototype.isChangeValid = function(change) {
-      if (/^\d*$/.test(change.inserted.text)) {
-        return SocialSecurityNumberFormatter.__super__.isChangeValid.call(this, change);
-      } else {
-        return false;
-      }
-    };
-
-    return SocialSecurityNumberFormatter;
-
-  })(DelimitedTextFormatter);
-
-  module.exports = SocialSecurityNumberFormatter;
-
-}).call(this);
-
-},{"./delimited_text_formatter":6}],11:[function(require,module,exports){
+},{"./delimited_text_formatter":6,"./utils":16}],11:[function(require,module,exports){
 (function() {
   var DelimitedTextFormatter, NANP_PHONE_DELIMITERS, NANP_PHONE_DELIMITERS_WITH_1, NANP_PHONE_DELIMITERS_WITH_PLUS, PhoneFormatter,
     __hasProp = {}.hasOwnProperty,
@@ -960,10 +920,10 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
     };
 
     PhoneFormatter.prototype.guessFormatFromText = function(text) {
-      if (text[0] === '+') {
+      if ((text != null ? text[0] : void 0) === '+') {
         this.delimiterMap = NANP_PHONE_DELIMITERS_WITH_PLUS;
         return this.maximumLength = 1 + 1 + 10 + 5;
-      } else if (text[0] === '1') {
+      } else if ((text != null ? text[0] : void 0) === '1') {
         this.delimiterMap = NANP_PHONE_DELIMITERS_WITH_1;
         return this.maximumLength = 1 + 10 + 5;
       } else {
@@ -987,6 +947,46 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
   })(DelimitedTextFormatter);
 
   module.exports = PhoneFormatter;
+
+}).call(this);
+
+},{"./delimited_text_formatter":6}],12:[function(require,module,exports){
+(function() {
+  var DelimitedTextFormatter, SocialSecurityNumberFormatter, _ref,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  DelimitedTextFormatter = require('./delimited_text_formatter');
+
+  SocialSecurityNumberFormatter = (function(_super) {
+    __extends(SocialSecurityNumberFormatter, _super);
+
+    function SocialSecurityNumberFormatter() {
+      _ref = SocialSecurityNumberFormatter.__super__.constructor.apply(this, arguments);
+      return _ref;
+    }
+
+    SocialSecurityNumberFormatter.prototype.delimiter = '-';
+
+    SocialSecurityNumberFormatter.prototype.maximumLength = 9 + 2;
+
+    SocialSecurityNumberFormatter.prototype.hasDelimiterAtIndex = function(index) {
+      return index === 3 || index === 6;
+    };
+
+    SocialSecurityNumberFormatter.prototype.isChangeValid = function(change) {
+      if (/^\d*$/.test(change.inserted.text)) {
+        return SocialSecurityNumberFormatter.__super__.isChangeValid.call(this, change);
+      } else {
+        return false;
+      }
+    };
+
+    return SocialSecurityNumberFormatter;
+
+  })(DelimitedTextFormatter);
+
+  module.exports = SocialSecurityNumberFormatter;
 
 }).call(this);
 
