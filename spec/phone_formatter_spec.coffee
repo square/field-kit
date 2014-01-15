@@ -13,6 +13,7 @@ describe 'PhoneFormatter', ->
     field.setFormatter formatter
 
   it 'guesses the format to use when setting a value', ->
+    expect(formatter.format(null)).toEqual('')
     expect(formatter.format('4155551234')).toEqual('(415) 555-1234')
     expect(formatter.format('14155551234')).toEqual('1 (415) 555-1234')
     expect(formatter.format('+14155551234')).toEqual('+1 (415) 555-1234')
