@@ -17,6 +17,10 @@ describe 'PhoneFormatter', ->
     expect(formatter.format('4155551234')).toEqual('(415) 555-1234')
     expect(formatter.format('14155551234')).toEqual('1 (415) 555-1234')
     expect(formatter.format('+14155551234')).toEqual('+1 (415) 555-1234')
+    expect(formatter.format('1-415-555-1234')).toEqual('1 (415) 555-1234')
+    expect(formatter.format('1 (415) 555 1234')).toEqual('1 (415) 555-1234')
+    expect(formatter.format('1 (415) 555-1234')).toEqual('1 (415) 555-1234')
+    expect(formatter.format('415-555-1234')).toEqual('(415) 555-1234')
 
   it 'does not allow initializing with a delimiter', ->
     expect(-> new PhoneFormatter('-')).toThrow()
