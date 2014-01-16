@@ -23,7 +23,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./adaptive_card_formatter":2,"./amex_card_formatter":3,"./card_text_field":4,"./default_card_formatter":5,"./delimited_text_formatter":6,"./expiry_date_field":7,"./expiry_date_formatter":8,"./formatter":9,"./number_formatter":10,"./phone_formatter":11,"./social_security_number_formatter":12,"./text_field":13,"./undo_manager":14}],9:[function(require,module,exports){
+},{"./adaptive_card_formatter":2,"./amex_card_formatter":3,"./card_text_field":4,"./delimited_text_formatter":5,"./default_card_formatter":6,"./expiry_date_field":7,"./expiry_date_formatter":8,"./formatter":9,"./number_formatter":10,"./phone_formatter":11,"./social_security_number_formatter":12,"./text_field":13,"./undo_manager":14}],9:[function(require,module,exports){
 (function() {
   var Formatter;
 
@@ -263,7 +263,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./amex_card_formatter":3,"./default_card_formatter":5,"./card_utils":15}],3:[function(require,module,exports){
+},{"./default_card_formatter":6,"./amex_card_formatter":3,"./card_utils":15}],3:[function(require,module,exports){
 (function() {
   var AmexCardFormatter, DefaultCardFormatter, _ref,
     __hasProp = {}.hasOwnProperty,
@@ -293,7 +293,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./default_card_formatter":5}],4:[function(require,module,exports){
+},{"./default_card_formatter":6}],4:[function(require,module,exports){
 (function() {
   var AdaptiveCardFormatter, CardMaskStrategy, CardTextField, TextField, determineCardType,
     __hasProp = {}.hasOwnProperty,
@@ -409,60 +409,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 }).call(this);
 
 },{"./text_field":13,"./adaptive_card_formatter":2,"./card_utils":15}],5:[function(require,module,exports){
-(function() {
-  var DefaultCardFormatter, DelimitedTextFormatter, luhnCheck, validCardLength, _ref, _ref1,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  DelimitedTextFormatter = require('./delimited_text_formatter');
-
-  _ref = require('./card_utils'), validCardLength = _ref.validCardLength, luhnCheck = _ref.luhnCheck;
-
-  DefaultCardFormatter = (function(_super) {
-    __extends(DefaultCardFormatter, _super);
-
-    function DefaultCardFormatter() {
-      _ref1 = DefaultCardFormatter.__super__.constructor.apply(this, arguments);
-      return _ref1;
-    }
-
-    DefaultCardFormatter.prototype.delimiter = ' ';
-
-    DefaultCardFormatter.prototype.maximumLength = 16 + 3;
-
-    DefaultCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
-      return index === 4 || index === 9 || index === 14;
-    };
-
-    DefaultCardFormatter.prototype.parse = function(text, error) {
-      var value;
-      value = this._valueFromText(text);
-      if (!validCardLength(value)) {
-        if (typeof error === "function") {
-          error('card-formatter.number-too-short');
-        }
-      }
-      if (!luhnCheck(value)) {
-        if (typeof error === "function") {
-          error('card-formatter.invalid-number');
-        }
-      }
-      return DefaultCardFormatter.__super__.parse.call(this, text, error);
-    };
-
-    DefaultCardFormatter.prototype._valueFromText = function(text) {
-      return DefaultCardFormatter.__super__._valueFromText.call(this, (text != null ? text : '').replace(/[^\d]/g, ''));
-    };
-
-    return DefaultCardFormatter;
-
-  })(DelimitedTextFormatter);
-
-  module.exports = DefaultCardFormatter;
-
-}).call(this);
-
-},{"./delimited_text_formatter":6,"./card_utils":15}],6:[function(require,module,exports){
 (function() {
   var DelimitedTextFormatter, Formatter,
     __hasProp = {}.hasOwnProperty,
@@ -642,7 +588,61 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./formatter":9}],7:[function(require,module,exports){
+},{"./formatter":9}],6:[function(require,module,exports){
+(function() {
+  var DefaultCardFormatter, DelimitedTextFormatter, luhnCheck, validCardLength, _ref, _ref1,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  DelimitedTextFormatter = require('./delimited_text_formatter');
+
+  _ref = require('./card_utils'), validCardLength = _ref.validCardLength, luhnCheck = _ref.luhnCheck;
+
+  DefaultCardFormatter = (function(_super) {
+    __extends(DefaultCardFormatter, _super);
+
+    function DefaultCardFormatter() {
+      _ref1 = DefaultCardFormatter.__super__.constructor.apply(this, arguments);
+      return _ref1;
+    }
+
+    DefaultCardFormatter.prototype.delimiter = ' ';
+
+    DefaultCardFormatter.prototype.maximumLength = 16 + 3;
+
+    DefaultCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
+      return index === 4 || index === 9 || index === 14;
+    };
+
+    DefaultCardFormatter.prototype.parse = function(text, error) {
+      var value;
+      value = this._valueFromText(text);
+      if (!validCardLength(value)) {
+        if (typeof error === "function") {
+          error('card-formatter.number-too-short');
+        }
+      }
+      if (!luhnCheck(value)) {
+        if (typeof error === "function") {
+          error('card-formatter.invalid-number');
+        }
+      }
+      return DefaultCardFormatter.__super__.parse.call(this, text, error);
+    };
+
+    DefaultCardFormatter.prototype._valueFromText = function(text) {
+      return DefaultCardFormatter.__super__._valueFromText.call(this, (text != null ? text : '').replace(/[^\d]/g, ''));
+    };
+
+    return DefaultCardFormatter;
+
+  })(DelimitedTextFormatter);
+
+  module.exports = DefaultCardFormatter;
+
+}).call(this);
+
+},{"./delimited_text_formatter":5,"./card_utils":15}],7:[function(require,module,exports){
 (function() {
   var ExpiryDateField, ExpiryDateFormatter, TextField,
     __hasProp = {}.hasOwnProperty,
@@ -788,7 +788,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./delimited_text_formatter":6,"./utils":16}],11:[function(require,module,exports){
+},{"./delimited_text_formatter":5,"./utils":16}],11:[function(require,module,exports){
 (function() {
   var DelimitedTextFormatter, NANP_PHONE_DELIMITERS, NANP_PHONE_DELIMITERS_WITH_1, NANP_PHONE_DELIMITERS_WITH_PLUS, PhoneFormatter,
     __hasProp = {}.hasOwnProperty,
@@ -950,7 +950,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./delimited_text_formatter":6}],12:[function(require,module,exports){
+},{"./delimited_text_formatter":5}],12:[function(require,module,exports){
 (function() {
   var DelimitedTextFormatter, SocialSecurityNumberFormatter, _ref,
     __hasProp = {}.hasOwnProperty,
@@ -990,7 +990,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./delimited_text_formatter":6}],13:[function(require,module,exports){
+},{"./delimited_text_formatter":5}],13:[function(require,module,exports){
 (function() {
   var AFFINITY, Formatter, KEYS, TextField, TextFieldStateChange, UndoManager, hasLeftWordBreakAtIndex, hasRightWordBreakAtIndex, isWordChar, keyBindingsForPlatform, _ref,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -3036,7 +3036,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
       exponent: 2,
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-      minimumIntegerDigits: 0,
+      minimumIntegerDigits: 1,
       positiveSuffix: function(formatter) {
         return formatter.percentSymbol();
       },
