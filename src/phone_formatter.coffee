@@ -23,6 +23,9 @@ NANP_PHONE_DELIMITERS_WITH_PLUS =
   8:  ' '
   12: '-'
 
+# This should match any characters in the maps above.
+DELIMITER_PATTERN = /[-\(\) ]/g
+
 class PhoneFormatter extends DelimitedTextFormatter
   maximumLength: null
   delimiterMap: null
@@ -117,6 +120,6 @@ class PhoneFormatter extends DelimitedTextFormatter
   # Internal: Removes characters from the phone number that will be added
   # by the formatter.
   removeDelimiterMapChars: (text) ->
-    return (text ? '').replace(/[-\(\)\s]/g, '')
+    (text ? '').replace(DELIMITER_PATTERN, '')
 
 module.exports = PhoneFormatter
