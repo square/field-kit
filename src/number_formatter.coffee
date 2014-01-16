@@ -574,7 +574,7 @@ StyleDefaults =
     exponent:              2
     minimumFractionDigits: 0
     maximumFractionDigits: 0
-    minimumIntegerDigits:  0
+    minimumIntegerDigits:  1
     positiveSuffix: (formatter) -> formatter.percentSymbol()
     negativeSuffix: (formatter) -> formatter.percentSymbol()
   CURRENCY:
