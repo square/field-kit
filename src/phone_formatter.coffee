@@ -57,7 +57,7 @@ class PhoneFormatter extends DelimitedTextFormatter
 
   format: (value) ->
     @guessFormatFromText value
-    super value
+    super @removeDelimiterMapChars(value)
 
   isChangeValid: (change, error) ->
     @guessFormatFromText change.proposed.text
@@ -113,5 +113,10 @@ class PhoneFormatter extends DelimitedTextFormatter
     if extraDigits > 0
       digits = digits.substr(extraDigits)
     return digits
+
+  # Internal: Removes characters from the phone number that will be added
+  # by the formatter.
+  removeDelimiterMapChars: (text) ->
+    return (text ? '').replace(/[-\(\)\s]/g, '')
 
 module.exports = PhoneFormatter
