@@ -402,6 +402,9 @@ describe 'NumberFormatter', ->
         expect(formatter.format 4.21).toEqual('421%')
         expect(formatter.format -4.21).toEqual('-421%')
 
+      it 'formats zero as a percent', ->
+        expect(formatter.format 0).toEqual('0%')
+
       describe 'with a custom percent symbol', ->
         beforeEach ->
           formatter.setPercentSymbol 'PER'
