@@ -309,6 +309,9 @@ class NumberFormatter extends Formatter
     return null
 
   format: (number) ->
+    if number is ""
+      return ""
+
     if (zeroSymbol = @zeroSymbol())? and number is 0
       return zeroSymbol
 
