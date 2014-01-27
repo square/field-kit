@@ -109,6 +109,10 @@ describe 'NumberFormatter', ->
         it 'uses the custom zero symbol', ->
           expect(formatter.format 0).toEqual('#')
 
+    describe 'given empty string', ->
+      it 'returns empty string', ->
+        expect(formatter.format "").toEqual("")
+
     describe 'given null', ->
       describe 'and a custom null symbol', ->
         beforeEach ->
