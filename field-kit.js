@@ -263,37 +263,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./default_card_formatter":5,"./card_utils":15,"./amex_card_formatter":3}],3:[function(require,module,exports){
-(function() {
-  var AmexCardFormatter, DefaultCardFormatter, _ref,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  DefaultCardFormatter = require('./default_card_formatter');
-
-  AmexCardFormatter = (function(_super) {
-    __extends(AmexCardFormatter, _super);
-
-    function AmexCardFormatter() {
-      _ref = AmexCardFormatter.__super__.constructor.apply(this, arguments);
-      return _ref;
-    }
-
-    AmexCardFormatter.prototype.maximumLength = 15 + 2;
-
-    AmexCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
-      return index === 4 || index === 11;
-    };
-
-    return AmexCardFormatter;
-
-  })(DefaultCardFormatter);
-
-  module.exports = AmexCardFormatter;
-
-}).call(this);
-
-},{"./default_card_formatter":5}],4:[function(require,module,exports){
+},{"./amex_card_formatter":3,"./default_card_formatter":5,"./card_utils":15}],4:[function(require,module,exports){
 (function() {
   var AdaptiveCardFormatter, CardMaskStrategy, CardTextField, TextField, determineCardType,
     __hasProp = {}.hasOwnProperty,
@@ -462,7 +432,37 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./delimited_text_formatter":6,"./card_utils":15}],6:[function(require,module,exports){
+},{"./delimited_text_formatter":6,"./card_utils":15}],3:[function(require,module,exports){
+(function() {
+  var AmexCardFormatter, DefaultCardFormatter, _ref,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  DefaultCardFormatter = require('./default_card_formatter');
+
+  AmexCardFormatter = (function(_super) {
+    __extends(AmexCardFormatter, _super);
+
+    function AmexCardFormatter() {
+      _ref = AmexCardFormatter.__super__.constructor.apply(this, arguments);
+      return _ref;
+    }
+
+    AmexCardFormatter.prototype.maximumLength = 15 + 2;
+
+    AmexCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
+      return index === 4 || index === 11;
+    };
+
+    return AmexCardFormatter;
+
+  })(DefaultCardFormatter);
+
+  module.exports = AmexCardFormatter;
+
+}).call(this);
+
+},{"./default_card_formatter":5}],6:[function(require,module,exports){
 (function() {
   var DelimitedTextFormatter, Formatter,
     __hasProp = {}.hasOwnProperty,
@@ -675,7 +675,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./text_field":13,"./expiry_date_formatter":8}],8:[function(require,module,exports){
+},{"./expiry_date_formatter":8,"./text_field":13}],8:[function(require,module,exports){
 (function() {
   var DelimitedTextFormatter, ExpiryDateFormatter, interpretTwoDigitYear, zpad2, _ref,
     __hasProp = {}.hasOwnProperty,
@@ -2738,6 +2738,9 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     NumberFormatter.prototype.format = function(number) {
       var copiedCharacterCount, exponent, fractionPart, i, integerPart, integerPartWithGroupingSeparators, maximumFractionDigits, maximumIntegerDigits, minimumFractionDigits, minimumIntegerDigits, negative, negativeInfinitySymbol, notANumberSymbol, nullSymbol, positiveInfinitySymbol, result, rounded, string, unrounded, zeroSymbol, _i, _ref1, _ref2, _ref3, _ref4;
+      if (number === "") {
+        return "";
+      }
       if (((zeroSymbol = this.zeroSymbol()) != null) && number === 0) {
         return zeroSymbol;
       }
