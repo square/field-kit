@@ -23,5 +23,8 @@
     "grunt": "~0.4.1",
     "coffee-script": "~1.6.2",
     "timekeeper": "0.0.3"
+  },
+  "publishConfig": {
+    "registry": "http://npm.corp.squareup.com:8000"
   }
 }
