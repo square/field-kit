@@ -1,6 +1,6 @@
 {
   "name": "field-kit",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Utilities to effectively manage text entry on the web.",
   "main": "lib/index.js",
   "scripts": {
@@ -10,7 +10,8 @@
   "author": "Square, Inc.",
   "license": "BSD",
   "dependencies": {
-    "stround": "0.0.2"
+    "stround": "0.0.2",
+    "jquery-caret": "0.0.1"
   },
   "devDependencies": {
     "jasmine-node": "~1.7.0",
