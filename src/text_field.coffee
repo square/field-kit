@@ -56,8 +56,8 @@ class TextField
     @element.on 'keyup.field-kit', @keyUp
     @element.on 'click.field-kit', @click
     @element.on 'paste.field-kit', @paste
-    @element.on 'focus.field-kit', @_focus
-    @element.on 'blur.field-kit', @_blur
+    @element.on 'focusin.field-kit', @_focusin
+    @element.on 'focusout.field-kit', @_focusout
     @_buildKeybindings()
 
   destroy: ->
@@ -1212,11 +1212,11 @@ class TextField
   hasFocus: ->
     @element.get(0).ownerDocument.activeElement is @element.get(0)
 
-  _focus: (event) =>
+  _focusin: (event) =>
     @_textFieldDidBeginEditing()
     @_syncPlaceholder()
 
-  _blur: (event) =>
+  _focusout: (event) =>
     @_textFieldDidEndEditing()
     @_syncPlaceholder()
 
