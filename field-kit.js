@@ -263,7 +263,37 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./amex_card_formatter":3,"./default_card_formatter":5,"./card_utils":15}],4:[function(require,module,exports){
+},{"./amex_card_formatter":3,"./default_card_formatter":5,"./card_utils":15}],3:[function(require,module,exports){
+(function() {
+  var AmexCardFormatter, DefaultCardFormatter, _ref,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  DefaultCardFormatter = require('./default_card_formatter');
+
+  AmexCardFormatter = (function(_super) {
+    __extends(AmexCardFormatter, _super);
+
+    function AmexCardFormatter() {
+      _ref = AmexCardFormatter.__super__.constructor.apply(this, arguments);
+      return _ref;
+    }
+
+    AmexCardFormatter.prototype.maximumLength = 15 + 2;
+
+    AmexCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
+      return index === 4 || index === 11;
+    };
+
+    return AmexCardFormatter;
+
+  })(DefaultCardFormatter);
+
+  module.exports = AmexCardFormatter;
+
+}).call(this);
+
+},{"./default_card_formatter":5}],4:[function(require,module,exports){
 (function() {
   var AdaptiveCardFormatter, CardMaskStrategy, CardTextField, TextField, determineCardType,
     __hasProp = {}.hasOwnProperty,
@@ -432,37 +462,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./delimited_text_formatter":6,"./card_utils":15}],3:[function(require,module,exports){
-(function() {
-  var AmexCardFormatter, DefaultCardFormatter, _ref,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  DefaultCardFormatter = require('./default_card_formatter');
-
-  AmexCardFormatter = (function(_super) {
-    __extends(AmexCardFormatter, _super);
-
-    function AmexCardFormatter() {
-      _ref = AmexCardFormatter.__super__.constructor.apply(this, arguments);
-      return _ref;
-    }
-
-    AmexCardFormatter.prototype.maximumLength = 15 + 2;
-
-    AmexCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
-      return index === 4 || index === 11;
-    };
-
-    return AmexCardFormatter;
-
-  })(DefaultCardFormatter);
-
-  module.exports = AmexCardFormatter;
-
-}).call(this);
-
-},{"./default_card_formatter":5}],6:[function(require,module,exports){
+},{"./delimited_text_formatter":6,"./card_utils":15}],6:[function(require,module,exports){
 (function() {
   var DelimitedTextFormatter, Formatter,
     __hasProp = {}.hasOwnProperty,
@@ -675,7 +675,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./expiry_date_formatter":8,"./text_field":13}],8:[function(require,module,exports){
+},{"./text_field":13,"./expiry_date_formatter":8}],8:[function(require,module,exports){
 (function() {
   var DelimitedTextFormatter, ExpiryDateFormatter, interpretTwoDigitYear, zpad2, _ref,
     __hasProp = {}.hasOwnProperty,
@@ -1051,8 +1051,8 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
     function TextField(element, _formatter) {
       this.element = element;
       this._formatter = _formatter;
-      this._blur = __bind(this._blur, this);
-      this._focus = __bind(this._focus, this);
+      this._focusout = __bind(this._focusout, this);
+      this._focusin = __bind(this._focusin, this);
       this.click = __bind(this.click, this);
       this.paste = __bind(this.paste, this);
       this.keyUp = __bind(this.keyUp, this);
@@ -1069,8 +1069,8 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
       this.element.on('keyup.field-kit', this.keyUp);
       this.element.on('click.field-kit', this.click);
       this.element.on('paste.field-kit', this.paste);
-      this.element.on('focus.field-kit', this._focus);
-      this.element.on('blur.field-kit', this._blur);
+      this.element.on('focusin.field-kit', this._focusin);
+      this.element.on('focusout.field-kit', this._focusout);
       this._buildKeybindings();
     }
 
@@ -1795,12 +1795,12 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
       return this.element.get(0).ownerDocument.activeElement === this.element.get(0);
     };
 
-    TextField.prototype._focus = function(event) {
+    TextField.prototype._focusin = function(event) {
       this._textFieldDidBeginEditing();
       return this._syncPlaceholder();
     };
 
-    TextField.prototype._blur = function(event) {
+    TextField.prototype._focusout = function(event) {
       this._textFieldDidEndEditing();
       return this._syncPlaceholder();
     };
