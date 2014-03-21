@@ -712,3 +712,27 @@ describe 'NumberFormatter', ->
 
       it 'does not allow complete garbage', ->
         expect(formatter.parse '4##@238420@(!)@*)#!').toBeNull()
+
+  describe '#maximumFractionDigits', ->
+    it 'changes when a higher minimumFractionDigits value is set', ->
+      formatter.setMaximumFractionDigits(2)
+      formatter.setMinimumFractionDigits(20)
+      expect(formatter.maximumFractionDigits()).toEqual(20)
+
+  describe '#minimumFractionDigits', ->
+    it 'changes when a lower maximumFractionDigits value is set', ->
+      formatter.setMinimumFractionDigits(20)
+      formatter.setMaximumFractionDigits(2)
+      expect(formatter.minimumFractionDigits()).toEqual(2)
+
+  describe '#maximumIntegerDigits', ->
+    it 'changes when a higher minimumIntegerDigits value is set', ->
+      formatter.setMaximumIntegerDigits(2)
+      formatter.setMinimumIntegerDigits(20)
+      expect(formatter.maximumIntegerDigits()).toEqual(20)
+
+  describe '#minimumIntegerDigits', ->
+    it 'changes when a lower maximumIntegerDigits value is set', ->
+      formatter.setMinimumIntegerDigits(20)
+      formatter.setMaximumIntegerDigits(2)
+      expect(formatter.minimumIntegerDigits()).toEqual(2)
