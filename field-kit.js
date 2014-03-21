@@ -263,7 +263,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./amex_card_formatter":3,"./default_card_formatter":5,"./card_utils":15}],3:[function(require,module,exports){
+},{"./default_card_formatter":5,"./amex_card_formatter":3,"./card_utils":15}],3:[function(require,module,exports){
 (function() {
   var AmexCardFormatter, DefaultCardFormatter, _ref,
     __hasProp = {}.hasOwnProperty,
@@ -408,61 +408,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./text_field":13,"./adaptive_card_formatter":2,"./card_utils":15}],5:[function(require,module,exports){
-(function() {
-  var DefaultCardFormatter, DelimitedTextFormatter, luhnCheck, validCardLength, _ref, _ref1,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  DelimitedTextFormatter = require('./delimited_text_formatter');
-
-  _ref = require('./card_utils'), validCardLength = _ref.validCardLength, luhnCheck = _ref.luhnCheck;
-
-  DefaultCardFormatter = (function(_super) {
-    __extends(DefaultCardFormatter, _super);
-
-    function DefaultCardFormatter() {
-      _ref1 = DefaultCardFormatter.__super__.constructor.apply(this, arguments);
-      return _ref1;
-    }
-
-    DefaultCardFormatter.prototype.delimiter = ' ';
-
-    DefaultCardFormatter.prototype.maximumLength = 16 + 3;
-
-    DefaultCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
-      return index === 4 || index === 9 || index === 14;
-    };
-
-    DefaultCardFormatter.prototype.parse = function(text, error) {
-      var value;
-      value = this._valueFromText(text);
-      if (!validCardLength(value)) {
-        if (typeof error === "function") {
-          error('card-formatter.number-too-short');
-        }
-      }
-      if (!luhnCheck(value)) {
-        if (typeof error === "function") {
-          error('card-formatter.invalid-number');
-        }
-      }
-      return DefaultCardFormatter.__super__.parse.call(this, text, error);
-    };
-
-    DefaultCardFormatter.prototype._valueFromText = function(text) {
-      return DefaultCardFormatter.__super__._valueFromText.call(this, (text != null ? text : '').replace(/[^\d]/g, ''));
-    };
-
-    return DefaultCardFormatter;
-
-  })(DelimitedTextFormatter);
-
-  module.exports = DefaultCardFormatter;
-
-}).call(this);
-
-},{"./delimited_text_formatter":6,"./card_utils":15}],6:[function(require,module,exports){
+},{"./text_field":13,"./adaptive_card_formatter":2,"./card_utils":15}],6:[function(require,module,exports){
 (function() {
   var DelimitedTextFormatter, Formatter,
     __hasProp = {}.hasOwnProperty,
@@ -642,7 +588,61 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./formatter":9}],7:[function(require,module,exports){
+},{"./formatter":9}],5:[function(require,module,exports){
+(function() {
+  var DefaultCardFormatter, DelimitedTextFormatter, luhnCheck, validCardLength, _ref, _ref1,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  DelimitedTextFormatter = require('./delimited_text_formatter');
+
+  _ref = require('./card_utils'), validCardLength = _ref.validCardLength, luhnCheck = _ref.luhnCheck;
+
+  DefaultCardFormatter = (function(_super) {
+    __extends(DefaultCardFormatter, _super);
+
+    function DefaultCardFormatter() {
+      _ref1 = DefaultCardFormatter.__super__.constructor.apply(this, arguments);
+      return _ref1;
+    }
+
+    DefaultCardFormatter.prototype.delimiter = ' ';
+
+    DefaultCardFormatter.prototype.maximumLength = 16 + 3;
+
+    DefaultCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
+      return index === 4 || index === 9 || index === 14;
+    };
+
+    DefaultCardFormatter.prototype.parse = function(text, error) {
+      var value;
+      value = this._valueFromText(text);
+      if (!validCardLength(value)) {
+        if (typeof error === "function") {
+          error('card-formatter.number-too-short');
+        }
+      }
+      if (!luhnCheck(value)) {
+        if (typeof error === "function") {
+          error('card-formatter.invalid-number');
+        }
+      }
+      return DefaultCardFormatter.__super__.parse.call(this, text, error);
+    };
+
+    DefaultCardFormatter.prototype._valueFromText = function(text) {
+      return DefaultCardFormatter.__super__._valueFromText.call(this, (text != null ? text : '').replace(/[^\d]/g, ''));
+    };
+
+    return DefaultCardFormatter;
+
+  })(DelimitedTextFormatter);
+
+  module.exports = DefaultCardFormatter;
+
+}).call(this);
+
+},{"./delimited_text_formatter":6,"./card_utils":15}],7:[function(require,module,exports){
 (function() {
   var ExpiryDateField, ExpiryDateFormatter, TextField,
     __hasProp = {}.hasOwnProperty,
@@ -2544,6 +2544,9 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     NumberFormatter.prototype.setMaximumFractionDigits = function(maximumFractionDigits) {
       this._maximumFractionDigits = maximumFractionDigits;
+      if (maximumFractionDigits < this.minimumFractionDigits()) {
+        this.setMinimumFractionDigits(maximumFractionDigits);
+      }
       return this;
     };
 
@@ -2553,6 +2556,9 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     NumberFormatter.prototype.setMinimumFractionDigits = function(minimumFractionDigits) {
       this._minimumFractionDigits = minimumFractionDigits;
+      if (minimumFractionDigits > this.maximumFractionDigits()) {
+        this.setMaximumFractionDigits(minimumFractionDigits);
+      }
       return this;
     };
 
@@ -2562,6 +2568,9 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     NumberFormatter.prototype.setMaximumIntegerDigits = function(maximumIntegerDigits) {
       this._maximumIntegerDigits = maximumIntegerDigits;
+      if (maximumIntegerDigits < this.minimumIntegerDigits()) {
+        this.setMinimumIntegerDigits(maximumIntegerDigits);
+      }
       return this;
     };
 
@@ -2571,6 +2580,9 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
     NumberFormatter.prototype.setMinimumIntegerDigits = function(minimumIntegerDigits) {
       this._minimumIntegerDigits = minimumIntegerDigits;
+      if (minimumIntegerDigits > this.maximumIntegerDigits()) {
+        this.setMaximumIntegerDigits(minimumIntegerDigits);
+      }
       return this;
     };
 

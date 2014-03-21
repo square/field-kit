@@ -161,6 +161,8 @@ class NumberFormatter extends Formatter
 
   setMaximumFractionDigits: (maximumFractionDigits) ->
     @_maximumFractionDigits = maximumFractionDigits
+    if maximumFractionDigits < @minimumFractionDigits()
+      @setMinimumFractionDigits(maximumFractionDigits)
     return this
 
   minimumFractionDigits: ->
@@ -168,6 +170,8 @@ class NumberFormatter extends Formatter
 
   setMinimumFractionDigits: (minimumFractionDigits) ->
     @_minimumFractionDigits = minimumFractionDigits
+    if minimumFractionDigits > @maximumFractionDigits()
+      @setMaximumFractionDigits(minimumFractionDigits)
     return this
 
   maximumIntegerDigits: ->
@@ -175,6 +179,8 @@ class NumberFormatter extends Formatter
 
   setMaximumIntegerDigits: (maximumIntegerDigits) ->
     @_maximumIntegerDigits = maximumIntegerDigits
+    if maximumIntegerDigits < @minimumIntegerDigits()
+      @setMinimumIntegerDigits(maximumIntegerDigits)
     return this
 
   minimumIntegerDigits: ->
@@ -182,6 +188,8 @@ class NumberFormatter extends Formatter
 
   setMinimumIntegerDigits: (minimumIntegerDigits) ->
     @_minimumIntegerDigits = minimumIntegerDigits
+    if minimumIntegerDigits > @maximumIntegerDigits()
+      @setMaximumIntegerDigits(minimumIntegerDigits)
     return this
 
   exponent: ->
@@ -339,6 +347,7 @@ class NumberFormatter extends Formatter
       [ negative, integerPart, fractionPart ] =
         stround.shift([ negative, integerPart, fractionPart ], exponent)
       integerPart = integerPart.slice(1) while integerPart[0] is '0'
+
 
     # round fraction part to the maximum length
     maximumFractionDigits = @maximumFractionDigits()
