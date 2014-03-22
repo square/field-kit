@@ -4,7 +4,7 @@
   "description": "Utilities to effectively manage text entry on the web.",
   "main": "lib/index.js",
   "scripts": {
-    "test": "grunt"
+    "test": "grunt && qunit -c test/test_helper.js -t test/*_test.js"
   },
   "repository": "",
   "author": "Square, Inc.",
