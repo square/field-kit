@@ -204,6 +204,7 @@ class NumberFormatter extends Formatter
 
   setNegativeInfinitySymbol: (negativeInfinitySymbol) ->
     @_negativeInfinitySymbol = negativeInfinitySymbol
+    return this
 
   negativePrefix: ->
     @_get 'negativePrefix'
@@ -224,12 +225,14 @@ class NumberFormatter extends Formatter
 
   setNotANumberSymbol: (notANumberSymbol) ->
     @_notANumberSymbol = notANumberSymbol
+    return this
 
   nullSymbol: ->
     @_get 'nullSymbol'
 
   setNullSymbol: (nullSymbol) ->
     @_nullSymbol = nullSymbol
+    return this
 
   numberStyle: ->
     @_numberStyle
@@ -287,12 +290,14 @@ class NumberFormatter extends Formatter
 
   setUsesGroupingSeparator: (usesGroupingSeparator) ->
     @_usesGroupingSeparator = usesGroupingSeparator
+    return this
 
   zeroSymbol: ->
     @_get 'zeroSymbol'
 
   setZeroSymbol: (zeroSymbol) ->
     @_zeroSymbol = zeroSymbol
+    return this
 
   _get: (attr) ->
     value = this["_#{attr}"]
