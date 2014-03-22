@@ -23,7 +23,10 @@
     "grunt-contrib-uglify": "~0.2.0",
     "grunt": "~0.4.1",
     "coffee-script": "~1.6.2",
-    "timekeeper": "0.0.3"
+    "timekeeper": "0.0.3",
+    "qunit": "^0.6.2",
+    "qunit-bdd": "0.0.5",
+    "sinon": "^1.9.0"
   },
   "publishConfig": {
     "registry": "http://npm.corp.squareup.com:8000"
