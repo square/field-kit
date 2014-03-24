@@ -14,11 +14,9 @@
     "jquery-caret": "0.0.1"
   },
   "devDependencies": {
-    "jasmine-node": "~1.7.0",
     "gluejs": "~0.2.0",
     "grunt-coffeelint": "0.0.6",
     "grunt-browserify": "~0.2.3",
-    "grunt-jasmine-node": "~0.1.0",
     "grunt-contrib-coffee": "~0.7.0",
     "grunt-contrib-uglify": "~0.2.0",
     "grunt": "~0.4.1",

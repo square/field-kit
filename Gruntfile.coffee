@@ -13,18 +13,6 @@ module.exports = (grunt) ->
         dest: 'lib'
         ext: '.js'
 
-    jasmine_node:
-      specNameMatcher: '_spec'
-      projectRoot: '.'
-      requirejs: false
-      extensions: 'js|coffee'
-      forceExit: true
-      jUnit:
-        report: false
-        savePath : './build/reports/jasmine/'
-        useDotNotation: true
-        consolidate: true
-
     browserify:
       compile:
         src: 'lib/index.js'
@@ -35,9 +23,8 @@ module.exports = (grunt) ->
     uglify:
       'field-kit.min.js': [ 'field-kit.js' ]
 
-  grunt.loadNpmTasks 'grunt-jasmine-node'
   grunt.loadNpmTasks 'grunt-coffeelint'
   grunt.loadNpmTasks 'grunt-contrib-coffee'
   grunt.loadNpmTasks 'grunt-contrib-uglify'
   grunt.loadNpmTasks 'grunt-browserify'
-  grunt.registerTask 'default', ['coffeelint', 'coffee', 'jasmine_node', 'browserify', 'uglify']
+  grunt.registerTask 'default', ['coffeelint', 'coffee', 'browserify', 'uglify']
