@@ -23,7 +23,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./adaptive_card_formatter":2,"./amex_card_formatter":3,"./card_text_field":4,"./default_card_formatter":5,"./delimited_text_formatter":6,"./expiry_date_field":7,"./expiry_date_formatter":8,"./formatter":9,"./number_formatter":10,"./phone_formatter":11,"./social_security_number_formatter":12,"./text_field":13,"./undo_manager":14}],9:[function(require,module,exports){
+},{"./adaptive_card_formatter":2,"./amex_card_formatter":3,"./card_text_field":4,"./default_card_formatter":5,"./delimited_text_formatter":6,"./expiry_date_field":7,"./expiry_date_formatter":8,"./number_formatter":9,"./formatter":10,"./phone_formatter":11,"./social_security_number_formatter":12,"./text_field":13,"./undo_manager":14}],10:[function(require,module,exports){
 (function() {
   var Formatter;
 
@@ -263,7 +263,61 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./amex_card_formatter":3,"./card_utils":15,"./default_card_formatter":5}],3:[function(require,module,exports){
+},{"./amex_card_formatter":3,"./default_card_formatter":5,"./card_utils":15}],5:[function(require,module,exports){
+(function() {
+  var DefaultCardFormatter, DelimitedTextFormatter, luhnCheck, validCardLength, _ref, _ref1,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  DelimitedTextFormatter = require('./delimited_text_formatter');
+
+  _ref = require('./card_utils'), validCardLength = _ref.validCardLength, luhnCheck = _ref.luhnCheck;
+
+  DefaultCardFormatter = (function(_super) {
+    __extends(DefaultCardFormatter, _super);
+
+    function DefaultCardFormatter() {
+      _ref1 = DefaultCardFormatter.__super__.constructor.apply(this, arguments);
+      return _ref1;
+    }
+
+    DefaultCardFormatter.prototype.delimiter = ' ';
+
+    DefaultCardFormatter.prototype.maximumLength = 16 + 3;
+
+    DefaultCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
+      return index === 4 || index === 9 || index === 14;
+    };
+
+    DefaultCardFormatter.prototype.parse = function(text, error) {
+      var value;
+      value = this._valueFromText(text);
+      if (!validCardLength(value)) {
+        if (typeof error === "function") {
+          error('card-formatter.number-too-short');
+        }
+      }
+      if (!luhnCheck(value)) {
+        if (typeof error === "function") {
+          error('card-formatter.invalid-number');
+        }
+      }
+      return DefaultCardFormatter.__super__.parse.call(this, text, error);
+    };
+
+    DefaultCardFormatter.prototype._valueFromText = function(text) {
+      return DefaultCardFormatter.__super__._valueFromText.call(this, (text != null ? text : '').replace(/[^\d]/g, ''));
+    };
+
+    return DefaultCardFormatter;
+
+  })(DelimitedTextFormatter);
+
+  module.exports = DefaultCardFormatter;
+
+}).call(this);
+
+},{"./delimited_text_formatter":6,"./card_utils":15}],3:[function(require,module,exports){
 (function() {
   var AmexCardFormatter, DefaultCardFormatter, _ref,
     __hasProp = {}.hasOwnProperty,
@@ -408,61 +462,40 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./text_field":13,"./adaptive_card_formatter":2,"./card_utils":15}],5:[function(require,module,exports){
+},{"./text_field":13,"./adaptive_card_formatter":2,"./card_utils":15}],7:[function(require,module,exports){
 (function() {
-  var DefaultCardFormatter, DelimitedTextFormatter, luhnCheck, validCardLength, _ref, _ref1,
+  var ExpiryDateField, ExpiryDateFormatter, TextField,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  DelimitedTextFormatter = require('./delimited_text_formatter');
+  TextField = require('./text_field');
 
-  _ref = require('./card_utils'), validCardLength = _ref.validCardLength, luhnCheck = _ref.luhnCheck;
+  ExpiryDateFormatter = require('./expiry_date_formatter');
 
-  DefaultCardFormatter = (function(_super) {
-    __extends(DefaultCardFormatter, _super);
+  ExpiryDateField = (function(_super) {
+    __extends(ExpiryDateField, _super);
 
-    function DefaultCardFormatter() {
-      _ref1 = DefaultCardFormatter.__super__.constructor.apply(this, arguments);
-      return _ref1;
+    function ExpiryDateField(element) {
+      ExpiryDateField.__super__.constructor.call(this, element, new ExpiryDateFormatter());
     }
 
-    DefaultCardFormatter.prototype.delimiter = ' ';
-
-    DefaultCardFormatter.prototype.maximumLength = 16 + 3;
-
-    DefaultCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
-      return index === 4 || index === 9 || index === 14;
-    };
-
-    DefaultCardFormatter.prototype.parse = function(text, error) {
+    ExpiryDateField.prototype.textFieldDidEndEditing = function() {
       var value;
-      value = this._valueFromText(text);
-      if (!validCardLength(value)) {
-        if (typeof error === "function") {
-          error('card-formatter.number-too-short');
-        }
+      value = this.value();
+      if (value) {
+        return this.setText(this.formatter().format(value));
       }
-      if (!luhnCheck(value)) {
-        if (typeof error === "function") {
-          error('card-formatter.invalid-number');
-        }
-      }
-      return DefaultCardFormatter.__super__.parse.call(this, text, error);
     };
 
-    DefaultCardFormatter.prototype._valueFromText = function(text) {
-      return DefaultCardFormatter.__super__._valueFromText.call(this, (text != null ? text : '').replace(/[^\d]/g, ''));
-    };
+    return ExpiryDateField;
 
-    return DefaultCardFormatter;
+  })(TextField);
 
-  })(DelimitedTextFormatter);
-
-  module.exports = DefaultCardFormatter;
+  module.exports = ExpiryDateField;
 
 }).call(this);
 
-},{"./delimited_text_formatter":6,"./card_utils":15}],6:[function(require,module,exports){
+},{"./text_field":13,"./expiry_date_formatter":8}],6:[function(require,module,exports){
 (function() {
   var DelimitedTextFormatter, Formatter,
     __hasProp = {}.hasOwnProperty,
@@ -642,40 +675,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./formatter":9}],7:[function(require,module,exports){
-(function() {
-  var ExpiryDateField, ExpiryDateFormatter, TextField,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  TextField = require('./text_field');
-
-  ExpiryDateFormatter = require('./expiry_date_formatter');
-
-  ExpiryDateField = (function(_super) {
-    __extends(ExpiryDateField, _super);
-
-    function ExpiryDateField(element) {
-      ExpiryDateField.__super__.constructor.call(this, element, new ExpiryDateFormatter());
-    }
-
-    ExpiryDateField.prototype.textFieldDidEndEditing = function() {
-      var value;
-      value = this.value();
-      if (value) {
-        return this.setText(this.formatter().format(value));
-      }
-    };
-
-    return ExpiryDateField;
-
-  })(TextField);
-
-  module.exports = ExpiryDateField;
-
-}).call(this);
-
-},{"./text_field":13,"./expiry_date_formatter":8}],8:[function(require,module,exports){
+},{"./formatter":10}],8:[function(require,module,exports){
 (function() {
   var DelimitedTextFormatter, ExpiryDateFormatter, interpretTwoDigitYear, zpad2, _ref,
     __hasProp = {}.hasOwnProperty,
@@ -788,7 +788,47 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./utils":16,"./delimited_text_formatter":6}],11:[function(require,module,exports){
+},{"./delimited_text_formatter":6,"./utils":16}],12:[function(require,module,exports){
+(function() {
+  var DelimitedTextFormatter, SocialSecurityNumberFormatter, _ref,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  DelimitedTextFormatter = require('./delimited_text_formatter');
+
+  SocialSecurityNumberFormatter = (function(_super) {
+    __extends(SocialSecurityNumberFormatter, _super);
+
+    function SocialSecurityNumberFormatter() {
+      _ref = SocialSecurityNumberFormatter.__super__.constructor.apply(this, arguments);
+      return _ref;
+    }
+
+    SocialSecurityNumberFormatter.prototype.delimiter = '-';
+
+    SocialSecurityNumberFormatter.prototype.maximumLength = 9 + 2;
+
+    SocialSecurityNumberFormatter.prototype.hasDelimiterAtIndex = function(index) {
+      return index === 3 || index === 6;
+    };
+
+    SocialSecurityNumberFormatter.prototype.isChangeValid = function(change) {
+      if (/^\d*$/.test(change.inserted.text)) {
+        return SocialSecurityNumberFormatter.__super__.isChangeValid.call(this, change);
+      } else {
+        return false;
+      }
+    };
+
+    return SocialSecurityNumberFormatter;
+
+  })(DelimitedTextFormatter);
+
+  module.exports = SocialSecurityNumberFormatter;
+
+}).call(this);
+
+},{"./delimited_text_formatter":6}],11:[function(require,module,exports){
 (function() {
   var DELIMITER_PATTERN, DelimitedTextFormatter, NANP_PHONE_DELIMITERS, NANP_PHONE_DELIMITERS_WITH_1, NANP_PHONE_DELIMITERS_WITH_PLUS, PhoneFormatter,
     __hasProp = {}.hasOwnProperty,
@@ -953,46 +993,6 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
   })(DelimitedTextFormatter);
 
   module.exports = PhoneFormatter;
-
-}).call(this);
-
-},{"./delimited_text_formatter":6}],12:[function(require,module,exports){
-(function() {
-  var DelimitedTextFormatter, SocialSecurityNumberFormatter, _ref,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  DelimitedTextFormatter = require('./delimited_text_formatter');
-
-  SocialSecurityNumberFormatter = (function(_super) {
-    __extends(SocialSecurityNumberFormatter, _super);
-
-    function SocialSecurityNumberFormatter() {
-      _ref = SocialSecurityNumberFormatter.__super__.constructor.apply(this, arguments);
-      return _ref;
-    }
-
-    SocialSecurityNumberFormatter.prototype.delimiter = '-';
-
-    SocialSecurityNumberFormatter.prototype.maximumLength = 9 + 2;
-
-    SocialSecurityNumberFormatter.prototype.hasDelimiterAtIndex = function(index) {
-      return index === 3 || index === 6;
-    };
-
-    SocialSecurityNumberFormatter.prototype.isChangeValid = function(change) {
-      if (/^\d*$/.test(change.inserted.text)) {
-        return SocialSecurityNumberFormatter.__super__.isChangeValid.call(this, change);
-      } else {
-        return false;
-      }
-    };
-
-    return SocialSecurityNumberFormatter;
-
-  })(DelimitedTextFormatter);
-
-  module.exports = SocialSecurityNumberFormatter;
 
 }).call(this);
 
@@ -1993,7 +1993,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./formatter":9,"./undo_manager":14,"./keybindings":17}],15:[function(require,module,exports){
+},{"./formatter":10,"./undo_manager":14,"./keybindings":17}],15:[function(require,module,exports){
 (function() {
   var AMEX, DISCOVER, JCB, MASTERCARD, VISA, determineCardType, luhnCheck, validCardLength;
 
@@ -2316,7 +2316,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 (function() {
   var CURRENCY, CurrencyDefaults, DEFAULT_COUNTRY, DEFAULT_LOCALE, Formatter, LocaleDefaults, NONE, NumberFormatter, PERCENT, RegionDefaults, StyleDefaults, endsWith, get, isDigits, splitLocaleComponents, startsWith, stround, trim, zpad, _ref,
     __slice = [].slice,
@@ -2600,7 +2600,8 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
     };
 
     NumberFormatter.prototype.setNegativeInfinitySymbol = function(negativeInfinitySymbol) {
-      return this._negativeInfinitySymbol = negativeInfinitySymbol;
+      this._negativeInfinitySymbol = negativeInfinitySymbol;
+      return this;
     };
 
     NumberFormatter.prototype.negativePrefix = function() {
@@ -2626,7 +2627,8 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
     };
 
     NumberFormatter.prototype.setNotANumberSymbol = function(notANumberSymbol) {
-      return this._notANumberSymbol = notANumberSymbol;
+      this._notANumberSymbol = notANumberSymbol;
+      return this;
     };
 
     NumberFormatter.prototype.nullSymbol = function() {
@@ -2634,7 +2636,8 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
     };
 
     NumberFormatter.prototype.setNullSymbol = function(nullSymbol) {
-      return this._nullSymbol = nullSymbol;
+      this._nullSymbol = nullSymbol;
+      return this;
     };
 
     NumberFormatter.prototype.numberStyle = function() {
@@ -2709,7 +2712,8 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
     };
 
     NumberFormatter.prototype.setUsesGroupingSeparator = function(usesGroupingSeparator) {
-      return this._usesGroupingSeparator = usesGroupingSeparator;
+      this._usesGroupingSeparator = usesGroupingSeparator;
+      return this;
     };
 
     NumberFormatter.prototype.zeroSymbol = function() {
@@ -2717,7 +2721,8 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
     };
 
     NumberFormatter.prototype.setZeroSymbol = function(zeroSymbol) {
-      return this._zeroSymbol = zeroSymbol;
+      this._zeroSymbol = zeroSymbol;
+      return this;
     };
 
     NumberFormatter.prototype._get = function(attr) {
@@ -3202,7 +3207,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./formatter":9,"./utils":16,"stround":18}],18:[function(require,module,exports){
+},{"./formatter":10,"./utils":16,"stround":18}],18:[function(require,module,exports){
 /** @const */ var CEILING = 0;
 /** @const */ var FLOOR = 1;
 /** @const */ var DOWN = 2;
