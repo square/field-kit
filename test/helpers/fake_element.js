@@ -1,4 +1,5 @@
 var EventEmitter = require('events').EventEmitter;
+var bind = require('./function/').bind;
 
 function FakeElement(ownerDocument, tagName) {
   EventEmitter.call(this);
@@ -38,16 +39,16 @@ FakeElement.prototype.setAttribute = function(name, value) {
 };
 
 FakeElement.prototype.insertBefore = function(newChild, referenceChild) {
-  this.reparent(newChild, function() {
+  this.reparent(newChild, bind(function() {
     var referenceIndex = this.childNodes.indexOf(referenceChild);
     this.childNodes.splice(referenceIndex, 0, [newChild]);
-  }.bind(this));
+  }, this));
 };
 
 FakeElement.prototype.appendChild = function(child) {
-  this.reparent(child, function() {
+  this.reparent(child, bind(function() {
     this.childNodes.push(child);
-  }.bind(this));
+  }, this));
 };
 
 FakeElement.prototype.reparent = function(child, callback) {

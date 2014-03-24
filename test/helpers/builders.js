@@ -1,14 +1,14 @@
 /* jshint undef:true, node:true */
+/* global FieldKit */
 
 var FakeDocument = require('./fake_document');
 var FakeInput = require('./fake_input');
-var TextField = require('../../lib/text_field');
 var PassthroughFormatter = require('./passthrough_formatter');
 var WrappedFakeElements = require('./wrapped_fake_elements');
 
 function buildField(textFieldClass, options) {
   if (!textFieldClass) {
-    textFieldClass = TextField;
+    textFieldClass = FieldKit.TextField;
   }
   if (!options) {
     options = {};
@@ -17,7 +17,7 @@ function buildField(textFieldClass, options) {
   if (arguments.length === 1) {
     if (typeof textFieldClass !== 'function') {
       options = textFieldClass;
-      textFieldClass = TextField;
+      textFieldClass = FieldKit.TextField;
     }
   }
 

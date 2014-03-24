@@ -4,7 +4,7 @@
   "description": "Utilities to effectively manage text entry on the web.",
   "main": "lib/index.js",
   "scripts": {
-    "test": "grunt && qunit -c test/test_helper.js -t test/*_test.js"
+    "test": "grunt test"
   },
   "repository": "",
   "author": "Square, Inc.",
@@ -24,7 +24,10 @@
     "timekeeper": "0.0.3",
     "qunit": "^0.6.2",
     "qunit-bdd": "0.0.5",
-    "sinon": "^1.9.0"
+    "sinon": "^1.9.0",
+    "grunt-contrib-connect": "^0.7.1",
+    "grunt-contrib-qunit": "^0.4.0",
+    "browserify-middleware": "^2.4.0"
   },
   "publishConfig": {
     "registry": "http://npm.corp.squareup.com:8000"
