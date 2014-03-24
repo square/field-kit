@@ -1,4 +1,3 @@
-global.FieldKit = require('../lib');
 global.sinon = require('sinon');
 global.timekeeper = require('timekeeper');
 
