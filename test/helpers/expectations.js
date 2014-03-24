@@ -3,6 +3,7 @@ var Caret = require('./caret');
 var TextField = require('../../lib/text_field');
 var buildInput = require('./builders').buildInput;
 var type = require('./typing').type;
+var bind = require('./function/').bind;
 
 function FieldExpectationBase() {}
 
@@ -69,19 +70,19 @@ FieldExpectationBase.prototype.applyDescription = function() {
 FieldExpectationBase.prototype.proxyDelegate = function() {
   var currentDelegate = this.field.delegate();
   this.field.setDelegate({
-    textFieldDidFailToValidateChange: function(textField, change, errorType) {
+    textFieldDidFailToValidateChange: bind(function(textField, change, errorType) {
       this.actualErrorType = errorType;
       if (currentDelegate && typeof currentDelegate.textFieldDidFailToValidateChange === 'function') {
         currentDelegate.textFieldDidFailToValidateChange(change, errorType);
       }
-    }.bind(this),
+    }, this),
 
-    textFieldDidFailToParseString: function(textField, change, errorType) {
+    textFieldDidFailToParseString: bind(function(textField, change, errorType) {
       this.actualErrorType = errorType;
       if (currentDelegate && typeof currentDelegate.textFieldDidFailToParseString === 'function') {
         currentDelegate.textFieldDidFailToParseString(change, errorType);
       }
-    }.bind(this)
+    }, this)
   });
 };
 

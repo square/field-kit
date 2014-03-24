@@ -1,14 +1,15 @@
 /* jshint undef:true, node:true */
 
 var FakeEvent = require('./fake_event');
-var TextField = require('../../lib/text_field');
+var WrappedFakeElements = require('./wrapped_fake_elements');
+var bind = require('./function/').bind;
 
 function Type(keys) {
   this.keys = keys;
 }
 
 Type.prototype.into = function(element) {
-  if (element instanceof TextField) {
+  if (element.element instanceof WrappedFakeElements) {
     element = element.element;
   }
   this.element = element;
@@ -17,14 +18,14 @@ Type.prototype.into = function(element) {
 };
 
 Type.prototype.perform = function() {
-  FakeEvent.eventsForKeys(this.keys).forEach(function(event) {
+  FakeEvent.eventsForKeys(this.keys).forEach(bind(function(event) {
     this.element.trigger('keydown', event);
     if (shouldFireKeypress(this.element, event)) {
       event.type = 'keypress';
       this.element.trigger('keypress', event);
     }
     this.element.trigger('keyup', event);
-  }.bind(this));
+  }, this));
 };
 
 function shouldFireKeypress(element, keyDownEvent) {
