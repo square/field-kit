@@ -1,2322 +1,2993 @@
 (function(e){if("function"==typeof bootstrap)bootstrap("fieldkit",e);else if("object"==typeof exports)module.exports=e();else if("function"==typeof define&&define.amd)define(e);else if("undefined"!=typeof ses){if(!ses.ok())return;ses.makeFieldKit=e}else"undefined"!=typeof window?window.FieldKit=e():global.FieldKit=e()})(function(){var define,ses,bootstrap,module,exports;
 return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require=="function"&&require;if(!s&&o)return o(n,!0);if(r)return r(n,!0);throw new Error("Cannot find module '"+n+"'")}var u=t[n]={exports:{}};e[n][0].call(u.exports,function(t){var r=e[n][1][t];return i(r?r:t)},u,u.exports)}return t[n].exports}var r=typeof require=="function"&&require;for(var s=0;s<n.length;s++)i(n[s]);return i})({1:[function(require,module,exports){
-(function() {
-  var FieldKit;
+module.exports = {
+  AdaptiveCardFormatter         : require('./adaptive_card_formatter'),
+  AmexCardFormatter             : require('./amex_card_formatter'),
+  CardTextField                 : require('./card_text_field'),
+  DefaultCardFormatter          : require('./default_card_formatter'),
+  DelimitedTextFormatter        : require('./delimited_text_formatter'),
+  ExpiryDateField               : require('./expiry_date_field'),
+  ExpiryDateFormatter           : require('./expiry_date_formatter'),
+  Formatter                     : require('./formatter'),
+  NumberFormatter               : require('./number_formatter'),
+  PhoneFormatter                : require('./phone_formatter'),
+  SocialSecurityNumberFormatter : require('./social_security_number_formatter'),
+  TextField                     : require('./text_field'),
+  UndoManager                   : require('./undo_manager')
+};
 
-  FieldKit = {
-    AdaptiveCardFormatter: require('./adaptive_card_formatter'),
-    AmexCardFormatter: require('./amex_card_formatter'),
-    CardTextField: require('./card_text_field'),
-    DefaultCardFormatter: require('./default_card_formatter'),
-    DelimitedTextFormatter: require('./delimited_text_formatter'),
-    ExpiryDateField: require('./expiry_date_field'),
-    ExpiryDateFormatter: require('./expiry_date_formatter'),
-    Formatter: require('./formatter'),
-    NumberFormatter: require('./number_formatter'),
-    PhoneFormatter: require('./phone_formatter'),
-    SocialSecurityNumberFormatter: require('./social_security_number_formatter'),
-    TextField: require('./text_field'),
-    UndoManager: require('./undo_manager')
-  };
+},{"./adaptive_card_formatter":2,"./amex_card_formatter":3,"./card_text_field":4,"./default_card_formatter":5,"./delimited_text_formatter":6,"./expiry_date_field":7,"./expiry_date_formatter":8,"./formatter":9,"./number_formatter":10,"./phone_formatter":11,"./social_security_number_formatter":12,"./text_field":13,"./undo_manager":14}],9:[function(require,module,exports){
+function Formatter() {}
 
-  module.exports = FieldKit;
+Formatter.prototype.maximumLength = null;
 
-}).call(this);
+Formatter.prototype.format = function(text) {
+  if (text === undefined || text === null) { text = ''; }
+  if (this.maximumLength !== undefined && this.maximumLength !== null) {
+    text = text.substring(0, this.maximumLength);
+  }
+  return text;
+};
 
-},{"./adaptive_card_formatter":2,"./amex_card_formatter":3,"./card_text_field":4,"./default_card_formatter":5,"./delimited_text_formatter":6,"./expiry_date_field":7,"./expiry_date_formatter":8,"./number_formatter":9,"./formatter":10,"./phone_formatter":11,"./social_security_number_formatter":12,"./text_field":13,"./undo_manager":14}],10:[function(require,module,exports){
-(function() {
-  var Formatter;
+Formatter.prototype.parse = function(text, error) {
+  if (text === undefined || text === null) { text = ''; }
+  if (this.maximumLength !== undefined && this.maximumLength !== null) {
+    text = text.substring(0, this.maximumLength);
+  }
+  return text;
+};
 
-  Formatter = (function() {
-    function Formatter() {}
+Formatter.prototype.isChangeValid = function(change, error) {
+  var selectedRange = change.proposed.selectedRange;
+  var text = change.proposed.text;
+  if (this.maximumLength !== undefined && this.maximumLength !== null && text.length > this.maximumLength) {
+    var available = this.maximumLength - (text.length - change.inserted.text.length);
+    var newText = change.current.text.substring(0, change.current.selectedRange.start);
+    if (available > 0) {
+      newText += change.inserted.text.substring(0, available);
+    }
+    newText += change.current.text.substring(change.current.selectedRange.start + change.current.selectedRange.length);
+    truncatedLength = text.length - newText.length;
+    change.proposed.text = newText;
+    selectedRange.start -= truncatedLength;
+  }
+  return true;
+};
 
-    Formatter.prototype.maximumLength = null;
-
-    Formatter.prototype.format = function(text) {
-      if (text == null) {
-        text = '';
-      }
-      if (this.maximumLength != null) {
-        text = text.substring(0, this.maximumLength);
-      }
-      return text;
-    };
-
-    Formatter.prototype.parse = function(text, error) {
-      if (text == null) {
-        text = '';
-      }
-      if (this.maximumLength != null) {
-        text = text.substring(0, this.maximumLength);
-      }
-      return text;
-    };
-
-    Formatter.prototype.isChangeValid = function(change, error) {
-      var available, newText, selectedRange, text, truncatedLength, _ref;
-      _ref = change.proposed, selectedRange = _ref.selectedRange, text = _ref.text;
-      if ((this.maximumLength != null) && text.length > this.maximumLength) {
-        available = this.maximumLength - (text.length - change.inserted.text.length);
-        newText = change.current.text.substring(0, change.current.selectedRange.start);
-        if (available > 0) {
-          newText += change.inserted.text.substring(0, available);
-        }
-        newText += change.current.text.substring(change.current.selectedRange.start + change.current.selectedRange.length);
-        truncatedLength = text.length - newText.length;
-        change.proposed.text = newText;
-        selectedRange.start -= truncatedLength;
-      }
-      return true;
-    };
-
-    return Formatter;
-
-  })();
-
-  module.exports = Formatter;
-
-}).call(this);
+module.exports = Formatter;
 
 },{}],14:[function(require,module,exports){
-(function() {
-  var UndoManager, hasGetter,
-    __slice = [].slice;
+function hasGetter(object, property) {
+  // Skip if getOwnPropertyDescriptor throws (IE8)
+  try {
+    Object.getOwnPropertyDescriptor({}, 'sq');
+  } catch (e) {
+    return false;
+  }
 
-  hasGetter = function(object, property) {
-    var e, _ref, _ref1, _ref2;
-    try {
-      Object.getOwnPropertyDescriptor({}, 'sq');
-    } catch (_error) {
-      e = _error;
-      return;
+  var descriptor;
+
+  if (object && object.constructor && object.constructor.prototype) {
+    descriptor = Object.getOwnPropertyDescriptor(object.constructor.prototype, property);
+  }
+
+  if (!descriptor) {
+    descriptor = Object.getOwnPropertyDescriptor(object, property);
+  }
+
+  if (descriptor && descriptor.get) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+/**
+ * UndoManager is a general-purpose recorder of operations for undo and redo.
+ *
+ * Registering an undo action is done by specifying the changed object, along
+ * with a method to invoke to revert its state and the arguments for that
+ * method. When performing undo an UndoManager saves the operations reverted so
+ * that you can redo the undos.
+ */
+function UndoManager() {
+  this._undos = [];
+  this._redos = [];
+}
+
+UndoManager.prototype._undos = null;
+UndoManager.prototype._redos = null;
+UndoManager.prototype._isUndoing = false;
+UndoManager.prototype._isRedoing = false;
+
+/**
+ * Determines whether there are any undo actions on the stack.
+ *
+ * @return {boolean}
+ */
+UndoManager.prototype.canUndo = function() {
+  return this._undos.length !== 0;
+};
+
+/**
+ * Determines whether there are any redo actions on the stack.
+ *
+ * @return {boolean}
+ */
+UndoManager.prototype.canRedo = function() {
+  return this._redos.length !== 0;
+};
+
+/**
+ * Indicates whether or not this manager is currently processing an undo.
+ *
+ * @return {boolean}
+ */
+UndoManager.prototype.isUndoing = function() {
+  return this._isUndoing;
+}
+
+/**
+ * Indicates whether or not this manager is currently processing a redo.
+ *
+ * @return {boolean}
+ */
+UndoManager.prototype.isRedoing = function() {
+  return this._isRedoing;
+};
+
+/**
+ * Manually registers an simple undo action with the given args.
+ *
+ * If this undo manager is currently undoing then this will register a redo
+ * action instead. If this undo manager is neither undoing or redoing then the
+ * redo stack will be cleared.
+ *
+ * @param {object} target call `selector` on this object
+ * @param {string} selector the method name to call on `target`
+ * @param {object...} args arguments to pass when calling `selector` on `target`
+ */
+UndoManager.prototype.registerUndo = function() {
+  if (this._isUndoing) {
+    this._appendRedo.apply(this, arguments);
+  } else {
+    if (!this._isRedoing) {
+      this._redos.length = 0;
     }
-    if (object != null ? (_ref = object.constructor) != null ? _ref.prototype : void 0 : void 0) {
-      if ((_ref1 = Object.getOwnPropertyDescriptor(object.constructor.prototype, property)) != null ? _ref1.get : void 0) {
+    this._appendUndo.apply(this, arguments);
+  }
+  return null;
+};
+
+/**
+ * Appends an undo action to the internal stack.
+ *
+ * @private
+ */
+UndoManager.prototype._appendUndo = function(target, selector) {
+  this._undos.push({
+    target: target,
+    selector: selector,
+    args: [].slice.call(arguments, 2)
+  });
+};
+
+/**
+ * Appends a redo action to the internal stack.
+ *
+ * @private
+ */
+UndoManager.prototype._appendRedo = function(target, selector) {
+  this._redos.push({
+    target: target,
+    selector: selector,
+    args: [].slice.call(arguments, 2)
+  });
+};
+
+/**
+ * Performs the top-most undo action on the stack.
+ *
+ * Raises an error if there are no available undo actions.
+ */
+UndoManager.prototype.undo = function() {
+  if (!this.canUndo()) {
+    throw new Error('there are no registered undos');
+  }
+  var undo = this._undos.pop();
+  var target = undo.target;
+  var selector = undo.selector;
+  var args = undo.args;
+  this._isUndoing = true;
+  target[selector].apply(target, args);
+  this._isUndoing = false;
+};
+
+/**
+ * Performs the top-most redo action on the stack.
+ *
+ * Raises an error if there are no available redo actions.
+ */
+UndoManager.prototype.redo = function() {
+  if (!this.canRedo()) {
+    throw new Error('there are no registered redos');
+  }
+  var redo = this._redos.pop();
+  var target = redo.target;
+  var selector = redo.selector;
+  var args = redo.args;
+  this._isRedoing = true;
+  target[selector].apply(target, args);
+  this._isRedoing = false;
+  return null;
+};
+
+/**
+ * Returns a proxy object based on target that will register undo/redo actions
+ * by calling methods on the proxy.
+ *
+ * Example
+ *
+ *   setSize: (size) ->
+ *     @undoManager.proxyFor(this).setSize(@_size)
+ *     @_size = size
+ *
+ */
+UndoManager.prototype.proxyFor = function(target) {
+  var proxy = {};
+  var self = this;
+  for (var selector in target) {
+    // don't trigger anything that has a getter
+    if (hasGetter(target, selector)) { continue; }
+
+    // don't try to proxy properties that aren't functions
+    if (typeof target[selector] !== 'function') { continue; }
+
+    // set up a proxy function to register an undo
+    (function(selector) {
+      proxy[selector] = function() {
+        self.registerUndo.apply(self, [target, selector].concat([].slice.call(arguments)));
+      };
+    })(selector);
+  }
+  return proxy;
+};
+
+module.exports = UndoManager;
+
+},{}],2:[function(require,module,exports){
+var AmexCardFormatter = require('./amex_card_formatter');
+var DefaultCardFormatter = require('./default_card_formatter');
+var cardUtils = require('./card_utils');
+
+function AdaptiveCardFormatter() {
+  this.amexCardFormatter = new AmexCardFormatter();
+  this.defaultCardFormatter = new DefaultCardFormatter();
+  this.formatter = this.defaultCardFormatter;
+}
+
+AdaptiveCardFormatter.prototype.format = function(pan) {
+  return this._formatterForPan(pan).format(pan);
+};
+
+
+AdaptiveCardFormatter.prototype.parse = function(text, error) {
+  return this.formatter.parse(text, error);
+};
+
+AdaptiveCardFormatter.prototype.isChangeValid = function(change) {
+  this.formatter = this._formatterForPan(change.proposed.text);
+  return this.formatter.isChangeValid(change);
+};
+
+AdaptiveCardFormatter.prototype._formatterForPan = function(pan) {
+  if (cardUtils.determineCardType(pan.replace(/[^\d]+/g, '')) === cardUtils.AMEX) {
+    return this.amexCardFormatter;
+  } else {
+    return this.defaultCardFormatter;
+  }
+};
+
+module.exports = AdaptiveCardFormatter;
+
+},{"./amex_card_formatter":3,"./card_utils":15,"./default_card_formatter":5}],4:[function(require,module,exports){
+var TextField = require('./text_field');
+var AdaptiveCardFormatter = require('./adaptive_card_formatter');
+var cardUtils = require('./card_utils');
+
+var CardMaskStrategy = {
+  None: 'None',
+  DoneEditing: 'DoneEditing'
+};
+
+function CardTextField(element) {
+  TextField.call(this, element, new AdaptiveCardFormatter());
+  this.setCardMaskStrategy(CardMaskStrategy.None);
+}
+
+CardTextField.prototype = Object.create(TextField.prototype);
+
+/**
+ * Gets the card type for the current value.
+ *
+ * @return {string} Returns one of 'visa', 'mastercard', 'amex' and 'discover'.
+ */
+CardTextField.prototype.cardType = function() {
+  return cardUtils.determineCardType(this.value());
+};
+
+/**
+ * Gets the type of masking this field uses.
+ *
+ * @return {CardMaskStrategy}
+ */
+CardTextField.prototype.cardMaskStrategy = function() {
+  return this._cardMaskStrategy;
+};
+
+/**
+ * Sets the type of masking this field uses.
+ *
+ * @param {CardMaskStrategy} cardMaskStrategy One of CardMaskStrategy.
+ */
+CardTextField.prototype.setCardMaskStrategy = function (cardMaskStrategy) {
+  if (cardMaskStrategy !== this._cardMaskStrategy) {
+    this._cardMaskStrategy = cardMaskStrategy;
+    this._syncMask();
+  }
+
+  return null;
+};
+
+/**
+ * Returns a masked version of the current formatted PAN. Example:
+ *
+ *   field.setText('4111 1111 1111 1111')
+ *   field.cardMask() // "•••• •••• •••• 1111"
+ *
+ * @return {string} Returns a masked card string.
+ */
+CardTextField.prototype.cardMask = function() {
+  var text   = this.text();
+  var toMask = text.slice(0, -4);
+  var last4  = text.slice(-4);
+
+  return toMask.replace(/\d/g, '•') + last4;
+};
+
+/**
+ * Whether we are currently masking the displayed text.
+ */
+CardTextField.prototype._masked = false;
+
+/**
+ * Whether we are currently editing.
+ */
+CardTextField.prototype._editing = false;
+
+/**
+ * Gets the formatted PAN for this field.
+ *
+ * @return {string}
+ */
+CardTextField.prototype.text = function() {
+  if (this._masked) {
+    return this._unmaskedText;
+  } else {
+    return TextField.prototype.text.call(this);
+  }
+};
+
+/**
+ * Sets the formatted PAN for this field.
+ *
+ * @param {string} text A formatted PAN.
+ */
+CardTextField.prototype.setText = function(text) {
+  if (this._masked) {
+    this._unmaskedText = text;
+    text = this.cardMask();
+  }
+  TextField.prototype.setText.call(this, text);
+};
+
+/**
+ * Called by our superclass, used to implement card masking.
+ *
+ * @private
+ */
+CardTextField.prototype.textFieldDidEndEditing = function() {
+  this._editing = false;
+  this._syncMask();
+};
+
+/**
+ * Called by our superclass, used to implement card masking.
+ *
+ * @private
+ */
+CardTextField.prototype.textFieldDidBeginEditing = function() {
+  this._editing = true;
+  this._syncMask();
+};
+
+/**
+ * Enables masking if it is not already enabled.
+ *
+ * @private
+ */
+CardTextField.prototype._enableMasking = function() {
+  if (!this._masked) {
+    this._unmaskedText = this.text();
+    this._masked = true;
+    this.setText(this._unmaskedText);
+  }
+};
+
+/**
+ * Disables masking if it is currently enabled.
+ *
+ * @private
+ */
+CardTextField.prototype._disableMasking = function() {
+  if (this._masked) {
+    this._masked = false;
+    this.setText(this._unmaskedText);
+    this._unmaskedText = null;
+  }
+};
+
+/**
+ * Enables or disables masking based on the mask settings.
+ *
+ * @private
+ */
+CardTextField.prototype._syncMask = function() {
+  if (this.cardMaskStrategy() === CardMaskStrategy.DoneEditing) {
+    if (this._editing) {
+      this._disableMasking();
+    } else {
+      this._enableMasking();
+    }
+  }
+};
+
+CardTextField.CardMaskStrategy = CardMaskStrategy;
+
+module.exports = CardTextField;
+
+},{"./text_field":13,"./adaptive_card_formatter":2,"./card_utils":15}],3:[function(require,module,exports){
+var DefaultCardFormatter = require('./default_card_formatter');
+
+function AmexCardFormatter() {
+  DefaultCardFormatter.apply(this, arguments);
+}
+
+AmexCardFormatter.prototype = Object.create(DefaultCardFormatter.prototype);
+
+AmexCardFormatter.prototype.maximumLength = 15 + 2;
+
+AmexCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
+  return index === 4 || index === 11;
+};
+
+module.exports = AmexCardFormatter;
+
+},{"./default_card_formatter":5}],5:[function(require,module,exports){
+var DelimitedTextFormatter = require('./delimited_text_formatter');
+var cardUtils = require('./card_utils');
+
+function DefaultCardFormatter() {
+  DelimitedTextFormatter.apply(this, arguments);
+}
+
+DefaultCardFormatter.prototype = Object.create(DelimitedTextFormatter.prototype);
+
+DefaultCardFormatter.prototype.delimiter = ' ';
+
+DefaultCardFormatter.prototype.maximumLength = 16 + 3;
+
+DefaultCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
+  return index === 4 || index === 9 || index === 14;
+};
+
+DefaultCardFormatter.prototype.parse = function(text, error) {
+  var value = this._valueFromText(text);
+  if (typeof error === 'function') {
+    if (!cardUtils.validCardLength(value)) {
+      error('card-formatter.number-too-short');
+    }
+    if (!cardUtils.luhnCheck(value)) {
+      error('card-formatter.invalid-number');
+    }
+  }
+  return DelimitedTextFormatter.prototype.parse.call(this, text, error);
+};
+
+DefaultCardFormatter.prototype._valueFromText = function(text) {
+  return DelimitedTextFormatter.prototype._valueFromText.call(
+    this,
+    (text || '').replace(/[^\d]/g, '')
+  );
+};
+
+module.exports = DefaultCardFormatter;
+
+},{"./delimited_text_formatter":6,"./card_utils":15}],6:[function(require,module,exports){
+var Formatter = require('./formatter');
+
+function DelimitedTextFormatter(delimiter) {
+  if (!delimiter) { delimiter = this.delimiter; }
+  if (delimiter === null || delimiter === undefined || delimiter.length !== 1) {
+    throw new Error('delimiter must have just one character');
+  }
+  this.delimiter = delimiter;
+}
+
+DelimitedTextFormatter.prototype = Object.create(Formatter.prototype);
+
+DelimitedTextFormatter.prototype.delimiter = null;
+
+DelimitedTextFormatter.prototype.delimiterAt = function(index) {
+  if (!this.hasDelimiterAtIndex(index)) {
+    return null;
+  }
+  return this.delimiter;
+};
+
+DelimitedTextFormatter.prototype.isDelimiter = function(chr) {
+  return chr === this.delimiter;
+};
+
+DelimitedTextFormatter.prototype.format = function(value) {
+  return this._textFromValue(value);
+};
+
+DelimitedTextFormatter.prototype._textFromValue = function(value) {
+  if (!value) { return ''; }
+
+  var result = '';
+
+  for (var i = 0, l = value.length; i < l; i++) {
+    while ((delimiter = this.delimiterAt(result.length))) {
+      result += delimiter;
+    }
+    result += value[i];
+    while ((delimiter = this.delimiterAt(result.length))) {
+      result += delimiter;
+    }
+  }
+
+  return result;
+};
+
+DelimitedTextFormatter.prototype.parse = function(text, error) {
+  return this._valueFromText(text);
+};
+
+DelimitedTextFormatter.prototype._valueFromText = function(text) {
+  if (!text) { return ''; }
+  var result = '';
+  for (var i = 0, l = text.length; i < l; i++) {
+    if (!this.isDelimiter(text[i])) {
+      result += text[i];
+    }
+  }
+  return result;
+};
+
+DelimitedTextFormatter.prototype.isChangeValid = function(change, error) {
+  if (!Formatter.prototype.isChangeValid.call(this, change, error)) {
+    return false;
+  }
+
+  var newText = change.proposed.text;
+  var range = change.proposed.selectedRange;
+  var hasSelection = range.length !== 0;
+
+  var startMovedLeft = range.start < change.current.selectedRange.start;
+  var startMovedRight = range.start > change.current.selectedRange.start;
+  var endMovedLeft = (range.start + range.length) < (change.current.selectedRange.start + change.current.selectedRange.length);
+  var endMovedRight = (range.start + range.length) > (change.current.selectedRange.start + change.current.selectedRange.length);
+
+  var startMovedOverADelimiter = startMovedLeft && this.hasDelimiterAtIndex(range.start) ||
+                                  startMovedRight && this.hasDelimiterAtIndex(range.start - 1);
+  var endMovedOverADelimiter = endMovedLeft && this.hasDelimiterAtIndex(range.start + range.length) ||
+                                endMovedRight && this.hasDelimiterAtIndex(range.start + range.length - 1);
+
+  if (this.isDelimiter(change.deleted.text)) {
+    var newCursorPosition = change.deleted.start - 1;
+    // delete any immediately preceding delimiters
+    while (this.isDelimiter(newText.charAt(newCursorPosition))) {
+      newText = newText.substring(0, newCursorPosition) + newText.substring(newCursorPosition + 1);
+      newCursorPosition--;
+    }
+    // finally delete the real character that was intended
+    newText = newText.substring(0, newCursorPosition) + newText.substring(newCursorPosition + 1);
+  }
+
+  // adjust the cursor / selection
+  if (startMovedLeft && startMovedOverADelimiter) {
+    // move left over any immediately preceding delimiters
+    while (this.delimiterAt(range.start - 1)) {
+      range.start--;
+      range.length++;
+    }
+    // finally move left over the real intended character
+    range.start--;
+    range.length++;
+  }
+
+  if (startMovedRight) {
+    // move right over any immediately following delimiters
+    // In all but one scenario, the cursor should already be placed after the delimiter group,
+    // the one exception is when the format has a leading delimiter. In this case,
+    // we need to move past all leading delimiters before placing the real character input
+    while (this.delimiterAt(range.start)) {
+      range.start++;
+      range.length--;
+    }
+    // if the first character was a delimiter, then move right over the real character that was intended
+    if (startMovedOverADelimiter) {
+      range.start++;
+      range.length--;
+      // move right over any delimiters that might immediately follow the real character
+      while (this.delimiterAt(range.start)) {
+        range.start++;
+        range.length--;
+      }
+    }
+  }
+
+  if (hasSelection) { // Otherwise, the logic for the range start takes care of everything.
+    if (endMovedOverADelimiter) {
+      if (endMovedLeft) {
+        // move left over any immediately preceding delimiters
+        while (this.delimiterAt(range.start + range.length - 1)) {
+          range.length--;
+        }
+        // finally move left over the real intended character
+        range.length--;
+      }
+
+      if (endMovedRight) {
+        // move right over any immediately following delimters
+        while (this.delimiterAt(range.start + range.length)) {
+          range.length++;
+        }
+        // finally move right over the real intended character
+        range.length++;
+      }
+    }
+
+    // trailing delimiters in the selection
+    while (this.hasDelimiterAtIndex(range.start + range.length - 1)) {
+      if (startMovedLeft || endMovedLeft) {
+        range.length--;
+      } else {
+        range.length++;
+      }
+    }
+
+    while (this.hasDelimiterAtIndex(range.start)) {
+      if (startMovedRight || endMovedRight) {
+        range.start++;
+        range.length--;
+      } else {
+        range.start--;
+        range.length++;
+      }
+    }
+  } else {
+    range.length = 0;
+  }
+
+  var isChangeValid = true;
+
+  var value = this._valueFromText(newText, function() {
+    isChangeValid = false;
+    error.apply(null, arguments);
+  });
+
+  if (isChangeValid) {
+    change.proposed.text = this._textFromValue(value);
+  }
+
+  return isChangeValid;
+};
+
+module.exports = DelimitedTextFormatter;
+
+},{"./formatter":9}],7:[function(require,module,exports){
+(function(){var TextField           = require('./text_field');
+var ExpiryDateFormatter = require('./expiry_date_formatter');
+
+function ExpiryDateField(element) {
+  TextField.call(this, element, new ExpiryDateFormatter());
+}
+
+ExpiryDateField.prototype = Object.create(TextField.prototype);
+
+/**
+ * Called by our superclass, used to post-process the text.
+ *
+ * @private
+ */
+ExpiryDateField.prototype.textFieldDidEndEditing = function() {
+  var value = this.value();
+  if (value) {
+    return this.setText(this.formatter().format(value));
+  }
+};
+
+module.exports = ExpiryDateField;
+
+})()
+},{"./text_field":13,"./expiry_date_formatter":8}],8:[function(require,module,exports){
+var DelimitedTextFormatter = require('./delimited_text_formatter');
+var zpad2 = require('./utils').zpad2;
+
+function interpretTwoDigitYear(year) {
+  var thisYear = new Date().getFullYear();
+  var thisCentury = thisYear - (thisYear % 100);
+  var centuries = [thisCentury, thisCentury - 100, thisCentury + 100].sort(function(a, b) {
+    return Math.abs(thisYear - (year + a)) - Math.abs(thisYear - (year + b));
+  });
+  return year + centuries[0];
+}
+
+function ExpiryDateFormatter() {
+  DelimitedTextFormatter.apply(this, arguments);
+}
+
+ExpiryDateFormatter.prototype = Object.create(DelimitedTextFormatter.prototype);
+
+ExpiryDateFormatter.prototype.delimiter = '/';
+ExpiryDateFormatter.prototype.maximumLength = 5;
+
+ExpiryDateFormatter.prototype.hasDelimiterAtIndex = function(index) {
+  return index === 2;
+};
+
+ExpiryDateFormatter.prototype.format = function(value) {
+  if (!value) { return ''; }
+
+  var month = value.month;
+  var year = value.year;
+  year = year % 100;
+
+  return DelimitedTextFormatter.prototype.format.call(this, zpad2(month) + zpad2(year));
+};
+
+ExpiryDateFormatter.prototype.parse = function(text, error) {
+  var monthAndYear = text.split(this.delimiter);
+  var month = monthAndYear[0];
+  var year = monthAndYear[1];
+  if (month && month.match(/^(0?[1-9]|1\d)$/) && year && year.match(/^\d\d?$/)) {
+    month = Number(month);
+    year = interpretTwoDigitYear(Number(year));
+    return { month: month, year: year };
+  } else {
+    if (typeof error === 'function') {
+      error('expiry-date-formatter.invalid-date');
+    }
+    return null;
+  }
+};
+
+ExpiryDateFormatter.prototype.isChangeValid = function(change, error) {
+  if (!error) { error = function(){}; }
+
+  var isBackspace = change.proposed.text.length < change.current.text.length;
+  var newText = change.proposed.text;
+
+  if (isBackspace) {
+    if (change.deleted.text === this.delimiter) {
+      newText = newText[0];
+    }
+    if (newText === '0') {
+      newText = '';
+    }
+  } else if (change.inserted.text === this.delimiter && change.current.text === '1') {
+    newText = '01' + this.delimiter;
+  } else if (change.inserted.text.length > 0 && !/^\d$/.test(change.inserted.text)) {
+    error('expiry-date-formatter.only-digits-allowed');
+    return false;
+  } else {
+    // 4| -> 04|
+    if (/^[2-9]$/.test(newText)) {
+      newText = '0' + newText;
+    }
+
+    // 15| -> 1|
+    if (/^1[3-9]$/.test(newText)) {
+      error('expiry-date-formatter.invalid-month');
+      return false;
+    }
+
+    // Don't allow 00
+    if (newText === '00') {
+      error('expiry-date-formatter.invalid-month');
+      return false;
+    }
+
+    // 11| -> 11/
+    if (/^(0[1-9]|1[0-2])$/.test(newText)) {
+      newText += this.delimiter;
+    }
+
+    if ((match = newText.match(/^(\d\d)(.)(\d\d?).*$/)) && match[2] === this.delimiter) {
+      newText = match[1] + this.delimiter + match[3];
+    }
+  }
+
+  change.proposed.text = newText;
+  change.proposed.selectedRange = { start: newText.length, length: 0 };
+
+  return true;
+};
+
+module.exports = ExpiryDateFormatter;
+
+},{"./delimited_text_formatter":6,"./utils":16}],11:[function(require,module,exports){
+var DelimitedTextFormatter = require('./delimited_text_formatter');
+
+// (415) 555-1212
+var NANP_PHONE_DELIMITERS = {
+  0: '(',
+  4: ')',
+  5: ' ',
+  9: '-'
+};
+
+// 1 (415) 555-1212
+var NANP_PHONE_DELIMITERS_WITH_1 = {
+  1:  ' ',
+  2:  '(',
+  6:  ')',
+  7:  ' ',
+  11: '-'
+};
+
+// +1 (415) 555-1212
+var NANP_PHONE_DELIMITERS_WITH_PLUS = {
+  2:  ' ',
+  3:  '(',
+  7:  ')',
+  8:  ' ',
+  12: '-'
+};
+
+// This should match any characters in the maps above.
+var DELIMITER_PATTERN = /[-\(\) ]/g;
+
+function PhoneFormatter() {
+  if (arguments.length !== 0) {
+    throw new Error('were you trying to set a delimiter ('+arguments[0]+')?');
+  }
+}
+
+PhoneFormatter.prototype = Object.create(DelimitedTextFormatter.prototype);
+
+PhoneFormatter.prototype.maximumLength = null;
+PhoneFormatter.prototype.delimiterMap = null;
+
+PhoneFormatter.prototype.isDelimiter = function(chr) {
+  var map = this.delimiterMap;
+  for (var index in map) {
+    if (map.hasOwnProperty(index)) {
+      if (map[index] === chr) {
         return true;
       }
     }
-    return ((_ref2 = Object.getOwnPropertyDescriptor(object, property)) != null ? _ref2.get : void 0) != null;
-  };
-
-  UndoManager = (function() {
-    UndoManager.prototype._undos = null;
-
-    UndoManager.prototype._redos = null;
-
-    UndoManager.prototype._isUndoing = false;
-
-    UndoManager.prototype._isRedoing = false;
-
-    function UndoManager() {
-      this._undos = [];
-      this._redos = [];
-    }
-
-    UndoManager.prototype.canUndo = function() {
-      return this._undos.length !== 0;
-    };
-
-    UndoManager.prototype.canRedo = function() {
-      return this._redos.length !== 0;
-    };
-
-    UndoManager.prototype.isUndoing = function() {
-      return this._isUndoing;
-    };
-
-    UndoManager.prototype.isRedoing = function() {
-      return this._isRedoing;
-    };
-
-    UndoManager.prototype.registerUndo = function() {
-      var args, selector, target;
-      target = arguments[0], selector = arguments[1], args = 3 <= arguments.length ? __slice.call(arguments, 2) : [];
-      if (this._isUndoing) {
-        this._appendRedo.apply(this, [target, selector].concat(__slice.call(args)));
-      } else {
-        if (!this._isRedoing) {
-          this._redos.length = 0;
-        }
-        this._appendUndo.apply(this, [target, selector].concat(__slice.call(args)));
-      }
-      return null;
-    };
-
-    UndoManager.prototype._appendUndo = function() {
-      var args, selector, target;
-      target = arguments[0], selector = arguments[1], args = 3 <= arguments.length ? __slice.call(arguments, 2) : [];
-      return this._undos.push({
-        target: target,
-        selector: selector,
-        args: args
-      });
-    };
-
-    UndoManager.prototype._appendRedo = function() {
-      var args, selector, target;
-      target = arguments[0], selector = arguments[1], args = 3 <= arguments.length ? __slice.call(arguments, 2) : [];
-      return this._redos.push({
-        target: target,
-        selector: selector,
-        args: args
-      });
-    };
-
-    UndoManager.prototype.undo = function() {
-      var args, selector, target, _ref;
-      if (!this.canUndo()) {
-        throw new Error('there are no registered undos');
-      }
-      _ref = this._undos.pop(), target = _ref.target, selector = _ref.selector, args = _ref.args;
-      this._isUndoing = true;
-      target[selector].apply(target, args);
-      this._isUndoing = false;
-      return null;
-    };
-
-    UndoManager.prototype.redo = function() {
-      var args, selector, target, _ref;
-      if (!this.canRedo()) {
-        throw new Error('there are no registered redos');
-      }
-      _ref = this._redos.pop(), target = _ref.target, selector = _ref.selector, args = _ref.args;
-      this._isRedoing = true;
-      target[selector].apply(target, args);
-      this._isRedoing = false;
-      return null;
-    };
-
-    UndoManager.prototype.proxyFor = function(target) {
-      var proxy, selector, _fn,
-        _this = this;
-      proxy = {};
-      _fn = function(selector) {
-        return proxy[selector] = function() {
-          var args;
-          args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-          return _this.registerUndo.apply(_this, [target, selector].concat(__slice.call(args)));
-        };
-      };
-      for (selector in target) {
-        if (hasGetter(target, selector)) {
-          continue;
-        }
-        if (typeof target[selector] !== 'function') {
-          continue;
-        }
-        _fn(selector);
-      }
-      return proxy;
-    };
-
-    return UndoManager;
-
-  })();
-
-  module.exports = UndoManager;
-
-}).call(this);
-
-},{}],2:[function(require,module,exports){
-(function() {
-  var AMEX, AdaptiveCardFormatter, AmexCardFormatter, DefaultCardFormatter, determineCardType, _ref;
-
-  AmexCardFormatter = require('./amex_card_formatter');
-
-  DefaultCardFormatter = require('./default_card_formatter');
-
-  _ref = require('./card_utils'), determineCardType = _ref.determineCardType, AMEX = _ref.AMEX;
-
-  AdaptiveCardFormatter = (function() {
-    function AdaptiveCardFormatter() {
-      this.amexCardFormatter = new AmexCardFormatter();
-      this.defaultCardFormatter = new DefaultCardFormatter();
-      this.formatter = this.defaultCardFormatter;
-    }
-
-    AdaptiveCardFormatter.prototype.format = function(pan) {
-      return this._formatterForPan(pan).format(pan);
-    };
-
-    AdaptiveCardFormatter.prototype.parse = function(text, error) {
-      return this.formatter.parse(text, error);
-    };
-
-    AdaptiveCardFormatter.prototype.isChangeValid = function(change) {
-      this.formatter = this._formatterForPan(change.proposed.text);
-      return this.formatter.isChangeValid(change);
-    };
-
-    AdaptiveCardFormatter.prototype._formatterForPan = function(pan) {
-      if (determineCardType(pan.replace(/[^\d]+/g, '')) === AMEX) {
-        return this.amexCardFormatter;
-      } else {
-        return this.defaultCardFormatter;
-      }
-    };
-
-    return AdaptiveCardFormatter;
-
-  })();
-
-  module.exports = AdaptiveCardFormatter;
-
-}).call(this);
-
-},{"./amex_card_formatter":3,"./default_card_formatter":5,"./card_utils":15}],5:[function(require,module,exports){
-(function() {
-  var DefaultCardFormatter, DelimitedTextFormatter, luhnCheck, validCardLength, _ref, _ref1,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  DelimitedTextFormatter = require('./delimited_text_formatter');
-
-  _ref = require('./card_utils'), validCardLength = _ref.validCardLength, luhnCheck = _ref.luhnCheck;
-
-  DefaultCardFormatter = (function(_super) {
-    __extends(DefaultCardFormatter, _super);
-
-    function DefaultCardFormatter() {
-      _ref1 = DefaultCardFormatter.__super__.constructor.apply(this, arguments);
-      return _ref1;
-    }
-
-    DefaultCardFormatter.prototype.delimiter = ' ';
-
-    DefaultCardFormatter.prototype.maximumLength = 16 + 3;
-
-    DefaultCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
-      return index === 4 || index === 9 || index === 14;
-    };
-
-    DefaultCardFormatter.prototype.parse = function(text, error) {
-      var value;
-      value = this._valueFromText(text);
-      if (!validCardLength(value)) {
-        if (typeof error === "function") {
-          error('card-formatter.number-too-short');
-        }
-      }
-      if (!luhnCheck(value)) {
-        if (typeof error === "function") {
-          error('card-formatter.invalid-number');
-        }
-      }
-      return DefaultCardFormatter.__super__.parse.call(this, text, error);
-    };
-
-    DefaultCardFormatter.prototype._valueFromText = function(text) {
-      return DefaultCardFormatter.__super__._valueFromText.call(this, (text != null ? text : '').replace(/[^\d]/g, ''));
-    };
-
-    return DefaultCardFormatter;
-
-  })(DelimitedTextFormatter);
-
-  module.exports = DefaultCardFormatter;
-
-}).call(this);
-
-},{"./delimited_text_formatter":6,"./card_utils":15}],3:[function(require,module,exports){
-(function() {
-  var AmexCardFormatter, DefaultCardFormatter, _ref,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  DefaultCardFormatter = require('./default_card_formatter');
-
-  AmexCardFormatter = (function(_super) {
-    __extends(AmexCardFormatter, _super);
-
-    function AmexCardFormatter() {
-      _ref = AmexCardFormatter.__super__.constructor.apply(this, arguments);
-      return _ref;
-    }
-
-    AmexCardFormatter.prototype.maximumLength = 15 + 2;
-
-    AmexCardFormatter.prototype.hasDelimiterAtIndex = function(index) {
-      return index === 4 || index === 11;
-    };
-
-    return AmexCardFormatter;
-
-  })(DefaultCardFormatter);
-
-  module.exports = AmexCardFormatter;
-
-}).call(this);
-
-},{"./default_card_formatter":5}],4:[function(require,module,exports){
-(function() {
-  var AdaptiveCardFormatter, CardMaskStrategy, CardTextField, TextField, determineCardType,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  TextField = require('./text_field');
-
-  AdaptiveCardFormatter = require('./adaptive_card_formatter');
-
-  determineCardType = require('./card_utils').determineCardType;
-
-  CardMaskStrategy = {
-    None: 'None',
-    DoneEditing: 'DoneEditing'
-  };
-
-  CardTextField = (function(_super) {
-    __extends(CardTextField, _super);
-
-    function CardTextField(element) {
-      CardTextField.__super__.constructor.call(this, element, new AdaptiveCardFormatter());
-      this.setCardMaskStrategy(CardMaskStrategy.None);
-    }
-
-    CardTextField.prototype.cardType = function() {
-      return determineCardType(this.value());
-    };
-
-    CardTextField.prototype.cardMaskStrategy = function() {
-      return this._cardMaskStrategy;
-    };
-
-    CardTextField.prototype.setCardMaskStrategy = function(cardMaskStrategy) {
-      if (cardMaskStrategy !== this._cardMaskStrategy) {
-        this._cardMaskStrategy = cardMaskStrategy;
-        this._syncMask();
-      }
-      return null;
-    };
-
-    CardTextField.prototype.cardMask = function() {
-      var last4, text, toMask;
-      text = this.text();
-      toMask = text.slice(0, -4);
-      last4 = text.slice(-4);
-      return toMask.replace(/\d/g, '•') + last4;
-    };
-
-    CardTextField.prototype._masked = false;
-
-    CardTextField.prototype._editing = false;
-
-    CardTextField.prototype.text = function() {
-      if (this._masked) {
-        return this._unmaskedText;
-      } else {
-        return CardTextField.__super__.text.call(this);
-      }
-    };
-
-    CardTextField.prototype.setText = function(text) {
-      if (this._masked) {
-        this._unmaskedText = text;
-        text = this.cardMask();
-      }
-      return CardTextField.__super__.setText.call(this, text);
-    };
-
-    CardTextField.prototype.textFieldDidEndEditing = function() {
-      this._editing = false;
-      return this._syncMask();
-    };
-
-    CardTextField.prototype.textFieldDidBeginEditing = function() {
-      this._editing = true;
-      return this._syncMask();
-    };
-
-    CardTextField.prototype._enableMasking = function() {
-      if (!this._masked) {
-        this._unmaskedText = this.text();
-        this._masked = true;
-        return this.setText(this._unmaskedText);
-      }
-    };
-
-    CardTextField.prototype._disableMasking = function() {
-      if (this._masked) {
-        this._masked = false;
-        this.setText(this._unmaskedText);
-        return this._unmaskedText = null;
-      }
-    };
-
-    CardTextField.prototype._syncMask = function() {
-      if (this.cardMaskStrategy() === CardMaskStrategy.DoneEditing) {
-        if (this._editing) {
-          return this._disableMasking();
-        } else {
-          return this._enableMasking();
-        }
-      }
-    };
-
-    return CardTextField;
-
-  })(TextField);
-
-  CardTextField.CardMaskStrategy = CardMaskStrategy;
-
-  module.exports = CardTextField;
-
-}).call(this);
-
-},{"./text_field":13,"./adaptive_card_formatter":2,"./card_utils":15}],7:[function(require,module,exports){
-(function() {
-  var ExpiryDateField, ExpiryDateFormatter, TextField,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  TextField = require('./text_field');
-
-  ExpiryDateFormatter = require('./expiry_date_formatter');
-
-  ExpiryDateField = (function(_super) {
-    __extends(ExpiryDateField, _super);
-
-    function ExpiryDateField(element) {
-      ExpiryDateField.__super__.constructor.call(this, element, new ExpiryDateFormatter());
-    }
-
-    ExpiryDateField.prototype.textFieldDidEndEditing = function() {
-      var value;
-      value = this.value();
-      if (value) {
-        return this.setText(this.formatter().format(value));
-      }
-    };
-
-    return ExpiryDateField;
-
-  })(TextField);
-
-  module.exports = ExpiryDateField;
-
-}).call(this);
-
-},{"./text_field":13,"./expiry_date_formatter":8}],6:[function(require,module,exports){
-(function() {
-  var DelimitedTextFormatter, Formatter,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-    __slice = [].slice;
-
-  Formatter = require('./formatter');
-
-  DelimitedTextFormatter = (function(_super) {
-    __extends(DelimitedTextFormatter, _super);
-
-    DelimitedTextFormatter.prototype.delimiter = null;
-
-    DelimitedTextFormatter.prototype.delimiterAt = function(index) {
-      if (!this.hasDelimiterAtIndex(index)) {
-        return null;
-      }
-      return this.delimiter;
-    };
-
-    DelimitedTextFormatter.prototype.isDelimiter = function(chr) {
-      return chr === this.delimiter;
-    };
-
-    function DelimitedTextFormatter(delimiter) {
-      var _ref;
-      if (delimiter == null) {
-        delimiter = this.delimiter;
-      }
-      this.delimiter = delimiter;
-      if (((_ref = this.delimiter) != null ? _ref.length : void 0) !== 1) {
-        throw new Error('delimiter must have just one character');
-      }
-    }
-
-    DelimitedTextFormatter.prototype.format = function(value) {
-      return this._textFromValue(value);
-    };
-
-    DelimitedTextFormatter.prototype._textFromValue = function(value) {
-      var chr, delimiter, result, _i, _len;
-      if (!value) {
-        return '';
-      }
-      result = '';
-      for (_i = 0, _len = value.length; _i < _len; _i++) {
-        chr = value[_i];
-        while (delimiter = this.delimiterAt(result.length)) {
-          result += delimiter;
-        }
-        result += chr;
-        while (delimiter = this.delimiterAt(result.length)) {
-          result += delimiter;
-        }
-      }
-      return result;
-    };
-
-    DelimitedTextFormatter.prototype.parse = function(text, error) {
-      return this._valueFromText(text);
-    };
-
-    DelimitedTextFormatter.prototype._valueFromText = function(text) {
-      var chr;
-      if (!text) {
-        return '';
-      }
-      return ((function() {
-        var _i, _len, _results;
-        _results = [];
-        for (_i = 0, _len = text.length; _i < _len; _i++) {
-          chr = text[_i];
-          if (!this.isDelimiter(chr)) {
-            _results.push(chr);
-          }
-        }
-        return _results;
-      }).call(this)).join('');
-    };
-
-    DelimitedTextFormatter.prototype.isChangeValid = function(change, error) {
-      var endMovedLeft, endMovedOverADelimiter, endMovedRight, hasSelection, isChangeValid, newCursorPosition, newText, range, startMovedLeft, startMovedOverADelimiter, startMovedRight, value;
-      if (!DelimitedTextFormatter.__super__.isChangeValid.call(this, change, error)) {
-        return false;
-      }
-      newText = change.proposed.text;
-      range = change.proposed.selectedRange;
-      hasSelection = range.length !== 0;
-      startMovedLeft = range.start < change.current.selectedRange.start;
-      startMovedRight = range.start > change.current.selectedRange.start;
-      endMovedLeft = (range.start + range.length) < (change.current.selectedRange.start + change.current.selectedRange.length);
-      endMovedRight = (range.start + range.length) > (change.current.selectedRange.start + change.current.selectedRange.length);
-      startMovedOverADelimiter = startMovedLeft && this.hasDelimiterAtIndex(range.start) || startMovedRight && this.hasDelimiterAtIndex(range.start - 1);
-      endMovedOverADelimiter = endMovedLeft && this.hasDelimiterAtIndex(range.start + range.length) || endMovedRight && this.hasDelimiterAtIndex(range.start + range.length - 1);
-      if (this.isDelimiter(change.deleted.text)) {
-        newCursorPosition = change.deleted.start - 1;
-        while (this.isDelimiter(newText.charAt(newCursorPosition))) {
-          newText = newText.substring(0, newCursorPosition) + newText.substring(newCursorPosition + 1);
-          newCursorPosition--;
-        }
-        newText = newText.substring(0, newCursorPosition) + newText.substring(newCursorPosition + 1);
-      }
-      if (startMovedLeft && startMovedOverADelimiter) {
-        while (this.delimiterAt(range.start - 1)) {
-          range.start--;
-          range.length++;
-        }
-        range.start--;
-        range.length++;
-      }
-      if (startMovedRight) {
-        while (this.delimiterAt(range.start)) {
-          range.start++;
-          range.length--;
-        }
-        if (startMovedOverADelimiter) {
-          range.start++;
-          range.length--;
-          while (this.delimiterAt(range.start)) {
-            range.start++;
-            range.length--;
-          }
-        }
-      }
-      if (hasSelection) {
-        if (endMovedOverADelimiter) {
-          if (endMovedLeft) {
-            while (this.delimiterAt(range.start + range.length - 1)) {
-              range.length--;
-            }
-            range.length--;
-          }
-          if (endMovedRight) {
-            while (this.delimiterAt(range.start + range.length)) {
-              range.length++;
-            }
-            range.length++;
-          }
-        }
-        while (this.hasDelimiterAtIndex(range.start + range.length - 1)) {
-          if (startMovedLeft || endMovedLeft) {
-            range.length--;
-          } else {
-            range.length++;
-          }
-        }
-        while (this.hasDelimiterAtIndex(range.start)) {
-          if (startMovedRight || endMovedRight) {
-            range.start++;
-            range.length--;
-          } else {
-            range.start--;
-            range.length++;
-          }
-        }
-      } else {
-        range.length = 0;
-      }
-      isChangeValid = true;
-      value = this._valueFromText(newText, function() {
-        var args;
-        args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-        isChangeValid = false;
-        return error.apply(null, args);
-      });
-      if (isChangeValid) {
-        change.proposed.text = this._textFromValue(value);
-      }
-      return isChangeValid;
-    };
-
-    return DelimitedTextFormatter;
-
-  })(Formatter);
-
-  module.exports = DelimitedTextFormatter;
-
-}).call(this);
-
-},{"./formatter":10}],8:[function(require,module,exports){
-(function() {
-  var DelimitedTextFormatter, ExpiryDateFormatter, interpretTwoDigitYear, zpad2, _ref,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  DelimitedTextFormatter = require('./delimited_text_formatter');
-
-  zpad2 = require('./utils').zpad2;
-
-  interpretTwoDigitYear = function(year) {
-    var centuries, thisCentury, thisYear;
-    thisYear = new Date().getFullYear();
-    thisCentury = thisYear - (thisYear % 100);
-    centuries = [thisCentury, thisCentury - 100, thisCentury + 100].sort(function(a, b) {
-      return Math.abs(thisYear - (year + a)) - Math.abs(thisYear - (year + b));
-    });
-    return year + centuries[0];
-  };
-
-  ExpiryDateFormatter = (function(_super) {
-    __extends(ExpiryDateFormatter, _super);
-
-    function ExpiryDateFormatter() {
-      _ref = ExpiryDateFormatter.__super__.constructor.apply(this, arguments);
-      return _ref;
-    }
-
-    ExpiryDateFormatter.prototype.delimiter = '/';
-
-    ExpiryDateFormatter.prototype.maximumLength = 5;
-
-    ExpiryDateFormatter.prototype.hasDelimiterAtIndex = function(index) {
-      return index === 2;
-    };
-
-    ExpiryDateFormatter.prototype.format = function(value) {
-      var month, year;
-      if (!value) {
-        return '';
-      }
-      month = value.month, year = value.year;
-      year = year % 100;
-      return ExpiryDateFormatter.__super__.format.call(this, zpad2(month) + zpad2(year));
-    };
-
-    ExpiryDateFormatter.prototype.parse = function(text, error) {
-      var month, year, _ref1;
-      _ref1 = text.split(this.delimiter), month = _ref1[0], year = _ref1[1];
-      if ((month != null ? month.match(/^(0?[1-9]|1\d)$/) : void 0) && (year != null ? year.match(/^\d\d?$/) : void 0)) {
-        month = Number(month);
-        year = interpretTwoDigitYear(Number(year));
-        return {
-          month: month,
-          year: year
-        };
-      } else {
-        error('expiry-date-formatter.invalid-date');
-        return null;
-      }
-    };
-
-    ExpiryDateFormatter.prototype.isChangeValid = function(change, error) {
-      var isBackspace, match, newText;
-      isBackspace = change.proposed.text.length < change.current.text.length;
-      newText = change.proposed.text;
-      if (isBackspace) {
-        if (change.deleted.text === this.delimiter) {
-          newText = newText[0];
-        }
-        if (newText === '0') {
-          newText = '';
-        }
-      } else if (change.inserted.text === this.delimiter && change.current.text === '1') {
-        newText = "01" + this.delimiter;
-      } else if (change.inserted.text.length > 0 && !/^\d$/.test(change.inserted.text)) {
-        error('expiry-date-formatter.only-digits-allowed');
-        return false;
-      } else {
-        if (/^[2-9]$/.test(newText)) {
-          newText = '0' + newText;
-        }
-        if (/^1[3-9]$/.test(newText)) {
-          error('expiry-date-formatter.invalid-month');
-          return false;
-        }
-        if (newText === '00') {
-          error('expiry-date-formatter.invalid-month');
-          return false;
-        }
-        if (/^(0[1-9]|1[0-2])$/.test(newText)) {
-          newText += this.delimiter;
-        }
-        if ((match = newText.match(/^(\d\d)(.)(\d\d?).*$/)) && match[2] === this.delimiter) {
-          newText = match[1] + this.delimiter + match[3];
-        }
-      }
-      change.proposed.text = newText;
-      change.proposed.selectedRange = {
-        start: newText.length,
+  }
+  return false;
+};
+
+PhoneFormatter.prototype.delimiterAt = function(index) {
+  return this.delimiterMap[index];
+};
+
+PhoneFormatter.prototype.hasDelimiterAtIndex = function(index) {
+  var delimiter = this.delimiterAt(index);
+  return delimiter !== undefined && delimiter !== null;
+};
+
+PhoneFormatter.prototype.parse = function(text, error) {
+  if (!error) { error = function(){}; }
+  var digits = this.digitsWithoutCountryCode(text);
+  // Source: http://en.wikipedia.org/wiki/North_American_Numbering_Plan
+  //
+  // Area Code
+  if (text.length < 10) {
+    error('phone-formatter.number-too-short');
+  }
+  if (digits[0] === '0') {
+    error('phone-formatter.area-code-zero');
+  }
+  if (digits[0] === '1') {
+    error('phone-formatter.area-code-one');
+  }
+  if (digits[1] === '9') {
+    error('phone-formatter.area-code-n9n');
+  }
+  // Central Office Code
+  if (digits[3] === '1') {
+    error('phone-formatter.central-office-one');
+  }
+  if (digits.slice(4, 6) === '11') {
+    error('phone-formatter.central-office-n11');
+  }
+  return DelimitedTextFormatter.prototype.parse.call(this, text, error);
+};
+
+PhoneFormatter.prototype.format = function(value) {
+  this.guessFormatFromText(value);
+  return DelimitedTextFormatter.prototype.format.call(this, this.removeDelimiterMapChars(value));
+};
+
+PhoneFormatter.prototype.isChangeValid = function(change, error) {
+  this.guessFormatFromText(change.proposed.text);
+
+  if (change.inserted.text.length > 1) {
+    // handle pastes
+    var text = change.current.text;
+    var selectedRange = change.current.selectedRange;
+    var toInsert = change.inserted.text;
+
+    // Replace the selection with the new text, remove non-digits, then format.
+    var formatted = this.format((
+      text.slice(0, selectedRange.start) +
+      toInsert +
+      text.slice(selectedRange.start+selectedRange.length)
+    ).replace(/[^\d]/g, ''));
+
+    change.proposed = {
+      text: formatted,
+      selectedRange: {
+        start: formatted.length - (text.length - (selectedRange.start + selectedRange.length)),
         length: 0
-      };
-      return true;
-    };
-
-    return ExpiryDateFormatter;
-
-  })(DelimitedTextFormatter);
-
-  module.exports = ExpiryDateFormatter;
-
-}).call(this);
-
-},{"./delimited_text_formatter":6,"./utils":16}],12:[function(require,module,exports){
-(function() {
-  var DelimitedTextFormatter, SocialSecurityNumberFormatter, _ref,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  DelimitedTextFormatter = require('./delimited_text_formatter');
-
-  SocialSecurityNumberFormatter = (function(_super) {
-    __extends(SocialSecurityNumberFormatter, _super);
-
-    function SocialSecurityNumberFormatter() {
-      _ref = SocialSecurityNumberFormatter.__super__.constructor.apply(this, arguments);
-      return _ref;
-    }
-
-    SocialSecurityNumberFormatter.prototype.delimiter = '-';
-
-    SocialSecurityNumberFormatter.prototype.maximumLength = 9 + 2;
-
-    SocialSecurityNumberFormatter.prototype.hasDelimiterAtIndex = function(index) {
-      return index === 3 || index === 6;
-    };
-
-    SocialSecurityNumberFormatter.prototype.isChangeValid = function(change) {
-      if (/^\d*$/.test(change.inserted.text)) {
-        return SocialSecurityNumberFormatter.__super__.isChangeValid.call(this, change);
-      } else {
-        return false;
       }
     };
 
-    return SocialSecurityNumberFormatter;
-
-  })(DelimitedTextFormatter);
-
-  module.exports = SocialSecurityNumberFormatter;
-
-}).call(this);
-
-},{"./delimited_text_formatter":6}],11:[function(require,module,exports){
-(function() {
-  var DELIMITER_PATTERN, DelimitedTextFormatter, NANP_PHONE_DELIMITERS, NANP_PHONE_DELIMITERS_WITH_1, NANP_PHONE_DELIMITERS_WITH_PLUS, PhoneFormatter,
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
-
-  DelimitedTextFormatter = require('./delimited_text_formatter');
-
-  NANP_PHONE_DELIMITERS = {
-    0: '(',
-    4: ')',
-    5: ' ',
-    9: '-'
-  };
-
-  NANP_PHONE_DELIMITERS_WITH_1 = {
-    1: ' ',
-    2: '(',
-    6: ')',
-    7: ' ',
-    11: '-'
-  };
-
-  NANP_PHONE_DELIMITERS_WITH_PLUS = {
-    2: ' ',
-    3: '(',
-    7: ')',
-    8: ' ',
-    12: '-'
-  };
-
-  DELIMITER_PATTERN = /[-\(\) ]/g;
-
-  PhoneFormatter = (function(_super) {
-    __extends(PhoneFormatter, _super);
-
-    PhoneFormatter.prototype.maximumLength = null;
-
-    PhoneFormatter.prototype.delimiterMap = null;
-
-    function PhoneFormatter() {
-      if (arguments.length !== 0) {
-        throw new Error("were you trying to set a delimiter (" + arguments[0] + ")?");
-      }
-    }
-
-    PhoneFormatter.prototype.isDelimiter = function(chr) {
-      var delimiter, index;
-      return __indexOf.call((function() {
-        var _ref, _results;
-        _ref = this.delimiterMap;
-        _results = [];
-        for (index in _ref) {
-          delimiter = _ref[index];
-          _results.push(delimiter);
-        }
-        return _results;
-      }).call(this), chr) >= 0;
-    };
-
-    PhoneFormatter.prototype.delimiterAt = function(index) {
-      return this.delimiterMap[index];
-    };
-
-    PhoneFormatter.prototype.hasDelimiterAtIndex = function(index) {
-      return this.delimiterAt(index) != null;
-    };
-
-    PhoneFormatter.prototype.parse = function(text, error) {
-      var digits;
-      digits = this.digitsWithoutCountryCode(text);
-      if (!(text.length >= 10)) {
-        if (typeof error === "function") {
-          error('phone-formatter.number-too-short');
-        }
-      }
-      if (digits[0] === '0') {
-        if (typeof error === "function") {
-          error('phone-formatter.area-code-zero');
-        }
-      }
-      if (digits[0] === '1') {
-        if (typeof error === "function") {
-          error('phone-formatter.area-code-one');
-        }
-      }
-      if (digits[1] === '9') {
-        if (typeof error === "function") {
-          error('phone-formatter.area-code-n9n');
-        }
-      }
-      if (digits[3] === '1') {
-        if (typeof error === "function") {
-          error('phone-formatter.central-office-one');
-        }
-      }
-      if (digits.slice(4, 6) === '11') {
-        if (typeof error === "function") {
-          error('phone-formatter.central-office-n11');
-        }
-      }
-      return PhoneFormatter.__super__.parse.call(this, text, error);
-    };
-
-    PhoneFormatter.prototype.format = function(value) {
-      this.guessFormatFromText(value);
-      return PhoneFormatter.__super__.format.call(this, this.removeDelimiterMapChars(value));
-    };
-
-    PhoneFormatter.prototype.isChangeValid = function(change, error) {
-      var formatted, selectedRange, text, toInsert, _ref;
-      this.guessFormatFromText(change.proposed.text);
-      if (change.inserted.text.length > 1) {
-        _ref = change.current, text = _ref.text, selectedRange = _ref.selectedRange;
-        toInsert = change.inserted.text;
-        formatted = this.format((text.slice(0, selectedRange.start) + toInsert + text.slice(selectedRange.start + selectedRange.length)).replace(/[^\d]/g, ''));
-        change.proposed = {
-          text: formatted,
-          selectedRange: {
-            start: formatted.length - (text.length - (selectedRange.start + selectedRange.length)),
-            length: 0
-          }
-        };
-        return PhoneFormatter.__super__.isChangeValid.call(this, change, error);
-      }
-      if (/^\d*$/.test(change.inserted.text) || change.proposed.text.indexOf('+') === 0) {
-        return PhoneFormatter.__super__.isChangeValid.call(this, change, error);
-      } else {
-        return false;
-      }
-    };
-
-    PhoneFormatter.prototype.guessFormatFromText = function(text) {
-      if ((text != null ? text[0] : void 0) === '+') {
-        this.delimiterMap = NANP_PHONE_DELIMITERS_WITH_PLUS;
-        return this.maximumLength = 1 + 1 + 10 + 5;
-      } else if ((text != null ? text[0] : void 0) === '1') {
-        this.delimiterMap = NANP_PHONE_DELIMITERS_WITH_1;
-        return this.maximumLength = 1 + 10 + 5;
-      } else {
-        this.delimiterMap = NANP_PHONE_DELIMITERS;
-        return this.maximumLength = 10 + 4;
-      }
-    };
-
-    PhoneFormatter.prototype.digitsWithoutCountryCode = function(text) {
-      var digits, extraDigits;
-      digits = (text != null ? text : '').replace(/[^\d]/g, '');
-      extraDigits = digits.length - 10;
-      if (extraDigits > 0) {
-        digits = digits.substr(extraDigits);
-      }
-      return digits;
-    };
-
-    PhoneFormatter.prototype.removeDelimiterMapChars = function(text) {
-      return (text != null ? text : '').replace(DELIMITER_PATTERN, '');
-    };
-
-    return PhoneFormatter;
-
-  })(DelimitedTextFormatter);
-
-  module.exports = PhoneFormatter;
-
-}).call(this);
-
-},{"./delimited_text_formatter":6}],13:[function(require,module,exports){
-(function() {
-  var AFFINITY, Formatter, KEYS, TextField, TextFieldStateChange, UndoManager, hasLeftWordBreakAtIndex, hasRightWordBreakAtIndex, isWordChar, keyBindingsForPlatform, _ref,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __slice = [].slice;
-
-  Formatter = require('./formatter');
-
-  UndoManager = require('./undo_manager');
-
-  _ref = require('./keybindings'), KEYS = _ref.KEYS, keyBindingsForPlatform = _ref.keyBindingsForPlatform;
-
-  AFFINITY = {
-    UPSTREAM: 0,
-    DOWNSTREAM: 1,
-    NONE: null
-  };
-
-  isWordChar = function(chr) {
-    return chr && /^\w$/.test(chr);
-  };
-
-  hasLeftWordBreakAtIndex = function(text, index) {
-    if (index === 0) {
-      return true;
-    } else {
-      return !isWordChar(text[index - 1]) && isWordChar(text[index]);
-    }
-  };
-
-  hasRightWordBreakAtIndex = function(text, index) {
-    if (index === text.length) {
-      return true;
-    } else {
-      return isWordChar(text[index]) && !isWordChar(text[index + 1]);
-    }
-  };
-
-  TextField = (function() {
-    TextField.prototype.selectionAffinity = AFFINITY.NONE;
-
-    TextField.prototype._delegate = null;
-
-    TextField.prototype.delegate = function() {
-      return this._delegate;
-    };
-
-    TextField.prototype.setDelegate = function(delegate) {
-      this._delegate = delegate;
-      return null;
-    };
-
-    function TextField(element, _formatter) {
-      this.element = element;
-      this._formatter = _formatter;
-      this._focusout = __bind(this._focusout, this);
-      this._focusin = __bind(this._focusin, this);
-      this.click = __bind(this.click, this);
-      this.paste = __bind(this.paste, this);
-      this.keyUp = __bind(this.keyUp, this);
-      this.keyPress = __bind(this.keyPress, this);
-      this.keyDown = __bind(this.keyDown, this);
-      if (this.element.data('field-kit-text-field')) {
-        throw new Error("already attached a TextField to this element");
-      } else {
-        this.element.data('field-kit-text-field', this);
-      }
-      this._jQuery = this.element.constructor;
-      this.element.on('keydown.field-kit', this.keyDown);
-      this.element.on('keypress.field-kit', this.keyPress);
-      this.element.on('keyup.field-kit', this.keyUp);
-      this.element.on('click.field-kit', this.click);
-      this.element.on('paste.field-kit', this.paste);
-      this.element.on('focusin.field-kit', this._focusin);
-      this.element.on('focusout.field-kit', this._focusout);
-      this._buildKeybindings();
-    }
-
-    TextField.prototype.destroy = function() {
-      this.element.off('.field-kit');
-      this.element.data('field-kit-text-field', null);
-      return null;
-    };
-
-    TextField.prototype.insertText = function(text) {
-      var range;
-      if (this.hasSelection()) {
-        this.clearSelection();
-      }
-      this.replaceSelection(text);
-      range = this.selectedRange();
-      range.start += range.length;
-      range.length = 0;
-      return this.setSelectedRange(range);
-    };
-
-    TextField.prototype.insertNewline = function(event) {
-      this._textFieldDidEndEditing();
-      return this._didEndEditingButKeptFocus = true;
-    };
-
-    TextField.prototype._textDidChange = function() {
-      var _ref1;
-      this.textDidChange();
-      return (_ref1 = this._delegate) != null ? typeof _ref1.textDidChange === "function" ? _ref1.textDidChange(this) : void 0 : void 0;
-    };
-
-    TextField.prototype.textDidChange = function() {};
-
-    TextField.prototype._textFieldDidEndEditing = function() {
-      var _ref1;
-      this.textFieldDidEndEditing();
-      return (_ref1 = this._delegate) != null ? typeof _ref1.textFieldDidEndEditing === "function" ? _ref1.textFieldDidEndEditing(this) : void 0 : void 0;
-    };
-
-    TextField.prototype.textFieldDidEndEditing = function() {};
-
-    TextField.prototype._textFieldDidBeginEditing = function() {
-      var _ref1;
-      this.textFieldDidBeginEditing();
-      return (_ref1 = this._delegate) != null ? typeof _ref1.textFieldDidBeginEditing === "function" ? _ref1.textFieldDidBeginEditing(this) : void 0 : void 0;
-    };
-
-    TextField.prototype.textFieldDidBeginEditing = function() {};
-
-    TextField.prototype.moveUp = function(event) {
-      event.preventDefault();
-      return this.setSelectedRange({
-        start: 0,
-        length: 0
-      });
-    };
-
-    TextField.prototype.moveToBeginningOfParagraph = function(event) {
-      return this.moveUp(event);
-    };
-
-    TextField.prototype.moveUpAndModifySelection = function(event) {
-      var range;
-      event.preventDefault();
-      range = this.selectedRange();
-      switch (this.selectionAffinity) {
-        case AFFINITY.UPSTREAM:
-        case AFFINITY.NONE:
-          range.length += range.start;
-          range.start = 0;
-          break;
-        case AFFINITY.DOWNSTREAM:
-          range.length = range.start;
-          range.start = 0;
-      }
-      return this.setSelectedRangeWithAffinity(range, AFFINITY.UPSTREAM);
-    };
-
-    TextField.prototype.moveParagraphBackwardAndModifySelection = function(event) {
-      var range;
-      event.preventDefault();
-      range = this.selectedRange();
-      switch (this.selectionAffinity) {
-        case AFFINITY.UPSTREAM:
-        case AFFINITY.NONE:
-          range.length += range.start;
-          range.start = 0;
-          break;
-        case AFFINITY.DOWNSTREAM:
-          range.length = 0;
-      }
-      return this.setSelectedRangeWithAffinity(range, AFFINITY.UPSTREAM);
-    };
-
-    TextField.prototype.moveToBeginningOfDocument = function(event) {
-      return this.moveToBeginningOfLine(event);
-    };
-
-    TextField.prototype.moveToBeginningOfDocumentAndModifySelection = function(event) {
-      var range;
-      event.preventDefault();
-      range = this.selectedRange();
-      range.length += range.start;
-      range.start = 0;
-      return this.setSelectedRangeWithAffinity(range, AFFINITY.UPSTREAM);
-    };
-
-    TextField.prototype.moveDown = function(event) {
-      var range;
-      event.preventDefault();
-      range = {
-        start: this.text().length,
-        length: 0
-      };
-      return this.setSelectedRangeWithAffinity(range, AFFINITY.NONE);
-    };
-
-    TextField.prototype.moveToEndOfParagraph = function(event) {
-      return this.moveDown(event);
-    };
-
-    TextField.prototype.moveDownAndModifySelection = function(event) {
-      var end, range;
-      event.preventDefault();
-      range = this.selectedRange();
-      end = this.text().length;
-      if (this.selectionAffinity === AFFINITY.UPSTREAM) {
-        range.start += range.length;
-      }
-      range.length = end - range.start;
-      return this.setSelectedRangeWithAffinity(range, AFFINITY.DOWNSTREAM);
-    };
-
-    TextField.prototype.moveParagraphForwardAndModifySelection = function(event) {
-      var range;
-      event.preventDefault();
-      range = this.selectedRange();
-      switch (this.selectionAffinity) {
-        case AFFINITY.DOWNSTREAM:
-        case AFFINITY.NONE:
-          range.length = this.text().length - range.start;
-          break;
-        case AFFINITY.UPSTREAM:
-          range.start += range.length;
-          range.length = 0;
-      }
-      return this.setSelectedRangeWithAffinity(range, AFFINITY.DOWNSTREAM);
-    };
-
-    TextField.prototype.moveToEndOfDocument = function(event) {
-      return this.moveToEndOfLine(event);
-    };
-
-    TextField.prototype.moveToEndOfDocumentAndModifySelection = function(event) {
-      var range;
-      event.preventDefault();
-      range = this.selectedRange();
-      range.length = this.text().length - range.start;
-      return this.setSelectedRangeWithAffinity(range, AFFINITY.DOWNSTREAM);
-    };
-
-    TextField.prototype.moveLeft = function(event) {
-      var range;
-      event.preventDefault();
-      range = this.selectedRange();
-      if (range.length !== 0) {
-        range.length = 0;
-      } else {
-        range.start--;
-      }
-      return this.setSelectedRangeWithAffinity(range, AFFINITY.NONE);
-    };
-
-    TextField.prototype.moveLeftAndModifySelection = function(event) {
-      var range;
-      event.preventDefault();
-      range = this.selectedRange();
-      switch (this.selectionAffinity) {
-        case AFFINITY.UPSTREAM:
-        case AFFINITY.NONE:
-          this.selectionAffinity = AFFINITY.UPSTREAM;
-          range.start--;
-          range.length++;
-          break;
-        case AFFINITY.DOWNSTREAM:
-          range.length--;
-      }
-      return this.setSelectedRange(range);
-    };
-
-    TextField.prototype.moveWordLeft = function(event) {
-      var index;
-      event.preventDefault();
-      index = this.lastWordBreakBeforeIndex(this.selectedRange().start - 1);
-      return this.setSelectedRange({
-        start: index,
-        length: 0
-      });
-    };
-
-    TextField.prototype.moveWordLeftAndModifySelection = function(event) {
-      var end, range, start;
-      event.preventDefault();
-      range = this.selectedRange();
-      switch (this.selectionAffinity) {
-        case AFFINITY.UPSTREAM:
-        case AFFINITY.NONE:
-          this.selectionAffinity = AFFINITY.UPSTREAM;
-          start = this.lastWordBreakBeforeIndex(range.start - 1);
-          range.length += range.start - start;
-          range.start = start;
-          break;
-        case AFFINITY.DOWNSTREAM:
-          end = this.lastWordBreakBeforeIndex(range.start + range.length);
-          if (end < range.start) {
-            end = range.start;
-          }
-          range.length -= range.start + range.length - end;
-      }
-      return this.setSelectedRange(range);
-    };
-
-    TextField.prototype.moveToBeginningOfLine = function(event) {
-      event.preventDefault();
-      return this.setSelectedRange({
-        start: 0,
-        length: 0
-      });
-    };
-
-    TextField.prototype.moveToBeginningOfLineAndModifySelection = function(event) {
-      var range;
-      event.preventDefault();
-      range = this.selectedRange();
-      range.length += range.start;
-      range.start = 0;
-      return this.setSelectedRangeWithAffinity(range, AFFINITY.UPSTREAM);
-    };
-
-    TextField.prototype.moveRight = function(event) {
-      var range;
-      event.preventDefault();
-      range = this.selectedRange();
-      if (range.length !== 0) {
-        range.start += range.length;
-        range.length = 0;
-      } else {
-        range.start++;
-      }
-      return this.setSelectedRangeWithAffinity(range, AFFINITY.NONE);
-    };
-
-    TextField.prototype.moveRightAndModifySelection = function(event) {
-      var range;
-      event.preventDefault();
-      range = this.selectedRange();
-      switch (this.selectionAffinity) {
-        case AFFINITY.UPSTREAM:
-          range.start++;
-          range.length--;
-          break;
-        case AFFINITY.DOWNSTREAM:
-        case AFFINITY.NONE:
-          this.selectionAffinity = AFFINITY.DOWNSTREAM;
-          range.length++;
-      }
-      return this.setSelectedRange(range);
-    };
-
-    TextField.prototype.moveWordRight = function(event) {
-      var index, range;
-      event.preventDefault();
-      range = this.selectedRange();
-      index = this.nextWordBreakAfterIndex(range.start + range.length);
-      return this.setSelectedRange({
-        start: index,
-        length: 0
-      });
-    };
-
-    TextField.prototype.moveWordRightAndModifySelection = function(event) {
-      var end, range, start;
-      event.preventDefault();
-      range = this.selectedRange();
-      start = range.start;
-      end = range.start + range.length;
-      switch (this.selectionAffinity) {
-        case AFFINITY.UPSTREAM:
-          start = Math.min(this.nextWordBreakAfterIndex(start), end);
-          break;
-        case AFFINITY.DOWNSTREAM:
-        case AFFINITY.NONE:
-          this.selectionAffinity = AFFINITY.DOWNSTREAM;
-          end = this.nextWordBreakAfterIndex(range.start + range.length);
-      }
-      return this.setSelectedRange({
-        start: start,
-        length: end - start
-      });
-    };
-
-    TextField.prototype.moveToEndOfLine = function(event) {
-      event.preventDefault();
-      return this.setSelectedRange({
-        start: this.text().length,
-        length: 0
-      });
-    };
-
-    TextField.prototype.moveToEndOfLineAndModifySelection = function(event) {
-      var range;
-      event.preventDefault();
-      range = this.selectedRange();
-      range.length = this.text().length - range.start;
-      return this.setSelectedRangeWithAffinity(range, AFFINITY.DOWNSTREAM);
-    };
-
-    TextField.prototype.deleteBackward = function(event) {
-      var range;
-      event.preventDefault();
-      range = this.selectedRange();
-      if (range.length === 0) {
-        range.start--;
-        range.length++;
-        this.setSelectedRange(range);
-      }
-      return this.clearSelection();
-    };
-
-    TextField.prototype.deleteWordBackward = function(event) {
-      var range, start;
-      if (this.hasSelection()) {
-        return this.deleteBackward(event);
-      }
-      event.preventDefault();
-      range = this.selectedRange();
-      start = this.lastWordBreakBeforeIndex(range.start);
-      range.length += range.start - start;
-      range.start = start;
-      this.setSelectedRange(range);
-      return this.clearSelection();
-    };
-
-    TextField.prototype.deleteBackwardByDecomposingPreviousCharacter = function(event) {
-      return this.deleteBackward(event);
-    };
-
-    TextField.prototype.deleteBackwardToBeginningOfLine = function(event) {
-      var range;
-      if (this.hasSelection()) {
-        return this.deleteBackward(event);
-      }
-      event.preventDefault();
-      range = this.selectedRange();
-      range.length = range.start;
-      range.start = 0;
-      this.setSelectedRange(range);
-      return this.clearSelection();
-    };
-
-    TextField.prototype.deleteForward = function(event) {
-      var range;
-      event.preventDefault();
-      range = this.selectedRange();
-      if (range.length === 0) {
-        range.length++;
-        this.setSelectedRange(range);
-      }
-      return this.clearSelection();
-    };
-
-    TextField.prototype.deleteWordForward = function(event) {
-      var end, range;
-      if (this.hasSelection()) {
-        return this.deleteForward(event);
-      }
-      event.preventDefault();
-      range = this.selectedRange();
-      end = this.nextWordBreakAfterIndex(range.start + range.length);
-      this.setSelectedRange({
-        start: range.start,
-        length: end - range.start
-      });
-      return this.clearSelection();
-    };
-
-    TextField.prototype.insertTab = function(event) {};
-
-    TextField.prototype.insertBackTab = function(event) {};
-
-    TextField.prototype.hasSelection = function() {
-      return this.selectedRange().length !== 0;
-    };
-
-    TextField.prototype.lastWordBreakBeforeIndex = function(index) {
-      var indexes, result, wordBreakIndex, _i, _len;
-      indexes = this.leftWordBreakIndexes();
-      result = indexes[0];
-      for (_i = 0, _len = indexes.length; _i < _len; _i++) {
-        wordBreakIndex = indexes[_i];
-        if (index > wordBreakIndex) {
-          result = wordBreakIndex;
-        } else {
-          break;
-        }
-      }
-      return result;
-    };
-
-    TextField.prototype.leftWordBreakIndexes = function() {
-      var i, result, text, _i, _ref1;
-      result = [];
-      text = this.text();
-      for (i = _i = 0, _ref1 = text.length - 1; 0 <= _ref1 ? _i <= _ref1 : _i >= _ref1; i = 0 <= _ref1 ? ++_i : --_i) {
-        if (hasLeftWordBreakAtIndex(text, i)) {
-          result.push(i);
-        }
-      }
-      return result;
-    };
-
-    TextField.prototype.nextWordBreakAfterIndex = function(index) {
-      var indexes, result, wordBreakIndex, _i, _len;
-      indexes = this.rightWordBreakIndexes().reverse();
-      result = indexes[0];
-      for (_i = 0, _len = indexes.length; _i < _len; _i++) {
-        wordBreakIndex = indexes[_i];
-        if (index < wordBreakIndex) {
-          result = wordBreakIndex;
-        } else {
-          break;
-        }
-      }
-      return result;
-    };
-
-    TextField.prototype.rightWordBreakIndexes = function() {
-      var i, result, text, _i, _ref1;
-      result = [];
-      text = this.text();
-      for (i = _i = 0, _ref1 = text.length; 0 <= _ref1 ? _i <= _ref1 : _i >= _ref1; i = 0 <= _ref1 ? ++_i : --_i) {
-        if (hasRightWordBreakAtIndex(text, i)) {
-          result.push(i + 1);
-        }
-      }
-      return result;
-    };
-
-    TextField.prototype.clearSelection = function() {
-      return this.replaceSelection('');
-    };
-
-    TextField.prototype.replaceSelection = function(replacement) {
-      var end, range, text;
-      range = this.selectedRange();
-      end = range.start + range.length;
-      text = this.text();
-      text = text.substring(0, range.start) + replacement + text.substring(end);
-      range.length = replacement.length;
-      this.setText(text);
-      return this.setSelectedRangeWithAffinity(range, AFFINITY.NONE);
-    };
-
-    TextField.prototype.selectAll = function(event) {
-      event.preventDefault();
-      return this.setSelectedRangeWithAffinity({
-        start: 0,
-        length: this.text().length
-      }, AFFINITY.NONE);
-    };
-
-    TextField.prototype.readSelectionFromPasteboard = function(pasteboard) {
-      var range, text;
-      text = pasteboard.getData('Text');
-      this.replaceSelection(text);
-      range = this.selectedRange();
-      range.start += range.length;
-      range.length = 0;
-      return this.setSelectedRange(range);
-    };
-
-    TextField.prototype.keyDown = function(event) {
-      var action,
-        _this = this;
-      if (this._didEndEditingButKeptFocus) {
-        this._textFieldDidBeginEditing();
-        this._didEndEditingButKeptFocus = false;
-      }
-      if (action = this._bindings.actionForEvent(event)) {
-        switch (action) {
-          case 'undo':
-          case 'redo':
-            return this[action](event);
-          default:
-            return this.rollbackInvalidChanges(function() {
-              return _this[action](event);
-            });
-        }
-      }
-    };
-
-    TextField.prototype.keyPress = function(event) {
-      var charCode, _ref1,
-        _this = this;
-      if (!event.metaKey && !event.ctrlKey && ((_ref1 = event.keyCode) !== KEYS.ENTER && _ref1 !== KEYS.TAB && _ref1 !== KEYS.BACKSPACE)) {
-        event.preventDefault();
-        if (event.charCode !== 0) {
-          charCode = event.charCode || event.keyCode;
-          return this.rollbackInvalidChanges(function() {
-            return _this.insertText(String.fromCharCode(charCode));
-          });
-        }
-      }
-    };
-
-    TextField.prototype.keyUp = function(event) {
-      var _this = this;
-      return this.rollbackInvalidChanges(function() {
-        if (event.keyCode === KEYS.TAB) {
-          return _this.selectAll(event);
-        }
-      });
-    };
-
-    TextField.prototype.paste = function(event) {
-      var _this = this;
-      event.preventDefault();
-      return this.rollbackInvalidChanges(function() {
-        return _this.readSelectionFromPasteboard(event.originalEvent.clipboardData);
-      });
-    };
-
-    TextField.prototype.rollbackInvalidChanges = function(callback) {
-      var change, error, errorType, result, _ref1, _ref2;
-      result = null;
-      errorType = null;
-      change = TextFieldStateChange.build(this, function() {
-        return result = callback();
-      });
-      error = function(type) {
-        return errorType = type;
-      };
-      if (change.hasChanges()) {
-        if (typeof ((_ref1 = this.formatter()) != null ? _ref1.isChangeValid : void 0) === 'function') {
-          if (this.formatter().isChangeValid(change, error)) {
-            change.recomputeDiff();
-            this.setText(change.proposed.text);
-            this.setSelectedRange(change.proposed.selectedRange);
-          } else {
-            if ((_ref2 = this.delegate()) != null) {
-              if (typeof _ref2.textFieldDidFailToValidateChange === "function") {
-                _ref2.textFieldDidFailToValidateChange(this, change, errorType);
-              }
-            }
-            this.setText(change.current.text);
-            this.setSelectedRange(change.current.selectedRange);
-            return result;
-          }
-        }
-        if (change.inserted.text.length || change.deleted.text.length) {
-          this.undoManager().proxyFor(this)._applyChangeFromUndoManager(change);
-          this._textDidChange();
-        }
-      }
-      return result;
-    };
-
-    TextField.prototype.click = function(event) {
-      return this.selectionAffinity = AFFINITY.NONE;
-    };
-
-    TextField.prototype.on = function() {
-      var args, _ref1;
-      args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-      return (_ref1 = this.element).on.apply(_ref1, args);
-    };
-
-    TextField.prototype.off = function() {
-      var args, _ref1;
-      args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-      return (_ref1 = this.element).off.apply(_ref1, args);
-    };
-
-    TextField.prototype.text = function() {
-      return this.element.val();
-    };
-
-    TextField.prototype.setText = function(text) {
-      return this.element.val(text);
-    };
-
-    TextField.prototype.value = function() {
-      var value,
-        _this = this;
-      value = this.text();
-      if (!this.formatter()) {
-        return value;
-      }
-      return this.formatter().parse(value, function(errorType) {
-        var _ref1;
-        return (_ref1 = _this._delegate) != null ? typeof _ref1.textFieldDidFailToParseString === "function" ? _ref1.textFieldDidFailToParseString(_this, value, errorType) : void 0 : void 0;
-      });
-    };
-
-    TextField.prototype.setValue = function(value) {
-      if (this._formatter) {
-        value = this._formatter.format(value);
-      }
-      this.setText("" + value);
-      return this.element.trigger('change');
-    };
-
-    TextField.prototype.formatter = function() {
-      var _this = this;
-      return this._formatter || (this._formatter = (function() {
-        var formatter, maximumLengthString;
-        formatter = new Formatter();
-        if ((maximumLengthString = _this.element.attr('maxlength')) != null) {
-          formatter.maximumLength = parseInt(maximumLengthString, 10);
-        }
-        return formatter;
-      })());
-    };
-
-    TextField.prototype.setFormatter = function(formatter) {
-      var value;
-      value = this.value();
-      this._formatter = formatter;
-      return this.setValue(value);
-    };
-
-    TextField.prototype.selectedRange = function() {
-      var caret;
-      caret = this.element.caret();
-      return {
-        start: caret.start,
-        length: caret.end - caret.start
-      };
-    };
-
-    TextField.prototype.setSelectedRange = function(range) {
-      return this.setSelectedRangeWithAffinity(range, this.selectionAffinity);
-    };
-
-    TextField.prototype.setSelectedRangeWithAffinity = function(range, affinity) {
-      var caret, max, min;
-      min = 0;
-      max = this.text().length;
-      caret = {
-        start: Math.max(min, Math.min(max, range.start)),
-        end: Math.max(min, Math.min(max, range.start + range.length))
-      };
-      this.element.caret(caret);
-      return this.selectionAffinity = range.length === 0 ? AFFINITY.NONE : affinity;
-    };
-
-    TextField.prototype.selectionAnchor = function() {
-      var range;
-      range = this.selectedRange();
-      switch (this.selectionAffinity) {
-        case AFFINITY.UPSTREAM:
-          return range.start + range.length;
-        case AFFINITY.DOWNSTREAM:
-          return range.start;
-        default:
-          return null;
-      }
-    };
-
-    TextField.prototype.undo = function(event) {
-      if (this.undoManager().canUndo()) {
-        this.undoManager().undo();
-      }
-      return event.preventDefault();
-    };
-
-    TextField.prototype.redo = function(event) {
-      if (this.undoManager().canRedo()) {
-        this.undoManager().redo();
-      }
-      return event.preventDefault();
-    };
-
-    TextField.prototype.undoManager = function() {
-      return this._undoManager || (this._undoManager = new UndoManager());
-    };
-
-    TextField.prototype.allowsUndo = function() {
-      return this._allowsUndo;
-    };
-
-    TextField.prototype.setAllowsUndo = function(allowsUndo) {
-      return this._allowsUndo = allowsUndo;
-    };
-
-    TextField.prototype._applyChangeFromUndoManager = function(change) {
-      this.undoManager().proxyFor(this)._applyChangeFromUndoManager(change);
-      if (this.undoManager().isUndoing()) {
-        this.setText(change.current.text);
-        this.setSelectedRange(change.current.selectedRange);
-      } else {
-        this.setText(change.proposed.text);
-        this.setSelectedRange(change.proposed.selectedRange);
-      }
-      return this._textDidChange();
-    };
-
-    TextField.prototype._enabled = true;
-
-    TextField.prototype.isEnabled = function() {
-      return this._enabled;
-    };
-
-    TextField.prototype.setEnabled = function(_enabled) {
-      this._enabled = _enabled;
-      this._syncPlaceholder();
-      return null;
-    };
-
-    TextField.prototype.hasFocus = function() {
-      return this.element.get(0).ownerDocument.activeElement === this.element.get(0);
-    };
-
-    TextField.prototype._focusin = function(event) {
-      this._textFieldDidBeginEditing();
-      return this._syncPlaceholder();
-    };
-
-    TextField.prototype._focusout = function(event) {
-      this._textFieldDidEndEditing();
-      return this._syncPlaceholder();
-    };
-
-    TextField.prototype._didEndEditingButKeptFocus = false;
-
-    TextField.prototype.becomeFirstResponder = function(event) {
-      var _this = this;
-      this.element.focus();
-      return this.rollbackInvalidChanges(function() {
-        _this.element.select();
-        return _this._syncPlaceholder();
-      });
-    };
-
-    TextField.prototype.resignFirstResponder = function(event) {
-      if (event != null) {
-        event.preventDefault();
-      }
-      this.element.blur();
-      return this._syncPlaceholder();
-    };
-
-    TextField.prototype._placeholder = null;
-
-    TextField.prototype._disabledPlaceholder = null;
-
-    TextField.prototype._focusedPlaceholder = null;
-
-    TextField.prototype._unfocusedPlaceholder = null;
-
-    TextField.prototype.disabledPlaceholder = function() {
-      return this._disabledPlaceholder;
-    };
-
-    TextField.prototype.setDisabledPlaceholder = function(_disabledPlaceholder) {
-      this._disabledPlaceholder = _disabledPlaceholder;
-      this._syncPlaceholder();
-      return null;
-    };
-
-    TextField.prototype.focusedPlaceholder = function() {
-      return this._focusedPlaceholder;
-    };
-
-    TextField.prototype.setFocusedPlaceholder = function(_focusedPlaceholder) {
-      this._focusedPlaceholder = _focusedPlaceholder;
-      this._syncPlaceholder();
-      return null;
-    };
-
-    TextField.prototype.unfocusedPlaceholder = function() {
-      return this._unfocusedPlaceholder;
-    };
-
-    TextField.prototype.setUnfocusedPlaceholder = function(_unfocusedPlaceholder) {
-      this._unfocusedPlaceholder = _unfocusedPlaceholder;
-      this._syncPlaceholder();
-      return null;
-    };
-
-    TextField.prototype.placeholder = function() {
-      return this._placeholder;
-    };
-
-    TextField.prototype.setPlaceholder = function(_placeholder) {
-      this._placeholder = _placeholder;
-      return this.element.attr('placeholder', this._placeholder);
-    };
-
-    TextField.prototype._syncPlaceholder = function() {
-      if (!this._enabled) {
-        if (this._disabledPlaceholder != null) {
-          return this.setPlaceholder(this._disabledPlaceholder);
-        }
-      } else if (this.hasFocus()) {
-        if (this._focusedPlaceholder != null) {
-          return this.setPlaceholder(this._focusedPlaceholder);
-        }
-      } else {
-        if (this._unfocusedPlaceholder != null) {
-          return this.setPlaceholder(this._unfocusedPlaceholder);
-        }
-      }
-    };
-
-    TextField.prototype._buildKeybindings = function() {
-      var doc, osx, userAgent, win;
-      doc = this.element.get(0).ownerDocument;
-      win = doc.defaultView || doc.parentWindow;
-      userAgent = win.navigator.userAgent;
-      osx = /^Mozilla\/[\d\.]+ \(Macintosh/.test(userAgent);
-      return this._bindings = keyBindingsForPlatform(osx ? 'OSX' : 'Default');
-    };
-
-    TextField.prototype.inspect = function() {
-      return "#<TextField text=\"" + (this.text()) + "\">";
-    };
-
-    return TextField;
-
-  })();
-
-  TextFieldStateChange = (function() {
-    TextFieldStateChange.prototype.field = null;
-
-    TextFieldStateChange.prototype.current = null;
-
-    TextFieldStateChange.prototype.proposed = null;
-
-    function TextFieldStateChange(field) {
-      this.field = field;
-    }
-
-    TextFieldStateChange.build = function(field, callback) {
-      var change;
-      change = new this(field);
-      change.current = {
-        text: field.text(),
-        selectedRange: field.selectedRange()
-      };
-      callback();
-      change.proposed = {
-        text: field.text(),
-        selectedRange: field.selectedRange()
-      };
-      change.recomputeDiff();
-      return change;
-    };
-
-    TextFieldStateChange.prototype.hasChanges = function() {
-      this.recomputeDiff();
-      return this.current.text !== this.proposed.text || this.current.selectedRange.start !== this.proposed.selectedRange.start || this.current.selectedRange.length !== this.proposed.selectedRange.length;
-    };
-
-    TextFieldStateChange.prototype.recomputeDiff = function() {
-      var ctext, deleted, i, inserted, minTextLength, ptext, sharedPrefixLength, sharedSuffixLength, _i, _j, _ref1;
-      if (this.proposed.text !== this.current.text) {
-        ctext = this.current.text;
-        ptext = this.proposed.text;
-        sharedPrefixLength = 0;
-        sharedSuffixLength = 0;
-        minTextLength = Math.min(ctext.length, ptext.length);
-        for (i = _i = 0; 0 <= minTextLength ? _i < minTextLength : _i > minTextLength; i = 0 <= minTextLength ? ++_i : --_i) {
-          if (ptext[i] === ctext[i]) {
-            sharedPrefixLength = i + 1;
-          } else {
-            break;
-          }
-        }
-        for (i = _j = 0, _ref1 = minTextLength - sharedPrefixLength; 0 <= _ref1 ? _j < _ref1 : _j > _ref1; i = 0 <= _ref1 ? ++_j : --_j) {
-          if (ptext[ptext.length - 1 - i] === ctext[ctext.length - 1 - i]) {
-            sharedSuffixLength = i + 1;
-          } else {
-            break;
-          }
-        }
-        inserted = {
-          start: sharedPrefixLength,
-          end: ptext.length - sharedSuffixLength
-        };
-        deleted = {
-          start: sharedPrefixLength,
-          end: ctext.length - sharedSuffixLength
-        };
-        inserted.text = ptext.substring(inserted.start, inserted.end);
-        deleted.text = ctext.substring(deleted.start, deleted.end);
-        this.inserted = inserted;
-        this.deleted = deleted;
-      } else {
-        this.inserted = {
-          start: this.proposed.selectedRange.start,
-          end: this.proposed.selectedRange.start + this.proposed.selectedRange.length,
-          text: ''
-        };
-        this.deleted = {
-          start: this.current.selectedRange.start,
-          end: this.current.selectedRange.start + this.current.selectedRange.length,
-          text: ''
-        };
-      }
-      return null;
-    };
-
-    return TextFieldStateChange;
-
-  })();
-
-  module.exports = TextField;
-
-}).call(this);
-
-},{"./formatter":10,"./undo_manager":14,"./keybindings":17}],15:[function(require,module,exports){
-(function() {
-  var AMEX, DISCOVER, JCB, MASTERCARD, VISA, determineCardType, luhnCheck, validCardLength;
-
-  AMEX = 'amex';
-
-  DISCOVER = 'discover';
-
-  JCB = 'jcb';
-
-  MASTERCARD = 'mastercard';
-
-  VISA = 'visa';
-
-  determineCardType = function(pan) {
-    var firsttwo, halfiin, iin;
-    if (pan == null) {
-      return null;
-    }
-    pan = pan.toString();
-    firsttwo = parseInt(pan.slice(0, 2), 10);
-    iin = parseInt(pan.slice(0, 6), 10);
-    halfiin = parseInt(pan.slice(0, 3), 10);
-    if (pan[0] === '4') {
-      return VISA;
-    } else if (pan.slice(0, 4) === '6011' || firsttwo === 65 || (halfiin >= 664 && halfiin <= 649) || (iin >= 622126 && iin <= 622925)) {
-      return DISCOVER;
-    } else if (pan.slice(0, 4) === '2131' || pan.slice(0, 4) === '1800' || firsttwo === 35) {
-      return JCB;
-    } else if (firsttwo >= 51 && firsttwo <= 55) {
-      return MASTERCARD;
-    } else if (firsttwo === 34 || firsttwo === 37) {
-      return AMEX;
-    }
-  };
-
-  luhnCheck = function(pan) {
-    var digit, flip, i, sum, _i, _ref;
-    sum = 0;
-    flip = true;
-    for (i = _i = _ref = pan.length - 1; _ref <= 0 ? _i <= 0 : _i >= 0; i = _ref <= 0 ? ++_i : --_i) {
-      if (!(pan.charAt(i) !== ' ')) {
-        continue;
-      }
-      digit = parseInt(pan.charAt(i), 10);
-      sum += (flip = !flip) ? Math.floor((digit * 2) / 10) + Math.floor(digit * 2 % 10) : digit;
-    }
-    return sum % 10 === 0;
-  };
-
-  validCardLength = function(pan) {
-    var _ref, _ref1;
-    switch (determineCardType(pan)) {
-      case VISA:
-        return (_ref = pan.length) === 13 || _ref === 16;
-      case DISCOVER:
-      case MASTERCARD:
-        return pan.length === 16;
-      case JCB:
-        return (_ref1 = pan.length) === 15 || _ref1 === 16;
-      case AMEX:
-        return pan.length === 15;
-      default:
-        return false;
-    }
-  };
-
-  module.exports = {
-    determineCardType: determineCardType,
-    luhnCheck: luhnCheck,
-    validCardLength: validCardLength,
-    AMEX: AMEX,
-    DISCOVER: DISCOVER,
-    JCB: JCB,
-    MASTERCARD: MASTERCARD,
-    VISA: VISA
-  };
-
-}).call(this);
-
-},{}],16:[function(require,module,exports){
-(function() {
-  var endsWith, isDigits, startsWith, trim, zpad, zpad2;
-
-  isDigits = function(string) {
-    return /^\d*$/.test(string);
-  };
-
-  startsWith = function(prefix, string) {
-    return string.slice(0, prefix.length) === prefix;
-  };
-
-  endsWith = function(suffix, string) {
-    return string.slice(string.length - suffix.length) === suffix;
-  };
-
-  if (''.trim) {
-    trim = function(string) {
-      return string.trim();
-    };
-  } else {
-    trim = function(string) {
-      return string.replace(/(^\s+|\s+$)/, '');
-    };
+    return DelimitedTextFormatter.prototype.isChangeValid.call(this, change, error);
   }
 
-  zpad = function(length, n) {
-    var result;
-    result = "" + n;
-    while (result.length < length) {
-      result = "0" + result;
+  if (/^\d*$/.test(change.inserted.text) || change.proposed.text.indexOf('+') === 0) {
+    return DelimitedTextFormatter.prototype.isChangeValid.call(this, change, error);
+  } else {
+    return false;
+  }
+};
+
+/**
+ * Re-configures this formatter to use the delimiters appropriate
+ * for the given text.
+ *
+ * @param {string} text A potentially formatted string containing a phone number.
+ * @private
+ */
+PhoneFormatter.prototype.guessFormatFromText = function(text) {
+  if (text && text[0] === '+') {
+    this.delimiterMap = NANP_PHONE_DELIMITERS_WITH_PLUS;
+    this.maximumLength = 1 + 1 + 10 + 5;
+  } else if (text && text[0] === '1') {
+    this.delimiterMap = NANP_PHONE_DELIMITERS_WITH_1;
+    this.maximumLength = 1 + 10 + 5;
+  } else {
+    this.delimiterMap = NANP_PHONE_DELIMITERS;
+    this.maximumLength = 10 + 4;
+  }
+};
+
+/**
+ * Gives back just the phone number digits as a string without the
+ * country code. Future-proofing internationalization where the country code
+ * isn't just +1.
+ *
+ * @private
+ */
+PhoneFormatter.prototype.digitsWithoutCountryCode = function(text) {
+  var digits = (text || '').replace(/[^\d]/g, '');
+  var extraDigits = digits.length - 10;
+  if (extraDigits > 0) {
+    digits = digits.substr(extraDigits);
+  }
+  return digits;
+};
+
+/**
+ * Removes characters from the phone number that will be added
+ * by the formatter.
+ *
+ * @private
+ */
+PhoneFormatter.prototype.removeDelimiterMapChars = function(text) {
+  return (text || '').replace(DELIMITER_PATTERN, '');
+};
+
+module.exports = PhoneFormatter;
+
+},{"./delimited_text_formatter":6}],12:[function(require,module,exports){
+var DelimitedTextFormatter = require('./delimited_text_formatter');
+var DIGITS_PATTERN = /^\d*$/;
+
+function SocialSecurityNumberFormatter() {
+  DelimitedTextFormatter.apply(this, arguments);
+}
+
+SocialSecurityNumberFormatter.prototype = Object.create(DelimitedTextFormatter.prototype);
+
+SocialSecurityNumberFormatter.prototype.delimiter = '-';
+
+SocialSecurityNumberFormatter.prototype.maximumLength = 9 + 2;
+
+SocialSecurityNumberFormatter.prototype.hasDelimiterAtIndex = function(index) {
+  return index === 3 || index === 6;
+};
+
+SocialSecurityNumberFormatter.prototype.isChangeValid = function(change) {
+  if (DIGITS_PATTERN.test(change.inserted.text)) {
+    return DelimitedTextFormatter.prototype.isChangeValid.call(this, change);
+  } else {
+    return false;
+  }
+};
+
+module.exports = SocialSecurityNumberFormatter;
+
+},{"./delimited_text_formatter":6}],13:[function(require,module,exports){
+/* jshint undef:true, node:true */
+
+var Formatter = require('./formatter');
+var UndoManager = require('./undo_manager');
+var keys = require('./keybindings');
+var KEYS = keys.KEYS;
+var keyBindingsForPlatform = keys.keyBindingsForPlatform;
+var bind = require('./utils').bind;
+
+var AFFINITY = {
+  UPSTREAM: 0,
+  DOWNSTREAM: 1,
+  NONE: null
+};
+
+function isWordChar(chr) {
+  return chr && /^\w$/.test(chr);
+}
+
+function hasLeftWordBreakAtIndex(text, index) {
+  if (index === 0) {
+    return true;
+  } else {
+    return !isWordChar(text[index - 1]) && isWordChar(text[index]);
+  }
+}
+
+function hasRightWordBreakAtIndex(text, index) {
+  if (index === text.length) {
+    return true;
+  } else {
+    return isWordChar(text[index]) && !isWordChar(text[index + 1]);
+  }
+}
+
+function TextField(element, _formatter) {
+  this.element = element;
+  this._formatter = _formatter;
+  this._focusout = bind(this._focusout, this);
+  this._focusin = bind(this._focusin, this);
+  this.click = bind(this.click, this);
+  this.paste = bind(this.paste, this);
+  this.keyUp = bind(this.keyUp, this);
+  this.keyPress = bind(this.keyPress, this);
+  this.keyDown = bind(this.keyDown, this);
+  if (this.element.data('field-kit-text-field')) {
+    throw new Error("already attached a TextField to this element");
+  } else {
+    this.element.data('field-kit-text-field', this);
+  }
+  this._jQuery = this.element.constructor;
+  this.element.on('keydown.field-kit', this.keyDown);
+  this.element.on('keypress.field-kit', this.keyPress);
+  this.element.on('keyup.field-kit', this.keyUp);
+  this.element.on('click.field-kit', this.click);
+  this.element.on('paste.field-kit', this.paste);
+  this.element.on('focusin.field-kit', this._focusin);
+  this.element.on('focusout.field-kit', this._focusout);
+  this._buildKeybindings();
+}
+
+/**
+ * Contains one of the AFFINITY enum to indicate the preferred direction of
+ * selection.
+ *
+ * @private
+ */
+TextField.prototype.selectionAffinity = AFFINITY.NONE;
+
+TextField.prototype._delegate = null;
+
+/**
+ * Gets the current delegate for this text field.
+ *
+ * @return {TextFieldDelegate}
+ */
+TextField.prototype.delegate = function() {
+  return this._delegate;
+};
+
+/**
+ * Sets the current delegate for this text field.
+ *
+ * @param {TextFieldDelegate} delegate
+ */
+TextField.prototype.setDelegate = function(delegate) {
+  this._delegate = delegate;
+  return null;
+};
+
+TextField.prototype.destroy = function() {
+  this.element.off('.field-kit');
+  this.element.data('field-kit-text-field', null);
+  return null;
+};
+
+/**
+ * Handles a key event that is trying to insert a character.
+ */
+TextField.prototype.insertText = function(text) {
+  var range;
+  if (this.hasSelection()) {
+    this.clearSelection();
+  }
+  this.replaceSelection(text);
+  range = this.selectedRange();
+  range.start += range.length;
+  range.length = 0;
+  return this.setSelectedRange(range);
+};
+
+TextField.prototype.insertNewline = function(event) {
+  this._textFieldDidEndEditing();
+  this._didEndEditingButKeptFocus = true;
+};
+
+/**
+ * Performs actions necessary for text change.
+ *
+ * @private
+ */
+TextField.prototype._textDidChange = function() {
+  var delegate = this._delegate;
+  this.textDidChange();
+  if (delegate && typeof delegate.textDidChange === 'function') {
+    delegate.textDidChange(this);
+  }
+};
+
+/**
+ * Called when the user has changed the text of the field. Can be used in
+ * subclasses to perform actions suitable for this event.
+ */
+TextField.prototype.textDidChange = function() {};
+
+/**
+ * Performs actions necessary for ending editing.
+ *
+ * @private
+ */
+TextField.prototype._textFieldDidEndEditing = function() {
+  var delegate = this._delegate;
+  this.textFieldDidEndEditing();
+  if (delegate && typeof delegate.textFieldDidEndEditing === 'function') {
+    delegate.textFieldDidEndEditing(this);
+  }
+};
+
+/**
+ * Called when the user has in some way declared that they are done editing,
+ * such as leaving the field or perhaps pressing enter. Can be used in
+ * subclasses to perform actions suitable for this event.
+ *
+ * @private
+ */
+TextField.prototype.textFieldDidEndEditing = function() {};
+
+TextField.prototype._textFieldDidBeginEditing = function() {
+  var delegate = this._delegate;
+  this.textFieldDidBeginEditing();
+  if (delegate && typeof delegate.textFieldDidBeginEditing === 'function') {
+    delegate.textFieldDidBeginEditing(this);
+  }
+};
+
+/**
+ * Performs actions necessary for beginning editing.
+ *
+ * @private
+ */
+TextField.prototype.textFieldDidBeginEditing = function() {};
+
+/**
+ * Moves the cursor up, which because this is a single-line text field, means
+ * moving to the beginning of the value.
+ *
+ * Examples
+ *
+ *   Hey guys|
+ *   moveUp(event)
+ *   |Hey guys
+ *
+ *   Hey |guys|
+ *   moveUp(event)
+ *   |Hey guys
+ *
+ */
+TextField.prototype.moveUp = function(event) {
+  event.preventDefault();
+  this.setSelectedRange({
+    start: 0,
+    length: 0
+  });
+};
+
+/**
+ * Moves the cursor up to the beginning of the current paragraph, which because
+ * this is a single-line text field, means moving to the beginning of the
+ * value.
+ *
+ * Examples
+ *
+ *   Hey guys|
+ *   moveToBeginningOfParagraph(event)
+ *   |Hey guys
+ *
+ *   Hey |guys|
+ *   moveToBeginningOfParagraph(event)
+ *   |Hey guys
+ *
+ */
+TextField.prototype.moveToBeginningOfParagraph = function(event) {
+  this.moveUp(event);
+};
+
+/**
+ * Moves the cursor up, keeping the current anchor point and extending the
+ * selection to the beginning as #moveUp would.
+ *
+ * Examples
+ *
+ *   # rightward selections are shrunk
+ *   Hey guys, |where> are you?
+ *   moveUpAndModifySelection(event)
+ *   <Hey guys, |where are you?
+ *
+ *   # leftward selections are extended
+ *   Hey guys, <where| are you?
+ *   moveUpAndModifySelection(event)
+ *   <Hey guys, where| are you?
+ *
+ *   # neutral selections are extended
+ *   Hey guys, |where| are you?
+ *   moveUpAndModifySelection(event)
+ *   <Hey guys, where| are you?
+ *
+ */
+TextField.prototype.moveUpAndModifySelection = function(event) {
+  event.preventDefault();
+  var range = this.selectedRange();
+  switch (this.selectionAffinity) {
+    case AFFINITY.UPSTREAM:
+    case AFFINITY.NONE:
+      // 12<34 56|78  =>  <1234 56|78
+      range.length += range.start;
+      range.start = 0;
+      break;
+    case AFFINITY.DOWNSTREAM:
+      // 12|34 56>78   =>   <12|34 5678
+      range.length = range.start;
+      range.start = 0;
+      break;
+  }
+  this.setSelectedRangeWithAffinity(range, AFFINITY.UPSTREAM);
+};
+
+/**
+ * Moves the free end of the selection to the beginning of the paragraph, or
+ * since this is a single-line text field to the beginning of the line.
+ */
+TextField.prototype.moveParagraphBackwardAndModifySelection = function(event) {
+  event.preventDefault();
+  var range = this.selectedRange();
+  switch (this.selectionAffinity) {
+    case AFFINITY.UPSTREAM:
+    case AFFINITY.NONE:
+      // 12<34 56|78  =>  <1234 56|78
+      range.length += range.start;
+      range.start = 0;
+      break;
+    case AFFINITY.DOWNSTREAM:
+      // 12|34 56>78  =>  12|34 5678
+      range.length = 0;
+      break;
+  }
+  this.setSelectedRangeWithAffinity(range, AFFINITY.UPSTREAM);
+};
+
+/**
+ * Moves the cursor to the beginning of the document.
+ */
+TextField.prototype.moveToBeginningOfDocument = function(event) {
+  // Since we only support a single line this is just an alias.
+  this.moveToBeginningOfLine(event);
+};
+
+/**
+ * Moves the selection start to the beginning of the document.
+ */
+TextField.prototype.moveToBeginningOfDocumentAndModifySelection = function(event) {
+  event.preventDefault();
+  var range = this.selectedRange();
+  range.length += range.start;
+  range.start = 0;
+  return this.setSelectedRangeWithAffinity(range, AFFINITY.UPSTREAM);
+};
+
+/**
+ * Moves the cursor down, which because this is a single-line text field, means
+ * moving to the end of the value.
+ *
+ * Examples
+ *
+ *   Hey |guys
+ *   moveDown(event)
+ *   Hey guys|
+ *
+ *   |Hey| guys
+ *   moveDown(event)
+ *   Hey guys|
+ */
+TextField.prototype.moveDown = function(event) {
+  event.preventDefault();
+  // 12|34 56|78  =>  1234 5678|
+  var range = {
+    start: this.text().length,
+    length: 0
+  };
+  this.setSelectedRangeWithAffinity(range, AFFINITY.NONE);
+};
+
+/**
+ * Moves the cursor up to the end of the current paragraph, which because this
+ * is a single-line text field, means moving to the end of the value.
+ *
+ * Examples
+ *
+ *   |Hey guys
+ *   moveToEndOfParagraph(event)
+ *   Hey guys|
+ *
+ *   Hey |guys|
+ *   moveToEndOfParagraph(event)
+ *   Hey guys|
+ *
+ */
+TextField.prototype.moveToEndOfParagraph = function(event) {
+  this.moveDown(event);
+};
+
+/**
+ * Moves the cursor down, keeping the current anchor point and extending the
+ * selection to the end as #moveDown would.
+ *
+ * Examples
+ *
+ *   # leftward selections are shrunk
+ *   Hey guys, <where| are you?
+ *   moveDownAndModifySelection(event)
+ *   Hey guys, |where are you?>
+ *
+ *   # rightward selections are extended
+ *   Hey guys, |where> are you?
+ *   moveDownAndModifySelection(event)
+ *   Hey guys, where| are you?>
+ *
+ *   # neutral selections are extended
+ *   Hey guys, |where| are you?
+ *   moveDownAndModifySelection(event)
+ *   Hey guys, |where are you?>
+ */
+TextField.prototype.moveDownAndModifySelection = function(event) {
+  event.preventDefault();
+  var range = this.selectedRange();
+  var end = this.text().length;
+  if (this.selectionAffinity === AFFINITY.UPSTREAM) {
+    range.start += range.length;
+  }
+  range.length = end - range.start;
+  this.setSelectedRangeWithAffinity(range, AFFINITY.DOWNSTREAM);
+};
+
+/**
+ * Moves the free end of the selection to the end of the paragraph, or since
+ * this is a single-line text field to the end of the line.
+ */
+TextField.prototype.moveParagraphForwardAndModifySelection = function(event) {
+  event.preventDefault();
+  var range = this.selectedRange();
+  switch (this.selectionAffinity) {
+    case AFFINITY.DOWNSTREAM:
+    case AFFINITY.NONE:
+      // 12|34 56>78  =>  12|34 5678>
+      range.length = this.text().length - range.start;
+      break;
+    case AFFINITY.UPSTREAM:
+      // 12<34 56|78  =>  12|34 5678
+      range.start += range.length;
+      range.length = 0;
+      break;
+  }
+  this.setSelectedRangeWithAffinity(range, AFFINITY.DOWNSTREAM);
+};
+
+/**
+ * Moves the cursor to the end of the document.
+ */
+TextField.prototype.moveToEndOfDocument = function(event) {
+  // Since we only support a single line this is just an alias.
+  this.moveToEndOfLine(event);
+};
+
+/**
+ * Moves the selection end to the end of the document.
+ */
+TextField.prototype.moveToEndOfDocumentAndModifySelection = function(event) {
+  event.preventDefault();
+  var range = this.selectedRange();
+  range.length = this.text().length - range.start;
+  this.setSelectedRangeWithAffinity(range, AFFINITY.DOWNSTREAM);
+};
+
+/**
+ * Moves the cursor to the left, counting selections as a thing to move past.
+ *
+ * Examples
+ *
+ *   # no selection just moves the cursor left
+ *   Hey guys|
+ *   moveLeft(event)
+ *   Hey guy|s
+ *
+ *   # selections are removed
+ *   Hey |guys|
+ *   moveLeft(event)
+ *   Hey |guys
+ */
+TextField.prototype.moveLeft = function(event) {
+  event.preventDefault();
+  var range = this.selectedRange();
+  if (range.length !== 0) {
+    range.length = 0;
+  } else {
+    range.start--;
+  }
+  this.setSelectedRangeWithAffinity(range, AFFINITY.NONE);
+};
+
+/**
+ * Moves the free end of the selection one to the left.
+ *
+ * Examples
+ *
+ *   # no selection just selects to the left
+ *   Hey guys|
+ *   moveLeftAndModifySelection(event)
+ *   Hey guy<s|
+ *
+ *   # left selections are extended
+ *   Hey <guys|
+ *   moveLeftAndModifySelection(event)
+ *   Hey< guys|
+ *
+ *   # right selections are shrunk
+ *   Hey |guys>
+ *   moveLeftAndModifySelection(event)
+ *   Hey |guy>s
+ *
+ *   # neutral selections are extended
+ *   Hey |guys|
+ *   moveLeftAndModifySelection(event)
+ *   Hey< guys|
+ */
+TextField.prototype.moveLeftAndModifySelection = function(event) {
+  event.preventDefault();
+  var range = this.selectedRange();
+  switch (this.selectionAffinity) {
+    case AFFINITY.UPSTREAM:
+    case AFFINITY.NONE:
+      this.selectionAffinity = AFFINITY.UPSTREAM;
+      range.start--;
+      range.length++;
+      break;
+    case AFFINITY.DOWNSTREAM:
+      range.length--;
+      break;
+  }
+  this.setSelectedRange(range);
+};
+
+/**
+ * Moves the cursor left until the start of a word is found.
+ *
+ * Examples
+ *
+ *   # no selection just moves the cursor left
+ *   Hey guys|
+ *   moveWordLeft(event)
+ *   Hey |guys
+ *
+ *   # selections are removed
+ *   Hey |guys|
+ *   moveWordLeft(event)
+ *   |Hey guys
+ */
+TextField.prototype.moveWordLeft = function(event) {
+  event.preventDefault();
+  var index = this.lastWordBreakBeforeIndex(this.selectedRange().start - 1);
+  this.setSelectedRange({ start: index, length: 0 });
+};
+
+/**
+ * Moves the free end of the current selection to the beginning of the previous
+ * word.
+ *
+ * Examples
+ *
+ *   # no selection just selects to the left
+ *   Hey guys|
+ *   moveWordLeftAndModifySelection(event)
+ *   Hey |guys|
+ *
+ *   # left selections are extended
+ *   Hey <guys|
+ *   moveWordLeftAndModifySelection(event)
+ *   <Hey guys|
+ *
+ *   # right selections are shrunk
+ *   |Hey guys>
+ *   moveWordLeftAndModifySelection(event)
+ *   |Hey >guys
+ *
+ *   # neutral selections are extended
+ *   Hey |guys|
+ *   moveWordLeftAndModifySelection(event)
+ *   <Hey guys|
+ */
+TextField.prototype.moveWordLeftAndModifySelection = function(event) {
+  event.preventDefault();
+  var range = this.selectedRange();
+  switch (this.selectionAffinity) {
+    case AFFINITY.UPSTREAM:
+    case AFFINITY.NONE:
+      this.selectionAffinity = AFFINITY.UPSTREAM;
+      var start = this.lastWordBreakBeforeIndex(range.start - 1);
+      range.length += range.start - start;
+      range.start = start;
+      break;
+    case AFFINITY.DOWNSTREAM:
+      var end = this.lastWordBreakBeforeIndex(range.start + range.length);
+      if (end < range.start) {
+        end = range.start;
+      }
+      range.length -= range.start + range.length - end;
+      break;
+  }
+  this.setSelectedRange(range);
+};
+
+/**
+ * Moves the cursor to the beginning of the current line.
+ *
+ * Examples
+ *
+ *   Hey guys, where| are ya?
+ *   moveToBeginningOfLine(event)
+ *   |Hey guys, where are ya?
+ */
+TextField.prototype.moveToBeginningOfLine = function(event) {
+  event.preventDefault();
+  this.setSelectedRange({ start: 0, length: 0 });
+};
+
+/**
+ * Select from the free end of the selection to the beginning of line.
+ *
+ * Examples
+ *
+ *   Hey guys, where| are ya?
+ *   moveToBeginningOfLineAndModifySelection(event)
+ *   <Hey guys, where| are ya?
+ *
+ *   Hey guys, where| are> ya?
+ *   moveToBeginningOfLineAndModifySelection(event)
+ *   <Hey guys, where are| ya?
+ */
+TextField.prototype.moveToBeginningOfLineAndModifySelection = function(event) {
+  event.preventDefault();
+  var range = this.selectedRange();
+  range.length += range.start;
+  range.start = 0;
+  this.setSelectedRangeWithAffinity(range, AFFINITY.UPSTREAM);
+};
+
+/**
+ * Moves the cursor to the right, counting selections as a thing to move past.
+ *
+ * Examples
+ *
+ *   # no selection just moves the cursor right
+ *   Hey guy|s
+ *   moveRight(event)
+ *   Hey guys|
+ *
+ *   # selections are removed
+ *   Hey |guys|
+ *   moveRight(event)
+ *   Hey guys|
+ */
+TextField.prototype.moveRight = function(event) {
+  event.preventDefault();
+  var range = this.selectedRange();
+  if (range.length !== 0) {
+    range.start += range.length;
+    range.length = 0;
+  } else {
+    range.start++;
+  }
+  this.setSelectedRangeWithAffinity(range, AFFINITY.NONE);
+};
+
+/**
+ * Moves the free end of the selection one to the right.
+ *
+ * Examples
+ *
+ *   # no selection just selects to the right
+ *   Hey |guys
+ *   moveRightAndModifySelection(event)
+ *   Hey |g>uys
+ *
+ *   # right selections are extended
+ *   Hey |gu>ys
+ *   moveRightAndModifySelection(event)
+ *   Hey |guy>s
+ *
+ *   # left selections are shrunk
+ *   <Hey |guys
+ *   moveRightAndModifySelection(event)
+ *   H<ey |guys
+ *
+ *   # neutral selections are extended
+ *   |Hey| guys
+ *   moveRightAndModifySelection(event)
+ *   |Hey >guys
+ */
+TextField.prototype.moveRightAndModifySelection = function(event) {
+  event.preventDefault();
+  var range = this.selectedRange();
+  switch (this.selectionAffinity) {
+    case AFFINITY.UPSTREAM:
+      range.start++;
+      range.length--;
+      break;
+    case AFFINITY.DOWNSTREAM:
+    case AFFINITY.NONE:
+      this.selectionAffinity = AFFINITY.DOWNSTREAM;
+      range.length++;
+      break;
+  }
+  this.setSelectedRange(range);
+};
+
+/**
+ * Moves the cursor right until the end of a word is found.
+ *
+ * Examples
+ *
+ *   # no selection just moves the cursor right
+ *   Hey| guys
+ *   moveWordRight(event)
+ *   Hey guys|
+ *
+ *   # selections are removed
+ *   |Hey| guys
+ *   moveWordRight(event)
+ *   Hey guys|
+ */
+TextField.prototype.moveWordRight = function(event) {
+  event.preventDefault();
+  var range = this.selectedRange();
+  var index = this.nextWordBreakAfterIndex(range.start + range.length);
+  this.setSelectedRange({ start: index, length: 0 });
+};
+
+/**
+ * Moves the free end of the current selection to the next end of word.
+ *
+ * Examples
+ *
+ *   # no selection just selects to the right
+ *   Hey |guys
+ *   moveWordRightAndModifySelection(event)
+ *   Hey |guys|
+ *
+ *   # right selections are extended
+ *   Hey |g>uys
+ *   moveWordRightAndModifySelection(event)
+ *   Hey |guys>
+ *
+ *   # left selections are shrunk
+ *   He<y |guys
+ *   moveWordRightAndModifySelection(event)
+ *   Hey< |guys
+ *
+ *   # neutral selections are extended
+ *   He|y |guys
+ *   moveWordRightAndModifySelection(event)
+ *   He|y guys>
+ */
+TextField.prototype.moveWordRightAndModifySelection = function(event) {
+  event.preventDefault();
+  var range = this.selectedRange();
+  var start = range.start;
+  var end = range.start + range.length;
+  switch (this.selectionAffinity) {
+    case AFFINITY.UPSTREAM:
+      start = Math.min(this.nextWordBreakAfterIndex(start), end);
+      break;
+    case AFFINITY.DOWNSTREAM:
+    case AFFINITY.NONE:
+      this.selectionAffinity = AFFINITY.DOWNSTREAM;
+      end = this.nextWordBreakAfterIndex(range.start + range.length);
+      break;
+  }
+  this.setSelectedRange({ start: start, length: end - start });
+};
+
+/**
+ * Moves the cursor to the end of the current line.
+ *
+ * Examples
+ *
+ *   Hey guys, where| are ya?
+ *   moveToEndOfLine(event)
+ *   |Hey guys, where are ya?
+ *
+ */
+TextField.prototype.moveToEndOfLine = function(event) {
+  event.preventDefault();
+  this.setSelectedRange({ start: this.text().length, length: 0 });
+};
+
+/**
+ * Moves the free end of the selection to the end of the current line.
+ *
+ * Examples
+ *
+ *   Hey guys, where| are ya?
+ *   moveToEndofLineAndModifySelection(event)
+ *   Hey guys, where| are ya?>
+ *
+ *   Hey guys, <where| are ya?
+ *   moveToEndofLineAndModifySelection(event)
+ *   Hey guys, |where are ya?>
+ */
+TextField.prototype.moveToEndOfLineAndModifySelection = function(event) {
+  event.preventDefault();
+  var range = this.selectedRange();
+  range.length = this.text().length - range.start;
+  this.setSelectedRangeWithAffinity(range, AFFINITY.DOWNSTREAM);
+};
+
+/**
+ * Deletes backward one character or clears a non-empty selection.
+ *
+ * Examples
+ *
+ *   |What's up, doc?
+ *   deleteBackward(event)
+ *   |What's up, doc?
+ *
+ *   What'|s up, doc?
+ *   deleteBackward(event)
+ *   What|s up, doc?
+ *
+ *   |What's| up, doc?
+ *   deleteBackward(event)
+ *   | up, doc?
+ */
+TextField.prototype.deleteBackward = function(event) {
+  event.preventDefault();
+  var range = this.selectedRange();
+  if (range.length === 0) {
+    range.start--;
+    range.length++;
+    this.setSelectedRange(range);
+  }
+  this.clearSelection();
+};
+
+/**
+ * Deletes backward one word or clears a non-empty selection.
+ *
+ * Examples
+ *
+ *   |What's up, doc?
+ *   deleteWordBackward(event)
+ *   |What's up, doc?
+ *
+ *   What'|s up, doc?
+ *   deleteWordBackward(event)
+ *   |s up, doc?
+ *
+ *   |What's| up, doc?
+ *   deleteWordBackward(event)
+ *   | up, doc?
+ */
+TextField.prototype.deleteWordBackward = function(event) {
+  if (this.hasSelection()) {
+    this.deleteBackward(event);
+  } else {
+    event.preventDefault();
+    var range = this.selectedRange();
+    var start = this.lastWordBreakBeforeIndex(range.start);
+    range.length += range.start - start;
+    range.start = start;
+    this.setSelectedRange(range);
+    this.clearSelection();
+  }
+};
+
+/**
+ * Deletes backward one character, clears a non-empty selection, or decomposes
+ * an accented character to its simple form.
+ *
+ * TODO: Make this work as described.
+ *
+ * Examples
+ *
+ *   |fiancée
+ *   deleteBackwardByDecomposingPreviousCharacter(event)
+ *   |What's up, doc?
+ *
+ *   fianc|é|e
+ *   deleteBackwardByDecomposingPreviousCharacter(event)
+ *   fianc|e
+ *
+ *   fiancé|e
+ *   deleteBackwardByDecomposingPreviousCharacter(event)
+ *   fiance|e
+ */
+TextField.prototype.deleteBackwardByDecomposingPreviousCharacter = function(event) {
+  this.deleteBackward(event);
+};
+
+/**
+ * Deletes all characters before the cursor or clears a non-empty selection.
+ *
+ * Examples
+ *
+ *   The quick |brown fox.
+ *   deleteBackwardToBeginningOfLine(event)
+ *   |brown fox.
+ *
+ *   The |quick |brown fox.
+ *   deleteBackwardToBeginningOfLine(event)
+ *   The brown fox.
+ */
+TextField.prototype.deleteBackwardToBeginningOfLine = function(event) {
+  if (this.hasSelection()) {
+    this.deleteBackward(event);
+  } else {
+    event.preventDefault();
+    var range = this.selectedRange();
+    range.length = range.start;
+    range.start = 0;
+    this.setSelectedRange(range);
+    this.clearSelection();
+  }
+};
+
+/**
+ * Deletes forward one character or clears a non-empty selection.
+ *
+ * Examples
+ *
+ *   What's up, doc?|
+ *   deleteForward(event)
+ *   What's up, doc?|
+ *
+ *   What'|s up, doc?
+ *   deleteForward(event)
+ *   What'| up, doc?
+ *
+ *   |What's| up, doc?
+ *   deleteForward(event)
+ *   | up, doc?
+ */
+TextField.prototype.deleteForward = function(event) {
+  event.preventDefault();
+  var range = this.selectedRange();
+  if (range.length === 0) {
+    range.length++;
+    this.setSelectedRange(range);
+  }
+  return this.clearSelection();
+};
+
+/**
+ * Deletes forward one word or clears a non-empty selection.
+ *
+ * Examples
+ *
+ *   What's up, doc?|
+ *   deleteWordForward(event)
+ *   What's up, doc?|
+ *
+ *   What's |up, doc?
+ *   deleteWordForward(event)
+ *   What's |, doc?
+ *
+ *   |What's| up, doc?
+ *   deleteWordForward(event)
+ *   | up, doc?
+ */
+TextField.prototype.deleteWordForward = function(event) {
+  if (this.hasSelection()) {
+    return this.deleteForward(event);
+  } else {
+    event.preventDefault();
+    var range = this.selectedRange();
+    var end = this.nextWordBreakAfterIndex(range.start + range.length);
+    this.setSelectedRange({
+      start: range.start,
+      length: end - range.start
+    });
+    this.clearSelection();
+  }
+};
+
+/**
+ * Handles the tab key.
+ */
+TextField.prototype.insertTab = function(event) {};
+
+/**
+ * Handles the back tab key.
+ */
+TextField.prototype.insertBackTab = function(event) {};
+
+/**
+ * Determines whether this field has any selection.
+ *
+ * @return {boolean} true if there is at least one character selected
+ */
+TextField.prototype.hasSelection = function() {
+  return this.selectedRange().length !== 0;
+};
+
+/**
+ * Finds the start of the "word" before index.
+ *
+ * @private
+ * @param {number} index position at which to start looking
+ * @return {number} index in value less than or equal to the given index
+ */
+TextField.prototype.lastWordBreakBeforeIndex = function(index) {
+  var indexes = this.leftWordBreakIndexes();
+  var result = indexes[0];
+  for (var i = 0, l = indexes.length; i < l; i++) {
+    var wordBreakIndex = indexes[i];
+    if (index > wordBreakIndex) {
+      result = wordBreakIndex;
+    } else {
+      break;
     }
-    return result;
-  };
+  }
+  return result;
+};
 
-  zpad2 = function(n) {
-    return zpad(2, n);
-  };
+/**
+ * Find starts of "words" for navigational purposes.
+ *
+ * Examples
+ *
+ *   # given value of "123456789" and text of "123-45-6789"
+ *   >> leftWordBreakIndexes()
+ *   => [0, 3, 5]
+ *
+ * @private
+ * @return {Array.<number>} indexes in value of word starts.
+ */
+TextField.prototype.leftWordBreakIndexes = function() {
+  var result = [];
+  var text = this.text();
+  for (var i = 0, l = text.length; i < l; i++) {
+    if (hasLeftWordBreakAtIndex(text, i)) {
+      result.push(i);
+    }
+  }
+  return result;
+};
 
-  module.exports = {
-    isDigits: isDigits,
-    startsWith: startsWith,
-    endsWith: endsWith,
-    trim: trim,
-    zpad: zpad,
-    zpad2: zpad2
-  };
+/**
+ * Finds the end of the "word" after index.
+ *
+ * @private
+ * @param {number} index position in value at which to start looking.
+ * @return {number}
+ */
+TextField.prototype.nextWordBreakAfterIndex = function(index) {
+  var indexes = this.rightWordBreakIndexes().reverse();
+  var result = indexes[0];
+  for (var i = 0, l = indexes.length; i < l; i++) {
+    var wordBreakIndex = indexes[i];
+    if (index < wordBreakIndex) {
+      result = wordBreakIndex;
+    } else {
+      break;
+    }
+  }
+  return result;
+};
 
-}).call(this);
+/**
+ * Find ends of "words" for navigational purposes.
+ *
+ * Examples
+ *
+ *   # given value of "123456789" and text of "123-45-6789"
+ *   >> rightWordBreakIndexes()
+ *   => [3, 5, 9]
+ *
+ * @private
+ * @return {Array.<number>}
+ */
+TextField.prototype.rightWordBreakIndexes = function() {
+  var result = [];
+  var text = this.text();
+  for (var i = 0, l = text.length; i <= l; i++) {
+    if (hasRightWordBreakAtIndex(text, i)) {
+      result.push(i + 1);
+    }
+  }
+  return result;
+};
+
+/**
+ * Clears all characters in the existing selection.
+ *
+ * Examples
+ *
+ *   12|34567|8
+ *   clearSelection()
+ *   12|8
+ */
+TextField.prototype.clearSelection = function() {
+  this.replaceSelection('');
+};
+
+/**
+ * Replaces the characters within the selection with given text.
+ *
+ * Examples
+ *
+ *   12|34567|8
+ *   replaceSelection("00")
+ *   12|00|8
+ */
+TextField.prototype.replaceSelection = function(replacement) {
+  var range = this.selectedRange();
+  var end = range.start + range.length;
+  var text = this.text();
+  text = text.substring(0, range.start) + replacement + text.substring(end);
+  range.length = replacement.length;
+  this.setText(text);
+  this.setSelectedRangeWithAffinity(range, AFFINITY.NONE);
+};
+
+/**
+ * Expands the selection to contain all the characters in the content.
+ *
+ * Examples
+ *
+ *   123|45678
+ *   selectAll(event)
+ *   |12345678|
+ */
+TextField.prototype.selectAll = function(event) {
+  event.preventDefault();
+  this.setSelectedRangeWithAffinity({
+    start: 0,
+    length: this.text().length
+  }, AFFINITY.NONE);
+};
+
+/**
+ * Replaces the current selection with text from the given pasteboard.
+ *
+ * @param {ClipboardData} pasteboard
+ */
+TextField.prototype.readSelectionFromPasteboard = function(pasteboard) {
+  var range, text;
+  text = pasteboard.getData('Text');
+  this.replaceSelection(text);
+  range = this.selectedRange();
+  range.start += range.length;
+  range.length = 0;
+  this.setSelectedRange(range);
+};
+
+/**
+ * Handles keyDown events. This method essentially just delegates to other,
+ * more semantic, methods based on the modifier keys and the pressed key of the
+ * event.
+ *
+ * @private
+ */
+TextField.prototype.keyDown = function(event) {
+  if (this._didEndEditingButKeptFocus) {
+    this._textFieldDidBeginEditing();
+    this._didEndEditingButKeptFocus = false;
+  }
+
+  var action = this._bindings.actionForEvent(event);
+  if (action) {
+    switch (action) {
+      case 'undo':
+      case 'redo':
+        this[action](event);
+        break;
+
+      default:
+        var self = this;
+        this.rollbackInvalidChanges(function() {
+          return self[action](event);
+        });
+        break;
+    }
+  }
+};
+
+/**
+ * Handles inserting characters based on the typed key.
+ *
+ * @private
+ */
+TextField.prototype.keyPress = function(event) {
+  var keyCode = event.keyCode;
+  if (!event.metaKey && !event.ctrlKey &&
+      keyCode !== KEYS.ENTER &&
+      keyCode !== KEYS.TAB &&
+      keyCode !== KEYS.BACKSPACE) {
+    event.preventDefault();
+    if (event.charCode !== 0) {
+      var self = this;
+      var charCode = event.charCode || event.keyCode;
+      this.rollbackInvalidChanges(function() {
+        self.insertText(String.fromCharCode(charCode));
+      });
+    }
+  }
+};
+
+/**
+ * Handles keyup events.
+ *
+ * @private
+ */
+TextField.prototype.keyUp = function(event) {
+  var self = this;
+  this.rollbackInvalidChanges(function() {
+    if (event.keyCode === KEYS.TAB) {
+      self.selectAll(event);
+    }
+  });
+};
+
+/**
+ * Handles paste events.
+ *
+ * @private
+ */
+TextField.prototype.paste = function(event) {
+  var self = this;
+  event.preventDefault();
+  this.rollbackInvalidChanges(function() {
+    self.readSelectionFromPasteboard(event.originalEvent.clipboardData);
+  });
+};
+
+/**
+ * Checks changes after invoking the passed function for validity and rolls
+ * them back if the changes turned out to be invalid.
+ *
+ * @return {object} whatever object `callback` returns
+ */
+TextField.prototype.rollbackInvalidChanges = function(callback) {
+  var result = null;
+  var errorType = null;
+  var change = TextFieldStateChange.build(this, function() {
+    result = callback();
+  });
+  var error = function(type) { errorType = type; };
+  if (change.hasChanges()) {
+    var formatter = this.formatter();
+    if (formatter && typeof formatter.isChangeValid === 'function') {
+      if (formatter.isChangeValid(change, error)) {
+        change.recomputeDiff();
+        this.setText(change.proposed.text);
+        this.setSelectedRange(change.proposed.selectedRange);
+      } else {
+        var delegate = this.delegate();
+        if (delegate) {
+          if (typeof delegate.textFieldDidFailToValidateChange === "function") {
+            delegate.textFieldDidFailToValidateChange(this, change, errorType);
+          }
+        }
+        this.setText(change.current.text);
+        this.setSelectedRange(change.current.selectedRange);
+        return result;
+      }
+    }
+    if (change.inserted.text.length || change.deleted.text.length) {
+      this.undoManager().proxyFor(this)._applyChangeFromUndoManager(change);
+      this._textDidChange();
+    }
+  }
+  return result;
+};
+
+/**
+ * Handles clicks by resetting the selection affinity.
+ *
+ * @private
+ */
+TextField.prototype.click = function(event) {
+  this.selectionAffinity = AFFINITY.NONE;
+};
+
+TextField.prototype.on = function() {
+  this.element.on.apply(this.element, arguments);
+};
+
+TextField.prototype.off = function() {
+  this.element.off.apply(this.element, arguments);
+};
+
+/**
+ * Gets the formatted text value. This is the same as the value of the
+ * underlying input element.
+ *
+ * @return {string}
+ */
+TextField.prototype.text = function() {
+  return this.element.val();
+};
+
+/**
+ * Sets the formatted text value. This generally should not be used. Instead,
+ * use the value setter.
+ *
+ * @param {string} text
+ */
+TextField.prototype.setText = function(text) {
+  this.element.val(text);
+};
+
+/**
+ * Gets the object value. This is the value that should be considered the
+ * "real" value of the field.
+ *
+ * @return {object}
+ */
+TextField.prototype.value = function() {
+  var self = this;
+  var value = this.text();
+  var delegate = this.delegate();
+  var formatter = this.formatter();
+  if (!formatter) { return value; }
+
+  return formatter.parse(value, function(errorType) {
+    if (delegate) {
+      if (typeof delegate.textFieldDidFailToParseString === 'function') {
+        delegate.textFieldDidFailToParseString(self, value, errorType);
+      }
+    }
+  });
+};
+
+/**
+ * Sets the object value of the field.
+ *
+ * @param {string} value
+ */
+TextField.prototype.setValue = function(value) {
+  if (this._formatter) {
+    value = this._formatter.format(value);
+  }
+  this.setText("" + value);
+  return this.element.trigger('change');
+};
+
+/**
+ * Gets the current formatter. Formatters are used to translate between #text
+ * and #value properties of the field.
+ *
+ * @return {Formatter}
+ */
+TextField.prototype.formatter = function() {
+  if (!this._formatter) {
+    this._formatter = new Formatter();
+    var maximumLengthString = this.element.attr('maxlength');
+    if (maximumLengthString !== undefined && maximumLengthString !== null) {
+      this._formatter.maximumLength = parseInt(maximumLengthString, 10);
+    }
+  }
+
+  return this._formatter;
+};
+
+/**
+ * Sets the current formatter.
+ *
+ * @param {Formatter} formatter
+ */
+TextField.prototype.setFormatter = function(formatter) {
+  var value = this.value();
+  this._formatter = formatter;
+  this.setValue(value);
+};
+
+/**
+ * Gets the range of the current selection.
+ *
+ * @return {{start: number, length: number}}
+ */
+TextField.prototype.selectedRange = function() {
+  var caret = this.element.caret();
+  return {
+    start: caret.start,
+    length: caret.end - caret.start
+  };
+};
+
+/**
+ * Sets the range of the current selection without changing the affinity.
+ *
+ * @return {{start: number, length: number}}
+ */
+TextField.prototype.setSelectedRange = function(range) {
+  return this.setSelectedRangeWithAffinity(range, this.selectionAffinity);
+};
+
+/**
+ * Sets the range of the current selection and the selection affinity.
+ *
+ * @param {{start: number, length: number}} range
+ * @param {AFFINITY} affinity
+ */
+TextField.prototype.setSelectedRangeWithAffinity = function(range, affinity) {
+  var min = 0;
+  var max = this.text().length;
+  var caret = {
+    start: Math.max(min, Math.min(max, range.start)),
+    end: Math.max(min, Math.min(max, range.start + range.length))
+  };
+  this.element.caret(caret);
+  this.selectionAffinity = range.length === 0 ? AFFINITY.NONE : affinity;
+};
+
+/**
+ * Gets the position of the current selection's anchor point, i.e. the point
+ * that the selection extends from, if any.
+ *
+ * @return {number}
+ */
+TextField.prototype.selectionAnchor = function() {
+  var range = this.selectedRange();
+  switch (this.selectionAffinity) {
+    case AFFINITY.UPSTREAM:
+      return range.start + range.length;
+    case AFFINITY.DOWNSTREAM:
+      return range.start;
+    default:
+      return null;
+  }
+};
+
+/**
+ * Undo Support
+ */
+
+/**
+ * Triggers an undo in the underlying UndoManager, if applicable.
+ *
+ * @param {Event} event
+ */
+TextField.prototype.undo = function(event) {
+  if (this.undoManager().canUndo()) {
+    this.undoManager().undo();
+  }
+  event.preventDefault();
+};
+
+/**
+ * Triggers a redo in the underlying UndoManager, if applicable.
+ *
+ * @param {Event} event
+ */
+TextField.prototype.redo = function(event) {
+  if (this.undoManager().canRedo()) {
+    this.undoManager().redo();
+  }
+  event.preventDefault();
+};
+
+/**
+ * Gets the UndoManager for this text field.
+ *
+ * @return {UndoManager}
+ */
+TextField.prototype.undoManager = function() {
+  return this._undoManager || (this._undoManager = new UndoManager());
+};
+
+/**
+ * Gets whether this text field records undo actions with its undo manager.
+ *
+ * @return {boolean}
+ */
+TextField.prototype.allowsUndo = function() {
+  return this._allowsUndo;
+};
+
+/**
+ * Sets whether this text field records undo actions with its undo manager.
+ *
+ * @param {boolean} allowsUndo
+ */
+TextField.prototype.setAllowsUndo = function(allowsUndo) {
+  this._allowsUndo = allowsUndo;
+};
+
+/**
+ * Applies the given change as an undo/redo.
+ *
+ * @private
+ */
+TextField.prototype._applyChangeFromUndoManager = function(change) {
+  this.undoManager().proxyFor(this)._applyChangeFromUndoManager(change);
+
+  if (this.undoManager().isUndoing()) {
+    this.setText(change.current.text);
+    this.setSelectedRange(change.current.selectedRange);
+  } else {
+    this.setText(change.proposed.text);
+    this.setSelectedRange(change.proposed.selectedRange);
+  }
+
+  this._textDidChange();
+};
+
+/**
+ * Enabled/disabled support
+ */
+
+TextField.prototype._enabled = true;
+
+TextField.prototype.isEnabled = function() {
+  return this._enabled;
+};
+
+TextField.prototype.setEnabled = function(enabled) {
+  this._enabled = enabled;
+  this._syncPlaceholder();
+};
+
+TextField.prototype.hasFocus = function() {
+  return this.element.get(0).ownerDocument.activeElement === this.element.get(0);
+};
+
+TextField.prototype._focusin = function(event) {
+  this._textFieldDidBeginEditing();
+  return this._syncPlaceholder();
+};
+
+TextField.prototype._focusout = function(event) {
+  this._textFieldDidEndEditing();
+  return this._syncPlaceholder();
+};
+
+TextField.prototype._didEndEditingButKeptFocus = false;
+
+/**
+ * Removes focus from this field if it has focus.
+ */
+TextField.prototype.becomeFirstResponder = function(event) {
+  var self = this;
+  this.element.focus();
+  this.rollbackInvalidChanges(function() {
+    self.element.select();
+    self._syncPlaceholder();
+  });
+};
+
+/**
+ * Removes focus from this field if it has focus.
+ *
+ * @param {Event} event
+ */
+TextField.prototype.resignFirstResponder = function(event) {
+  if (event !== undefined && event !== null) {
+    event.preventDefault();
+  }
+  this.element.blur();
+  this._syncPlaceholder();
+};
+
+/*
+ * Placeholder support
+ */
+
+TextField.prototype._placeholder = null;
+
+TextField.prototype._disabledPlaceholder = null;
+
+TextField.prototype._focusedPlaceholder = null;
+
+TextField.prototype._unfocusedPlaceholder = null;
+
+TextField.prototype.disabledPlaceholder = function() {
+  return this._disabledPlaceholder;
+};
+
+TextField.prototype.setDisabledPlaceholder = function(_disabledPlaceholder) {
+  this._disabledPlaceholder = _disabledPlaceholder;
+  this._syncPlaceholder();
+};
+
+TextField.prototype.focusedPlaceholder = function() {
+  return this._focusedPlaceholder;
+};
+
+TextField.prototype.setFocusedPlaceholder = function(_focusedPlaceholder) {
+  this._focusedPlaceholder = _focusedPlaceholder;
+  this._syncPlaceholder();
+};
+
+TextField.prototype.unfocusedPlaceholder = function() {
+  return this._unfocusedPlaceholder;
+};
+
+TextField.prototype.setUnfocusedPlaceholder = function(_unfocusedPlaceholder) {
+  this._unfocusedPlaceholder = _unfocusedPlaceholder;
+  this._syncPlaceholder();
+};
+
+TextField.prototype.placeholder = function() {
+  return this._placeholder;
+};
+
+TextField.prototype.setPlaceholder = function(_placeholder) {
+  this._placeholder = _placeholder;
+  this.element.attr('placeholder', this._placeholder);
+};
+
+TextField.prototype._syncPlaceholder = function() {
+  if (!this._enabled) {
+    var disabledPlaceholder = this._disabledPlaceholder;
+    if (disabledPlaceholder !== undefined && disabledPlaceholder !== null) {
+      this.setPlaceholder(disabledPlaceholder);
+    }
+  } else if (this.hasFocus()) {
+    var focusedPlaceholder = this._focusedPlaceholder;
+    if (focusedPlaceholder !== undefined && focusedPlaceholder !== null) {
+      this.setPlaceholder(focusedPlaceholder);
+    }
+  } else {
+    var unfocusedPlaceholder = this._unfocusedPlaceholder;
+    if (unfocusedPlaceholder !== undefined && unfocusedPlaceholder !== null) {
+      this.setPlaceholder(unfocusedPlaceholder);
+    }
+  }
+};
+
+/**
+ * Keybindings
+ */
+
+TextField.prototype._buildKeybindings = function() {
+  var doc = this.element.get(0).ownerDocument;
+  var win = doc.defaultView || doc.parentWindow;
+  var userAgent = win.navigator.userAgent;
+  var osx = /^Mozilla\/[\d\.]+ \(Macintosh/.test(userAgent);
+  this._bindings = keyBindingsForPlatform(osx ? 'OSX' : 'Default');
+};
+
+/**
+ * Debug support
+ */
+
+TextField.prototype.inspect = function() {
+  return '#<TextField text="' + this.text() + '">';
+};
+
+function TextFieldStateChange(field) {
+  this.field = field;
+}
+
+TextFieldStateChange.prototype.field = null;
+
+TextFieldStateChange.prototype.current = null;
+
+TextFieldStateChange.prototype.proposed = null;
+
+
+TextFieldStateChange.build = function(field, callback) {
+  var change = new this(field);
+  change.current = {
+    text: field.text(),
+    selectedRange: field.selectedRange()
+  };
+  callback();
+  change.proposed = {
+    text: field.text(),
+    selectedRange: field.selectedRange()
+  };
+  change.recomputeDiff();
+  return change;
+};
+
+TextFieldStateChange.prototype.hasChanges = function() {
+  this.recomputeDiff();
+  return this.current.text !== this.proposed.text ||
+    this.current.selectedRange.start !== this.proposed.selectedRange.start ||
+    this.current.selectedRange.length !== this.proposed.selectedRange.length;
+};
+
+TextFieldStateChange.prototype.recomputeDiff = function() {
+  if (this.proposed.text !== this.current.text) {
+    var ctext = this.current.text;
+    var ptext = this.proposed.text;
+    var sharedPrefixLength = 0;
+    var sharedSuffixLength = 0;
+    var minTextLength = Math.min(ctext.length, ptext.length);
+    var i;
+
+    for (i = 0; i < minTextLength; i++) {
+      if (ptext[i] === ctext[i]) {
+        sharedPrefixLength = i + 1;
+      } else {
+        break;
+      }
+    }
+
+    for (i = 0; i < minTextLength - sharedPrefixLength; i++) {
+      if (ptext[ptext.length - 1 - i] === ctext[ctext.length - 1 - i]) {
+        sharedSuffixLength = i + 1;
+      } else {
+        break;
+      }
+    }
+
+    var inserted = {
+      start: sharedPrefixLength,
+      end: ptext.length - sharedSuffixLength
+    };
+    var deleted = {
+      start: sharedPrefixLength,
+      end: ctext.length - sharedSuffixLength
+    };
+    inserted.text = ptext.substring(inserted.start, inserted.end);
+    deleted.text = ctext.substring(deleted.start, deleted.end);
+    this.inserted = inserted;
+    this.deleted = deleted;
+  } else {
+    this.inserted = {
+      start: this.proposed.selectedRange.start,
+      end: this.proposed.selectedRange.start + this.proposed.selectedRange.length,
+      text: ''
+    };
+    this.deleted = {
+      start: this.current.selectedRange.start,
+      end: this.current.selectedRange.start + this.current.selectedRange.length,
+      text: ''
+    };
+  }
+  return null;
+};
+
+module.exports = TextField;
+
+},{"./formatter":9,"./undo_manager":14,"./keybindings":17,"./utils":16}],15:[function(require,module,exports){
+var AMEX        = 'amex';
+var DISCOVER    = 'discover';
+var JCB         = 'jcb';
+var MASTERCARD  = 'mastercard';
+var VISA        = 'visa';
+
+function determineCardType(pan) {
+  if (pan === null || pan === undefined) {
+    return null;
+  }
+
+  pan = pan.toString();
+  var firsttwo = parseInt(pan.slice(0, 2), 10);
+  var iin = parseInt(pan.slice(0, 6), 10);
+  var halfiin = parseInt(pan.slice(0, 3), 10);
+
+  if (pan[0] === '4') {
+    return VISA;
+  } else if (pan.slice(0, 4) === '6011' || firsttwo === 65 || (halfiin >= 664 && halfiin <= 649) || (iin >= 622126 && iin <= 622925)) {
+    return DISCOVER;
+  } else if (pan.slice(0, 4) === '2131' || pan.slice(0, 4) === '1800' || firsttwo === 35) {
+    return JCB;
+  } else if (firsttwo >= 51 && firsttwo <= 55) {
+    return MASTERCARD;
+  } else if (firsttwo === 34 || firsttwo === 37) {
+    return AMEX;
+  }
+}
+
+function luhnCheck(pan) {
+  var sum = 0;
+  var flip = true;
+  for (var i = pan.length - 1; i >= 0; i--) {
+    digit = parseInt(pan.charAt(i), 10);
+    sum += (flip = !flip) ? Math.floor((digit * 2) / 10) + Math.floor(digit * 2 % 10) : digit;
+  }
+
+  return sum % 10 === 0;
+}
+
+function validCardLength(pan) {
+  switch (determineCardType(pan)) {
+    case VISA:
+      return pan.length === 13 || pan.length === 16;
+    case DISCOVER: case MASTERCARD:
+      return pan.length === 16;
+    case JCB:
+      return pan.length === 15 || pan.length === 16;
+    case AMEX:
+      return pan.length === 15;
+    default:
+      return false;
+  }
+}
+
+module.exports = {
+  determineCardType: determineCardType,
+  luhnCheck: luhnCheck,
+  validCardLength: validCardLength,
+  AMEX: AMEX,
+  DISCOVER: DISCOVER,
+  JCB: JCB,
+  MASTERCARD: MASTERCARD,
+  VISA: VISA
+};
+
+},{}],16:[function(require,module,exports){
+var DIGITS_PATTERN = /^\d*$/;
+var SURROUNDING_SPACE_PATTERN = /(^\s+|\s+$)/;
+
+function isDigits(string) {
+  return DIGITS_PATTERN.test(string);
+}
+
+function startsWith(prefix, string) {
+  return string.slice(0, prefix.length) === prefix;
+}
+
+function endsWith(suffix, string) {
+  return string.slice(string.length - suffix.length) === suffix;
+}
+
+var trim;
+if (typeof ''.trim === 'function') {
+  trim = function(string) {
+    return string.trim();
+  };
+} else {
+  trim = function(string) {
+    return string.replace(SURROUNDING_SPACE_PATTERN, '');
+  };
+}
+
+function zpad(length, n) {
+  var result = ''+n;
+  while (result.length < length) {
+    result = '0'+result;
+  }
+  return result;
+}
+
+function zpad2(n) {
+  return zpad(2, n);
+}
+
+// PhantomJS 1.9 does not have Function#bind.
+function bind(fn, context) {
+  if (typeof fn.bind === 'function') {
+    return fn.bind(context);
+  } else {
+    return function() {
+      return fn.apply(context, arguments);
+    };
+  }
+}
+
+module.exports = {
+  isDigits: isDigits,
+  startsWith: startsWith,
+  endsWith: endsWith,
+  trim: trim,
+  zpad: zpad,
+  zpad2: zpad2,
+  bind: bind
+};
 
 },{}],17:[function(require,module,exports){
-(function() {
-  var A, ALT, BACKSPACE, BindingSet, CTRL, DELETE, DOWN, ENTER, KEYS, LEFT, META, NINE, RIGHT, SHIFT, TAB, UP, Y, Z, ZERO, build, cache, keyBindingsForPlatform,
-    __slice = [].slice;
+var A = 65;
+var Y = 89;
+var Z = 90;
+var ZERO = 48;
+var NINE = 57;
+var LEFT = 37;
+var RIGHT = 39;
+var UP = 38;
+var DOWN = 40;
+var BACKSPACE = 8;
+var DELETE = 46;
+var TAB = 9;
+var ENTER = 13;
 
-  A = 65;
+var KEYS = {
+  A: A,
+  Y: Y,
+  Z: Z,
+  ZERO: ZERO,
+  NINE: NINE,
+  LEFT: LEFT,
+  RIGHT: RIGHT,
+  UP: UP,
+  DOWN: DOWN,
+  BACKSPACE: BACKSPACE,
+  DELETE: DELETE,
+  TAB: TAB,
+  ENTER: ENTER,
 
-  Y = 89;
+  isDigit: function(keyCode) {
+    return ZERO <= keyCode && keyCode <= NINE;
+  },
 
-  Z = 90;
+  isDirectional: function(keyCode) {
+    return keyCode === LEFT || keyCode === RIGHT || keyCode === UP || keyCode === DOWN;
+  }
+};
 
-  ZERO = 48;
+var CTRL  = 1 << 0;
+var META  = 1 << 1;
+var ALT   = 1 << 2;
+var SHIFT = 1 << 3;
 
-  NINE = 57;
 
-  LEFT = 37;
+var cache = {};
 
-  RIGHT = 39;
+/**
+ * Builds a BindingSet based on the current platform.
+ *
+ * @param {string} platform A string name of a platform (e.g. "OSX").
+ *
+ * @return {BindingSet} keybindings appropriate for the given platform.
+ */
+function keyBindingsForPlatform(platform) {
+  var osx = platform === 'OSX';
+  var ctrl = osx ? META : CTRL;
 
-  UP = 38;
+  if (!cache[platform]) {
+    cache[platform] = build(platform, function(bind) {
+      bind(A         , ctrl       , 'selectAll');
+      bind(LEFT      , null       , 'moveLeft');
+      bind(LEFT      , ALT        , 'moveWordLeft');
+      bind(LEFT      , SHIFT      , 'moveLeftAndModifySelection');
+      bind(LEFT      , ALT|SHIFT  , 'moveWordLeftAndModifySelection');
+      bind(RIGHT     , null       , 'moveRight');
+      bind(RIGHT     , ALT        , 'moveWordRight');
+      bind(RIGHT     , SHIFT      , 'moveRightAndModifySelection');
+      bind(RIGHT     , ALT|SHIFT  , 'moveWordRightAndModifySelection');
+      bind(UP        , null       , 'moveUp');
+      bind(UP        , ALT        , 'moveToBeginningOfParagraph');
+      bind(UP        , SHIFT      , 'moveUpAndModifySelection');
+      bind(UP        , ALT|SHIFT  , 'moveParagraphBackwardAndModifySelection');
+      bind(DOWN      , null       , 'moveDown');
+      bind(DOWN      , ALT        , 'moveToEndOfParagraph');
+      bind(DOWN      , SHIFT      , 'moveDownAndModifySelection');
+      bind(DOWN      , ALT|SHIFT  , 'moveParagraphForwardAndModifySelection');
+      bind(BACKSPACE , null       , 'deleteBackward');
+      bind(BACKSPACE , SHIFT      , 'deleteBackward');
+      bind(BACKSPACE , ALT        , 'deleteWordBackward');
+      bind(BACKSPACE , ALT|SHIFT  , 'deleteWordBackward');
+      bind(BACKSPACE , ctrl       , 'deleteBackwardToBeginningOfLine');
+      bind(BACKSPACE , ctrl|SHIFT , 'deleteBackwardToBeginningOfLine');
+      bind(DELETE    , null       , 'deleteForward');
+      bind(DELETE    , ALT        , 'deleteWordForward');
+      bind(TAB       , null       , 'insertTab');
+      bind(TAB       , SHIFT      , 'insertBackTab');
+      bind(ENTER     , null       , 'insertNewline');
+      bind(Z         , ctrl       , 'undo');
 
-  DOWN = 40;
-
-  BACKSPACE = 8;
-
-  DELETE = 46;
-
-  TAB = 9;
-
-  ENTER = 13;
-
-  KEYS = {
-    A: A,
-    Y: Y,
-    Z: Z,
-    ZERO: ZERO,
-    NINE: NINE,
-    LEFT: LEFT,
-    RIGHT: RIGHT,
-    UP: UP,
-    DOWN: DOWN,
-    BACKSPACE: BACKSPACE,
-    DELETE: DELETE,
-    TAB: TAB,
-    ENTER: ENTER,
-    isDigit: function(keyCode) {
-      return (ZERO <= keyCode && keyCode <= NINE);
-    },
-    isDirectional: function(keyCode) {
-      return keyCode === LEFT || keyCode === RIGHT || keyCode === UP || keyCode === DOWN;
-    }
-  };
-
-  CTRL = 1 << 0;
-
-  META = 1 << 1;
-
-  ALT = 1 << 2;
-
-  SHIFT = 1 << 3;
-
-  cache = {};
-
-  keyBindingsForPlatform = function(platform) {
-    var ctrl, osx;
-    osx = platform === 'OSX';
-    ctrl = osx ? META : CTRL;
-    return cache[platform] || (cache[platform] = build(platform, function(bind) {
-      bind(A, ctrl, 'selectAll');
-      bind(LEFT, null, 'moveLeft');
-      bind(LEFT, ALT, 'moveWordLeft');
-      bind(LEFT, SHIFT, 'moveLeftAndModifySelection');
-      bind(LEFT, ALT | SHIFT, 'moveWordLeftAndModifySelection');
       if (osx) {
-        bind(LEFT, META, 'moveToBeginningOfLine');
+        bind(LEFT      , META       , 'moveToBeginningOfLine');
+        bind(LEFT      , META|SHIFT , 'moveToBeginningOfLineAndModifySelection');
+        bind(RIGHT     , META       , 'moveToEndOfLine');
+        bind(RIGHT     , META|SHIFT , 'moveToEndOfLineAndModifySelection');
+        bind(UP        , META       , 'moveToBeginningOfDocument');
+        bind(UP        , META|SHIFT , 'moveToBeginningOfDocumentAndModifySelection');
+        bind(DOWN      , META       , 'moveToEndOfDocument');
+        bind(DOWN      , META|SHIFT , 'moveToEndOfDocumentAndModifySelection');
+        bind(BACKSPACE , CTRL       , 'deleteBackwardByDecomposingPreviousCharacter');
+        bind(BACKSPACE , CTRL|SHIFT , 'deleteBackwardByDecomposingPreviousCharacter');
+        bind(Z         , META|SHIFT , 'redo');
+      } else {
+        bind(Y         , CTRL       , 'redo');
       }
-      if (osx) {
-        bind(LEFT, META | SHIFT, 'moveToBeginningOfLineAndModifySelection');
-      }
-      bind(RIGHT, null, 'moveRight');
-      bind(RIGHT, ALT, 'moveWordRight');
-      bind(RIGHT, SHIFT, 'moveRightAndModifySelection');
-      bind(RIGHT, ALT | SHIFT, 'moveWordRightAndModifySelection');
-      if (osx) {
-        bind(RIGHT, META, 'moveToEndOfLine');
-      }
-      if (osx) {
-        bind(RIGHT, META | SHIFT, 'moveToEndOfLineAndModifySelection');
-      }
-      bind(UP, null, 'moveUp');
-      bind(UP, ALT, 'moveToBeginningOfParagraph');
-      bind(UP, SHIFT, 'moveUpAndModifySelection');
-      bind(UP, ALT | SHIFT, 'moveParagraphBackwardAndModifySelection');
-      if (osx) {
-        bind(UP, META, 'moveToBeginningOfDocument');
-      }
-      if (osx) {
-        bind(UP, META | SHIFT, 'moveToBeginningOfDocumentAndModifySelection');
-      }
-      bind(DOWN, null, 'moveDown');
-      bind(DOWN, ALT, 'moveToEndOfParagraph');
-      bind(DOWN, SHIFT, 'moveDownAndModifySelection');
-      bind(DOWN, ALT | SHIFT, 'moveParagraphForwardAndModifySelection');
-      if (osx) {
-        bind(DOWN, META, 'moveToEndOfDocument');
-      }
-      if (osx) {
-        bind(DOWN, META | SHIFT, 'moveToEndOfDocumentAndModifySelection');
-      }
-      bind(BACKSPACE, null, 'deleteBackward');
-      bind(BACKSPACE, SHIFT, 'deleteBackward');
-      bind(BACKSPACE, ALT, 'deleteWordBackward');
-      bind(BACKSPACE, ALT | SHIFT, 'deleteWordBackward');
-      if (osx) {
-        bind(BACKSPACE, CTRL, 'deleteBackwardByDecomposingPreviousCharacter');
-      }
-      if (osx) {
-        bind(BACKSPACE, CTRL | SHIFT, 'deleteBackwardByDecomposingPreviousCharacter');
-      }
-      bind(BACKSPACE, ctrl, 'deleteBackwardToBeginningOfLine');
-      bind(BACKSPACE, ctrl | SHIFT, 'deleteBackwardToBeginningOfLine');
-      bind(DELETE, null, 'deleteForward');
-      bind(DELETE, ALT, 'deleteWordForward');
-      bind(TAB, null, 'insertTab');
-      bind(TAB, SHIFT, 'insertBackTab');
-      bind(ENTER, null, 'insertNewline');
-      bind(Z, ctrl, 'undo');
-      if (osx) {
-        bind(Z, META | SHIFT, 'redo');
-      }
-      if (!osx) {
-        return bind(Y, CTRL, 'redo');
-      }
-    }));
-  };
-
-  build = function(platform, callback) {
-    var result;
-    result = new BindingSet(platform);
-    callback(function() {
-      var args;
-      args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-      return result.bind.apply(result, args);
     });
-    return result;
-  };
+  }
 
-  BindingSet = (function() {
-    BindingSet.prototype.platform = null;
+  return cache[platform];
+}
 
-    BindingSet.prototype.bindings = null;
+function build(platform, callback) {
+  var result = new BindingSet(platform);
+  callback(function() {
+    return result.bind.apply(result, arguments);
+  });
+  return result;
+}
 
-    function BindingSet(platform) {
-      this.platform = platform;
-      this.bindings = {};
-    }
+function BindingSet(platform) {
+  this.platform = platform;
+  this.bindings = {};
+}
 
-    BindingSet.prototype.bind = function(keyCode, modifiers, action) {
-      var _base;
-      return ((_base = this.bindings)[keyCode] || (_base[keyCode] = {}))[modifiers || 0] = action;
-    };
+BindingSet.prototype.platform = null;
+BindingSet.prototype.bindings = null;
 
-    BindingSet.prototype.actionForEvent = function(event) {
-      var bindingsForKeyCode, modifiers;
-      if (bindingsForKeyCode = this.bindings[event.keyCode]) {
-        modifiers = 0;
-        if (event.altKey) {
-          modifiers |= ALT;
-        }
-        if (event.ctrlKey) {
-          modifiers |= CTRL;
-        }
-        if (event.metaKey) {
-          modifiers |= META;
-        }
-        if (event.shiftKey) {
-          modifiers |= SHIFT;
-        }
-        return bindingsForKeyCode[modifiers];
-      }
-    };
+BindingSet.prototype.bind = function(keyCode, modifiers, action) {
+  if (!this.bindings[keyCode]) { this.bindings[keyCode] = {}; }
+  this.bindings[keyCode][modifiers || 0] = action;
+};
 
-    return BindingSet;
+BindingSet.prototype.actionForEvent = function(event) {
+  var bindingsForKeyCode = this.bindings[event.keyCode];
+  if (bindingsForKeyCode) {
+    var modifiers = 0;
+    if (event.altKey) { modifiers |= ALT; }
+    if (event.ctrlKey) { modifiers |= CTRL; }
+    if (event.metaKey) { modifiers |= META; }
+    if (event.shiftKey) { modifiers |= SHIFT; }
+    return bindingsForKeyCode[modifiers];
+  }
+};
 
-  })();
+module.exports = {
+  KEYS: KEYS,
+  keyBindingsForPlatform: keyBindingsForPlatform
+};
 
-  module.exports = {
-    KEYS: KEYS,
-    keyBindingsForPlatform: keyBindingsForPlatform
-  };
-
-}).call(this);
-
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 (function() {
   var CURRENCY, CurrencyDefaults, DEFAULT_COUNTRY, DEFAULT_LOCALE, Formatter, LocaleDefaults, NONE, NumberFormatter, PERCENT, RegionDefaults, StyleDefaults, endsWith, get, isDigits, splitLocaleComponents, startsWith, stround, trim, zpad, _ref,
     __slice = [].slice,
@@ -3207,7 +3878,7 @@ return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require
 
 }).call(this);
 
-},{"./formatter":10,"./utils":16,"stround":18}],18:[function(require,module,exports){
+},{"./formatter":9,"./utils":16,"stround":18}],18:[function(require,module,exports){
 /** @const */ var CEILING = 0;
 /** @const */ var FLOOR = 1;
 /** @const */ var DOWN = 2;
