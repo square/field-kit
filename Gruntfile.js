@@ -18,6 +18,15 @@ module.exports = function(grunt) {
       }
     },
 
+    copy: {
+      source: {
+        expand: true,
+        cwd: 'src',
+        src: ['**/*.js'],
+        dest: 'lib'
+      }
+    },
+
     browserify: {
       compile: {
         src: 'lib/index.js',
@@ -88,8 +97,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-qunit');
+  grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-browserify');
   grunt.registerTask('default', ['test']);
-  grunt.registerTask('test', ['coffeelint', 'coffee', 'browserify', 'connect:test', 'qunit', 'uglify']);
+  grunt.registerTask('test', ['coffeelint', 'coffee', 'copy', 'browserify', 'connect:test', 'qunit', 'uglify']);
   grunt.registerTask('develop', ['connect:test:keepalive']);
 };
