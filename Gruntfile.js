@@ -2,31 +2,6 @@ module.exports = function(grunt) {
   var browserify = require('browserify-middleware');
 
   grunt.initConfig({
-    coffeelint: {
-      app: ['src/**/*.coffee'],
-      specs: ['spec/**/*.coffee'],
-      options: grunt.file.readJSON('.coffeelint.json')
-    },
-
-    coffee: {
-      compile: {
-        expand: true,
-        cwd: 'src',
-        src: ['**/*.coffee'],
-        dest: 'lib',
-        ext: '.js'
-      }
-    },
-
-    copy: {
-      source: {
-        expand: true,
-        cwd: 'src',
-        src: ['**/*.js'],
-        dest: 'lib'
-      }
-    },
-
     browserify: {
       compile: {
         src: 'lib/index.js',
@@ -92,14 +67,11 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.loadNpmTasks('grunt-coffeelint');
-  grunt.loadNpmTasks('grunt-contrib-coffee');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-qunit');
-  grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-browserify');
   grunt.registerTask('default', ['test']);
-  grunt.registerTask('test', ['coffeelint', 'coffee', 'copy', 'browserify', 'connect:test', 'qunit', 'uglify']);
+  grunt.registerTask('test', ['browserify', 'connect:test', 'qunit', 'uglify']);
   grunt.registerTask('develop', ['connect:test:keepalive']);
 };
