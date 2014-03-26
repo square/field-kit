@@ -4,7 +4,9 @@
   "description": "Utilities to effectively manage text entry on the web.",
   "main": "lib/index.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "rm -rf .test-build && broccoli build .test-build && grunt test",
+    "build": "rm -rf dist && ENVIRONMENT=production broccoli build dist",
+    "develop": "broccoli serve"
   },
   "repository": "",
   "author": "Square, Inc.",
@@ -14,20 +16,17 @@
     "jquery-caret": "0.0.1"
   },
   "devDependencies": {
-    "gluejs": "~0.2.0",
-    "grunt-coffeelint": "0.0.6",
-    "grunt-browserify": "~0.2.3",
-    "grunt-contrib-coffee": "~0.7.0",
-    "grunt-contrib-uglify": "~0.2.0",
     "grunt": "~0.4.1",
-    "coffee-script": "~1.6.2",
     "timekeeper": "0.0.3",
     "qunit": "^0.6.2",
     "qunit-bdd": "0.1.0",
     "sinon": "^1.9.0",
     "grunt-contrib-connect": "^0.7.1",
     "grunt-contrib-qunit": "^0.4.0",
-    "browserify-middleware": "^2.4.0"
+    "broccoli-browserify": "0.0.1",
+    "broccoli-concat": "0.0.3",
+    "broccoli-cli": "0.0.1",
+    "broccoli": "^0.4.1"
   },
   "publishConfig": {
     "registry": "http://npm.corp.squareup.com:8000"
