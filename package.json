@@ -14,7 +14,6 @@
     "jquery-caret": "0.0.1"
   },
   "devDependencies": {
-    "gluejs": "~0.2.0",
     "grunt-coffeelint": "0.0.6",
     "grunt-browserify": "~0.2.3",
     "grunt-contrib-coffee": "~0.7.0",
