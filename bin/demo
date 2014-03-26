@@ -3,10 +3,12 @@
 fs   = require 'fs'
 http = require 'http'
 path = require 'path'
-Glue = require 'gluejs'
 {exec} = require 'child_process'
 CoffeeScript = require 'coffee-script'
+browserify = require 'browserify-middleware'
 PORT = 9090
+
+lib = browserify('../lib/index.js', standalone: 'FieldKit', debug: false)
 
 server = http.createServer (request, response) ->
   respond = (status, headers, data) ->
@@ -46,8 +48,8 @@ server = http.createServer (request, response) ->
           writeFileIfFound err, data
 
   if request.url is '/field-kit.js'
-    new Glue().basepath('lib').include('lib').export('FieldKit').render writeFileIfFound
-  if match = request.url.match(/^\/(lib|src)\//)
+    lib(request, response, -> respond 404)
+  else if match = request.url.match(/^\/(lib|src)\//)
     requestPath = request.url.substring(match[0].length)
     serveFromPath match[1], requestPath
   else
