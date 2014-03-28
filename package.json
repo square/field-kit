@@ -26,7 +26,9 @@
     "broccoli-browserify": "0.0.1",
     "broccoli-concat": "0.0.3",
     "broccoli-cli": "0.0.1",
-    "broccoli": "^0.4.1"
+    "broccoli": "^0.4.1",
+    "es6-class": "0.0.2",
+    "broccoli-filter": "^0.1.4"
   },
   "publishConfig": {
     "registry": "http://npm.corp.squareup.com:8000"
