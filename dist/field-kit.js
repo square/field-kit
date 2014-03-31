@@ -1311,50 +1311,66 @@ var NumberFormatter = function() {
       };
 
       NumberFormatter.prototype.maximumFractionDigits = function() {
-        return this._get('maximumFractionDigits');
+        var result = this._get('maximumFractionDigits');
+        var minimumFractionDigits = this._minimumFractionDigits;
+        if (result !== null && result !== undefined &&
+            minimumFractionDigits !== null && minimumFractionDigits !== undefined &&
+            minimumFractionDigits > result) {
+          result = minimumFractionDigits;
+        }
+        return result;
       };
 
       NumberFormatter.prototype.setMaximumFractionDigits = function(maximumFractionDigits) {
         this._maximumFractionDigits = maximumFractionDigits;
-        if (maximumFractionDigits < this.minimumFractionDigits()) {
-          this.setMinimumFractionDigits(maximumFractionDigits);
-        }
         return this;
       };
 
       NumberFormatter.prototype.minimumFractionDigits = function() {
-        return this._get('minimumFractionDigits');
+        var result = this._get('minimumFractionDigits');
+        var maximumFractionDigits = this._maximumFractionDigits;
+        if (result !== null && result !== undefined &&
+            maximumFractionDigits !== null && maximumFractionDigits !== undefined &&
+            maximumFractionDigits < result) {
+          result = maximumFractionDigits;
+        }
+        return result;
       };
 
       NumberFormatter.prototype.setMinimumFractionDigits = function(minimumFractionDigits) {
         this._minimumFractionDigits = minimumFractionDigits;
-        if (minimumFractionDigits > this.maximumFractionDigits()) {
-          this.setMaximumFractionDigits(minimumFractionDigits);
-        }
         return this;
       };
 
       NumberFormatter.prototype.maximumIntegerDigits = function() {
-        return this._get('maximumIntegerDigits');
+        var result = this._get('maximumIntegerDigits');
+        var minimumIntegerDigits = this._minimumIntegerDigits;
+        if (result !== null && result !== undefined &&
+            minimumIntegerDigits !== null && minimumIntegerDigits !== undefined &&
+            minimumIntegerDigits > result) {
+          result = minimumIntegerDigits;
+        }
+        return result;
       };
 
       NumberFormatter.prototype.setMaximumIntegerDigits = function(maximumIntegerDigits) {
         this._maximumIntegerDigits = maximumIntegerDigits;
-        if (maximumIntegerDigits < this.minimumIntegerDigits()) {
-          this.setMinimumIntegerDigits(maximumIntegerDigits);
-        }
         return this;
       };
 
       NumberFormatter.prototype.minimumIntegerDigits = function() {
-        return this._get('minimumIntegerDigits');
+        var result = this._get('minimumIntegerDigits');
+        var maximumIntegerDigits = this._maximumIntegerDigits;
+        if (result !== null && result !== undefined &&
+            maximumIntegerDigits !== null && maximumIntegerDigits !== undefined &&
+            maximumIntegerDigits < result) {
+          result = maximumIntegerDigits;
+        }
+        return result;
       };
 
       NumberFormatter.prototype.setMinimumIntegerDigits = function(minimumIntegerDigits) {
         this._minimumIntegerDigits = minimumIntegerDigits;
-        if (minimumIntegerDigits > this.maximumIntegerDigits()) {
-          this.setMaximumIntegerDigits(minimumIntegerDigits);
-        }
         return this;
       };
 
