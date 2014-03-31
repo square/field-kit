@@ -128,6 +128,54 @@ describe('FieldKit.NumberFormatter', function() {
     });
   });
 
+  describe('#maximumFractionDigits', function() {
+    it('uses minimumFractionDigits if it is configured higher', function() {
+      // set minimum > maximum
+      formatter.setMinimumFractionDigits(9);
+      formatter.setMaximumFractionDigits(3);
+      expect(formatter.maximumFractionDigits()).to.equal(9);
+
+      // bring minimum < maximum
+      formatter.setMinimumFractionDigits(2);
+      expect(formatter.maximumFractionDigits()).to.equal(3);
+    });
+  });
+
+  describe('#minimumFractionDigits', function() {
+    it('uses maximumFractionDigits if it is lower', function() {
+      // set minimum > maximum
+      formatter.setMinimumFractionDigits(9);
+      formatter.setMaximumFractionDigits(3);
+      expect(formatter.minimumFractionDigits()).to.equal(3);
+
+      // bring minimum < maximum
+      formatter.setMaximumFractionDigits(10);
+      expect(formatter.minimumFractionDigits()).to.equal(9);
+    });
+
+    it('stays at the default when a maximumFractionDigits is set', function() {
+      formatter.setMinimumFractionDigits(null);
+      formatter.setMaximumFractionDigits(20);
+      expect(formatter.minimumFractionDigits())
+        .to.equal(new FieldKit.NumberFormatter().minimumFractionDigits());
+    });
+  });
+
+  describe('#maximumIntegerDigits', function() {
+    it('does not use minimumIntegerDigits by default', function() {
+      formatter.setMinimumIntegerDigits(1);
+      expect(formatter.maximumIntegerDigits()).to.equal(new FieldKit.NumberFormatter().maximumIntegerDigits());
+    });
+  });
+
+  describe('#minimumIntegerDigits', function() {
+    it('changes when a lower maximumIntegerDigits value is set', function() {
+      formatter.setMinimumIntegerDigits(20);
+      formatter.setMaximumIntegerDigits(2);
+      expect(formatter.minimumIntegerDigits()).to.equal(2);
+    });
+  });
+
   describe('#format', function() {
     it('works with 702', function() {
       formatter.setNumberStyle(FieldKit.NumberFormatter.Style.CURRENCY);
@@ -963,38 +1011,6 @@ describe('FieldKit.NumberFormatter', function() {
       it('does not allow complete garbage', function() {
         expect(formatter.parse('4##@238420@(!)@*)#!')).to.be.null();
       });
-    });
-  });
-
-  describe('#maximumFractionDigits', function() {
-    it('changes when a higher minimumFractionDigits value is set', function() {
-      formatter.setMaximumFractionDigits(2);
-      formatter.setMinimumFractionDigits(20);
-      expect(formatter.maximumFractionDigits()).to.equal(20);
-    });
-  });
-
-  describe('#minimumFractionDigits', function() {
-    it('changes when a lower maximumFractionDigits value is set', function() {
-      formatter.setMinimumFractionDigits(20);
-      formatter.setMaximumFractionDigits(2);
-      expect(formatter.minimumFractionDigits()).to.equal(2);
-    });
-  });
-
-  describe('#maximumIntegerDigits', function() {
-    it('changes when a higher minimumIntegerDigits value is set', function() {
-      formatter.setMaximumIntegerDigits(2);
-      formatter.setMinimumIntegerDigits(20);
-      expect(formatter.maximumIntegerDigits()).to.equal(20);
-    });
-  });
-
-  describe('#minimumIntegerDigits', function() {
-    it('changes when a lower maximumIntegerDigits value is set', function() {
-      formatter.setMinimumIntegerDigits(20);
-      formatter.setMaximumIntegerDigits(2);
-      expect(formatter.minimumIntegerDigits()).to.equal(2);
     });
   });
 });
