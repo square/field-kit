@@ -1,0 +1,27 @@
+{
+  "name": "field-kit",
+  "version": "0.1.2",
+  "authors": [
+    "Brian Donovan <donovan@squareup.com>"
+  ],
+  "description": "Utilities to effectively manage text entry on the web.",
+  "main": "field-kit.js",
+  "keywords": [
+    "input",
+    "text",
+    "format",
+    "i18n"
+  ],
+  "license": "Apache 2",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test"
+  ],
+  "dependencies": {
+    "jquery-caret": "https://donovan@stash.corp.squareup.com/scm/js/jquery-caret.git#~0.0.1",
+    "stround": "~0.1.0"
+  }
+}
