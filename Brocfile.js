@@ -16,9 +16,9 @@ function es6(inputTree) {
 }
 
 module.exports = function(broccoli) {
-  var lib = broccoli.makeTree('lib');
-  var test = broccoli.makeTree('test');
-  var qunit = broccoli.makeTree('node_modules/qunit/support/qunit/qunit');
+  var lib = 'lib';
+  var test = 'test';
+  var qunit = 'node_modules/qunit/support/qunit/qunit';
 
   var fieldKit = browserify(es6(lib), {
     entries: ['./index'],

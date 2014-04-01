@@ -26,7 +26,7 @@
     "broccoli-browserify": "0.0.1",
     "broccoli-concat": "0.0.3",
     "broccoli-cli": "0.0.1",
-    "broccoli": "^0.4.1",
+    "broccoli": "^0.5.0",
     "es6-class": "0.0.2",
     "broccoli-filter": "^0.1.4",
     "grunt-cli": "^0.1.13"
