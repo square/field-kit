@@ -38,9 +38,9 @@ module.exports = function(broccoli) {
 
   switch (ENV) {
     case 'development':
-      return [es6(fieldKit), es6(testSetup), allTests, test, qunit];
+      return [fieldKit, es6(testSetup), allTests, test, qunit];
 
     case 'production':
-      return [es6(fieldKit)];
+      return [fieldKit];
   }
 };
