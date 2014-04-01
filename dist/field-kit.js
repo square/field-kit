@@ -966,6 +966,7 @@ module.exports = {
   AdaptiveCardFormatter         : _dereq_('./adaptive_card_formatter'),
   AmexCardFormatter             : _dereq_('./amex_card_formatter'),
   CardTextField                 : _dereq_('./card_text_field'),
+  CardUtils                     : _dereq_('./card_utils'),
   DefaultCardFormatter          : _dereq_('./default_card_formatter'),
   DelimitedTextFormatter        : _dereq_('./delimited_text_formatter'),
   ExpiryDateField               : _dereq_('./expiry_date_field'),
@@ -978,7 +979,7 @@ module.exports = {
   UndoManager                   : _dereq_('./undo_manager')
 };
 
-},{"./adaptive_card_formatter":2,"./amex_card_formatter":3,"./card_text_field":4,"./default_card_formatter":6,"./delimited_text_formatter":7,"./expiry_date_field":8,"./expiry_date_formatter":9,"./formatter":10,"./number_formatter":13,"./phone_formatter":14,"./social_security_number_formatter":15,"./text_field":16,"./undo_manager":17}],12:[function(_dereq_,module,exports){
+},{"./adaptive_card_formatter":2,"./amex_card_formatter":3,"./card_text_field":4,"./card_utils":5,"./default_card_formatter":6,"./delimited_text_formatter":7,"./expiry_date_field":8,"./expiry_date_formatter":9,"./formatter":10,"./number_formatter":13,"./phone_formatter":14,"./social_security_number_formatter":15,"./text_field":16,"./undo_manager":17}],12:[function(_dereq_,module,exports){
 /* jshint esnext:true */
 
 var A = 65;
