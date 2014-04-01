@@ -76,6 +76,46 @@ a user would trigger when editing the field. Here's an example of entering an
 You can trigger these events however you like, but it makes sense to have
 helpers for entering text that do the right thing and then use them everywhere.
 
+## Contributing
+
+### Setup
+
+First, install the development dependencies:
+
+```
+$ npm --registry http://npm.corp.squareup.com:8000 install
+```
+
+You may need to install the `grunt` command-line utility:
+
+```
+$ [sudo] npm install -g grunt-cli
+```
+
+Then, try running the tests:
+
+```
+$ npm test
+```
+
+### Development
+
+As you make changes you may find it useful to have everything automatically
+compiled and ready to test interactively in the browser. You can do that using
+the `develop` npm script:
+
+```
+$ npm run develop
+```
+
+Then go to http://localhost:4200/ in your browser.
+
+### Pull Requests
+
+Contributions via pull requests are very welcome! Follow the steps in
+Developing above, then add your feature or bugfix with tests to cover it, push
+to a branch, and open a pull request. Don't worry about rebuilding
+dist/field-kit.js. If you need to for some reason, run `npm run build`.
 [demo-page]: https://stash.corp.squareup.com/www/JS/field-kit/gh-pages/
 [nsformatter]: https://developer.apple.com/library/mac/documentation/cocoa/reference/foundation/classes/NSFormatter_Class/Reference/Reference.html
 [stround]: https://github.com/square/stround
