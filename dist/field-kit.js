@@ -1,4 +1,4 @@
-!(function(e) {if("object"==typeof exports)module.exports=e();else if("function"==typeof define&&define.amd)define(e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.FieldKit=e()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+!function(e){if("object"==typeof exports)module.exports=e();else if("function"==typeof define&&define.amd)define(e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.FieldKit=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 /** @const */ var CEILING = 0;
 /** @const */ var FLOOR = 1;
 /** @const */ var DOWN = 2;
@@ -324,7 +324,8 @@ var DefaultCardFormatter = _dereq_('./default_card_formatter');
 
 var AmexCardFormatter = function() {
       function AmexCardFormatter() {
-        Object.getPrototypeOf(AmexCardFormatter.prototype).constructor.apply(this, arguments);
+        Object.getPrototypeOf(AmexCardFormatter.prototype).constructor.call(this);
+        this.maximumLength = 15 + 2;
       }
 
       AmexCardFormatter.__proto__ = DefaultCardFormatter;
@@ -341,7 +342,6 @@ var AmexCardFormatter = function() {
       return AmexCardFormatter;
     }();
 
-AmexCardFormatter.prototype.maximumLength = 15 + 2;
 module.exports = AmexCardFormatter;
 
 },{"./default_card_formatter":6}],4:[function(_dereq_,module,exports){
@@ -360,6 +360,16 @@ var CardTextField = function() {
       function CardTextField(element) {
         Object.getPrototypeOf(CardTextField.prototype).constructor.call(this, element, new AdaptiveCardFormatter());
         this.setCardMaskStrategy(CardMaskStrategy.None);
+
+        /**
+         * Whether we are currently masking the displayed text.
+         */
+        this._masked = false;
+
+        /**
+         * Whether we are currently editing.
+         */
+        this._editing = false;
       }
 
       CardTextField.__proto__ = TextField;
@@ -449,16 +459,6 @@ var CardTextField = function() {
       return CardTextField;
     }();
 
-/**
- * Whether we are currently masking the displayed text.
- */
-CardTextField.prototype._masked = false;
-
-/**
- * Whether we are currently editing.
- */
-CardTextField.prototype._editing = false;
-
 CardTextField.CardMaskStrategy = CardMaskStrategy;
 module.exports = CardTextField;
 
@@ -537,7 +537,7 @@ var cardUtils = _dereq_('./card_utils');
 
 var DefaultCardFormatter = function() {
       function DefaultCardFormatter() {
-        Object.getPrototypeOf(DefaultCardFormatter.prototype).constructor.apply(this, arguments);
+        Object.getPrototypeOf(DefaultCardFormatter.prototype).constructor.call(this, ' ');
       }
 
       DefaultCardFormatter.__proto__ = DelimitedTextFormatter;
@@ -571,7 +571,6 @@ var DefaultCardFormatter = function() {
       return DefaultCardFormatter;
     }();
 
-DefaultCardFormatter.prototype.delimiter = ' ';
 DefaultCardFormatter.prototype.maximumLength = 16 + 3;
 module.exports = DefaultCardFormatter;
 
@@ -817,7 +816,8 @@ function interpretTwoDigitYear(year) {
 
 var ExpiryDateFormatter = function() {
       function ExpiryDateFormatter() {
-        Object.getPrototypeOf(ExpiryDateFormatter.prototype).constructor.apply(this, arguments);
+        Object.getPrototypeOf(ExpiryDateFormatter.prototype).constructor.call(this, '/');
+        this.maximumLength = 5;
       }
 
       ExpiryDateFormatter.__proto__ = DelimitedTextFormatter;
@@ -913,8 +913,6 @@ var ExpiryDateFormatter = function() {
       return ExpiryDateFormatter;
     }();
 
-ExpiryDateFormatter.prototype.delimiter = '/';
-ExpiryDateFormatter.prototype.maximumLength = 5;
 module.exports = ExpiryDateFormatter;
 
 },{"./delimited_text_formatter":7,"./utils":18}],10:[function(_dereq_,module,exports){
@@ -1840,7 +1838,7 @@ var NumberFormatter = function() {
       NumberFormatter.prototype._regionDefaults = function() {
         var result = {};
 
-        forEach(RegionDefaults.default, function(value, key) {
+        forEach(RegionDefaults['default'], function(value, key) {
           result[key] = value;
         });
 
@@ -1858,8 +1856,8 @@ var NumberFormatter = function() {
         var result = {};
 
         var defaultFallbacks = [
-          RegionDefaults.default,
-          LocaleDefaults.default,
+          RegionDefaults['default'],
+          LocaleDefaults['default'],
           RegionDefaults[countryCode],  // CA
           LocaleDefaults[lang],         // fr
           LocaleDefaults[locale]        // fr-CA
@@ -2254,7 +2252,8 @@ var DIGITS_PATTERN = /^\d*$/;
 
 var SocialSecurityNumberFormatter = function() {
       function SocialSecurityNumberFormatter() {
-        Object.getPrototypeOf(SocialSecurityNumberFormatter.prototype).constructor.apply(this, arguments);
+        Object.getPrototypeOf(SocialSecurityNumberFormatter.prototype).constructor.call(this, '-');
+        this.maximumLength = 9 + 2;
       }
 
       SocialSecurityNumberFormatter.__proto__ = DelimitedTextFormatter;
@@ -2279,8 +2278,6 @@ var SocialSecurityNumberFormatter = function() {
       return SocialSecurityNumberFormatter;
     }();
 
-SocialSecurityNumberFormatter.prototype.delimiter = '-';
-SocialSecurityNumberFormatter.prototype.maximumLength = 9 + 2;
 module.exports = SocialSecurityNumberFormatter;
 
 },{"./delimited_text_formatter":7}],16:[function(_dereq_,module,exports){
@@ -2349,6 +2346,14 @@ var TextField = function() {
         this.element.on('focusin.field-kit', this._focusin);
         this.element.on('focusout.field-kit', this._focusout);
         this._buildKeybindings();
+
+        /**
+         * Contains one of the AFFINITY enum to indicate the preferred direction of
+         * selection.
+         *
+         * @private
+         */
+        this.selectionAffinity = AFFINITY.NONE;
       }
 
       TextField.prototype.delegate = function() {
@@ -3159,14 +3164,6 @@ var TextField = function() {
 
       return TextField;
     }();
-
-/**
- * Contains one of the AFFINITY enum to indicate the preferred direction of
- * selection.
- *
- * @private
- */
-TextField.prototype.selectionAffinity = AFFINITY.NONE;
 
 var TextFieldStateChange = function() {
       function TextFieldStateChange(field) {
