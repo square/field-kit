@@ -13,7 +13,7 @@
   "author": "Square, Inc.",
   "license": "BSD",
   "dependencies": {
-    "stround": "0.0.2",
+    "stround": "0.2.2",
     "jquery-caret": "0.0.1"
   },
   "devDependencies": {
