@@ -2321,6 +2321,10 @@ var TextField = function() {
         this.element = element;
         this._formatter = formatter;
         this._enabled = true;
+        this._manualCaret = {
+          start: 0,
+          end: 0
+        };
         this._placeholder = null;
         this._disabledPlaceholder = null;
         this._focusedPlaceholder = null;
@@ -2346,6 +2350,14 @@ var TextField = function() {
         this.element.on('focusin.field-kit', this._focusin);
         this.element.on('focusout.field-kit', this._focusout);
         this._buildKeybindings();
+
+        /**
+         * Fixes caret bug (Android) that caused the input
+         * to place inserted charecters in the wrong place
+         * Expected: 1234 5678|  =>  1234 5678 9|
+         * Bug: 1234 5678|  =>  1234 5679| 8
+         */
+        this._needsManualCaret = navigator.userAgent.toLowerCase().indexOf("android") > -1;
 
         /**
          * Contains one of the AFFINITY enum to indicate the preferred direction of
@@ -2919,6 +2931,9 @@ var TextField = function() {
       };
 
       TextField.prototype.click = function(event) {
+        if(this._needsManualCaret) {
+          this._manualCaret = this.element.caret();
+        }
         this.selectionAffinity = AFFINITY.NONE;
       };
 
@@ -2981,7 +2996,13 @@ var TextField = function() {
       };
 
       TextField.prototype.selectedRange = function() {
-        var caret = this.element.caret();
+        var caret;
+        if(this._needsManualCaret) {
+          caret = this._manualCaret;
+        } else {
+          caret = this.element.caret();
+        }
+
         return {
           start: caret.start,
           length: caret.end - caret.start
@@ -2999,6 +3020,7 @@ var TextField = function() {
           start: Math.max(min, Math.min(max, range.start)),
           end: Math.max(min, Math.min(max, range.start + range.length))
         };
+        this._manualCaret = caret;
         this.element.caret(caret);
         this.selectionAffinity = range.length === 0 ? AFFINITY.NONE : affinity;
       };
