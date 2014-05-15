@@ -7,10 +7,7 @@
     "test": "rm -rf .test-build && broccoli build .test-build && grunt test",
     "build": "rm -rf dist && ENVIRONMENT=production broccoli build dist",
     "develop": "broccoli serve",
-    "prepublish": "npm test",
-    "bump-major": "mversion major -m",
-    "bump-minor": "mversion minor -m",
-    "bump-revision": "mversion revision -m"
+    "prepublish": "npm test"
   },
   "repository": "",
   "author": "Square, Inc.",
