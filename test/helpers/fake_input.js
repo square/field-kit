@@ -1,62 +1,58 @@
-var FakeElement = require('./fake_element');
+/* jshint esnext:true, unused:true, undef:true */
 
-function attr(constructor, name) {
-  Object.defineProperty(constructor.prototype, name, {
-    get: function() {
-      return this.getAttribute(name);
-    },
+import FakeElement from './fake_element';
 
-    set: function(value) {
-      this.setAttribute(name, value);
-    }
-  });
-}
-
-function FakeInput(ownerDocument, type) {
-  FakeElement.call(this, ownerDocument, 'input');
-  this.type = type || 'text';
-  this.value = '';
-}
-
-FakeInput.prototype = Object.create(FakeElement.prototype);
-
-FakeInput.prototype.selfClosing = true;
-
-attr(FakeInput, 'value');
-attr(FakeInput, 'type');
-
-Object.defineProperties(FakeInput.prototype, {
-  selectionStart: {
-    get: function() {
-      return this._selectionStart;
-    },
-
-    set: function(selectionStart) {
-      if (selectionStart < 0) {
-        selectionStart = 0;
-      }
-      if (selectionStart > this.value.length) {
-        selectionStart = this.value.length;
-      }
-      this._selectionStart = selectionStart;
-    }
-  },
-
-  selectionEnd: {
-    get: function() {
-      return this._selectionEnd;
-    },
-
-    set: function(selectionEnd) {
-      if (selectionEnd < 0) {
-        selectionEnd = 0;
-      }
-      if (selectionEnd > this.value.length) {
-        selectionEnd = this.value.length;
-      }
-      this._selectionEnd = selectionEnd;
-    }
+class FakeInput extends FakeElement {
+  constructor(ownerDocument, type) {
+    super(ownerDocument, 'input');
+    this.type = type || 'text';
+    this.value = '';
+    this.selfClosing = true;
   }
-});
 
-module.exports = FakeInput;
+  get value() {
+    return this.getAttribute('value');
+  }
+
+  set value(value) {
+    this.setAttribute('value', value);
+  }
+
+  get type() {
+    return this.getAttribute('type');
+  }
+
+  set type(type) {
+    this.setAttribute('type', type);
+  }
+
+  get selectionStart() {
+    return this._selectionStart;
+  }
+
+  set selectionStart(selectionStart) {
+    if (selectionStart < 0) {
+      selectionStart = 0;
+    }
+    if (selectionStart > this.value.length) {
+      selectionStart = this.value.length;
+    }
+    this._selectionStart = selectionStart;
+  }
+
+  get selectionEnd() {
+    return this._selectionEnd;
+  }
+
+  set selectionEnd(selectionEnd) {
+    if (selectionEnd < 0) {
+      selectionEnd = 0;
+    }
+    if (selectionEnd > this.value.length) {
+      selectionEnd = this.value.length;
+    }
+    this._selectionEnd = selectionEnd;
+  }
+}
+
+export default FakeInput;

@@ -1,6 +1,8 @@
-/* jshint undef:true */
-/* global FieldKit, describe, context, before, it, expect, sinon */
-/* global expectThatLeaving, buildField */
+/* jshint esnext:true, unused:true, undef:true */
+/* global FieldKit, describe, before, it */
+
+import { expectThatLeaving } from './helpers/expectations';
+import { buildField } from './helpers/builders';
 
 describe('FieldKit.ExpiryDateField', function() {
   var field;

@@ -1,32 +1,33 @@
-/* jshint undef:true, node:true */
+/* jshint esnext:true, unused:true, undef:true */
 
-var FakeEvent = require('./fake_event');
-var WrappedFakeElements = require('./wrapped_fake_elements');
-var bind = require('./function/').bind;
+import FakeEvent from './fake_event';
+import WrappedFakeElements from './wrapped_fake_elements';
 
-function Type(keys) {
-  this.keys = keys;
-}
-
-Type.prototype.into = function(element) {
-  if (element.element instanceof WrappedFakeElements) {
-    element = element.element;
+class Type {
+  constructor(keys) {
+    this.keys = keys;
   }
-  this.element = element;
-  this.perform();
-  return this;
-};
 
-Type.prototype.perform = function() {
-  FakeEvent.eventsForKeys(this.keys).forEach(bind(function(event) {
-    this.element.trigger('keydown', event);
-    if (shouldFireKeypress(this.element, event)) {
-      event.type = 'keypress';
-      this.element.trigger('keypress', event);
+  into(element) {
+    if (element.element instanceof WrappedFakeElements) {
+      element = element.element;
     }
-    this.element.trigger('keyup', event);
-  }, this));
-};
+    this.element = element;
+    this.perform();
+    return this;
+  }
+
+  perform() {
+    FakeEvent.eventsForKeys(this.keys).forEach(event => {
+      this.element.trigger('keydown', event);
+      if (shouldFireKeypress(this.element, event)) {
+        event.type = 'keypress';
+        this.element.trigger('keypress', event);
+      }
+      this.element.trigger('keyup', event);
+    });
+  }
+}
 
 function shouldFireKeypress(element, keyDownEvent) {
   var document = element.get(0).ownerDocument;
@@ -35,8 +36,6 @@ function shouldFireKeypress(element, keyDownEvent) {
     window.navigator.FK_firesKeyPressWhenKeydownPrevented;
 }
 
-function type() {
-  return new Type([].slice.call(arguments));
+export function type(...keys) {
+  return new Type(keys);
 }
-
-module.exports = { type: type };

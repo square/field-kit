@@ -1,12 +1,12 @@
-/* jshint undef:true, node:true */
+/* jshint esnext:true, unused:true, undef:true */
 /* global FieldKit */
 
-var FakeDocument = require('./fake_document');
-var FakeInput = require('./fake_input');
-var PassthroughFormatter = require('./passthrough_formatter');
-var WrappedFakeElements = require('./wrapped_fake_elements');
+import FakeDocument from './fake_document';
+import FakeInput from './fake_input';
+import PassthroughFormatter from './passthrough_formatter';
+import WrappedFakeElements from './wrapped_fake_elements';
 
-function buildField(textFieldClass, options) {
+export function buildField(textFieldClass, options) {
   if (!textFieldClass) {
     textFieldClass = FieldKit.TextField;
   }
@@ -38,7 +38,7 @@ function buildField(textFieldClass, options) {
   return field;
 }
 
-function buildInput(document) {
+export function buildInput(document) {
   if (!document) {
     document = new FakeDocument();
   }
@@ -46,8 +46,3 @@ function buildInput(document) {
   document.body.appendChild(input);
   return new WrappedFakeElements([input]);
 }
-
-module.exports = {
-  buildField: buildField,
-  buildInput: buildInput
-};

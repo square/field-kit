@@ -1,4 +1,4 @@
-/* jshint undef:true, node:true */
+/* jshint esnext:true, unused:true, undef:true */
 
 var NAVIGATORS = {
   'osx.chrome.latest': {
@@ -23,16 +23,16 @@ var NAVIGATORS = {
   }
 };
 
-function FakeNavigator() {
-  this.userAgent = 'osx.chrome.latest';
-}
+class FakeNavigator {
+  constructor() {
+    this.userAgent = 'osx.chrome.latest';
+  }
 
-Object.defineProperty(FakeNavigator.prototype, 'userAgent', {
-  get: function() {
+  get userAgent() {
     return this._userAgent;
-  },
+  }
 
-  set: function(userAgent) {
+  set userAgent(userAgent) {
     if (userAgent.match(/^\w+(\.\w+)*$/)) {
       var info = NAVIGATORS[userAgent];
       if (!info) {
@@ -49,13 +49,13 @@ Object.defineProperty(FakeNavigator.prototype, 'userAgent', {
 
     this._userAgent = userAgent;
   }
-});
-
-function FakeWindow(document) {
-  this.document = document;
-  this.navigator = new FakeNavigator();
 }
 
-FakeWindow.prototype.navigator = null;
+class FakeWindow {
+  constructor(document) {
+    this.document = document;
+    this.navigator = new FakeNavigator();
+  }
+}
 
-module.exports = FakeWindow;
+export default FakeWindow;
