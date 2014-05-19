@@ -51,3 +51,5 @@ test-setup: dist/field-kit.js build/test/all.js Makefile
 
 test: test-setup
 	node_modules/karma/bin/karma start --single-run
+
+.PHONY: test
