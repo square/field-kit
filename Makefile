@@ -47,5 +47,7 @@ dist/%.min.js: dist/%.js
 build/test/all.js: $(TEST_HELPERS_OBJS) $(TEST_OBJS) Makefile
 	es6-modules convert -I build/test -f export-variable -o $@ $(TEST_OBJS)
 
-test: dist/field-kit.js build/test/all.js Makefile
-	grunt test
+test-setup: dist/field-kit.js build/test/all.js Makefile
+
+test: test-setup
+	node_modules/karma/bin/karma start --single-run

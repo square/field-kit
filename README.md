@@ -86,12 +86,6 @@ First, install the development dependencies:
 $ npm --registry http://npm.corp.squareup.com:8000 install
 ```
 
-You may need to install the `grunt` command-line utility:
-
-```
-$ [sudo] npm install -g grunt-cli
-```
-
 Then, try running the tests:
 
 ```
@@ -102,13 +96,14 @@ $ npm test
 
 As you make changes you may find it useful to have everything automatically
 compiled and ready to test interactively in the browser. You can do that using
-the `develop` npm script:
+`script/develop`:
 
 ```
-$ npm run develop
+$ ./script/develop
 ```
 
-Then go to http://localhost:4200/ in your browser.
+That will run the tests in PhantomJS whenever files are changed. You can run
+the tests in other browsers by opening http://localhost:9876/.
 
 ### Pull Requests
 

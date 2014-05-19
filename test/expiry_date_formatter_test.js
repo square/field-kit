@@ -1,5 +1,5 @@
 /* jshint esnext:true, unused:true, undef:true */
-/* global FieldKit, describe, before, it, expect, sinon, timekeeper */
+/* global FieldKit, describe, before, it, expect, sinon, after */
 
 import { expectThatTyping } from './helpers/expectations';
 import { buildField } from './helpers/builders';
@@ -72,28 +72,30 @@ describe('FieldKit.ExpiryDateFormatter', function() {
   });
 
   describe('#parse', function() {
+    var clock;
+
     it('parses high two digit years as happening in the 20th century', function() {
-      timekeeper.freeze(new Date(2013, 0));
+      clock = sinon.useFakeTimers(new Date(2013, 0).getTime());
       expect(formatter.parse('04/99')).to.eql({month: 4, year: 1999});
-      timekeeper.reset();
     });
 
     it('parses low two digit years as happening in the 21st century', function() {
-      timekeeper.freeze(new Date(2013, 0));
+      clock = sinon.useFakeTimers(new Date(2013, 0).getTime());
       expect(formatter.parse('04/04')).to.eql({month: 4, year: 2004});
-      timekeeper.reset();
     });
 
     it('when near the end of a century, parses low numbers as the beginning of the next century', function() {
-      timekeeper.freeze(new Date(2099, 0));
+      clock = sinon.useFakeTimers(new Date(2099, 0).getTime());
       expect(formatter.parse('04/04')).to.eql({month: 4, year: 2104});
-      timekeeper.reset();
     });
 
     it('parses incomplete dates as formatted', function() {
-      timekeeper.freeze(new Date(2013, 0));
+      clock = sinon.useFakeTimers(new Date(2013, 0).getTime());
       expect(formatter.parse('12/3')).to.eql({month: 12, year: 2003});
-      timekeeper.reset();
+    });
+
+    after(function() {
+      clock.restore();
     });
   });
 });
