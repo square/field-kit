@@ -1,0 +1,48 @@
+#!/usr/bin/env node
+
+/* jshint node:true, unused:true, undef:true */
+
+var spawn = require('child_process').spawn;
+var chokidar = require('chokidar');
+
+function proxyChildOutput(child) {
+  child.stdout.pipe(process.stdout);
+  child.stderr.pipe(process.stderr);
+}
+
+var karma = spawn('node_modules/karma/bin/karma', ['start']);
+proxyChildOutput(karma);
+
+var watcher = chokidar.watch(['lib', 'test'], {
+  ignoreInitial: true
+});
+
+watcher
+  .on('add', make)
+  .on('change', make)
+  .on('unlink', make);
+
+var makeid = 1;
+function make(path) {
+  var id = makeid++;
+  console.log('CHANGE %d path = %s', id, path);
+
+  var start = process.hrtime();
+  var child = spawn('make', ['test-setup']);
+  proxyChildOutput(child);
+  child.on('close', function(code) {
+    if (code === 0) {
+      var time = process.hrtime(start);
+      console.log(
+        'DONE %d in %ds path = %s',
+        id,
+        (time[0] + time[1] / 1e9).toFixed(2),
+        path
+      );
+    } else {
+      console.log('ERR %d path = %s', id, path);
+    }
+  });
+}
+
+make('test');
