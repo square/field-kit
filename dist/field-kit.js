@@ -1049,13 +1049,15 @@
             this.element.on('focusout', this._focusout);
             this._buildKeybindings();
 
+            var window = this.element.get(0).ownerDocument.defaultView;
+
             /**
              * Fixes caret bug (Android) that caused the input
              * to place inserted charecters in the wrong place
              * Expected: 1234 5678|  =>  1234 5678 9|
              * Bug: 1234 5678|  =>  1234 5679| 8
              */
-            this._needsManualCaret = navigator.userAgent.toLowerCase().indexOf('android') > -1;
+            this._needsManualCaret = window.navigator.userAgent.toLowerCase().indexOf('android') > -1;
 
             /**
              * Contains one of the AFFINITY enum to indicate the preferred direction of
