@@ -1,4 +1,6 @@
 export PATH := node_modules/.bin:$(PATH)
+ESNEXT=esnext
+CONCAT_MODULES=es6-modules
 
 all: dist
 
@@ -15,7 +17,7 @@ dist: dist/field-kit.js dist/field-kit.min.js
 define esnextbuild
 $(patsubst %.js, $(2)/%.js, $(notdir $(1))): $(1)
 	@mkdir -p $(2)
-	esnext -o $$@ $$<
+	$(ESNEXT) -o $$@ $$<
 endef
 
 # Build lib/*.js
@@ -39,13 +41,13 @@ TEST_OBJS=$(foreach file,$(wildcard test/*.js),build/test/$(notdir $(file)))
 # Build the distribution file by using es6-modules to concatenate.
 dist/field-kit.js: $(LIB_OBJS) node_modules/stround/lib/*.js Makefile
 	@mkdir -p dist
-	es6-modules convert -I build/lib -I node_modules/stround/lib -f export-variable -o $@ index
+	$(CONCAT_MODULES) convert -I build/lib -I node_modules/stround/lib -f export-variable -o $@ index
 
 dist/%.min.js: dist/%.js
 	cat $< | closure-compiler --language_in ECMASCRIPT5 > $@
 
 build/test/all.js: $(TEST_HELPERS_OBJS) $(TEST_OBJS) Makefile
-	es6-modules convert -I build/test -f export-variable -o $@ $(TEST_OBJS)
+	$(CONCAT_MODULES) convert -I build/test -f export-variable -o $@ $(TEST_OBJS)
 
 test-setup: dist/field-kit.js build/test/all.js Makefile
 
