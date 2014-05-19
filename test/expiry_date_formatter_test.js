@@ -1,6 +1,8 @@
-/* jshint undef:true */
-/* global FieldKit, describe, context, before, it, expect, sinon, timekeeper */
-/* global expectThatTyping, buildField */
+/* jshint esnext:true, unused:true, undef:true */
+/* global FieldKit, describe, before, it, expect, sinon, timekeeper */
+
+import { expectThatTyping } from './helpers/expectations';
+import { buildField } from './helpers/builders';
 
 describe('FieldKit.ExpiryDateFormatter', function() {
   var field;

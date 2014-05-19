@@ -1,4 +1,4 @@
-/* jshint undef:true */
+/* jshint esnext:true, unused:true, undef:true */
 /* global FieldKit, describe, context, before, it, expect, sinon */
 
 describe('FieldKit.NumberFormatter', function() {

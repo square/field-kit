@@ -4,14 +4,27 @@
 
   <title>FieldKit Test Suite</title>
 
-  <!-- Load local QUnit. -->
-  <link rel="stylesheet" href="/qunit.css" media="screen">
-  <script src="/qunit.js"></script>
-  <!-- Load library. -->
-  <script src="/field-kit.js"></script>
-  <!-- Load tests. -->
-  <script src="/test/setup.js"></script>
-  <script src="/test/all.js"></script>
+  <!-- Load testing libraries. -->
+  <link rel="stylesheet" href="/node_modules/qunit/node_modules/qunitjs/qunit/qunit.css" media="screen">
+  <script src="/node_modules/sinon/pkg/sinon-1.9.1.js"></script>
+
+  <!-- pretend we're node so timekeeper will work for us -->
+  <script type="text/javascript" charset="utf-8">
+    var module = { exports: {} };
+  </script>
+  <script src="/node_modules/timekeeper/lib/timekeeper.js"></script>
+  <script type="text/javascript" charset="utf-8">
+    var timekeeper = module.exports;
+    module = undefined;
+  </script>
+  <!-- stop pretending we're node -->
+
+  <script src="/node_modules/qunit/node_modules/qunitjs/qunit/qunit.js"></script>
+  <script src="/node_modules/qunit-bdd/lib/qunit-bdd.js"></script>
+  <!-- Load FieldKit library. -->
+  <script src="/dist/field-kit.js"></script>
+  <!-- Load FieldKit tests. -->
+  <script src="/build/test/all.js"></script>
 </head>
 <body>
   <div id="qunit"></div>

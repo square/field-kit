@@ -5,7 +5,7 @@ module.exports = function(grunt) {
       all: {
         options: {
           urls: [
-            'http://0.0.0.0:<%= connect.test.options.port %>/'
+            'http://0.0.0.0:<%= connect.test.options.port %>/test'
           ]
         }
       }
@@ -16,7 +16,7 @@ module.exports = function(grunt) {
       test: {
         options: {
           port: process.env.PORT || 8000,
-          base: '.test-build'
+          base: '.'
         }
       }
     }

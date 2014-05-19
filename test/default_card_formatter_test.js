@@ -1,6 +1,9 @@
-/* jshint undef:true */
-/* global FieldKit, describe, context, before, it, expect, sinon */
-/* global expectThatTyping, buildField, type */
+/* jshint esnext:true, unused:true, undef:true */
+/* global FieldKit, describe, before, it, expect, sinon */
+
+import { expectThatTyping } from './helpers/expectations';
+import { buildField } from './helpers/builders';
+import { type } from './helpers/typing';
 
 describe('FieldKit.DefaultCardFormatter', function() {
   var field;

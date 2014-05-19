@@ -1,6 +1,8 @@
-/* jshint undef:true */
-/* global FieldKit, describe, context, before, it, expect, sinon */
-/* global expectThatTyping, expectThatPasting, buildField */
+/* jshint esnext:true, unused:true, undef:true */
+/* global FieldKit, describe, before, it */
+
+import { expectThatTyping, expectThatPasting } from './helpers/expectations';
+import { buildField } from './helpers/builders';
 
 describe('FieldKit.Formatter', function() {
   var field;
