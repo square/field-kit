@@ -4,8 +4,8 @@
   "description": "Utilities to effectively manage text entry on the web.",
   "main": "lib/index.js",
   "scripts": {
-    "test": "rm -rf .test-build && broccoli build .test-build && grunt test",
-    "build": "rm -rf dist && ENVIRONMENT=production broccoli build dist",
+    "test": "make test",
+    "build": "make dist",
     "develop": "broccoli serve",
     "prepublish": "npm test"
   },
@@ -20,18 +20,12 @@
     "grunt": "~0.4.5",
     "timekeeper": "0.0.4",
     "qunit": "^0.6.3",
-    "qunit-bdd": "0.6.0",
+    "qunit-bdd": "^0.6.1",
     "sinon": "^1.9.0",
     "grunt-contrib-connect": "^0.7.1",
     "grunt-contrib-qunit": "^0.4.0",
-    "broccoli-browserify": "0.1.0",
-    "broccoli-concat": "0.0.6",
-    "broccoli-cli": "0.0.1",
-    "broccoli": "^0.12.0",
     "es6-class": "0.0.2",
-    "broccoli-filter": "^0.1.6",
     "grunt-cli": "^0.1.13",
-    "mversion": "^0.4.2",
-    "broccoli-merge-trees": "^0.1.3"
+    "es6-modules": "git+ssh://git@git.corp.squareup.com:js/es6-modules.git#master"
   }
 }

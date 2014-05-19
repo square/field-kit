@@ -1,3 +1,6 @@
+/* jshint esnext:true, unused:true, undef:true */
+/* global FieldKit, describe, before, it, expect, fail */
+
 function Shoe() {
   // This is here so our test can omit getters on the object.
   Object.defineProperty(this, 'getterOnObject', { get: function(){ return 99; } });

@@ -1,6 +1,12 @@
-/* jshint undef:true */
-/* global FieldKit, describe, context, before, it, expect, fail, sinon */
+/* jshint esnext:true, unused:true, undef:true */
+/* global FieldKit, describe, before, it, expect, fail, sinon */
 /* global expectThatTyping, expectThatPasting, FakeEvent, buildField, buildInput, type, PassthroughFormatter */
+
+import { expectThatTyping, expectThatPasting } from './helpers/expectations';
+import { buildField, buildInput } from './helpers/builders';
+import FakeEvent from './helpers/fake_event';
+import { type } from './helpers/typing';
+import PassthroughFormatter from './helpers/passthrough_formatter';
 
 describe('FieldKit.TextField', function() {
   describe('constructor', function() {
@@ -556,7 +562,7 @@ describe('FieldKit.TextField', function() {
       expect($input.val()).to.equal('a');
 
       field1.destroy();
-      var field2 = buildField({input: $input});
+      buildField({input: $input});
       type('b').into($input);
       expect($input.val()).to.equal('ab');
     });

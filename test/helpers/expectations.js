@@ -1,104 +1,104 @@
-var FakeEvent = require('./fake_event');
-var Caret = require('./caret');
-var TextField = require('../../lib/text_field');
-var buildInput = require('./builders').buildInput;
-var type = require('./typing').type;
-var bind = require('./function/').bind;
+/* jshint esnext:true, unused:true, undef:true */
+/* global expect */
 
-function FieldExpectationBase() {}
+import FakeEvent from './fake_event';
+import Caret from './caret';
+import TextField from '../../lib/text_field';
+import { buildInput } from './builders';
+import { type } from './typing';
 
-FieldExpectationBase.prototype.into = function(field) {
-  this.field = field;
-  return this;
-};
+class FieldExpectationBase {
+  into(field) {
+    this.field = field;
+    return this;
+  }
 
-FieldExpectationBase.prototype.withFormatter = function(formatter) {
-  this.field.setFormatter(formatter);
-  return this;
-};
+  withFormatter(formatter) {
+    this.field.setFormatter(formatter);
+    return this;
+  }
 
-FieldExpectationBase.prototype.willChange = function(currentDescription) {
-  this.currentDescription = currentDescription;
-  return this;
-};
+  willChange(currentDescription) {
+    this.currentDescription = currentDescription;
+    return this;
+  }
 
-FieldExpectationBase.prototype.willNotChange = function(currentDescription) {
-  this.currentDescription = currentDescription;
-  return this.to(currentDescription);
-};
+  willNotChange(currentDescription) {
+    this.currentDescription = currentDescription;
+    return this.to(currentDescription);
+  }
 
-FieldExpectationBase.prototype.to = function(expectedDescription) {
-  this.expectedDescription = expectedDescription;
-  this.applyDescription();
-  this.proxyDelegate();
-  this.perform();
-  this.assert();
-  return this;
-};
+  to(expectedDescription) {
+    this.expectedDescription = expectedDescription;
+    this.applyDescription();
+    this.proxyDelegate();
+    this.perform();
+    this.assert();
+    return this;
+  }
 
-FieldExpectationBase.prototype.withError = function(errorType) {
-  expect(this.actualErrorType).to.equal(errorType);
-};
+  withError(errorType) {
+    expect(this.actualErrorType).to.equal(errorType);
+  }
 
-FieldExpectationBase.prototype.onOSX = function() {
-  return this.withUserAgent('osx.chrome.latest');
-};
+  onOSX() {
+    return this.withUserAgent('osx.chrome.latest');
+  }
 
-FieldExpectationBase.prototype.onWindows = function() {
-  return this.withUserAgent('windows.chrome.latest');
-};
+  onWindows() {
+    return this.withUserAgent('windows.chrome.latest');
+  }
 
-FieldExpectationBase.prototype.onAndroid = function() {
-  return this.withUserAgent('android.chrome.latest');
-};
+  onAndroid() {
+    return this.withUserAgent('android.chrome.latest');
+  }
 
-FieldExpectationBase.prototype.withUserAgent = function(userAgent) {
-  this.userAgent = userAgent;
-  return this;
-};
+  withUserAgent(userAgent) {
+    this.userAgent = userAgent;
+    return this;
+  }
 
-FieldExpectationBase.prototype.applyDescription = function() {
-  var description = Caret.parseDescription(this.currentDescription);
-  var caret = description.caret;
-  var affinity = description.affinity;
-  var value = description.value;
-  this.field.element.val(value);
-  this.field.element.caret(caret);
-  this.field.selectionAffinity = affinity;
-};
+  applyDescription() {
+    var description = Caret.parseDescription(this.currentDescription);
+    var caret = description.caret;
+    var affinity = description.affinity;
+    var value = description.value;
+    this.field.element.val(value);
+    this.field.element.caret(caret);
+    this.field.selectionAffinity = affinity;
+  }
 
-FieldExpectationBase.prototype.proxyDelegate = function() {
-  var currentDelegate = this.field.delegate();
-  this.field.setDelegate({
-    textFieldDidFailToValidateChange: bind(function(textField, change, errorType) {
-      this.actualErrorType = errorType;
-      if (currentDelegate && typeof currentDelegate.textFieldDidFailToValidateChange === 'function') {
-        currentDelegate.textFieldDidFailToValidateChange(change, errorType);
+  proxyDelegate() {
+    var currentDelegate = this.field.delegate();
+    this.field.setDelegate({
+      textFieldDidFailToValidateChange: (textField, change, errorType) => {
+        this.actualErrorType = errorType;
+        if (currentDelegate && typeof currentDelegate.textFieldDidFailToValidateChange === 'function') {
+          currentDelegate.textFieldDidFailToValidateChange(change, errorType);
+        }
+      },
+
+      textFieldDidFailToParseString: (textField, change, errorType) => {
+        this.actualErrorType = errorType;
+        if (currentDelegate && typeof currentDelegate.textFieldDidFailToParseString === 'function') {
+          currentDelegate.textFieldDidFailToParseString(change, errorType);
+        }
       }
-    }, this),
-
-    textFieldDidFailToParseString: bind(function(textField, change, errorType) {
-      this.actualErrorType = errorType;
-      if (currentDelegate && typeof currentDelegate.textFieldDidFailToParseString === 'function') {
-        currentDelegate.textFieldDidFailToParseString(change, errorType);
-      }
-    }, this)
-  });
-};
-
-FieldExpectationBase.prototype.assert = function() {
-  var actual =
-    Caret.printDescription({
-      caret: this.field.element.caret(),
-      affinity: this.field.selectionAffinity,
-      value: this.field.element.val()
     });
+  }
 
-  expect(actual).to.equal(this.expectedDescription);
-};
+  assert() {
+    var actual =
+      Caret.printDescription({
+        caret: this.field.element.caret(),
+        affinity: this.field.selectionAffinity,
+        value: this.field.element.val()
+      });
 
-Object.defineProperty(FieldExpectationBase.prototype, 'field', {
-  get: function() {
+    expect(actual).to.equal(this.expectedDescription);
+  }
+
+  get field() {
     if (!this._field) {
       var input = buildInput();
       if (this.userAgent) {
@@ -107,73 +107,65 @@ Object.defineProperty(FieldExpectationBase.prototype, 'field', {
       this._field = new TextField(input);
     }
     return this._field;
-  },
+  }
 
-  set: function(field) {
+  set field(field) {
     this._field = field;
   }
-});
-
-
-function ExpectThatTyping(keys) {
-  FieldExpectationBase.call(this);
-  this.keys = keys;
 }
 
-ExpectThatTyping.prototype = Object.create(FieldExpectationBase.prototype);
+class ExpectThatTyping extends FieldExpectationBase {
+  constructor(keys) {
+    super();
+    this.keys = keys;
+  }
 
-ExpectThatTyping.prototype.perform = function() {
-  this.typeKeys();
-};
+  perform() {
+    this.typeKeys();
+  }
 
-ExpectThatTyping.prototype.typeKeys = function() {
-  type.apply(null, this.keys).into(this.field);
-};
-
-
-function ExpectThatPasting(text) {
-  FieldExpectationBase.call(this);
-  this.text = text;
+  typeKeys() {
+    type(...this.keys).into(this.field);
+  }
 }
 
-ExpectThatPasting.prototype = Object.create(FieldExpectationBase.prototype);
+class ExpectThatPasting extends FieldExpectationBase {
+  constructor(text) {
+    super();
+    this.text = text;
+  }
 
-ExpectThatPasting.prototype.perform = function() {
-  this.paste();
-};
+  perform() {
+    this.paste();
+  }
 
-ExpectThatPasting.prototype.paste = function() {
-  var event = FakeEvent.pasteEventWithData({Text: this.text});
-  this.field.paste(event);
-};
-
-
-function ExpectThatLeaving(field) {
-  FieldExpectationBase.call(this);
-  this.field = field;
+  paste() {
+    var event = FakeEvent.pasteEventWithData({Text: this.text});
+    this.field.paste(event);
+  }
 }
 
-ExpectThatLeaving.prototype = Object.create(FieldExpectationBase.prototype);
 
-ExpectThatLeaving.prototype.perform = function() {
-  this.field.element.focus();
-  this.field.element.blur();
-};
+class ExpectThatLeaving extends FieldExpectationBase {
+  constructor(field) {
+    super();
+    this.field = field;
+  }
 
-function expectThatTyping() {
-  return new ExpectThatTyping([].slice.call(arguments));
+  perform() {
+    this.field.element.focus();
+    this.field.element.blur();
+  }
 }
 
-function expectThatPasting(text) {
+export function expectThatTyping(...keys) {
+  return new ExpectThatTyping(keys);
+}
+
+export function expectThatPasting(text) {
   return new ExpectThatPasting(text);
 }
 
-function expectThatLeaving(field) {
+export function expectThatLeaving(field) {
   return new ExpectThatLeaving(field);
 }
-
-module.exports = {
-  expectThatTyping: expectThatTyping,
-  expectThatPasting: expectThatPasting,
-  expectThatLeaving: expectThatLeaving
-};

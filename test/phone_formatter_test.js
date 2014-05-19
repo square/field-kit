@@ -1,6 +1,9 @@
-/* jshint undef:true */
-/* global FieldKit, describe, context, before, it, expect, sinon, QUnit, fail */
-/* global expectThatTyping, expectThatPasting, buildField, type */
+/* jshint esnext:true, unused:true, undef:true */
+/* global FieldKit, describe, before, it, expect, sinon, QUnit, fail */
+
+import { expectThatTyping, expectThatPasting } from './helpers/expectations';
+import { buildField } from './helpers/builders';
+import { type } from './helpers/typing';
 
 describe('FieldKit.PhoneFormatter', function() {
   var field;

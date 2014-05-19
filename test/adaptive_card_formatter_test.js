@@ -1,6 +1,9 @@
-/* jshint undef:true */
-/* global FieldKit, describe, context, before, it, expect, sinon */
+/* jshint esnext:true, unused:true, undef:true */
+/* global FieldKit, describe, before, it, expect */
 /* global expectThatTyping, buildField */
+
+import { buildField } from './helpers/builders';
+import { expectThatTyping } from './helpers/expectations';
 
 describe('FieldKit.AdaptiveCardFormatter', function() {
   var field = null;

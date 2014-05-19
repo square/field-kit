@@ -1,6 +1,9 @@
-/* jshint undef:true */
-/* global FieldKit, describe, context, before, it, expect, sinon */
+/* jshint esnext:true, unused:true, undef:true */
+/* global FieldKit, describe, before, it */
 /* global expectThatTyping, buildField */
+
+import { expectThatTyping } from './helpers/expectations';
+import { buildField } from './helpers/builders';
 
 describe('FieldKit.SocialSecurityNumberFormatter', function() {
   var field;

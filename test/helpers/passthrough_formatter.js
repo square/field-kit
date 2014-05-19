@@ -1,11 +1,13 @@
-function PassthroughFormatter() {}
+/* jshint esnext:true, unused:true, undef:true */
 
-PassthroughFormatter.prototype.format = function(value) {
-  return value;
-};
+class PassthroughFormatter {
+  format(value) {
+    return value;
+  }
 
-PassthroughFormatter.prototype.parse = function(text) {
-  return text;
-};
+  parse(text) {
+    return text;
+  }
+}
 
-module.exports = PassthroughFormatter;
+export default PassthroughFormatter;
