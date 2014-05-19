@@ -1,5 +1,7 @@
 /* jshint esnext:true, unused:true, undef:true */
 
+var hasOwnProp = Object.prototype.hasOwnProperty;
+
 class FakeElement {
   constructor(ownerDocument, tagName) {
     if (ownerDocument) {
@@ -126,7 +128,7 @@ class FakeElement {
   toString() {
     var result = '<' + this.tagName;
     for (var name in this.attributes) {
-      if (this.attributes.hasOwnProperty(name)) {
+      if (hasOwnProp.call(this.attributes, name)) {
         result += ' ' + name + '="' + this.attributes[name] + '"';
       }
     }
