@@ -23,7 +23,7 @@
     "es6-modules": "git+ssh://git@git.corp.squareup.com:js/es6-modules.git#master",
     "chokidar": "^0.8.2",
     "karma": "^0.12.16",
-    "qunitjs": "^1.12.0",
+    "qunitjs": "~1.12.0",
     "karma-qunit": "^0.1.1",
     "karma-phantomjs-launcher": "^0.1.4",
     "esnext": "^0.7.13"
