@@ -16,7 +16,7 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'node_modules/qunit-bdd/lib/qunit-bdd.js',
-      'node_modules/sinon/pkg/sinon-1.9.1.js',
+      'node_modules/sinon/pkg/sinon.js',
       'dist/field-kit.js',
       'build/test/all.js'
     ],
