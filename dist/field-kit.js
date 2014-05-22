@@ -239,7 +239,7 @@
                   }
 
                   if (endMovedRight) {
-                    // move right over any immediately following delimters
+                    // move right over any immediately following delimiters
                     while (this.delimiterAt(range.start + range.length)) {
                       range.length++;
                     }
@@ -1039,7 +1039,6 @@
             } else {
               this.element.data('field-kit-text-field', this);
             }
-            this._jQuery = this.element.constructor;
             this.element.on('keydown', this.keyDown);
             this.element.on('keypress', this.keyPress);
             this.element.on('keyup', this.keyUp);
@@ -1053,7 +1052,7 @@
 
             /**
              * Fixes caret bug (Android) that caused the input
-             * to place inserted charecters in the wrong place
+             * to place inserted characters in the wrong place
              * Expected: 1234 5678|  =>  1234 5678 9|
              * Bug: 1234 5678|  =>  1234 5679| 8
              */
@@ -4263,7 +4262,7 @@
             },
             negativeCurrencySuffix: function(formatter) {
               return ' ' + formatter.currencySymbol() + ')';
-            },
+            }
           },
           ja: {
             negativeCurrencyPrefix: function(formatter) {
