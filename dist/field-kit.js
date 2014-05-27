@@ -120,6 +120,7 @@
 
               var result = '';
               var delimiter;
+              var maximumLength = this.maximumLength;
 
               for (var i = 0, l = value.length; i < l; i++) {
                 while ((delimiter = this.delimiterAt(result.length))) {
@@ -131,7 +132,11 @@
                 }
               }
 
-              return result;
+              if (maximumLength !== undefined && maximumLength !== null) {
+                return result.slice(0, maximumLength);
+              } else {
+                return result;
+              }
             },
 
             enumerable: false,

@@ -1,5 +1,5 @@
 /* jshint esnext:true, unused:true, undef:true */
-/* global FieldKit, describe, before, it */
+/* global FieldKit, describe, before, it, context, expect */
 
 import { expectThatTyping } from './helpers/expectations';
 import { buildField } from './helpers/builders';
@@ -26,6 +26,16 @@ describe('LeadingDelimiterFormatter', function() {
   before(function() {
     field = buildField();
     field.setFormatter(new LeadingDelimiterFormatter('-'));
+  });
+
+  context('with a maximum length', function() {
+    before(function() {
+      field.formatter().maximumLength = 4;
+    });
+
+    it('truncates values to the maximum length', function() {
+      expect(field.formatter().format('21111')).to.equal('-211');
+    });
   });
 
   it('adds a delimiter before the first character', function() {
