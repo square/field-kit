@@ -1048,21 +1048,21 @@
             this._valueOnFocus = '';
             this._focusout = $$utils$$bind(this._focusout, this);
             this._focusin = $$utils$$bind(this._focusin, this);
-            this.click = $$utils$$bind(this.click, this);
-            this.paste = $$utils$$bind(this.paste, this);
-            this.keyUp = $$utils$$bind(this.keyUp, this);
-            this.keyPress = $$utils$$bind(this.keyPress, this);
-            this.keyDown = $$utils$$bind(this.keyDown, this);
+            this._click = $$utils$$bind(this._click, this);
+            this._paste = $$utils$$bind(this._paste, this);
+            this._keyUp = $$utils$$bind(this._keyUp, this);
+            this._keyPress = $$utils$$bind(this._keyPress, this);
+            this._keyDown = $$utils$$bind(this._keyDown, this);
             if (element['field-kit-text-field']) {
               throw new Error('already attached a TextField to this element');
             } else {
               element['field-kit-text-field'] = this;
             }
-            element.addEventListener('keydown', this.keyDown);
-            element.addEventListener('keypress', this.keyPress);
-            element.addEventListener('keyup', this.keyUp);
-            element.addEventListener('click', this.click);
-            element.addEventListener('paste', this.paste);
+            element.addEventListener('keydown', this._keyDown);
+            element.addEventListener('keypress', this._keyPress);
+            element.addEventListener('keyup', this._keyUp);
+            element.addEventListener('click', this._click);
+            element.addEventListener('paste', this._paste);
             element.addEventListener('focusin', this._focusin);
             element.addEventListener('focusout', this._focusout);
             this._buildKeybindings();
@@ -1086,88 +1086,20 @@
             this.selectionAffinity = AFFINITY.NONE;
           }
 
-          $__Object$defineProperty(TextField.prototype, "delegate", {
-            value: function() {
-              return this._delegate;
-            },
-
+          $__Object$defineProperty(TextField.prototype, "textDidChange", {
+            value: function() {},
             enumerable: false,
             writable: true
           });
 
-          $__Object$defineProperty(TextField.prototype, "setDelegate", {
-            value: function(delegate) {
-              this._delegate = delegate;
-              return null;
-            },
-
+          $__Object$defineProperty(TextField.prototype, "textFieldDidEndEditing", {
+            value: function() {},
             enumerable: false,
             writable: true
           });
 
-          $__Object$defineProperty(TextField.prototype, "destroy", {
-            value: function() {
-              var element = this.element;
-              element.removeEventListener('keydown', this.keyDown);
-              element.removeEventListener('keypress', this.keyPress);
-              element.removeEventListener('keyup', this.keyUp);
-              element.removeEventListener('click', this.click);
-              element.removeEventListener('paste', this.paste);
-              element.removeEventListener('focusin', this._focusin);
-              element.removeEventListener('focusout', this._focusout);
-              delete element['field-kit-text-field'];
-              return null;
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "insertText", {
-            value: function(text) {
-              var range;
-              if (this.hasSelection()) {
-                this.clearSelection();
-              }
-
-              if (!this._isDirty) {
-                this._valueOnFocus = this.element.value || '';
-                this._isDirty = true;
-              }
-
-              this.replaceSelection(text);
-              range = this.selectedRange();
-              range.start += range.length;
-              range.length = 0;
-
-              return this.setSelectedRange(range);
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "insertNewline", {
-            value: function() {
-              this._textFieldDidEndEditing();
-              this._didEndEditingButKeptFocus = true;
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "_fireEvent", {
-            value: function(eventType) {
-              if (typeof CustomEvent === 'undefined') {
-                var event = document.createEvent('Event');
-                event.initEvent(eventType, false, false);
-                this.element.dispatchEvent(event);
-              } else {
-                this.element.dispatchEvent(new CustomEvent(eventType, {}));
-              }
-            },
-
+          $__Object$defineProperty(TextField.prototype, "textFieldDidBeginEditing", {
+            value: function() {},
             enumerable: false,
             writable: true
           });
@@ -1184,12 +1116,6 @@
               this._fireEvent('input');
             },
 
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "textDidChange", {
-            value: function() {},
             enumerable: false,
             writable: true
           });
@@ -1216,12 +1142,6 @@
             writable: true
           });
 
-          $__Object$defineProperty(TextField.prototype, "textFieldDidEndEditing", {
-            value: function() {},
-            enumerable: false,
-            writable: true
-          });
-
           $__Object$defineProperty(TextField.prototype, "_textFieldDidBeginEditing", {
             value: function() {
               var delegate = this._delegate;
@@ -1235,8 +1155,236 @@
             writable: true
           });
 
-          $__Object$defineProperty(TextField.prototype, "textFieldDidBeginEditing", {
+          $__Object$defineProperty(TextField.prototype, "clearSelection", {
+            value: function() {
+              this.replaceSelection('');
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "delegate", {
+            value: function() {
+              return this._delegate;
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "setDelegate", {
+            value: function(delegate) {
+              this._delegate = delegate;
+              return null;
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "deleteBackward", {
+            value: function(event) {
+              event.preventDefault();
+              var range = this.selectedRange();
+              if (range.length === 0) {
+                range.start--;
+                range.length++;
+                this.setSelectedRange(range);
+              }
+              this.clearSelection();
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "deleteWordBackward", {
+            value: function(event) {
+              if (this.hasSelection()) {
+                this.deleteBackward(event);
+              } else {
+                event.preventDefault();
+                var range = this.selectedRange();
+                var start = this._lastWordBreakBeforeIndex(range.start);
+                range.length += range.start - start;
+                range.start = start;
+                this.setSelectedRange(range);
+                this.clearSelection();
+              }
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "deleteBackwardByDecomposingPreviousCharacter", {
+            value: function(event) {
+              this.deleteBackward(event);
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "deleteBackwardToBeginningOfLine", {
+            value: function(event) {
+              if (this.hasSelection()) {
+                this.deleteBackward(event);
+              } else {
+                event.preventDefault();
+                var range = this.selectedRange();
+                range.length = range.start;
+                range.start = 0;
+                this.setSelectedRange(range);
+                this.clearSelection();
+              }
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "deleteForward", {
+            value: function(event) {
+              event.preventDefault();
+              var range = this.selectedRange();
+              if (range.length === 0) {
+                range.length++;
+                this.setSelectedRange(range);
+              }
+              return this.clearSelection();
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "deleteWordForward", {
+            value: function(event) {
+              if (this.hasSelection()) {
+                return this.deleteForward(event);
+              } else {
+                event.preventDefault();
+                var range = this.selectedRange();
+                var end = this._nextWordBreakAfterIndex(range.start + range.length);
+                this.setSelectedRange({
+                  start: range.start,
+                  length: end - range.start
+                });
+                this.clearSelection();
+              }
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "destroy", {
+            value: function() {
+              var element = this.element;
+              element.removeEventListener('keydown', this._keyDown);
+              element.removeEventListener('keypress', this._keyPress);
+              element.removeEventListener('keyup', this._keyUp);
+              element.removeEventListener('click', this._click);
+              element.removeEventListener('paste', this._paste);
+              element.removeEventListener('focusin', this._focusin);
+              element.removeEventListener('focusout', this._focusout);
+              delete element['field-kit-text-field'];
+              return null;
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "formatter", {
+            value: function() {
+              if (!this._formatter) {
+                this._formatter = new $$formatter$$default();
+                var maximumLengthString = this.element.getAttribute('maxlength');
+                if (maximumLengthString !== undefined && maximumLengthString !== null) {
+                  this._formatter.maximumLength = parseInt(maximumLengthString, 10);
+                }
+              }
+
+              return this._formatter;
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "setFormatter", {
+            value: function(formatter) {
+              var value = this.value();
+              this._formatter = formatter;
+              this.setValue(value);
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "hasSelection", {
+            value: function() {
+              return this.selectedRange().length !== 0;
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "insertBackTab", {
             value: function() {},
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "insertTab", {
+            value: function() {},
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "insertText", {
+            value: function(text) {
+              var range;
+              if (this.hasSelection()) {
+                this.clearSelection();
+              }
+
+              if (!this._isDirty) {
+                this._valueOnFocus = this.element.value || '';
+                this._isDirty = true;
+              }
+
+              this.replaceSelection(text);
+              range = this.selectedRange();
+              range.start += range.length;
+              range.length = 0;
+              return this.setSelectedRange(range);
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "insertNewline", {
+            value: function() {
+              this._textFieldDidEndEditing();
+              this._didEndEditingButKeptFocus = true;
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "inspect", {
+            value: function() {
+              return '#<TextField text="' + this.text() + '">';
+            },
+
             enumerable: false,
             writable: true
           });
@@ -1459,7 +1607,7 @@
           $__Object$defineProperty(TextField.prototype, "moveWordLeft", {
             value: function(event) {
               event.preventDefault();
-              var index = this.lastWordBreakBeforeIndex(this.selectedRange().start - 1);
+              var index = this._lastWordBreakBeforeIndex(this.selectedRange().start - 1);
               this.setSelectedRange({ start: index, length: 0 });
             },
 
@@ -1475,12 +1623,12 @@
                 case AFFINITY.UPSTREAM:
                 case AFFINITY.NONE:
                   this.selectionAffinity = AFFINITY.UPSTREAM;
-                  var start = this.lastWordBreakBeforeIndex(range.start - 1);
+                  var start = this._lastWordBreakBeforeIndex(range.start - 1);
                   range.length += range.start - start;
                   range.start = start;
                   break;
                 case AFFINITY.DOWNSTREAM:
-                  var end = this.lastWordBreakBeforeIndex(range.start + range.length);
+                  var end = this._lastWordBreakBeforeIndex(range.start + range.length);
                   if (end < range.start) {
                     end = range.start;
                   }
@@ -1560,7 +1708,7 @@
             value: function(event) {
               event.preventDefault();
               var range = this.selectedRange();
-              var index = this.nextWordBreakAfterIndex(range.start + range.length);
+              var index = this._nextWordBreakAfterIndex(range.start + range.length);
               this.setSelectedRange({ start: index, length: 0 });
             },
 
@@ -1576,12 +1724,12 @@
               var end = range.start + range.length;
               switch (this.selectionAffinity) {
                 case AFFINITY.UPSTREAM:
-                  start = Math.min(this.nextWordBreakAfterIndex(start), end);
+                  start = Math.min(this._nextWordBreakAfterIndex(start), end);
                   break;
                 case AFFINITY.DOWNSTREAM:
                 case AFFINITY.NONE:
                   this.selectionAffinity = AFFINITY.DOWNSTREAM;
-                  end = this.nextWordBreakAfterIndex(range.start + range.length);
+                  end = this._nextWordBreakAfterIndex(range.start + range.length);
                   break;
               }
               this.setSelectedRange({ start: start, length: end - start });
@@ -1613,197 +1761,15 @@
             writable: true
           });
 
-          $__Object$defineProperty(TextField.prototype, "deleteBackward", {
-            value: function(event) {
-              event.preventDefault();
-              var range = this.selectedRange();
-              if (range.length === 0) {
-                range.start--;
-                range.length++;
-                this.setSelectedRange(range);
-              }
-              this.clearSelection();
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "deleteWordBackward", {
-            value: function(event) {
-              if (this.hasSelection()) {
-                this.deleteBackward(event);
-              } else {
-                event.preventDefault();
-                var range = this.selectedRange();
-                var start = this.lastWordBreakBeforeIndex(range.start);
-                range.length += range.start - start;
-                range.start = start;
-                this.setSelectedRange(range);
-                this.clearSelection();
-              }
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "deleteBackwardByDecomposingPreviousCharacter", {
-            value: function(event) {
-              this.deleteBackward(event);
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "deleteBackwardToBeginningOfLine", {
-            value: function(event) {
-              if (this.hasSelection()) {
-                this.deleteBackward(event);
-              } else {
-                event.preventDefault();
-                var range = this.selectedRange();
-                range.length = range.start;
-                range.start = 0;
-                this.setSelectedRange(range);
-                this.clearSelection();
-              }
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "deleteForward", {
-            value: function(event) {
-              event.preventDefault();
-              var range = this.selectedRange();
-              if (range.length === 0) {
-                range.length++;
-                this.setSelectedRange(range);
-              }
-              return this.clearSelection();
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "deleteWordForward", {
-            value: function(event) {
-              if (this.hasSelection()) {
-                return this.deleteForward(event);
-              } else {
-                event.preventDefault();
-                var range = this.selectedRange();
-                var end = this.nextWordBreakAfterIndex(range.start + range.length);
-                this.setSelectedRange({
-                  start: range.start,
-                  length: end - range.start
-                });
-                this.clearSelection();
-              }
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "insertTab", {
-            value: function() {},
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "insertBackTab", {
-            value: function() {},
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "hasSelection", {
-            value: function() {
-              return this.selectedRange().length !== 0;
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "lastWordBreakBeforeIndex", {
-            value: function(index) {
-              var indexes = this.leftWordBreakIndexes();
-              var result = indexes[0];
-              for (var i = 0, l = indexes.length; i < l; i++) {
-                var wordBreakIndex = indexes[i];
-                if (index > wordBreakIndex) {
-                  result = wordBreakIndex;
-                } else {
-                  break;
-                }
-              }
-              return result;
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "leftWordBreakIndexes", {
-            value: function() {
-              var result = [];
-              var text = this.text();
-              for (var i = 0, l = text.length; i < l; i++) {
-                if (hasLeftWordBreakAtIndex(text, i)) {
-                  result.push(i);
-                }
-              }
-              return result;
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "nextWordBreakAfterIndex", {
-            value: function(index) {
-              var indexes = this.rightWordBreakIndexes().reverse();
-              var result = indexes[0];
-              for (var i = 0, l = indexes.length; i < l; i++) {
-                var wordBreakIndex = indexes[i];
-                if (index < wordBreakIndex) {
-                  result = wordBreakIndex;
-                } else {
-                  break;
-                }
-              }
-              return result;
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "rightWordBreakIndexes", {
-            value: function() {
-              var result = [];
-              var text = this.text();
-              for (var i = 0, l = text.length; i <= l; i++) {
-                if (hasRightWordBreakAtIndex(text, i)) {
-                  result.push(i + 1);
-                }
-              }
-              return result;
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "clearSelection", {
-            value: function() {
-              this.replaceSelection('');
+          $__Object$defineProperty(TextField.prototype, "readSelectionFromPasteboard", {
+            value: function(pasteboard) {
+              var range, text;
+              text = pasteboard.getData('Text');
+              this.replaceSelection(text);
+              range = this.selectedRange();
+              range.start += range.length;
+              range.length = 0;
+              this.setSelectedRange(range);
             },
 
             enumerable: false,
@@ -1825,102 +1791,16 @@
             writable: true
           });
 
-          $__Object$defineProperty(TextField.prototype, "selectAll", {
-            value: function(event) {
-              event.preventDefault();
-              this.setSelectedRangeWithAffinity({
-                start: 0,
-                length: this.text().length
-              }, AFFINITY.NONE);
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "readSelectionFromPasteboard", {
-            value: function(pasteboard) {
-              var range, text;
-              text = pasteboard.getData('Text');
-              this.replaceSelection(text);
-              range = this.selectedRange();
-              range.start += range.length;
-              range.length = 0;
-              this.setSelectedRange(range);
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "keyDown", {
-            value: function(event) {
-              if (this._didEndEditingButKeptFocus) {
-                this._textFieldDidBeginEditing();
-                this._didEndEditingButKeptFocus = false;
-              }
-
-              var action = this._bindings.actionForEvent(event);
-              if (action) {
-                switch (action) {
-                  case 'undo':
-                  case 'redo':
-                    this[action](event);
-                    break;
-
-                  default:
-                    this.rollbackInvalidChanges(function() {
-                      return this[action](event);
-                    }.bind(this));
-                    break;
+          $__Object$defineProperty(TextField.prototype, "rightWordBreakIndexes", {
+            value: function() {
+              var result = [];
+              var text = this.text();
+              for (var i = 0, l = text.length; i <= l; i++) {
+                if (hasRightWordBreakAtIndex(text, i)) {
+                  result.push(i + 1);
                 }
               }
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "keyPress", {
-            value: function(event) {
-              var keyCode = event.keyCode;
-              if (!event.metaKey && !event.ctrlKey &&
-                  keyCode !== $$keybindings$$KEYS.ENTER &&
-                  keyCode !== $$keybindings$$KEYS.TAB &&
-                  keyCode !== $$keybindings$$KEYS.BACKSPACE) {
-                event.preventDefault();
-                if (event.charCode !== 0) {
-                  var charCode = event.charCode || event.keyCode;
-                  this.rollbackInvalidChanges(function() {
-                    return this.insertText(String.fromCharCode(charCode));
-                  }.bind(this));
-                }
-              }
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "keyUp", {
-            value: function(event) {
-              this.rollbackInvalidChanges(function() {
-                if (event.keyCode === $$keybindings$$KEYS.TAB) {
-                  this.selectAll(event);
-                }
-              }.bind(this));
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "paste", {
-            value: function(event) {
-              event.preventDefault();
-              this.rollbackInvalidChanges(function() {
-                this.readSelectionFromPasteboard(event.originalEvent.clipboardData);
-              }.bind(this));
+              return result;
             },
 
             enumerable: false,
@@ -1966,12 +1846,13 @@
             writable: true
           });
 
-          $__Object$defineProperty(TextField.prototype, "click", {
-            value: function() {
-              if (this._needsManualCaret) {
-                this._manualCaret = $$caret$$default.get(this.element);
-              }
-              this.selectionAffinity = AFFINITY.NONE;
+          $__Object$defineProperty(TextField.prototype, "selectAll", {
+            value: function(event) {
+              event.preventDefault();
+              this.setSelectedRangeWithAffinity({
+                start: 0,
+                length: this.text().length
+              }, AFFINITY.NONE);
             },
 
             enumerable: false,
@@ -2028,39 +1909,11 @@
             writable: true
           });
 
-          $__Object$defineProperty(TextField.prototype, "formatter", {
-            value: function() {
-              if (!this._formatter) {
-                this._formatter = new $$formatter$$default();
-                var maximumLengthString = this.element.getAttribute('maxlength');
-                if (maximumLengthString !== undefined && maximumLengthString !== null) {
-                  this._formatter.maximumLength = parseInt(maximumLengthString, 10);
-                }
-              }
-
-              return this._formatter;
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "setFormatter", {
-            value: function(formatter) {
-              var value = this.value();
-              this._formatter = formatter;
-              this.setValue(value);
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
           $__Object$defineProperty(TextField.prototype, "selectedRange", {
             value: function() {
               var caret = this._needsManualCaret ?
-                this._manualCaret :
-                $$caret$$default.get(this.element);
+                  this._manualCaret :
+                  $$caret$$default.get(this.element);
 
               return {
                 start: caret.start,
@@ -2115,39 +1968,6 @@
             writable: true
           });
 
-          $__Object$defineProperty(TextField.prototype, "undo", {
-            value: function(event) {
-              if (this.undoManager().canUndo()) {
-                this.undoManager().undo();
-              }
-              event.preventDefault();
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "redo", {
-            value: function(event) {
-              if (this.undoManager().canRedo()) {
-                this.undoManager().redo();
-              }
-              event.preventDefault();
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "undoManager", {
-            value: function() {
-              return this._undoManager || (this._undoManager = new $$undo_manager$$default());
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
           $__Object$defineProperty(TextField.prototype, "allowsUndo", {
             value: function() {
               return this._allowsUndo;
@@ -2166,19 +1986,55 @@
             writable: true
           });
 
-          $__Object$defineProperty(TextField.prototype, "_applyChangeFromUndoManager", {
-            value: function(change) {
-              this.undoManager().proxyFor(this)._applyChangeFromUndoManager(change);
-
-              if (this.undoManager().isUndoing()) {
-                this.setText(change.current.text);
-                this.setSelectedRange(change.current.selectedRange);
-              } else {
-                this.setText(change.proposed.text);
-                this.setSelectedRange(change.proposed.selectedRange);
+          $__Object$defineProperty(TextField.prototype, "redo", {
+            value: function(event) {
+              if (this.undoManager().canRedo()) {
+                this.undoManager().redo();
               }
+              event.preventDefault();
+            },
 
-              this._textDidChange();
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "undo", {
+            value: function(event) {
+              if (this.undoManager().canUndo()) {
+                this.undoManager().undo();
+              }
+              event.preventDefault();
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "undoManager", {
+            value: function() {
+              return this._undoManager || (this._undoManager = new $$undo_manager$$default());
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "becomeFirstResponder", {
+            value: function() {
+              this.element.focus();
+              this.rollbackInvalidChanges(function() {
+                this.element.select();
+                this._syncPlaceholder();
+              }.bind(this));
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "hasFocus", {
+            value: function() {
+              return this.element.ownerDocument.activeElement === this.element;
             },
 
             enumerable: false,
@@ -2198,48 +2054,6 @@
             value: function(enabled) {
               this._enabled = enabled;
               this._syncPlaceholder();
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "hasFocus", {
-            value: function() {
-              return this.element.ownerDocument.activeElement === this.element;
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "_focusin", {
-            value: function() {
-              this._textFieldDidBeginEditing();
-              return this._syncPlaceholder();
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "_focusout", {
-            value: function() {
-              this._textFieldDidEndEditing();
-              return this._syncPlaceholder();
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "becomeFirstResponder", {
-            value: function() {
-              this.element.focus();
-              this.rollbackInvalidChanges(function() {
-                this.element.select();
-                this._syncPlaceholder();
-              }.bind(this));
             },
 
             enumerable: false,
@@ -2297,6 +2111,25 @@
             writable: true
           });
 
+          $__Object$defineProperty(TextField.prototype, "placeholder", {
+            value: function() {
+              return this._placeholder;
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "setPlaceholder", {
+            value: function(_placeholder) {
+              this._placeholder = _placeholder;
+              this.element.setAttribute('placeholder', this._placeholder);
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
           $__Object$defineProperty(TextField.prototype, "unfocusedPlaceholder", {
             value: function() {
               return this._unfocusedPlaceholder;
@@ -2316,19 +2149,207 @@
             writable: true
           });
 
-          $__Object$defineProperty(TextField.prototype, "placeholder", {
-            value: function() {
-              return this._placeholder;
+          $__Object$defineProperty(TextField.prototype, "_applyChangeFromUndoManager", {
+            value: function(change) {
+              this.undoManager().proxyFor(this)._applyChangeFromUndoManager(change);
+
+              if (this.undoManager().isUndoing()) {
+                this.setText(change.current.text);
+                this.setSelectedRange(change.current.selectedRange);
+              } else {
+                this.setText(change.proposed.text);
+                this.setSelectedRange(change.proposed.selectedRange);
+              }
+
+              this._textDidChange();
             },
 
             enumerable: false,
             writable: true
           });
 
-          $__Object$defineProperty(TextField.prototype, "setPlaceholder", {
-            value: function(_placeholder) {
-              this._placeholder = _placeholder;
-              this.element.setAttribute('placeholder', this._placeholder);
+          $__Object$defineProperty(TextField.prototype, "_buildKeybindings", {
+            value: function() {
+              var doc = this.element.ownerDocument;
+              var win = doc.defaultView || doc.parentWindow;
+              var userAgent = win.navigator.userAgent;
+              var osx = /^Mozilla\/[\d\.]+ \(Macintosh/.test(userAgent);
+              this._bindings = $$keybindings$$keyBindingsForPlatform(osx ? 'OSX' : 'Default');
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "_click", {
+            value: function() {
+              if (this._needsManualCaret) {
+                this._manualCaret = $$caret$$default.get(this.element);
+              }
+              this.selectionAffinity = AFFINITY.NONE;
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "_fireEvent", {
+            value: function(eventType) {
+              if (typeof CustomEvent === 'undefined') {
+                var event = document.createEvent('Event');
+                event.initEvent(eventType, false, false);
+                this.element.dispatchEvent(event);
+              } else {
+                this.element.dispatchEvent(new CustomEvent(eventType, {}));
+              }
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "_focusin", {
+            value: function() {
+              this._textFieldDidBeginEditing();
+              return this._syncPlaceholder();
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "_focusout", {
+            value: function() {
+              this._textFieldDidEndEditing();
+              return this._syncPlaceholder();
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "_keyDown", {
+            value: function(event) {
+              if (this._didEndEditingButKeptFocus) {
+                this._textFieldDidBeginEditing();
+                this._didEndEditingButKeptFocus = false;
+              }
+
+              var action = this._bindings.actionForEvent(event);
+              if (action) {
+                switch (action) {
+                  case 'undo':
+                  case 'redo':
+                    this[action](event);
+                    break;
+
+                  default:
+                    this.rollbackInvalidChanges(function() {
+                      return this[action](event);
+                    }.bind(this));
+                    break;
+                }
+              }
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "_keyPress", {
+            value: function(event) {
+              var keyCode = event.keyCode;
+              if (!event.metaKey && !event.ctrlKey &&
+                  keyCode !== $$keybindings$$KEYS.ENTER &&
+                  keyCode !== $$keybindings$$KEYS.TAB &&
+                  keyCode !== $$keybindings$$KEYS.BACKSPACE) {
+                event.preventDefault();
+                if (event.charCode !== 0) {
+                  var charCode = event.charCode || event.keyCode;
+                  this.rollbackInvalidChanges(function() {
+                    return this.insertText(String.fromCharCode(charCode));
+                  }.bind(this));
+                }
+              }
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "_keyUp", {
+            value: function(event) {
+              this.rollbackInvalidChanges(function() {
+                if (event.keyCode === $$keybindings$$KEYS.TAB) {
+                  this.selectAll(event);
+                }
+              }.bind(this));
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "_lastWordBreakBeforeIndex", {
+            value: function(index) {
+              var indexes = this._leftWordBreakIndexes();
+              var result = indexes[0];
+              for (var i = 0, l = indexes.length; i < l; i++) {
+                var wordBreakIndex = indexes[i];
+                if (index > wordBreakIndex) {
+                  result = wordBreakIndex;
+                } else {
+                  break;
+                }
+              }
+              return result;
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "_leftWordBreakIndexes", {
+            value: function() {
+              var result = [];
+              var text = this.text();
+              for (var i = 0, l = text.length; i < l; i++) {
+                if (hasLeftWordBreakAtIndex(text, i)) {
+                  result.push(i);
+                }
+              }
+              return result;
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "_nextWordBreakAfterIndex", {
+            value: function(index) {
+              var indexes = this.rightWordBreakIndexes().reverse();
+              var result = indexes[0];
+              for (var i = 0, l = indexes.length; i < l; i++) {
+                var wordBreakIndex = indexes[i];
+                if (index < wordBreakIndex) {
+                  result = wordBreakIndex;
+                } else {
+                  break;
+                }
+              }
+              return result;
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
+          $__Object$defineProperty(TextField.prototype, "_paste", {
+            value: function(event) {
+              event.preventDefault();
+              this.rollbackInvalidChanges(function() {
+                this.readSelectionFromPasteboard(event.originalEvent.clipboardData);
+              }.bind(this));
             },
 
             enumerable: false,
@@ -2353,28 +2374,6 @@
                   this.setPlaceholder(unfocusedPlaceholder);
                 }
               }
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "_buildKeybindings", {
-            value: function() {
-              var doc = this.element.ownerDocument;
-              var win = doc.defaultView || doc.parentWindow;
-              var userAgent = win.navigator.userAgent;
-              var osx = /^Mozilla\/[\d\.]+ \(Macintosh/.test(userAgent);
-              this._bindings = $$keybindings$$keyBindingsForPlatform(osx ? 'OSX' : 'Default');
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "inspect", {
-            value: function() {
-              return '#<TextField text="' + this.text() + '">';
             },
 
             enumerable: false,
@@ -2461,6 +2460,17 @@
           return TextFieldStateChange;
         }();
 
+        /**
+         * Builds a new {TextFieldStateChange} that will allow you to
+         * compute differences, and see the current vs proposed changes.
+         *
+         * @param {FieldKitField} field
+         * @param {function} callback called when you want changes to the field
+         *    take place. Current will be calculated before this callback.
+         *    Proposed will be calculated after this callback.
+         *
+         * @return {object} change object with current and proposed properties
+         */
         TextFieldStateChange.build = function(field, callback) {
           var change = new this(field);
           change.current = {
