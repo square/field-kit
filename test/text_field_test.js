@@ -19,7 +19,7 @@ describe('FieldKit.TextField', function() {
     it('does not attempt to reformat existing text', function() {
       var formatter = { format: function(text) { return text + '!'; } };
       var $input = buildInput();
-      $input.val('hey');
+      $input.value = 'hey';
       var field = new FieldKit.TextField($input, formatter);
       expect(field.text()).to.equal('hey');
     });
@@ -359,13 +359,13 @@ describe('FieldKit.TextField', function() {
   describe('#hasFocus', function() {
     it('is true when the document active element is the text field element', function() {
       var field = buildField();
-      field.element.get(0).ownerDocument.activeElement = field.element.get(0);
+      field.element.ownerDocument.activeElement = field.element;
       expect(field.hasFocus()).to.be.true();
     });
 
     it('is false when the document active element is not the text field element', function() {
       var field = buildField();
-      field.element.get(0).ownerDocument.activeElement = null;
+      field.element.ownerDocument.activeElement = null;
       expect(field.hasFocus()).to.be.false();
     });
   });
@@ -391,14 +391,14 @@ describe('FieldKit.TextField', function() {
       field.setEnabled(false);
       field.setDisabledPlaceholder('OMG CLICK ME');
       expect(field.placeholder()).to.equal('OMG CLICK ME');
-      expect(field.element.attr('placeholder')).to.equal(field.placeholder());
+      expect(field.element.getAttribute('placeholder')).to.equal(field.placeholder());
     });
 
     it('is used as the placeholder when the text field becomes disabled', function() {
       field.setDisabledPlaceholder('OMG CLICK ME');
       field.setEnabled(false);
       expect(field.placeholder()).to.equal('OMG CLICK ME');
-      expect(field.element.attr('placeholder')).to.equal(field.placeholder());
+      expect(field.element.getAttribute('placeholder')).to.equal(field.placeholder());
     });
   });
 
@@ -559,12 +559,12 @@ describe('FieldKit.TextField', function() {
       var field1 = buildField({input: $input});
 
       type('a').into($input);
-      expect($input.val()).to.equal('a');
+      expect($input.value).to.equal('a');
 
       field1.destroy();
       buildField({input: $input});
       type('b').into($input);
-      expect($input.val()).to.equal('ab');
+      expect($input.value).to.equal('ab');
     });
   });
 
@@ -579,7 +579,7 @@ describe('FieldKit.TextField', function() {
 
     it('respects maxlength set on the element', function() {
       field = buildField();
-      field.element.attr('maxlength', '2');
+      field.element.setAttribute('maxlength', '2');
       field.setFormatter(null);
       expectThatTyping('abc').into(field).willChange('|').to('ab|');
     });

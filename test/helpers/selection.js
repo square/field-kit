@@ -1,6 +1,6 @@
 /* jshint esnext:true, unused:true, undef:true */
 
-class Caret {
+class Selection {
   constructor(input) {
     this.input = input;
   }
@@ -107,4 +107,4 @@ class Caret {
   }
 }
 
-export default Caret;
+export default Selection;

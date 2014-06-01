@@ -1,6 +1,6 @@
 (function() {
     "use strict";
-    var $$formatter$$default, $$delimited_text_formatter$$default, $$card_utils$$AMEX, $$card_utils$$DISCOVER, $$card_utils$$JCB, $$card_utils$$MASTERCARD, $$card_utils$$VISA, $$card_utils$$determineCardType, $$card_utils$$luhnCheck, $$card_utils$$validCardLength, $$default_card_formatter$$default, $$amex_card_formatter$$default, $$adaptive_card_formatter$$default, $$utils$$isDigits, $$utils$$startsWith, $$utils$$endsWith, $$utils$$trim, $$utils$$zpad, $$utils$$zpad2, $$utils$$bind, $$utils$$forEach, $$utils$$hasGetter, $$utils$$getAllPropertyNames, $$undo_manager$$default, $$keybindings$$KEYS, $$keybindings$$keyBindingsForPlatform, $$text_field$$default, $$card_text_field$$default, $$expiry_date_formatter$$default, $$expiry_date_field$$default, stround$$modes, stround$$parse, stround$$format, stround$$shiftParts, stround$$shift, stround$$round, $$number_formatter$$default, $$phone_formatter$$default, $$social_security_number_formatter$$default;
+    var $$formatter$$default, $$delimited_text_formatter$$default, $$card_utils$$AMEX, $$card_utils$$DISCOVER, $$card_utils$$JCB, $$card_utils$$MASTERCARD, $$card_utils$$VISA, $$card_utils$$determineCardType, $$card_utils$$luhnCheck, $$card_utils$$validCardLength, $$default_card_formatter$$default, $$amex_card_formatter$$default, $$adaptive_card_formatter$$default, $$utils$$isDigits, $$utils$$startsWith, $$utils$$endsWith, $$utils$$trim, $$utils$$zpad, $$utils$$zpad2, $$utils$$bind, $$utils$$forEach, $$utils$$hasGetter, $$utils$$getAllPropertyNames, $$undo_manager$$default, $$keybindings$$KEYS, $$keybindings$$keyBindingsForPlatform, $$caret$$default, $$text_field$$default, $$card_text_field$$default, $$expiry_date_formatter$$default, $$expiry_date_field$$default, stround$$modes, stround$$parse, stround$$format, stround$$shiftParts, stround$$shift, stround$$round, $$number_formatter$$default, $$phone_formatter$$default, $$social_security_number_formatter$$default;
 
     (function() {
         var $__Object$defineProperty = Object.defineProperty;
@@ -994,6 +994,10 @@
     })();
 
     (function() {
+        $$caret$$default = Caret;
+    })();
+
+    (function() {
         var $__Object$defineProperty = Object.defineProperty;
 
         var AFFINITY = {
@@ -1024,6 +1028,13 @@
 
         var TextField = function() {
           function TextField(element, formatter) {
+            if (typeof element.get === 'function') {
+              console.warn(
+                'DEPRECATION: FieldKit.TextField instances should no longer be ' +
+                'created with a jQuery-wrapped element.'
+              );
+              element = element.get(0);
+            }
             this.element = element;
             this._formatter = formatter;
             this._enabled = true;
@@ -1039,21 +1050,21 @@
             this.keyUp = $$utils$$bind(this.keyUp, this);
             this.keyPress = $$utils$$bind(this.keyPress, this);
             this.keyDown = $$utils$$bind(this.keyDown, this);
-            if (this.element.data('field-kit-text-field')) {
+            if (element['field-kit-text-field']) {
               throw new Error("already attached a TextField to this element");
             } else {
-              this.element.data('field-kit-text-field', this);
+              element['field-kit-text-field'] = this;
             }
-            this.element.on('keydown', this.keyDown);
-            this.element.on('keypress', this.keyPress);
-            this.element.on('keyup', this.keyUp);
-            this.element.on('click', this.click);
-            this.element.on('paste', this.paste);
-            this.element.on('focusin', this._focusin);
-            this.element.on('focusout', this._focusout);
+            element.addEventListener('keydown', this.keyDown);
+            element.addEventListener('keypress', this.keyPress);
+            element.addEventListener('keyup', this.keyUp);
+            element.addEventListener('click', this.click);
+            element.addEventListener('paste', this.paste);
+            element.addEventListener('focusin', this._focusin);
+            element.addEventListener('focusout', this._focusout);
             this._buildKeybindings();
 
-            var window = this.element.get(0).ownerDocument.defaultView;
+            var window = element.ownerDocument.defaultView;
 
             /**
              * Fixes caret bug (Android) that caused the input
@@ -1093,14 +1104,15 @@
 
           $__Object$defineProperty(TextField.prototype, "destroy", {
             value: function() {
-              this.element.off('keydown', this.keyDown);
-              this.element.off('keypress', this.keyPress);
-              this.element.off('keyup', this.keyUp);
-              this.element.off('click', this.click);
-              this.element.off('paste', this.paste);
-              this.element.off('focusin', this._focusin);
-              this.element.off('focusout', this._focusout);
-              this.element.data('field-kit-text-field', null);
+              var element = this.element;
+              element.removeEventListener('keydown', this.keyDown);
+              element.removeEventListener('keypress', this.keyPress);
+              element.removeEventListener('keyup', this.keyUp);
+              element.removeEventListener('click', this.click);
+              element.removeEventListener('paste', this.paste);
+              element.removeEventListener('focusin', this._focusin);
+              element.removeEventListener('focusout', this._focusout);
+              delete element['field-kit-text-field'];
               return null;
             },
 
@@ -1920,7 +1932,7 @@
           $__Object$defineProperty(TextField.prototype, "click", {
             value: function() {
               if (this._needsManualCaret) {
-                this._manualCaret = this.element.caret();
+                this._manualCaret = $$caret$$default.get(this.element);
               }
               this.selectionAffinity = AFFINITY.NONE;
             },
@@ -1929,27 +1941,9 @@
             writable: true
           });
 
-          $__Object$defineProperty(TextField.prototype, "on", {
-            value: function() {
-              this.element.on.apply(this.element, arguments);
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
-          $__Object$defineProperty(TextField.prototype, "off", {
-            value: function() {
-              this.element.off.apply(this.element, arguments);
-            },
-
-            enumerable: false,
-            writable: true
-          });
-
           $__Object$defineProperty(TextField.prototype, "text", {
             value: function() {
-              return this.element.val();
+              return this.element.value;
             },
 
             enumerable: false,
@@ -1958,7 +1952,7 @@
 
           $__Object$defineProperty(TextField.prototype, "setText", {
             value: function(text) {
-              this.element.val(text);
+              this.element.value = text;
             },
 
             enumerable: false,
@@ -1991,7 +1985,6 @@
                 value = this._formatter.format(value);
               }
               this.setText("" + value);
-              return this.element.trigger('change');
             },
 
             enumerable: false,
@@ -2002,7 +1995,7 @@
             value: function() {
               if (!this._formatter) {
                 this._formatter = new $$formatter$$default();
-                var maximumLengthString = this.element.attr('maxlength');
+                var maximumLengthString = this.element.getAttribute('maxlength');
                 if (maximumLengthString !== undefined && maximumLengthString !== null) {
                   this._formatter.maximumLength = parseInt(maximumLengthString, 10);
                 }
@@ -2029,8 +2022,8 @@
           $__Object$defineProperty(TextField.prototype, "selectedRange", {
             value: function() {
               var caret = this._needsManualCaret ?
-                caret = this._manualCaret :
-                caret = this.element.caret();
+                this._manualCaret :
+                $$caret$$default.get(this.element);
 
               return {
                 start: caret.start,
@@ -2060,7 +2053,7 @@
                 end: Math.max(min, Math.min(max, range.start + range.length))
               };
               this._manualCaret = caret;
-              this.element.caret(caret);
+              $$caret$$default.set(this.element, caret.start, caret.end);
               this.selectionAffinity = range.length === 0 ? AFFINITY.NONE : affinity;
             },
 
@@ -2176,7 +2169,7 @@
 
           $__Object$defineProperty(TextField.prototype, "hasFocus", {
             value: function() {
-              return this.element.get(0).ownerDocument.activeElement === this.element.get(0);
+              return this.element.ownerDocument.activeElement === this.element;
             },
 
             enumerable: false,
@@ -2298,7 +2291,7 @@
           $__Object$defineProperty(TextField.prototype, "setPlaceholder", {
             value: function(_placeholder) {
               this._placeholder = _placeholder;
-              this.element.attr('placeholder', this._placeholder);
+              this.element.setAttribute('placeholder', this._placeholder);
             },
 
             enumerable: false,
@@ -2331,7 +2324,7 @@
 
           $__Object$defineProperty(TextField.prototype, "_buildKeybindings", {
             value: function() {
-              var doc = this.element.get(0).ownerDocument;
+              var doc = this.element.ownerDocument;
               var win = doc.defaultView || doc.parentWindow;
               var userAgent = win.navigator.userAgent;
               var osx = /^Mozilla\/[\d\.]+ \(Macintosh/.test(userAgent);

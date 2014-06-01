@@ -1,5 +1,6 @@
 {
   "esnext": true,
   "unused": true,
-  "undef": true
+  "undef": true,
+  "browser": true
 }

@@ -5,6 +5,8 @@ import FakeElement from './fake_element';
 class FakeInput extends FakeElement {
   constructor(ownerDocument, type) {
     super(ownerDocument, 'input');
+    this._selectionStart = 0;
+    this._selectionEnd = 0;
     this.type = type || 'text';
     this.value = '';
     this.selfClosing = true;
@@ -52,6 +54,11 @@ class FakeInput extends FakeElement {
       selectionEnd = this.value.length;
     }
     this._selectionEnd = selectionEnd;
+  }
+
+  select() {
+    this.selectionStart = 0;
+    this.selectionEnd = this.value.length;
   }
 }
 
