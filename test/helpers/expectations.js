@@ -2,10 +2,11 @@
 /* global expect */
 
 import FakeEvent from './fake_event';
-import Caret from './caret';
+import Selection from './selection';
 import TextField from '../../lib/text_field';
 import { buildInput } from './builders';
 import { type } from './typing';
+import Caret from '../../lib/caret';
 
 class FieldExpectationBase {
   into(field) {
@@ -59,12 +60,12 @@ class FieldExpectationBase {
   }
 
   applyDescription() {
-    var description = Caret.parseDescription(this.currentDescription);
+    var description = Selection.parseDescription(this.currentDescription);
     var caret = description.caret;
     var affinity = description.affinity;
     var value = description.value;
-    this.field.element.val(value);
-    this.field.element.caret(caret);
+    this.field.element.value = value;
+    Caret.set(this.field.element, caret.start, caret.end);
     this.field.selectionAffinity = affinity;
   }
 
@@ -89,10 +90,10 @@ class FieldExpectationBase {
 
   assert() {
     var actual =
-      Caret.printDescription({
-        caret: this.field.element.caret(),
+      Selection.printDescription({
+        caret: Caret.get(this.field.element),
         affinity: this.field.selectionAffinity,
-        value: this.field.element.val()
+        value: this.field.element.value
       });
 
     expect(actual).to.equal(this.expectedDescription);
@@ -102,7 +103,7 @@ class FieldExpectationBase {
     if (!this._field) {
       var input = buildInput();
       if (this.userAgent) {
-        input.get(0).ownerDocument.defaultView.navigator.userAgent = this.userAgent;
+        input.ownerDocument.defaultView.navigator.userAgent = this.userAgent;
       }
       this._field = new TextField(input);
     }

@@ -4,7 +4,6 @@
 import FakeDocument from './fake_document';
 import FakeInput from './fake_input';
 import PassthroughFormatter from './passthrough_formatter';
-import WrappedFakeElements from './wrapped_fake_elements';
 
 export function buildField(textFieldClass, options) {
   if (!textFieldClass) {
@@ -21,15 +20,15 @@ export function buildField(textFieldClass, options) {
     }
   }
 
-  var wrapper = options.input || buildInput();
+  var input = options.input || buildInput();
 
   var field;
   if (options.formatter) {
     // formatter is specified, so use it as part of the constructor
-    field = new textFieldClass(wrapper, options.formatter);
+    field = new textFieldClass(input, options.formatter);
   } else {
     // since a default formatter may be provided by the text field, use #setFormatter
-    field = new textFieldClass(wrapper);
+    field = new textFieldClass(input);
     if (!field.formatter()) {
       field.setFormatter(new PassthroughFormatter());
     }
@@ -44,5 +43,5 @@ export function buildInput(document) {
   }
   var input = new FakeInput(document);
   document.body.appendChild(input);
-  return new WrappedFakeElements([input]);
+  return input;
 }
