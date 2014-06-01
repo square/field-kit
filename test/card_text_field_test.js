@@ -49,7 +49,7 @@ describe('FieldKit.CardTextField', function() {
         textField.textFieldDidBeginEditing();
         type(visa).into(textField);
         textField.textFieldDidEndEditing();
-        expect(textField.element.val()).to.equal(visa);
+        expect(textField.element.value).to.equal(visa);
       });
     });
 
@@ -61,14 +61,14 @@ describe('FieldKit.CardTextField', function() {
       it('does not change the displayed card number while typing', function() {
         textField.textFieldDidBeginEditing();
         type(visa).into(textField);
-        expect(textField.element.val()).to.equal(visa);
+        expect(textField.element.value).to.equal(visa);
       });
 
       it('masks the displayed card number on end editing', function() {
         textField.textFieldDidBeginEditing();
         type(visa).into(textField);
         textField.textFieldDidEndEditing();
-        expect(textField.element.val()).to.equal('•••• •••• •••• 1111');
+        expect(textField.element.value).to.equal('•••• •••• •••• 1111');
       });
 
       it('does not change the selected range on end editing', function() {
@@ -82,12 +82,12 @@ describe('FieldKit.CardTextField', function() {
         type(visa).into(textField);
         textField.textFieldDidEndEditing();
         textField.textFieldDidBeginEditing();
-        expect(textField.element.val()).to.equal(visa);
+        expect(textField.element.value).to.equal(visa);
       });
 
       it('masks when a value is set before editing', function() {
         textField.setValue('1234567890123456');
-        expect(textField.element.val()).to.equal('•••• •••• •••• 3456');
+        expect(textField.element.value).to.equal('•••• •••• •••• 3456');
       });
 
       // PENDING
@@ -96,7 +96,7 @@ describe('FieldKit.CardTextField', function() {
       //   type(visa).into(textField);
       //   textField.textFieldDidEndEditing();
       //   textField.setCardMaskStrategy(FieldKit.CardTextField.CardMaskStrategy.None);
-      //   expect(textField.element.val()).to.equal(visa);
+      //   expect(textField.element.value).to.equal(visa);
       // });
 
       // PENDING
@@ -106,7 +106,7 @@ describe('FieldKit.CardTextField', function() {
       //   textField.textFieldDidEndEditing();
       //   textField.setCardMaskStrategy(FieldKit.CardTextField.CardMaskStrategy.None);
       //   textField.setCardMaskStrategy(FieldKit.CardTextField.CardMaskStrategy.DoneEditing);
-      //   expect(textField.element.val()).to.equal('•••• •••• •••• 1111');
+      //   expect(textField.element.value).to.equal('•••• •••• •••• 1111');
       // });
     });
   });

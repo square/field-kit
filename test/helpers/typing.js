@@ -1,7 +1,6 @@
 /* jshint esnext:true, unused:true, undef:true */
 
 import FakeEvent from './fake_event';
-import WrappedFakeElements from './wrapped_fake_elements';
 
 class Type {
   constructor(keys) {
@@ -9,9 +8,10 @@ class Type {
   }
 
   into(element) {
-    if (element.element instanceof WrappedFakeElements) {
+    if (!element.ownerDocument) {
       element = element.element;
     }
+    this.element = element;
     this.element = element;
     this.perform();
     return this;
@@ -19,18 +19,20 @@ class Type {
 
   perform() {
     FakeEvent.eventsForKeys(this.keys).forEach(event => {
-      this.element.trigger('keydown', event);
+      event.type = 'keydown';
+      this.element.dispatchEvent(event);
       if (shouldFireKeypress(this.element, event)) {
         event.type = 'keypress';
-        this.element.trigger('keypress', event);
+        this.element.dispatchEvent(event);
       }
-      this.element.trigger('keyup', event);
+      event.type = 'keyup';
+      this.element.dispatchEvent(event);
     });
   }
 }
 
 function shouldFireKeypress(element, keyDownEvent) {
-  var document = element.get(0).ownerDocument;
+  var document = element.ownerDocument;
   var window = document.defaultView;
   return !keyDownEvent.isDefaultPrevented() ||
     window.navigator.FK_firesKeyPressWhenKeydownPrevented;
