@@ -17,6 +17,7 @@ module.exports = function(config) {
     files: [
       'node_modules/qunit-bdd/lib/qunit-bdd.js',
       'node_modules/sinon/pkg/sinon.js',
+      'node_modules/jquery-caret/jquery.caret.js',
       'dist/field-kit.js',
       'build/test/all.js'
     ],
