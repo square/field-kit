@@ -466,6 +466,74 @@ describe('FieldKit.TextField', function() {
     });
   });
 
+  describe('HTML5 events', function() {
+    var field;
+
+    describe('input', function() {
+      var inputSpy;
+
+      before(function() {
+        inputSpy = sinon.spy();
+        field = buildField();
+        field.element.addEventListener('input', inputSpy);
+      });
+
+      it('is fired when making a successful input', function() {
+        type('a').into(field);
+        expect(inputSpy.called).to.equal(true);
+      });
+
+      it('is not fired when making an empty input', function() {
+        type('left').into(field);
+        expect(inputSpy.called).to.equal(false);
+      });
+    });
+
+    describe('change', function() {
+      var changeSpy;
+
+      before(function() {
+        changeSpy = sinon.spy();
+        field = buildField();
+        field.element.addEventListener('change', changeSpy);
+      });
+
+      it('is not fired when leaving the field without making input', function() {
+        field.element.focus();
+        field.element.blur();
+        expect(changeSpy.called).to.equal(false);
+      });
+
+      it('is not fired when leaving the field after making an empty input', function() {
+        field.element.focus();
+        type('left').into(field);
+        field.element.blur();
+        expect(changeSpy.called).to.equal(false);
+      });
+
+      it('is fired when leaving the field after making a change', function() {
+        field.element.focus();
+        type('a').into(field);
+        expect(changeSpy.called).to.equal(false);
+        field.element.blur();
+        expect(changeSpy.called).to.equal(true);
+      });
+
+      it('status resets properly when leaving a field', function() {
+        field.element.focus();
+        type('a').into(field);
+        field.element.blur();
+        expect(changeSpy.called).to.equal(true);
+
+        field.element.focus();
+        type('left').into(field);
+        field.element.blur();
+
+        expect(changeSpy.callCount).to.equal(1);
+      });
+    });
+  });
+
   describe('when we have a delegate', function() {
     var field;
 
