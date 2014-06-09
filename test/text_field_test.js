@@ -519,6 +519,14 @@ describe('FieldKit.TextField', function() {
         expect(changeSpy.called).to.equal(true);
       });
 
+      it('is not fired when leaving the field that has the same value as before it was focused', function() {
+        field.element.focus();
+        type('a').into(field);
+        type('backspace').into(field);
+        field.element.blur();
+        expect(changeSpy.called).to.equal(false);
+      })
+
       it('status resets properly when leaving a field', function() {
         field.element.focus();
         type('a').into(field);
