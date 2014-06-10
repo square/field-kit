@@ -1,5 +1,6 @@
 ESNEXT=./node_modules/.bin/esnext
 COMPILE_MODULES=./node_modules/.bin/es6-modules
+JSHINT=./node_modules/.bin/jshint
 
 all: dist
 
@@ -50,7 +51,10 @@ build/test/all.js: $(TEST_HELPERS_OBJS) $(TEST_OBJS) Makefile
 
 test-setup: dist/field-kit.js build/test/all.js Makefile
 
-test: test-setup
+lint: lib/*.js test/*.js
+	$(JSHINT) $^
+
+test: lint test-setup
 	node_modules/karma/bin/karma start --single-run
 
-.PHONY: test test-setup
+.PHONY: test lint test-setup

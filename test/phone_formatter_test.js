@@ -37,13 +37,13 @@ describe('FieldKit.PhoneFormatter', function() {
 
   it('can strip formatting and remove country code digits', function() {
     // Formatting only
-    expect(formatter.digitsWithoutCountryCode("(206) 829-0752")).to.equal('2068290752');
-    expect(formatter.digitsWithoutCountryCode("206.829.0752")).to.equal('2068290752');
+    expect(formatter.digitsWithoutCountryCode('(206) 829-0752')).to.equal('2068290752');
+    expect(formatter.digitsWithoutCountryCode('206.829.0752')).to.equal('2068290752');
     // Country Code only
-    expect(formatter.digitsWithoutCountryCode("12068290752")).to.equal('2068290752');
-    expect(formatter.digitsWithoutCountryCode("442068290752")).to.equal('2068290752');  // 2 digit
+    expect(formatter.digitsWithoutCountryCode('12068290752')).to.equal('2068290752');
+    expect(formatter.digitsWithoutCountryCode('442068290752')).to.equal('2068290752');  // 2 digit
     // Both formatting and country (dial) code
-    expect(formatter.digitsWithoutCountryCode("+44 7570 127892")).to.equal('7570127892');
+    expect(formatter.digitsWithoutCountryCode('+44 7570 127892')).to.equal('7570127892');
   });
 
   it('adds a ( before the first digit', function() {

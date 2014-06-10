@@ -525,7 +525,7 @@ describe('FieldKit.TextField', function() {
         type('backspace').into(field);
         field.element.blur();
         expect(changeSpy.called).to.equal(false);
-      })
+      });
 
       it('status resets properly when leaving a field', function() {
         field.element.focus();
