@@ -563,6 +563,7 @@
         $$utils$$bind = bind;
 
         if (!Function.prototype.bind) {
+          /* jshint freeze:false */
           Function.prototype.bind = function(context) {
             var prependedArgs = [].slice.call(arguments, 1);
             var self = this;
@@ -1043,6 +1044,8 @@
             this._disabledPlaceholder = null;
             this._focusedPlaceholder = null;
             this._unfocusedPlaceholder = null;
+            this._isDirty = false;
+            this._valueOnFocus = '';
             this._focusout = $$utils$$bind(this._focusout, this);
             this._focusin = $$utils$$bind(this._focusin, this);
             this.click = $$utils$$bind(this.click, this);
@@ -1051,7 +1054,7 @@
             this.keyPress = $$utils$$bind(this.keyPress, this);
             this.keyDown = $$utils$$bind(this.keyDown, this);
             if (element['field-kit-text-field']) {
-              throw new Error("already attached a TextField to this element");
+              throw new Error('already attached a TextField to this element');
             } else {
               element['field-kit-text-field'] = this;
             }
@@ -1126,10 +1129,17 @@
               if (this.hasSelection()) {
                 this.clearSelection();
               }
+
+              if (!this._isDirty) {
+                this._valueOnFocus = this.element.value || '';
+                this._isDirty = true;
+              }
+
               this.replaceSelection(text);
               range = this.selectedRange();
               range.start += range.length;
               range.length = 0;
+
               return this.setSelectedRange(range);
             },
 
@@ -1147,6 +1157,21 @@
             writable: true
           });
 
+          $__Object$defineProperty(TextField.prototype, "_fireEvent", {
+            value: function(eventType) {
+              if (typeof CustomEvent === 'undefined') {
+                var event = document.createEvent('Event');
+                event.initEvent(eventType, false, false);
+                this.element.dispatchEvent(event);
+              } else {
+                this.element.dispatchEvent(new CustomEvent(eventType, {}));
+              }
+            },
+
+            enumerable: false,
+            writable: true
+          });
+
           $__Object$defineProperty(TextField.prototype, "_textDidChange", {
             value: function() {
               var delegate = this._delegate;
@@ -1154,6 +1179,9 @@
               if (delegate && typeof delegate.textDidChange === 'function') {
                 delegate.textDidChange(this);
               }
+
+              // manually fire the HTML5 input event
+              this._fireEvent('input');
             },
 
             enumerable: false,
@@ -1173,6 +1201,15 @@
               if (delegate && typeof delegate.textFieldDidEndEditing === 'function') {
                 delegate.textFieldDidEndEditing(this);
               }
+
+              // manually fire the HTML5 change event, only when a change has been made since focus
+              if (this._isDirty && (this._valueOnFocus !== this.element.value)) {
+                this._fireEvent('change');
+              }
+
+              // reset the dirty property
+              this._isDirty = false;
+              this._valueOnFocus = '';
             },
 
             enumerable: false,
@@ -1908,7 +1945,7 @@
                   } else {
                     var delegate = this.delegate();
                     if (delegate) {
-                      if (typeof delegate.textFieldDidFailToValidateChange === "function") {
+                      if (typeof delegate.textFieldDidFailToValidateChange === 'function') {
                         delegate.textFieldDidFailToValidateChange(this, change, errorType);
                       }
                     }
@@ -1984,7 +2021,7 @@
               if (this._formatter) {
                 value = this._formatter.format(value);
               }
-              this.setText("" + value);
+              this.setText('' + value);
             },
 
             enumerable: false,
