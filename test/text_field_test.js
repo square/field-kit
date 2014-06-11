@@ -220,7 +220,7 @@ describe('FieldKit.TextField', function() {
     it('is allowed to use the default action on keyPress so form submission works', function() {
       var field = buildField();
       var event = FakeEvent.withKey('enter');
-      field.keyPress(event);
+      field._keyPress(event);
       expect(event.isDefaultPrevented()).to.be.false();
     });
   });
@@ -229,7 +229,7 @@ describe('FieldKit.TextField', function() {
     it('is allowed to use the default action on keyPress so tabbing between fields', function() {
       var field = buildField();
       var event = FakeEvent.withKey('tab');
-      field.keyPress(event);
+      field._keyPress(event);
       expect(event.isDefaultPrevented()).to.be.false();
     });
   });
@@ -238,11 +238,11 @@ describe('FieldKit.TextField', function() {
     it('are not prevented', function() {
       var field = buildField();
       var event = FakeEvent.withKey('meta+r');
-      field.keyPress(event);
+      field._keyPress(event);
       expect(event.isDefaultPrevented()).to.be.false();
 
       event = FakeEvent.withKey('ctrl+r');
-      field.keyPress(event);
+      field._keyPress(event);
       expect(event.isDefaultPrevented()).to.be.false();
     });
   });

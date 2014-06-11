@@ -142,7 +142,7 @@ class ExpectThatPasting extends FieldExpectationBase {
 
   paste() {
     var event = FakeEvent.pasteEventWithData({Text: this.text});
-    this.field.paste(event);
+    this.field._paste(event);
   }
 }
 
