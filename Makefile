@@ -1,5 +1,5 @@
 ESNEXT=./node_modules/.bin/esnext
-COMPILE_MODULES=./node_modules/.bin/es6-modules
+COMPILE_MODULES=./node_modules/.bin/compile-modules
 JSHINT=./node_modules/.bin/jshint
 
 all: dist
@@ -41,13 +41,13 @@ TEST_OBJS=$(foreach file,$(wildcard test/*.js),build/test/$(notdir $(file)))
 # Build the distribution file by using es6-modules to concatenate.
 dist/field-kit.js: $(LIB_OBJS) node_modules/stround/lib/*.js Makefile
 	@mkdir -p dist
-	$(COMPILE_MODULES) convert -I build/lib -I node_modules/stround/lib -f export-variable -o $@ index
+	$(COMPILE_MODULES) convert -I build/lib -I node_modules/stround/lib -f bundle -o $@ index
 
 dist/%.min.js: dist/%.js
 	cat $< | closure-compiler --language_in ECMASCRIPT5 > $@
 
 build/test/all.js: $(TEST_HELPERS_OBJS) $(TEST_OBJS) Makefile
-	$(COMPILE_MODULES) convert -I build/test -f export-variable -o $@ $(TEST_OBJS)
+	$(COMPILE_MODULES) convert -I build/test -f bundle -o $@ $(TEST_OBJS)
 
 test-setup: dist/field-kit.js build/test/all.js Makefile
 
