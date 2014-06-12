@@ -17,7 +17,6 @@
   },
   "devDependencies": {
     "chokidar": "^0.8.2",
-    "es6-class": "0.0.2",
     "es6-module-transpiler": "git://github.com/square/es6-module-transpiler#rewrite-with-bindings",
     "esnext": "^0.7.13",
     "jshint": "^2.5.1",
