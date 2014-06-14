@@ -20,6 +20,14 @@ ConsecutiveDelimiterFormatter.prototype.hasDelimiterAtIndex = function(index) {
   return index === 0 || index === 2 || index === 3 || index === 6 || index === 7;
 };
 
+function LazyDelimiterFormatter() {
+  FieldKit.DelimitedTextFormatter.apply(this, arguments);
+}
+LazyDelimiterFormatter.prototype = Object.create(FieldKit.DelimitedTextFormatter.prototype);
+LazyDelimiterFormatter.prototype.hasDelimiterAtIndex = function(index) {
+  return index === 2 || index === 3;
+};
+
 describe('LeadingDelimiterFormatter', function() {
   var field;
 
@@ -103,4 +111,24 @@ describe('ConsecutiveDelimiterFormatter', function() {
     expectThatTyping('backspace').into(field).willChange('-3--|').to('|');
     expectThatTyping('backspace').into(field).willChange('-1--23--|').to('-1--2|');
   });
+});
+
+describe('LazyDelimiterFormatter', function() {
+  var field;
+
+  before(function() {
+    field = buildField();
+    field.setFormatter(new LazyDelimiterFormatter('-', true));
+  });
+
+  it('adds delimiters at the end only when typing past delimiter', function() {
+    expectThatTyping('2').into(field).willChange('1|').to('12|');
+    expectThatTyping('3').into(field).willChange('12|').to('12--3|');
+  });
+
+  it('backspaces delimiters before character', function() {
+    expectThatTyping('backspace').into(field).willChange('12--34|').to('12--3|');
+    expectThatTyping('backspace').into(field).willChange('12--3|').to('12|');
+  });
+
 });
