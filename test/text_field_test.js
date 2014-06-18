@@ -519,6 +519,19 @@ describe('FieldKit.TextField', function() {
         expect(changeSpy.called).to.equal(true);
       });
 
+      it('is fired when leaving the field after pressing backspace', function() {
+        field.element.focus();
+        type('a').into(field);
+        type('b').into(field);
+        field.element.blur();
+
+        field.element.focus();
+        type('backspace').into(field);
+        field.element.blur();
+
+        expect(changeSpy.callCount).to.equal(2);
+      });
+
       it('is not fired when leaving the field that has the same value as before it was focused', function() {
         field.element.focus();
         type('a').into(field);
