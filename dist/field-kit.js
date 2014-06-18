@@ -587,9 +587,9 @@
     })();
 
     /* jshint proto:true */
-    var $$utils$$getPrototypeOf = Object.getPrototypeOf || (function(object) {
+    var $$utils$$getPrototypeOf = Object.getPrototypeOf || function(object) {
       return object.__proto__;
-    });
+    };
 
     function $$utils$$hasGetter(object, property) {
       // Skip if getOwnPropertyDescriptor throws (IE8)
@@ -3796,7 +3796,7 @@
           var maximumFractionDigits = this.maximumFractionDigits();
           if (fractionPart.length > maximumFractionDigits) {
             var unrounded = "" + integerPart + "." + fractionPart + "";
-            var rounded = this._round(negative ? "-" + unrounded + "" : unrounded);
+            var rounded = this._round((negative ? "-" + unrounded + "" : unrounded));
             if (rounded[0] === '-') {
               rounded = rounded.slice(1);
             }
