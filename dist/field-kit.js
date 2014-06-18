@@ -587,9 +587,9 @@
     })();
 
     /* jshint proto:true */
-    var $$utils$$getPrototypeOf = Object.getPrototypeOf || function(object) {
+    var $$utils$$getPrototypeOf = Object.getPrototypeOf || (function(object) {
       return object.__proto__;
-    };
+    });
 
     function $$utils$$hasGetter(object, property) {
       // Skip if getOwnPropertyDescriptor throws (IE8)
@@ -1308,11 +1308,6 @@
             this.clearSelection();
           }
 
-          if (!this._isDirty) {
-            this._valueOnFocus = this.element.value || '';
-            this._isDirty = true;
-          }
-
           this.replaceSelection(text);
           range = this.selectedRange();
           range.start += range.length;
@@ -1772,6 +1767,10 @@
           if (change.hasChanges()) {
             var formatter = this.formatter();
             if (formatter && typeof formatter.isChangeValid === 'function') {
+              if (!this._isDirty) {
+                this._valueOnFocus = change.current.text || '';
+                this._isDirty = true;
+              }
               if (formatter.isChangeValid(change, error)) {
                 change.recomputeDiff();
                 this.setText(change.proposed.text);
@@ -3797,7 +3796,7 @@
           var maximumFractionDigits = this.maximumFractionDigits();
           if (fractionPart.length > maximumFractionDigits) {
             var unrounded = "" + integerPart + "." + fractionPart + "";
-            var rounded = this._round((negative ? "-" + unrounded + "" : unrounded));
+            var rounded = this._round(negative ? "-" + unrounded + "" : unrounded);
             if (rounded[0] === '-') {
               rounded = rounded.slice(1);
             }
