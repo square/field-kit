@@ -8,7 +8,7 @@
     "build": "make dist",
     "prepublish": "npm test"
   },
-  "repository": "",
+  "repository": "https://stash.corp.squareup.com/scm/js/field-kit.git",
   "author": "Square, Inc.",
   "license": "BSD",
   "dependencies": {
