@@ -216,23 +216,19 @@
           }
 
           if (startMovedRight) {
-            // move right over any immediately following delimiters
-            // In all but one scenario, the cursor should already be placed after the delimiter group,
-            // the one exception is when the format has a leading delimiter. In this case,
-            // we need to move past all leading delimiters before placing the real character input
+            // move right over any delimiters found on the way, including any leading delimiters
+            for (var i = change.current.selectedRange.start; i < range.start + range.length; i++) {
+              if (this.delimiterAt(i)) {
+                range.start++;
+                if(range.length > 0) {
+                  range.length--;
+                }
+              }
+            }
+
             while (this.delimiterAt(range.start)) {
               range.start++;
               range.length--;
-            }
-            // if the first character was a delimiter, then move right over the real character that was intended
-            if (startMovedOverADelimiter) {
-              range.start++;
-              range.length--;
-              // move right over any delimiters that might immediately follow the real character
-              while (this.delimiterAt(range.start)) {
-                range.start++;
-                range.length--;
-              }
             }
           }
 
@@ -587,9 +583,9 @@
     })();
 
     /* jshint proto:true */
-    var $$utils$$getPrototypeOf = Object.getPrototypeOf || function(object) {
+    var $$utils$$getPrototypeOf = Object.getPrototypeOf || (function(object) {
       return object.__proto__;
-    };
+    });
 
     function $$utils$$hasGetter(object, property) {
       // Skip if getOwnPropertyDescriptor throws (IE8)
@@ -2301,7 +2297,7 @@
         value: function(event) {
           event.preventDefault();
           this.rollbackInvalidChanges(function() {
-            this.readSelectionFromPasteboard(event.originalEvent.clipboardData);
+            this.readSelectionFromPasteboard(event.clipboardData);
           }.bind(this));
         },
 
@@ -3796,7 +3792,7 @@
           var maximumFractionDigits = this.maximumFractionDigits();
           if (fractionPart.length > maximumFractionDigits) {
             var unrounded = "" + integerPart + "." + fractionPart + "";
-            var rounded = this._round((negative ? "-" + unrounded + "" : unrounded));
+            var rounded = this._round(negative ? "-" + unrounded + "" : unrounded);
             if (rounded[0] === '-') {
               rounded = rounded.slice(1);
             }
