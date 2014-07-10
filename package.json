@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "chokidar": "^0.8.2",
-    "es6-module-transpiler": "git://github.com/square/es6-module-transpiler#rewrite-with-bindings",
+    "es6-module-transpiler": "^0.5.1",
     "esnext": "^0.7.13",
     "jshint": "^2.5.1",
     "karma": "^0.12.16",
@@ -25,7 +25,7 @@
     "karma-qunit": "^0.1.1",
     "qunit": "^0.6.3",
     "qunit-bdd": "^0.6.1",
-    "qunitjs": "~1.12.0",
+    "qunitjs": "~1.14.0",
     "sinon": "^1.9.0"
   }
 }
