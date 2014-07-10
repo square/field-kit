@@ -1,7 +1,7 @@
 /* jshint esnext:true, unused:true, undef:true */
 /* global FieldKit, describe, before, it, context, expect */
 
-import { expectThatTyping } from './helpers/expectations';
+import { expectThatTyping, expectThatPasting } from './helpers/expectations';
 import { buildField } from './helpers/builders';
 
 function LeadingDelimiterFormatter() {
@@ -89,8 +89,17 @@ describe('LeadingDelimiterFormatter', function() {
     expectThatTyping('shift+left').into(field).willChange('-411-<1|1').to('-41<1-1|1');
   });
 
+  it('deselects past delimiters as if they are not there', function() {
+    expectThatTyping('shift+right').into(field).willChange('-411-<1|1').to('-411-1|1');
+  });
+
   it('prevents entering the delimiter character', function() {
     expectThatTyping('-').into(field).willNotChange('-123-456-|');
+  });
+
+  it('positions the caret correctly after pastes', function() {
+    expectThatPasting('1234567890').into(field).willChange('|').to('-123-456-789-0|');
+    expectThatPasting('456').into(field).willChange('-123-|789-0').to('-123-456-|789-0');
   });
 });
 
