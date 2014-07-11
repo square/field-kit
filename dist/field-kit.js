@@ -996,8 +996,8 @@
         this._unfocusedPlaceholder = null;
         this._isDirty = false;
         this._valueOnFocus = '';
-        this._focusout = $$utils$$bind(this._focusout, this);
-        this._focusin = $$utils$$bind(this._focusin, this);
+        this._blur = $$utils$$bind(this._blur, this);
+        this._focus = $$utils$$bind(this._focus, this);
         this._click = $$utils$$bind(this._click, this);
         this._paste = $$utils$$bind(this._paste, this);
         this._keyUp = $$utils$$bind(this._keyUp, this);
@@ -1013,8 +1013,8 @@
         element.addEventListener('keyup', this._keyUp);
         element.addEventListener('click', this._click);
         element.addEventListener('paste', this._paste);
-        element.addEventListener('focusin', this._focusin);
-        element.addEventListener('focusout', this._focusout);
+        element.addEventListener('focus', this._focus);
+        element.addEventListener('blur', this._blur);
         this._buildKeybindings();
 
         var window = element.ownerDocument.defaultView;
@@ -1238,8 +1238,8 @@
           element.removeEventListener('keyup', this._keyUp);
           element.removeEventListener('click', this._click);
           element.removeEventListener('paste', this._paste);
-          element.removeEventListener('focusin', this._focusin);
-          element.removeEventListener('focusout', this._focusout);
+          element.removeEventListener('focus', this._focus);
+          element.removeEventListener('blur', this._blur);
           delete element['field-kit-text-field'];
           return null;
         },
@@ -2157,7 +2157,7 @@
         writable: true
       });
 
-      $$text_field$$$__Object$defineProperty(TextField.prototype, "_focusin", {
+      $$text_field$$$__Object$defineProperty(TextField.prototype, "_focus", {
         value: function() {
           this._textFieldDidBeginEditing();
           return this._syncPlaceholder();
@@ -2167,7 +2167,7 @@
         writable: true
       });
 
-      $$text_field$$$__Object$defineProperty(TextField.prototype, "_focusout", {
+      $$text_field$$$__Object$defineProperty(TextField.prototype, "_blur", {
         value: function() {
           this._textFieldDidEndEditing();
           return this._syncPlaceholder();
