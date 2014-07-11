@@ -1,5 +1,5 @@
 /* jshint esnext:true, unused:true, undef:true */
-/* global FieldKit, describe, before, it, expect, fail, sinon */
+/* global FieldKit, describe, before, it, expect, fail, sinon, lazy, context */
 /* global expectThatTyping, expectThatPasting, FakeEvent, buildField, buildInput, type, PassthroughFormatter */
 
 import { expectThatTyping, expectThatPasting } from './helpers/expectations';
@@ -559,7 +559,7 @@ describe('FieldKit.TextField', function() {
     var field;
 
     before(function() {
-      field = buildField();
+      field = buildField(null, this.fieldOptions || {});
       field.setDelegate({
         textFieldDidBeginEditing: sinon.spy(),
         textFieldDidEndEditing: sinon.spy(),
@@ -639,6 +639,21 @@ describe('FieldKit.TextField', function() {
 
       type('a').into(field);
       expect(field.delegate().textFieldDidBeginEditing.firstCall.args).to.eql([field]);
+    });
+
+    context ('in a browser that doesn\'t support focusin/out', function() {
+      lazy('fieldOptions', function() {
+        return {'userAgent': 'osx.firefox.v24'};
+      });
+
+      it('calls the delegate method for beginning editing and ending editing in a browser that doesn\'t support focusin/out', function() {
+        field.element.focus();
+        expect(field.delegate().textFieldDidBeginEditing.callCount).to.eql(1);
+
+        field.element.blur();
+        expect(field.delegate().textFieldDidEndEditing.callCount).to.eql(1);
+      });
+
     });
   });
 
