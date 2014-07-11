@@ -4,7 +4,7 @@
 import FakeEvent from './fake_event';
 import Selection from './selection';
 import TextField from '../../lib/text_field';
-import { buildInput } from './builders';
+import { buildField } from './builders';
 import { type } from './typing';
 import Caret from '../../lib/caret';
 
@@ -101,11 +101,11 @@ class FieldExpectationBase {
 
   get field() {
     if (!this._field) {
-      var input = buildInput();
+      var options = {};
       if (this.userAgent) {
-        input.ownerDocument.defaultView.navigator.userAgent = this.userAgent;
+        options['userAgent'] = this.userAgent;
       }
-      this._field = new TextField(input);
+      this._field = buildField(TextField, options);
     }
     return this._field;
   }
