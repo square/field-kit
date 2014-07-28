@@ -2144,12 +2144,12 @@
 
       $$text_field$$$__Object$defineProperty(TextField.prototype, "_fireEvent", {
         value: function(eventType) {
-          if (typeof CustomEvent === 'undefined') {
+          if (typeof CustomEvent === 'function') {
+            this.element.dispatchEvent(new CustomEvent(eventType, {}));
+          } else {
             var event = document.createEvent('Event');
             event.initEvent(eventType, false, false);
             this.element.dispatchEvent(event);
-          } else {
-            this.element.dispatchEvent(new CustomEvent(eventType, {}));
           }
         },
 
