@@ -30,8 +30,6 @@ var NAVIGATORS = {
 class FakeNavigator {
   constructor() {
     this.userAgent = 'osx.chrome.latest';
-    // replace the window's navigator with this fake one.
-    window.navigator = this;
   }
 
   get userAgent() {

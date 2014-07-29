@@ -79,7 +79,7 @@ class FakeElement {
     if (this.ownerDocument.activeElement === this) {
       this.ownerDocument.activeElement = null;
       this.emit('blur');
-      if (!window.navigator.FK_noSupportForFocusInOut) {
+      if (!this.ownerDocument.defaultView.navigator.FK_noSupportForFocusInOut) {
         this.emit('focusout');
       }
     }
@@ -88,7 +88,7 @@ class FakeElement {
   focus() {
     this.ownerDocument.activeElement = this;
     this.emit('focus');
-    if (!window.navigator.FK_noSupportForFocusInOut) {
+    if (!this.ownerDocument.defaultView.navigator.FK_noSupportForFocusInOut) {
       this.emit('focusin');
     }
   }
