@@ -641,7 +641,7 @@ describe('FieldKit.TextField', function() {
       expect(field.delegate().textFieldDidBeginEditing.firstCall.args).to.eql([field]);
     });
 
-    context ('in a browser that doesn\'t support focusin/out', function() {
+    context('in a browser that doesn\'t support focusin/out', function() {
       lazy('fieldOptions', function() {
         return {'userAgent': 'osx.firefox.v24'};
       });
@@ -653,7 +653,6 @@ describe('FieldKit.TextField', function() {
         field.element.blur();
         expect(field.delegate().textFieldDidEndEditing.callCount).to.eql(1);
       });
-
     });
   });
 
