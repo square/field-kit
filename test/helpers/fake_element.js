@@ -79,14 +79,18 @@ class FakeElement {
     if (this.ownerDocument.activeElement === this) {
       this.ownerDocument.activeElement = null;
       this.emit('blur');
-      this.emit('focusout');
+      if (!this.ownerDocument.defaultView.navigator.FK_noSupportForFocusInOut) {
+        this.emit('focusout');
+      }
     }
   }
 
   focus() {
     this.ownerDocument.activeElement = this;
-    this.emit('focusin');
     this.emit('focus');
+    if (!this.ownerDocument.defaultView.navigator.FK_noSupportForFocusInOut) {
+      this.emit('focusin');
+    }
   }
 
   dispatchEvent(event) {
