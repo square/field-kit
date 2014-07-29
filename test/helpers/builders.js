@@ -21,6 +21,9 @@ export function buildField(textFieldClass, options) {
   }
 
   var input = options.input || buildInput();
+  if (options.userAgent) {
+    input.ownerDocument.defaultView.navigator.userAgent = options.userAgent;
+  }
 
   var field;
   if (options.formatter) {
