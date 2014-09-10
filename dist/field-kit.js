@@ -583,9 +583,9 @@
     })();
 
     /* jshint proto:true */
-    var $$utils$$getPrototypeOf = Object.getPrototypeOf || (function(object) {
+    var $$utils$$getPrototypeOf = Object.getPrototypeOf || function(object) {
       return object.__proto__;
-    });
+    };
 
     function $$utils$$hasGetter(object, property) {
       // Skip if getOwnPropertyDescriptor throws (IE8)
@@ -951,16 +951,35 @@
     var $$caret$$default = Caret;
     var $$text_field$$$__Object$defineProperty = Object.defineProperty;
 
+    /**
+     * Enum for Affinity values.
+     * @readonly
+     * @enum {number}
+     */
     var $$text_field$$AFFINITY = {
       UPSTREAM: 0,
       DOWNSTREAM: 1,
       NONE: null
     };
 
+    /**
+     * Tests is string passed in is a single word.
+     *
+     * @param {String} chr
+     * @returns {Boolean}
+     */
     function $$text_field$$isWordChar(chr) {
       return chr && /^\w$/.test(chr);
     }
 
+    /**
+     * Checks if char to the left of {index} in {string}
+     * is a break (non-char).
+     *
+     * @param {String} text
+     * @param {Number} index
+     * @returns {Boolean}
+     */
     function $$text_field$$hasLeftWordBreakAtIndex(text, index) {
       if (index === 0) {
         return true;
@@ -969,6 +988,14 @@
       }
     }
 
+    /**
+     * Checks if char to the right of {index} in {string}
+     * is a break (non-char).
+     *
+     * @param {String} text
+     * @param {Number} index
+     * @returns {Boolean}
+     */
     function $$text_field$$hasRightWordBreakAtIndex(text, index) {
       if (index === text.length) {
         return true;
@@ -1203,7 +1230,7 @@
             range.length++;
             this.setSelectedRange(range);
           }
-          return this.clearSelection();
+          this.clearSelection();
         },
 
         enumerable: false,
@@ -1308,7 +1335,7 @@
           range = this.selectedRange();
           range.start += range.length;
           range.length = 0;
-          return this.setSelectedRange(range);
+          this.setSelectedRange(range);
         },
 
         enumerable: false,
@@ -1419,7 +1446,7 @@
           var range = this.selectedRange();
           range.length += range.start;
           range.start = 0;
-          return this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.UPSTREAM);
+          this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.UPSTREAM);
         },
 
         enumerable: false,
@@ -1876,7 +1903,7 @@
 
       $$text_field$$$__Object$defineProperty(TextField.prototype, "setSelectedRange", {
         value: function(range) {
-          return this.setSelectedRangeWithAffinity(range, this.selectionAffinity);
+          this.setSelectedRangeWithAffinity(range, this.selectionAffinity);
         },
 
         enumerable: false,
@@ -2160,7 +2187,7 @@
       $$text_field$$$__Object$defineProperty(TextField.prototype, "_focus", {
         value: function() {
           this._textFieldDidBeginEditing();
-          return this._syncPlaceholder();
+          this._syncPlaceholder();
         },
 
         enumerable: false,
@@ -2170,7 +2197,7 @@
       $$text_field$$$__Object$defineProperty(TextField.prototype, "_blur", {
         value: function() {
           this._textFieldDidEndEditing();
-          return this._syncPlaceholder();
+          this._syncPlaceholder();
         },
 
         enumerable: false,
@@ -2414,11 +2441,11 @@
      * compute differences, and see the current vs proposed changes.
      *
      * @param {FieldKitField} field
-     * @param {function} callback called when you want changes to the field
+     * @param {Function} callback called when you want changes to the field
      *    take place. Current will be calculated before this callback.
      *    Proposed will be calculated after this callback.
      *
-     * @return {object} change object with current and proposed properties
+     * @returns {Object} change object with current and proposed properties
      */
     $$text_field$$TextFieldStateChange.build = function(field, callback) {
       var change = new this(field);
@@ -3792,7 +3819,7 @@
           var maximumFractionDigits = this.maximumFractionDigits();
           if (fractionPart.length > maximumFractionDigits) {
             var unrounded = "" + integerPart + "." + fractionPart + "";
-            var rounded = this._round(negative ? "-" + unrounded + "" : unrounded);
+            var rounded = this._round((negative ? "-" + unrounded + "" : unrounded));
             if (rounded[0] === '-') {
               rounded = rounded.slice(1);
             }
