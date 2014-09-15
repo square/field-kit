@@ -19,6 +19,9 @@ field.setValue('123-45-6789');
 
 See examples of built-in formatters and fields at [the demo page][demo-page].
 
+### Documentation
+Please see our [documentation](docs/) for a more in depth overview.
+
 ### What are Formatters?
 
 Formatters provide two main methods: `parse()` and `format()`. `parse()` takes

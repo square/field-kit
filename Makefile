@@ -7,7 +7,7 @@ all: dist
 clean:
 	rm -rf build dist
 
-dist: dist/field-kit.js dist/field-kit.min.js
+dist: dist/field-kit.js dist/field-kit.min.js generate-docs
 
 # Create rules dynamically of the form:
 #
@@ -45,6 +45,14 @@ dist/field-kit.js: $(LIB_OBJS) node_modules/stround/lib/*.js Makefile
 
 dist/%.min.js: dist/%.js
 	cat $< | closure-compiler --language_in ECMASCRIPT5 > $@
+
+generate-docs: clean-docs write-doc-files
+
+clean-docs:
+	rm -rf docs; mkdir docs;
+
+write-doc-files:
+	for i in $$(find lib -name '*.js'); do echo ;echo $$i; $$(npm bin)/markdox $$i -o docs/$$(basename $${i%.*}).md && echo '['$$(basename $${i%.*})']('$$(basename $${i%.*})'.md)' >> docs/README.md; echo ' ' >> docs/README.md; done
 
 build/test/all.js: $(TEST_HELPERS_OBJS) $(TEST_OBJS) Makefile
 	$(COMPILE_MODULES) convert -I build/test -f bundle -o $@ $(TEST_OBJS)
