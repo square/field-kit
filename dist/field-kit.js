@@ -415,28 +415,28 @@
     var $$amex_card_formatter$$$__Object$create = Object.create;
 
     var $$amex_card_formatter$$AmexCardFormatter = function($__super) {
-      function AmexCardFormatter() {
-        $$amex_card_formatter$$$__Object$getPrototypeOf(AmexCardFormatter.prototype).constructor.call(this);
-        this.maximumLength = 15 + 2;
-      }
+     function AmexCardFormatter() {
+       $$amex_card_formatter$$$__Object$getPrototypeOf(AmexCardFormatter.prototype).constructor.call(this);
+       this.maximumLength = 15 + 2;
+     }
 
-      AmexCardFormatter.__proto__ = ($__super !== null ? $__super : Function.prototype);
-      AmexCardFormatter.prototype = $$amex_card_formatter$$$__Object$create(($__super !== null ? $__super.prototype : null));
+     AmexCardFormatter.__proto__ = ($__super !== null ? $__super : Function.prototype);
+     AmexCardFormatter.prototype = $$amex_card_formatter$$$__Object$create(($__super !== null ? $__super.prototype : null));
 
-      $$amex_card_formatter$$$__Object$defineProperty(AmexCardFormatter.prototype, "constructor", {
-        value: AmexCardFormatter
-      });
+     $$amex_card_formatter$$$__Object$defineProperty(AmexCardFormatter.prototype, "constructor", {
+      value: AmexCardFormatter
+     });
 
-      $$amex_card_formatter$$$__Object$defineProperty(AmexCardFormatter.prototype, "hasDelimiterAtIndex", {
-        value: function(index) {
-          return index === 4 || index === 11;
-        },
+     $$amex_card_formatter$$$__Object$defineProperty(AmexCardFormatter.prototype, "hasDelimiterAtIndex", {
+      value: function(index) {
+        return index === 4 || index === 11;
+      },
 
-        enumerable: false,
-        writable: true
-      });
+      enumerable: false,
+      writable: true
+     });
 
-      return AmexCardFormatter;
+     return AmexCardFormatter;
     }($$default_card_formatter$$default);
 
     var $$amex_card_formatter$$default = $$amex_card_formatter$$AmexCardFormatter;
@@ -468,9 +468,9 @@
       });
 
       $$adaptive_card_formatter$$$__Object$defineProperty(AdaptiveCardFormatter.prototype, "isChangeValid", {
-        value: function(change) {
+        value: function(change, error) {
           this.formatter = this._formatterForPan(change.proposed.text);
-          return this.formatter.isChangeValid(change);
+          return this.formatter.isChangeValid(change, error);
         },
 
         enumerable: false,
@@ -583,9 +583,9 @@
     })();
 
     /* jshint proto:true */
-    var $$utils$$getPrototypeOf = Object.getPrototypeOf || function(object) {
+    var $$utils$$getPrototypeOf = Object.getPrototypeOf || (function(object) {
       return object.__proto__;
-    };
+    });
 
     function $$utils$$hasGetter(object, property) {
       // Skip if getOwnPropertyDescriptor throws (IE8)
@@ -830,10 +830,20 @@
       TAB: $$keybindings$$TAB,
       ENTER: $$keybindings$$ENTER,
 
+      /**
+       * @param {Number} keyCode
+       * @returns {Boolean}
+       */
       isDigit: function(keyCode) {
         return $$keybindings$$ZERO <= keyCode && keyCode <= $$keybindings$$NINE;
       },
 
+      /**
+       * Is an arrow keyCode.
+       *
+       * @param {Number} keyCode
+       * @returns {Boolean}
+       */
       isDirectional: function(keyCode) {
         return keyCode === $$keybindings$$LEFT || keyCode === $$keybindings$$RIGHT || keyCode === $$keybindings$$UP || keyCode === $$keybindings$$DOWN;
       }
@@ -956,7 +966,7 @@
      * @readonly
      * @enum {number}
      */
-    var $$text_field$$AFFINITY = {
+    var $$text_field$$Affinity = {
       UPSTREAM: 0,
       DOWNSTREAM: 1,
       NONE: null
@@ -1055,12 +1065,12 @@
         this._needsManualCaret = window.navigator.userAgent.toLowerCase().indexOf('android') > -1;
 
         /**
-         * Contains one of the AFFINITY enum to indicate the preferred direction of
+         * Contains one of the Affinity enum to indicate the preferred direction of
          * selection.
          *
          * @private
          */
-        this.selectionAffinity = $$text_field$$AFFINITY.NONE;
+        this.selectionAffinity = $$text_field$$Affinity.NONE;
       }
 
       $$text_field$$$__Object$defineProperty(TextField.prototype, "textDidChange", {
@@ -1388,19 +1398,19 @@
           event.preventDefault();
           var range = this.selectedRange();
           switch (this.selectionAffinity) {
-            case $$text_field$$AFFINITY.UPSTREAM:
-            case $$text_field$$AFFINITY.NONE:
+            case $$text_field$$Affinity.UPSTREAM:
+            case $$text_field$$Affinity.NONE:
               // 12<34 56|78  =>  <1234 56|78
               range.length += range.start;
               range.start = 0;
               break;
-            case $$text_field$$AFFINITY.DOWNSTREAM:
+            case $$text_field$$Affinity.DOWNSTREAM:
               // 12|34 56>78   =>   <12|34 5678
               range.length = range.start;
               range.start = 0;
               break;
           }
-          this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.UPSTREAM);
+          this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.UPSTREAM);
         },
 
         enumerable: false,
@@ -1412,18 +1422,18 @@
           event.preventDefault();
           var range = this.selectedRange();
           switch (this.selectionAffinity) {
-            case $$text_field$$AFFINITY.UPSTREAM:
-            case $$text_field$$AFFINITY.NONE:
+            case $$text_field$$Affinity.UPSTREAM:
+            case $$text_field$$Affinity.NONE:
               // 12<34 56|78  =>  <1234 56|78
               range.length += range.start;
               range.start = 0;
               break;
-            case $$text_field$$AFFINITY.DOWNSTREAM:
+            case $$text_field$$Affinity.DOWNSTREAM:
               // 12|34 56>78  =>  12|34 5678
               range.length = 0;
               break;
           }
-          this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.UPSTREAM);
+          this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.UPSTREAM);
         },
 
         enumerable: false,
@@ -1446,7 +1456,7 @@
           var range = this.selectedRange();
           range.length += range.start;
           range.start = 0;
-          this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.UPSTREAM);
+          this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.UPSTREAM);
         },
 
         enumerable: false,
@@ -1461,7 +1471,7 @@
             start: this.text().length,
             length: 0
           };
-          this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.NONE);
+          this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.NONE);
         },
 
         enumerable: false,
@@ -1482,11 +1492,11 @@
           event.preventDefault();
           var range = this.selectedRange();
           var end = this.text().length;
-          if (this.selectionAffinity === $$text_field$$AFFINITY.UPSTREAM) {
+          if (this.selectionAffinity === $$text_field$$Affinity.UPSTREAM) {
             range.start += range.length;
           }
           range.length = end - range.start;
-          this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.DOWNSTREAM);
+          this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.DOWNSTREAM);
         },
 
         enumerable: false,
@@ -1498,18 +1508,18 @@
           event.preventDefault();
           var range = this.selectedRange();
           switch (this.selectionAffinity) {
-            case $$text_field$$AFFINITY.DOWNSTREAM:
-            case $$text_field$$AFFINITY.NONE:
+            case $$text_field$$Affinity.DOWNSTREAM:
+            case $$text_field$$Affinity.NONE:
               // 12|34 56>78  =>  12|34 5678>
               range.length = this.text().length - range.start;
               break;
-            case $$text_field$$AFFINITY.UPSTREAM:
+            case $$text_field$$Affinity.UPSTREAM:
               // 12<34 56|78  =>  12|34 5678
               range.start += range.length;
               range.length = 0;
               break;
           }
-          this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.DOWNSTREAM);
+          this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.DOWNSTREAM);
         },
 
         enumerable: false,
@@ -1531,7 +1541,7 @@
           event.preventDefault();
           var range = this.selectedRange();
           range.length = this.text().length - range.start;
-          this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.DOWNSTREAM);
+          this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.DOWNSTREAM);
         },
 
         enumerable: false,
@@ -1547,7 +1557,7 @@
           } else {
             range.start--;
           }
-          this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.NONE);
+          this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.NONE);
         },
 
         enumerable: false,
@@ -1559,13 +1569,13 @@
           event.preventDefault();
           var range = this.selectedRange();
           switch (this.selectionAffinity) {
-            case $$text_field$$AFFINITY.UPSTREAM:
-            case $$text_field$$AFFINITY.NONE:
-              this.selectionAffinity = $$text_field$$AFFINITY.UPSTREAM;
+            case $$text_field$$Affinity.UPSTREAM:
+            case $$text_field$$Affinity.NONE:
+              this.selectionAffinity = $$text_field$$Affinity.UPSTREAM;
               range.start--;
               range.length++;
               break;
-            case $$text_field$$AFFINITY.DOWNSTREAM:
+            case $$text_field$$Affinity.DOWNSTREAM:
               range.length--;
               break;
           }
@@ -1592,14 +1602,14 @@
           event.preventDefault();
           var range = this.selectedRange();
           switch (this.selectionAffinity) {
-            case $$text_field$$AFFINITY.UPSTREAM:
-            case $$text_field$$AFFINITY.NONE:
-              this.selectionAffinity = $$text_field$$AFFINITY.UPSTREAM;
+            case $$text_field$$Affinity.UPSTREAM:
+            case $$text_field$$Affinity.NONE:
+              this.selectionAffinity = $$text_field$$Affinity.UPSTREAM;
               var start = this._lastWordBreakBeforeIndex(range.start - 1);
               range.length += range.start - start;
               range.start = start;
               break;
-            case $$text_field$$AFFINITY.DOWNSTREAM:
+            case $$text_field$$Affinity.DOWNSTREAM:
               var end = this._lastWordBreakBeforeIndex(range.start + range.length);
               if (end < range.start) {
                 end = range.start;
@@ -1630,7 +1640,7 @@
           var range = this.selectedRange();
           range.length += range.start;
           range.start = 0;
-          this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.UPSTREAM);
+          this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.UPSTREAM);
         },
 
         enumerable: false,
@@ -1647,7 +1657,7 @@
           } else {
             range.start++;
           }
-          this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.NONE);
+          this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.NONE);
         },
 
         enumerable: false,
@@ -1659,13 +1669,13 @@
           event.preventDefault();
           var range = this.selectedRange();
           switch (this.selectionAffinity) {
-            case $$text_field$$AFFINITY.UPSTREAM:
+            case $$text_field$$Affinity.UPSTREAM:
               range.start++;
               range.length--;
               break;
-            case $$text_field$$AFFINITY.DOWNSTREAM:
-            case $$text_field$$AFFINITY.NONE:
-              this.selectionAffinity = $$text_field$$AFFINITY.DOWNSTREAM;
+            case $$text_field$$Affinity.DOWNSTREAM:
+            case $$text_field$$Affinity.NONE:
+              this.selectionAffinity = $$text_field$$Affinity.DOWNSTREAM;
               range.length++;
               break;
           }
@@ -1695,12 +1705,12 @@
           var start = range.start;
           var end = range.start + range.length;
           switch (this.selectionAffinity) {
-            case $$text_field$$AFFINITY.UPSTREAM:
+            case $$text_field$$Affinity.UPSTREAM:
               start = Math.min(this._nextWordBreakAfterIndex(start), end);
               break;
-            case $$text_field$$AFFINITY.DOWNSTREAM:
-            case $$text_field$$AFFINITY.NONE:
-              this.selectionAffinity = $$text_field$$AFFINITY.DOWNSTREAM;
+            case $$text_field$$Affinity.DOWNSTREAM:
+            case $$text_field$$Affinity.NONE:
+              this.selectionAffinity = $$text_field$$Affinity.DOWNSTREAM;
               end = this._nextWordBreakAfterIndex(range.start + range.length);
               break;
           }
@@ -1726,7 +1736,7 @@
           event.preventDefault();
           var range = this.selectedRange();
           range.length = this.text().length - range.start;
-          this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.DOWNSTREAM);
+          this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.DOWNSTREAM);
         },
 
         enumerable: false,
@@ -1756,7 +1766,7 @@
           text = text.substring(0, range.start) + replacement + text.substring(end);
           range.length = replacement.length;
           this.setText(text);
-          this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.NONE);
+          this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.NONE);
         },
 
         enumerable: false,
@@ -1828,7 +1838,7 @@
           this.setSelectedRangeWithAffinity({
             start: 0,
             length: this.text().length
-          }, $$text_field$$AFFINITY.NONE);
+          }, $$text_field$$Affinity.NONE);
         },
 
         enumerable: false,
@@ -1920,7 +1930,7 @@
           };
           this._manualCaret = caret;
           $$caret$$default.set(this.element, caret.start, caret.end);
-          this.selectionAffinity = range.length === 0 ? $$text_field$$AFFINITY.NONE : affinity;
+          this.selectionAffinity = range.length === 0 ? $$text_field$$Affinity.NONE : affinity;
         },
 
         enumerable: false,
@@ -1931,9 +1941,9 @@
         value: function() {
           var range = this.selectedRange();
           switch (this.selectionAffinity) {
-            case $$text_field$$AFFINITY.UPSTREAM:
+            case $$text_field$$Affinity.UPSTREAM:
               return range.start + range.length;
-            case $$text_field$$AFFINITY.DOWNSTREAM:
+            case $$text_field$$Affinity.DOWNSTREAM:
               return range.start;
             default:
               return null;
@@ -2162,7 +2172,7 @@
           if (this._needsManualCaret) {
             this._manualCaret = $$caret$$default.get(this.element);
           }
-          this.selectionAffinity = $$text_field$$AFFINITY.NONE;
+          this.selectionAffinity = $$text_field$$Affinity.NONE;
         },
 
         enumerable: false,
@@ -2467,6 +2477,11 @@
     var $$card_text_field$$$__Object$defineProperty = Object.defineProperty;
     var $$card_text_field$$$__Object$create = Object.create;
 
+    /**
+     * Enum for Affinity values.
+     * @readonly
+     * @enum {number}
+     */
     var $$card_text_field$$CardMaskStrategy = {
       None: 'None',
       DoneEditing: 'DoneEditing'
@@ -2636,6 +2651,17 @@
     var $$expiry_date_formatter$$$__Object$defineProperty = Object.defineProperty;
     var $$expiry_date_formatter$$$__Object$create = Object.create;
 
+    /**
+     * Give this function a 2 digit year it'll return with 4.
+     *
+     * @example
+     *   interpretTwoDigitYear(15);
+     *   // => 2015
+     *   interpretTwoDigitYear(97);
+     *   // => 1997
+     * @param {Number} year
+     * @returns {Number}
+     */
     function $$expiry_date_formatter$$interpretTwoDigitYear(year) {
       var thisYear = new Date().getFullYear();
       var thisCentury = thisYear - (thisYear % 100);
@@ -2785,7 +2811,7 @@
         value: function() {
           var value = this.value();
           if (value) {
-            return this.setText(this.formatter().format(value));
+            this.setText(this.formatter().format(value));
           }
         },
 
@@ -3048,6 +3074,10 @@
     var $$number_formatter$$DEFAULT_LOCALE = 'en-US';
     var $$number_formatter$$DEFAULT_COUNTRY = 'US';
 
+    /**
+     * @param {String} locale
+     * @returns {Object} {lang: lang, country: country}
+     */
     function $$number_formatter$$splitLocaleComponents(locale) {
       var match = locale.match(/^([a-z][a-z])(?:[-_]([a-z][a-z]))?$/i);
       if (match) {
@@ -3819,7 +3849,7 @@
           var maximumFractionDigits = this.maximumFractionDigits();
           if (fractionPart.length > maximumFractionDigits) {
             var unrounded = "" + integerPart + "." + fractionPart + "";
-            var rounded = this._round((negative ? "-" + unrounded + "" : unrounded));
+            var rounded = this._round(negative ? "-" + unrounded + "" : unrounded);
             if (rounded[0] === '-') {
               rounded = rounded.slice(1);
             }
@@ -4177,12 +4207,19 @@
     $$number_formatter$$NumberFormatter.prototype.setPlusSign = $$number_formatter$$NumberFormatter.prototype.setPositivePrefix;
     $$number_formatter$$NumberFormatter.Rounding = stround$$modes;
 
+    /**
+     * @enum
+     * @readonly
+     */
     $$number_formatter$$NumberFormatter.Style = {
       NONE: $$number_formatter$$NONE,
       CURRENCY: $$number_formatter$$CURRENCY,
       PERCENT: $$number_formatter$$PERCENT
     };
 
+    /**
+     * @namespace StyleDefaults
+     */
     var $$number_formatter$$StyleDefaults = {
       NONE: {
         usesGroupingSeparator: false,
@@ -4219,6 +4256,9 @@
       }
     };
 
+    /**
+     * @namespace LocaleDefaults
+     */
     var $$number_formatter$$LocaleDefaults = {
       'default': {
         allowsFloats: true,
@@ -4276,6 +4316,9 @@
       }
     };
 
+    /**
+     * @namespace RegionDefaults
+     */
     var $$number_formatter$$RegionDefaults = {
       CA: {
         currencyCode: 'CAD'
@@ -4300,6 +4343,9 @@
       }
     };
 
+    /**
+     * @namespace CurrencyDefaults
+     */
     var $$number_formatter$$CurrencyDefaults = {
       'default': {
         currencySymbol: function(formatter) {
@@ -4341,16 +4387,26 @@
     var $$phone_formatter$$$__Object$defineProperty = Object.defineProperty;
     var $$phone_formatter$$$__Object$create = Object.create;
 
-    // (415) 555-1212
-    var $$phone_formatter$$NANP_PHONE_DELIMITERS = {
+    /**
+     * @enum
+     * @example
+     *   (415) 555-1212
+     * @readonly
+     */
+    var $$phone_formatter$$NANPPhoneDelimiters = {
       0: '(',
       4: ')',
       5: ' ',
       9: '-'
     };
 
-    // 1 (415) 555-1212
-    var $$phone_formatter$$NANP_PHONE_DELIMITERS_WITH_1 = {
+    /**
+     * @enum
+     * @example
+     *  1 (415) 555-1212
+     * @readonly
+     */
+    var $$phone_formatter$$NANPPhoneDelimitersWithOne = {
       1:  ' ',
       2:  '(',
       6:  ')',
@@ -4358,8 +4414,13 @@
       11: '-'
     };
 
-    // +1 (415) 555-1212
-    var $$phone_formatter$$NANP_PHONE_DELIMITERS_WITH_PLUS = {
+    /**
+     * @enum
+     * @example
+     *  +1 (415) 555-1212
+     * @readonly
+     */
+    var $$phone_formatter$$NANPPhoneDelimitersWithPlus = {
       2:  ' ',
       3:  '(',
       7:  ')',
@@ -4507,13 +4568,13 @@
       $$phone_formatter$$$__Object$defineProperty(PhoneFormatter.prototype, "guessFormatFromText", {
         value: function(text) {
           if (text && text[0] === '+') {
-            this.delimiterMap = $$phone_formatter$$NANP_PHONE_DELIMITERS_WITH_PLUS;
+            this.delimiterMap = $$phone_formatter$$NANPPhoneDelimitersWithPlus;
             this.maximumLength = 1 + 1 + 10 + 5;
           } else if (text && text[0] === '1') {
-            this.delimiterMap = $$phone_formatter$$NANP_PHONE_DELIMITERS_WITH_1;
+            this.delimiterMap = $$phone_formatter$$NANPPhoneDelimitersWithOne;
             this.maximumLength = 1 + 10 + 5;
           } else {
-            this.delimiterMap = $$phone_formatter$$NANP_PHONE_DELIMITERS;
+            this.delimiterMap = $$phone_formatter$$NANPPhoneDelimiters;
             this.maximumLength = 10 + 4;
           }
         },
@@ -4577,9 +4638,9 @@
       });
 
       $$social_security_number_formatter$$$__Object$defineProperty(SocialSecurityNumberFormatter.prototype, "isChangeValid", {
-        value: function(change) {
+        value: function(change, error) {
           if ($$social_security_number_formatter$$DIGITS_PATTERN.test(change.inserted.text)) {
-            return $$social_security_number_formatter$$$__Object$getPrototypeOf(SocialSecurityNumberFormatter.prototype).isChangeValid.call(this, change);
+            return $$social_security_number_formatter$$$__Object$getPrototypeOf(SocialSecurityNumberFormatter.prototype).isChangeValid.call(this, change, error);
           } else {
             return false;
           }
@@ -4594,6 +4655,10 @@
 
     var $$social_security_number_formatter$$default = $$social_security_number_formatter$$SocialSecurityNumberFormatter;
 
+    /**
+     * @namespace FieldKit
+     * @readonly
+     */
     var index$$FieldKit = {
       AdaptiveCardFormatter: $$adaptive_card_formatter$$default,
       AmexCardFormatter: $$amex_card_formatter$$default,
