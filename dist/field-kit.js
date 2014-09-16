@@ -3343,6 +3343,25 @@
         writable: true
       });
 
+      $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "exponent", {
+        value: function() {
+          return this._get('exponent');
+        },
+
+        enumerable: false,
+        writable: true
+      });
+
+      $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "setExponent", {
+        value: function(exponent) {
+          this._exponent = exponent;
+          return this;
+        },
+
+        enumerable: false,
+        writable: true
+      });
+
       $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "groupingSeparator", {
         value: function() {
           return this._get('groupingSeparator');
@@ -3580,18 +3599,18 @@
         writable: true
       });
 
-      $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "exponent", {
+      $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "minusSign", {
         value: function() {
-          return this._get('exponent');
+          return this._get('minusSign');
         },
 
         enumerable: false,
         writable: true
       });
 
-      $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "setExponent", {
-        value: function(exponent) {
-          this._exponent = exponent;
+      $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "setMinusSign", {
+        value: function(minusSign) {
+          this._minusSign = minusSign;
           return this;
         },
 
@@ -3738,6 +3757,25 @@
       $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "setPercentSymbol", {
         value: function(percentSymbol) {
           this._percentSymbol = percentSymbol;
+          return this;
+        },
+
+        enumerable: false,
+        writable: true
+      });
+
+      $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "plusSign", {
+        value: function() {
+          return this._get('plusSign');
+        },
+
+        enumerable: false,
+        writable: true
+      });
+
+      $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "setPlusSign", {
+        value: function(plusSign) {
+          this._plusSign = plusSign;
           return this;
         },
 
@@ -4337,10 +4375,6 @@
     $$number_formatter$$NumberFormatter.prototype.stringFromNumber = $$number_formatter$$NumberFormatter.prototype.format;
 
     $$number_formatter$$NumberFormatter.prototype.numberFromString = $$number_formatter$$NumberFormatter.prototype.parse;
-    $$number_formatter$$NumberFormatter.prototype.minusSign = $$number_formatter$$NumberFormatter.prototype.negativePrefix;
-    $$number_formatter$$NumberFormatter.prototype.setMinusSign = $$number_formatter$$NumberFormatter.prototype.setNegativePrefix;
-    $$number_formatter$$NumberFormatter.prototype.plusSign = $$number_formatter$$NumberFormatter.prototype.positivePrefix;
-    $$number_formatter$$NumberFormatter.prototype.setPlusSign = $$number_formatter$$NumberFormatter.prototype.setPositivePrefix;
     $$number_formatter$$NumberFormatter.Rounding = stround$$modes;
 
     /**
@@ -4402,15 +4436,23 @@
         decimalSeparator: '.',
         groupingSeparator: ',',
         groupingSize: 3,
-        negativeInfinitySymbol: '-∞',
-        negativePrefix: '-',
+        minusSign: '-',
+        negativeInfinitySymbol: function(formatter) {
+          return formatter.minusSign() + '∞';
+        },
+        negativePrefix: function(formatter) {
+          return formatter.minusSign();
+        },
         negativeSuffix: '',
         notANumberSymbol: 'NaN',
         nullSymbol: '',
         percentSymbol: '%',
-        positiveInfinitySymbol: '+∞',
+        positiveInfinitySymbol: function(formatter) {
+          return formatter.plusSign() + '∞';
+        },
         positivePrefix: '',
         positiveSuffix: '',
+        plusSign: '+',
         roundingMode: $$number_formatter$$NumberFormatter.Rounding.HALF_EVEN,
         positiveCurrencyPrefix: function(formatter) {
           return formatter.currencySymbol();
@@ -4419,9 +4461,7 @@
         negativeCurrencyPrefix: function(formatter) {
           return '(' + formatter.currencySymbol();
         },
-        negativeCurrencySuffix: function() {
-          return ')';
-        }
+        negativeCurrencySuffix: ')'
       },
       fr: {
         decimalSeparator: ',',
@@ -4431,22 +4471,20 @@
         positiveCurrencySuffix: function(formatter) {
           return ' ' + formatter.currencySymbol();
         },
-        negativeCurrencyPrefix: function() {
-          return '(';
-        },
+        negativeCurrencyPrefix: '(',
         negativeCurrencySuffix: function(formatter) {
           return ' ' + formatter.currencySymbol() + ')';
         }
       },
       ja: {
         negativeCurrencyPrefix: function(formatter) {
-          return '-' + formatter.currencySymbol();
+          return formatter.minusSign() + formatter.currencySymbol();
         },
         negativeCurrencySuffix: ''
       },
       'en-GB': {
         negativeCurrencyPrefix: function(formatter) {
-          return '-' + formatter.currencySymbol();
+          return formatter.minusSign() + formatter.currencySymbol();
         },
         negativeCurrencySuffix: ''
       }
