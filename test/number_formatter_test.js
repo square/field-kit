@@ -115,16 +115,9 @@ describe('FieldKit.NumberFormatter', function() {
   });
 
   describe('#minusSign', function() {
-    it('is an alias for #negativePrefix', function() {
-      expect(formatter.minusSign).to.equal(formatter.negativePrefix);
-      expect(formatter.setMinusSign).to.equal(formatter.setNegativePrefix);
-    });
-  });
-
-  describe('#plusSign', function() {
-    it('is an alias for #positivePrefix', function() {
-      expect(formatter.plusSign).to.equal(formatter.positivePrefix);
-      expect(formatter.setPlusSign).to.equal(formatter.setPositivePrefix);
+    it('controls the minus sign used in formatting negative numbers in some locales', function() {
+      formatter.setMinusSign('*');
+      expect(formatter.format(-8)).to.equal('*8');
     });
   });
 
