@@ -1,4 +1,32 @@
-/* jshint browser:true, esnext:true, undef:true, unused:true */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: text_field.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: text_field.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* jshint browser:true, esnext:true, undef:true, unused:true */
 /* global console */
 
 import Formatter from './formatter';
@@ -27,7 +55,7 @@ var Affinity = {
  * @private
  */
 function isWordChar(chr) {
-  return chr && /^\w$/.test(chr);
+  return chr &amp;&amp; /^\w$/.test(chr);
 }
 
 /**
@@ -43,7 +71,7 @@ function hasLeftWordBreakAtIndex(text, index) {
   if (index === 0) {
     return true;
   } else {
-    return !isWordChar(text[index - 1]) && isWordChar(text[index]);
+    return !isWordChar(text[index - 1]) &amp;&amp; isWordChar(text[index]);
   }
 }
 
@@ -60,7 +88,7 @@ function hasRightWordBreakAtIndex(text, index) {
   if (index === text.length) {
     return true;
   } else {
-    return isWordChar(text[index]) && !isWordChar(text[index + 1]);
+    return isWordChar(text[index]) &amp;&amp; !isWordChar(text[index + 1]);
   }
 }
 
@@ -178,7 +206,7 @@ class TextField {
   _textDidChange() {
     var delegate = this._delegate;
     this.textDidChange();
-    if (delegate && typeof delegate.textDidChange === 'function') {
+    if (delegate &amp;&amp; typeof delegate.textDidChange === 'function') {
       delegate.textDidChange(this);
     }
 
@@ -194,12 +222,12 @@ class TextField {
   _textFieldDidEndEditing() {
     var delegate = this._delegate;
     this.textFieldDidEndEditing();
-    if (delegate && typeof delegate.textFieldDidEndEditing === 'function') {
+    if (delegate &amp;&amp; typeof delegate.textFieldDidEndEditing === 'function') {
       delegate.textFieldDidEndEditing(this);
     }
 
     // manually fire the HTML5 change event, only when a change has been made since focus
-    if (this._isDirty && (this._valueOnFocus !== this.element.value)) {
+    if (this._isDirty &amp;&amp; (this._valueOnFocus !== this.element.value)) {
       this._fireEvent('change');
     }
 
@@ -216,7 +244,7 @@ class TextField {
   _textFieldDidBeginEditing() {
     var delegate = this._delegate;
     this.textFieldDidBeginEditing();
-    if (delegate && typeof delegate.textFieldDidBeginEditing === 'function') {
+    if (delegate &amp;&amp; typeof delegate.textFieldDidBeginEditing === 'function') {
       delegate.textFieldDidBeginEditing(this);
     }
   }
@@ -448,7 +476,7 @@ class TextField {
     if (!this._formatter) {
       this._formatter = new Formatter();
       var maximumLengthString = this.element.getAttribute('maxlength');
-      if (maximumLengthString !== undefined && maximumLengthString !== null) {
+      if (maximumLengthString !== undefined &amp;&amp; maximumLengthString !== null) {
         this._formatter.maximumLength = parseInt(maximumLengthString, 10);
       }
     }
@@ -521,7 +549,7 @@ class TextField {
    * @return {string}
    */
   inspect() {
-    return '#<TextField text="' + this.text() + '">';
+    return '#&lt;TextField text="' + this.text() + '">';
   }
 
   /**
@@ -575,17 +603,17 @@ class TextField {
    *     // rightward selections are shrunk
    *     // Hey guys, |where> are you?
    *     moveUpAndModifySelection(event);
-   *     // <Hey guys, |where are you?
+   *     // &lt;Hey guys, |where are you?
    *
    *     // leftward selections are extended
-   *     // Hey guys, <where| are you?
+   *     // Hey guys, &lt;where| are you?
    *     moveUpAndModifySelection(event);
-   *     // <Hey guys, where| are you?
+   *     // &lt;Hey guys, where| are you?
    *
    *     // neutral selections are extended
    *     // Hey guys, |where| are you?
    *     moveUpAndModifySelection(event);
-   *     // <Hey guys, where| are you?
+   *     // &lt;Hey guys, where| are you?
    *
    * @param {Event} event
    */
@@ -595,12 +623,12 @@ class TextField {
     switch (this.selectionAffinity) {
       case Affinity.UPSTREAM:
       case Affinity.NONE:
-        // 12<34 56|78  =>  <1234 56|78
+        // 12&lt;34 56|78  =>  &lt;1234 56|78
         range.length += range.start;
         range.start = 0;
         break;
       case Affinity.DOWNSTREAM:
-        // 12|34 56>78   =>   <12|34 5678
+        // 12|34 56>78   =>   &lt;12|34 5678
         range.length = range.start;
         range.start = 0;
         break;
@@ -620,7 +648,7 @@ class TextField {
     switch (this.selectionAffinity) {
       case Affinity.UPSTREAM:
       case Affinity.NONE:
-        // 12<34 56|78  =>  <1234 56|78
+        // 12&lt;34 56|78  =>  &lt;1234 56|78
         range.length += range.start;
         range.start = 0;
         break;
@@ -704,7 +732,7 @@ class TextField {
    *
    * @example
    *     // leftward selections are shrunk
-   *     // Hey guys, <where| are you?
+   *     // Hey guys, &lt;where| are you?
    *     moveDownAndModifySelection(event)
    *     // Hey guys, |where are you?>
    *
@@ -747,7 +775,7 @@ class TextField {
         range.length = this.text().length - range.start;
         break;
       case Affinity.UPSTREAM:
-        // 12<34 56|78  =>  12|34 5678
+        // 12&lt;34 56|78  =>  12|34 5678
         range.start += range.length;
         range.length = 0;
         break;
@@ -810,12 +838,12 @@ class TextField {
    *     // no selection just selects to the left
    *     // Hey guys|
    *     moveLeftAndModifySelection(event)
-   *     // Hey guy<s|
+   *     // Hey guy&lt;s|
    *
    *     // left selections are extended
-   *     // Hey <guys|
+   *     // Hey &lt;guys|
    *     moveLeftAndModifySelection(event)
-   *     // Hey< guys|
+   *     // Hey&lt; guys|
    *
    *     // right selections are shrunk
    *     // Hey |guys>
@@ -825,7 +853,7 @@ class TextField {
    *     // neutral selections are extended
    *     // Hey |guys|
    *     moveLeftAndModifySelection(event)
-   *     //Hey< guys|
+   *     //Hey&lt; guys|
    *
    * @param {Event} event
    */
@@ -879,9 +907,9 @@ class TextField {
    *     // Hey |guys|
    *
    *     // left selections are extended
-   *     // Hey <guys|
+   *     // Hey &lt;guys|
    *     moveWordLeftAndModifySelection(event)
-   *     // <Hey guys|
+   *     // &lt;Hey guys|
    *
    *     // right selections are shrunk
    *     // |Hey guys>
@@ -891,7 +919,7 @@ class TextField {
    *     // neutral selections are extended
    *     // Hey |guys|
    *     moveWordLeftAndModifySelection(event)
-   *     // <Hey guys|
+   *     // &lt;Hey guys|
    *
    * @param {Event} event
    */
@@ -908,7 +936,7 @@ class TextField {
         break;
       case Affinity.DOWNSTREAM:
         var end = this._lastWordBreakBeforeIndex(range.start + range.length);
-        if (end < range.start) {
+        if (end &lt; range.start) {
           end = range.start;
         }
         range.length -= range.start + range.length - end;
@@ -938,11 +966,11 @@ class TextField {
    * @example
    *     // Hey guys, where| are ya?
    *     moveToBeginningOfLineAndModifySelection(event)
-   *     // <Hey guys, where| are ya?
+   *     // &lt;Hey guys, where| are ya?
    *
    *     // Hey guys, where| are> ya?
    *     moveToBeginningOfLineAndModifySelection(event)
-   *     // <Hey guys, where are| ya?
+   *     // &lt;Hey guys, where are| ya?
    *
    * @param {Event} event
    */
@@ -997,9 +1025,9 @@ class TextField {
    *     // Hey |guy>s
    *
    *     // left selections are shrunk
-   *     // <Hey |guys
+   *     // &lt;Hey |guys
    *     moveRightAndModifySelection(event)
-   *     // H<ey |guys
+   *     // H&lt;ey |guys
    *
    *     // neutral selections are extended
    *     // |Hey| guys
@@ -1063,9 +1091,9 @@ class TextField {
    *     // Hey |guys>
    *
    *     // left selections are shrunk
-   *     // He<y |guys
+   *     // He&lt;y |guys
    *     moveWordRightAndModifySelection(event)
-   *     // Hey< |guys
+   *     // Hey&lt; |guys
    *
    *     // neutral selections are extended
    *     // He|y |guys
@@ -1115,7 +1143,7 @@ class TextField {
    *     moveToEndOfLineAndModifySelection(event)
    *     // Hey guys, where| are ya?>
    *
-   *     // Hey guys, <where| are ya?
+   *     // Hey guys, &lt;where| are ya?
    *     moveToEndOfLineAndModifySelection(event)
    *     // Hey guys, |where are ya?>
    *
@@ -1176,7 +1204,7 @@ class TextField {
   rightWordBreakIndexes() {
     var result = [];
     var text = this.text();
-    for (var i = 0, l = text.length; i <= l; i++) {
+    for (var i = 0, l = text.length; i &lt;= l; i++) {
       if (hasRightWordBreakAtIndex(text, i)) {
         result.push(i + 1);
       }
@@ -1199,7 +1227,7 @@ class TextField {
     var error = function(type) { errorType = type; };
     if (change.hasChanges()) {
       var formatter = this.formatter();
-      if (formatter && typeof formatter.isChangeValid === 'function') {
+      if (formatter &amp;&amp; typeof formatter.isChangeValid === 'function') {
         if (!this._isDirty) {
           this._valueOnFocus = change.current.text || '';
           this._isDirty = true;
@@ -1466,7 +1494,7 @@ class TextField {
    * @param {Event} event
    */
   resignFirstResponder(event) {
-    if (event !== undefined && event !== null) {
+    if (event !== undefined &amp;&amp; event !== null) {
       event.preventDefault();
     }
     this.element.blur();
@@ -1685,9 +1713,9 @@ class TextField {
    */
   _keyPress(event) {
     var keyCode = event.keyCode;
-    if (!event.metaKey && !event.ctrlKey &&
-        keyCode !== KEYS.ENTER &&
-        keyCode !== KEYS.TAB &&
+    if (!event.metaKey &amp;&amp; !event.ctrlKey &amp;&amp;
+        keyCode !== KEYS.ENTER &amp;&amp;
+        keyCode !== KEYS.TAB &amp;&amp;
         keyCode !== KEYS.BACKSPACE) {
       event.preventDefault();
       if (event.charCode !== 0) {
@@ -1721,7 +1749,7 @@ class TextField {
   _lastWordBreakBeforeIndex(index) {
     var indexes = this._leftWordBreakIndexes();
     var result = indexes[0];
-    for (var i = 0, l = indexes.length; i < l; i++) {
+    for (var i = 0, l = indexes.length; i &lt; l; i++) {
       var wordBreakIndex = indexes[i];
       if (index > wordBreakIndex) {
         result = wordBreakIndex;
@@ -1746,7 +1774,7 @@ class TextField {
   _leftWordBreakIndexes() {
     var result = [];
     var text = this.text();
-    for (var i = 0, l = text.length; i < l; i++) {
+    for (var i = 0, l = text.length; i &lt; l; i++) {
       if (hasLeftWordBreakAtIndex(text, i)) {
         result.push(i);
       }
@@ -1764,9 +1792,9 @@ class TextField {
   _nextWordBreakAfterIndex(index) {
     var indexes = this.rightWordBreakIndexes().reverse();
     var result = indexes[0];
-    for (var i = 0, l = indexes.length; i < l; i++) {
+    for (var i = 0, l = indexes.length; i &lt; l; i++) {
       var wordBreakIndex = indexes[i];
-      if (index < wordBreakIndex) {
+      if (index &lt; wordBreakIndex) {
         result = wordBreakIndex;
       } else {
         break;
@@ -1794,17 +1822,17 @@ class TextField {
   _syncPlaceholder() {
     if (!this._enabled) {
       var disabledPlaceholder = this._disabledPlaceholder;
-      if (disabledPlaceholder !== undefined && disabledPlaceholder !== null) {
+      if (disabledPlaceholder !== undefined &amp;&amp; disabledPlaceholder !== null) {
         this.setPlaceholder(disabledPlaceholder);
       }
     } else if (this.hasFocus()) {
       var focusedPlaceholder = this._focusedPlaceholder;
-      if (focusedPlaceholder !== undefined && focusedPlaceholder !== null) {
+      if (focusedPlaceholder !== undefined &amp;&amp; focusedPlaceholder !== null) {
         this.setPlaceholder(focusedPlaceholder);
       }
     } else {
       var unfocusedPlaceholder = this._unfocusedPlaceholder;
-      if (unfocusedPlaceholder !== undefined && unfocusedPlaceholder !== null) {
+      if (unfocusedPlaceholder !== undefined &amp;&amp; unfocusedPlaceholder !== null) {
         this.setPlaceholder(unfocusedPlaceholder);
       }
     }
@@ -1850,7 +1878,7 @@ class TextFieldStateChange {
       var minTextLength = Math.min(ctext.length, ptext.length);
       var i;
 
-      for (i = 0; i < minTextLength; i++) {
+      for (i = 0; i &lt; minTextLength; i++) {
         if (ptext[i] === ctext[i]) {
           sharedPrefixLength = i + 1;
         } else {
@@ -1858,7 +1886,7 @@ class TextFieldStateChange {
         }
       }
 
-      for (i = 0; i < minTextLength - sharedPrefixLength; i++) {
+      for (i = 0; i &lt; minTextLength - sharedPrefixLength; i++) {
         if (ptext[ptext.length - 1 - i] === ctext[ctext.length - 1 - i]) {
           sharedSuffixLength = i + 1;
         } else {
@@ -1920,3 +1948,26 @@ TextFieldStateChange.build = function(field, callback) {
 };
 
 export default TextField;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="AdaptiveCardFormatter.html">AdaptiveCardFormatter</a></li><li><a href="AmexCardFormatter.html">AmexCardFormatter</a></li><li><a href="CardTextField.html">CardTextField</a></li><li><a href="DefaultCardFormatter.html">DefaultCardFormatter</a></li><li><a href="DelimitedTextFormatter.html">DelimitedTextFormatter</a></li><li><a href="ExpiryDateField.html">ExpiryDateField</a></li><li><a href="ExpiryDateFormatter.html">ExpiryDateFormatter</a></li><li><a href="Formatter.html">Formatter</a></li><li><a href="NumberFormatter.html">NumberFormatter</a></li><li><a href="PhoneFormatter.html">PhoneFormatter</a></li><li><a href="SocialSecurityNumberFormatter.html">SocialSecurityNumberFormatter</a></li><li><a href="TextField.html">TextField</a></li><li><a href="UndoManager.html">UndoManager</a></li></ul><h3>Namespaces</h3><ul><li><a href="CurrencyDefaults.html">CurrencyDefaults</a></li><li><a href="FieldKit.html">FieldKit</a></li><li><a href="KEYS.html">KEYS</a></li><li><a href="LocaleDefaults.html">LocaleDefaults</a></li><li><a href="RegionDefaults.html">RegionDefaults</a></li><li><a href="StyleDefaults.html">StyleDefaults</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Affinity">Affinity</a></li><li><a href="global.html#CardMaskStrategy">CardMaskStrategy</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a> on Tue Sep 16 2014 20:25:03 GMT-0700 (PDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
