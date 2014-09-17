@@ -1,4 +1,32 @@
-/*! jshint esnext:true, undef:true, unused:true */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: number_formatter.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: number_formatter.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*! jshint esnext:true, undef:true, unused:true */
 /**
  * @TODO Finish documenting
  */
@@ -23,8 +51,8 @@ var DEFAULT_COUNTRY = 'US';
 function splitLocaleComponents(locale) {
   var match = locale.match(/^([a-z][a-z])(?:[-_]([a-z][a-z]))?$/i);
   if (match) {
-    var lang = match[1] && match[1].toLowerCase();
-    var country = match[2] && match[2].toLowerCase();
+    var lang = match[1] &amp;&amp; match[1].toLowerCase();
+    var country = match[2] &amp;&amp; match[2].toLowerCase();
     return { lang: lang, country: country };
   }
 }
@@ -314,8 +342,8 @@ class NumberFormatter extends Formatter {
   maximumFractionDigits() {
     var result = this._get('maximumFractionDigits');
     var minimumFractionDigits = this._minimumFractionDigits;
-    if (result !== null && result !== undefined &&
-        minimumFractionDigits !== null && minimumFractionDigits !== undefined &&
+    if (result !== null &amp;&amp; result !== undefined &amp;&amp;
+        minimumFractionDigits !== null &amp;&amp; minimumFractionDigits !== undefined &amp;&amp;
         minimumFractionDigits > result) {
       result = minimumFractionDigits;
     }
@@ -337,9 +365,9 @@ class NumberFormatter extends Formatter {
   minimumFractionDigits() {
     var result = this._get('minimumFractionDigits');
     var maximumFractionDigits = this._maximumFractionDigits;
-    if (result !== null && result !== undefined &&
-        maximumFractionDigits !== null && maximumFractionDigits !== undefined &&
-        maximumFractionDigits < result) {
+    if (result !== null &amp;&amp; result !== undefined &amp;&amp;
+        maximumFractionDigits !== null &amp;&amp; maximumFractionDigits !== undefined &amp;&amp;
+        maximumFractionDigits &lt; result) {
       result = maximumFractionDigits;
     }
     return result;
@@ -360,8 +388,8 @@ class NumberFormatter extends Formatter {
   maximumIntegerDigits() {
     var result = this._get('maximumIntegerDigits');
     var minimumIntegerDigits = this._minimumIntegerDigits;
-    if (result !== null && result !== undefined &&
-        minimumIntegerDigits !== null && minimumIntegerDigits !== undefined &&
+    if (result !== null &amp;&amp; result !== undefined &amp;&amp;
+        minimumIntegerDigits !== null &amp;&amp; minimumIntegerDigits !== undefined &amp;&amp;
         minimumIntegerDigits > result) {
       result = minimumIntegerDigits;
     }
@@ -383,9 +411,9 @@ class NumberFormatter extends Formatter {
   minimumIntegerDigits() {
     var result = this._get('minimumIntegerDigits');
     var maximumIntegerDigits = this._maximumIntegerDigits;
-    if (result !== null && result !== undefined &&
-        maximumIntegerDigits !== null && maximumIntegerDigits !== undefined &&
-        maximumIntegerDigits < result) {
+    if (result !== null &amp;&amp; result !== undefined &amp;&amp;
+        maximumIntegerDigits !== null &amp;&amp; maximumIntegerDigits !== undefined &amp;&amp;
+        maximumIntegerDigits &lt; result) {
       result = maximumIntegerDigits;
     }
     return result;
@@ -644,26 +672,26 @@ class NumberFormatter extends Formatter {
    */
   _get(attr) {
     var value = this['_' + attr];
-    if (value !== null && value !== undefined) {
+    if (value !== null &amp;&amp; value !== undefined) {
       return value;
     }
     var styleDefaults = this._styleDefaults;
     var localeDefaults = this._localeDefaults();
     var regionDefaults = this._regionDefaults();
     value = get(styleDefaults, attr, this, localeDefaults);
-    if (value !== null && value !== undefined) {
+    if (value !== null &amp;&amp; value !== undefined) {
       return value;
     }
     value = get(localeDefaults, attr, this, styleDefaults);
-    if (value !== null && value !== undefined) {
+    if (value !== null &amp;&amp; value !== undefined) {
       return value;
     }
     value = get(regionDefaults, attr, this, styleDefaults);
-    if (value !== null && value !== undefined) {
+    if (value !== null &amp;&amp; value !== undefined) {
       return value;
     }
     value = get(this._currencyDefaults(), attr, this, localeDefaults);
-    if (value !== null && value !== undefined) {
+    if (value !== null &amp;&amp; value !== undefined) {
       return value;
     }
     return null;
@@ -679,38 +707,38 @@ class NumberFormatter extends Formatter {
     }
 
     var zeroSymbol = this.zeroSymbol();
-    if (zeroSymbol !== undefined && zeroSymbol !== null && number === 0) {
+    if (zeroSymbol !== undefined &amp;&amp; zeroSymbol !== null &amp;&amp; number === 0) {
       return zeroSymbol;
     }
 
     var nullSymbol = this.nullSymbol();
-    if (nullSymbol !== undefined && nullSymbol !== null && number === null) {
+    if (nullSymbol !== undefined &amp;&amp; nullSymbol !== null &amp;&amp; number === null) {
       return nullSymbol;
     }
 
     var notANumberSymbol = this.notANumberSymbol();
-    if (notANumberSymbol !== undefined && notANumberSymbol !== null && isNaN(number)) {
+    if (notANumberSymbol !== undefined &amp;&amp; notANumberSymbol !== null &amp;&amp; isNaN(number)) {
       return notANumberSymbol;
     }
 
     var positiveInfinitySymbol = this.positiveInfinitySymbol();
-    if (positiveInfinitySymbol !== undefined && positiveInfinitySymbol !== null && number === Infinity) {
+    if (positiveInfinitySymbol !== undefined &amp;&amp; positiveInfinitySymbol !== null &amp;&amp; number === Infinity) {
       return positiveInfinitySymbol;
     }
 
     var negativeInfinitySymbol = this.negativeInfinitySymbol();
-    if (negativeInfinitySymbol !== undefined && negativeInfinitySymbol !== null && number === -Infinity) {
+    if (negativeInfinitySymbol !== undefined &amp;&amp; negativeInfinitySymbol !== null &amp;&amp; number === -Infinity) {
       return negativeInfinitySymbol;
     }
 
-    var negative = number < 0;
+    var negative = number &lt; 0;
 
     var parts = (''+Math.abs(number)).split('.');
     var integerPart = parts[0];
     var fractionPart = parts[1] || '';
 
     var exponent = this.exponent();
-    if (exponent !== undefined && exponent !== null) {
+    if (exponent !== undefined &amp;&amp; exponent !== null) {
       var shifted = shiftParts([negative, integerPart, fractionPart], exponent);
       negative = shifted[0];
       integerPart = shifted[1];
@@ -735,24 +763,24 @@ class NumberFormatter extends Formatter {
 
     // right-pad fraction zeros up to the minimum length
     var minimumFractionDigits = this.minimumFractionDigits();
-    while (fractionPart.length < minimumFractionDigits) {
+    while (fractionPart.length &lt; minimumFractionDigits) {
       fractionPart += '0';
     }
 
     // left-pad integer zeros up to the minimum length
     var minimumIntegerDigits = this.minimumIntegerDigits();
-    while (integerPart.length < minimumIntegerDigits) {
+    while (integerPart.length &lt; minimumIntegerDigits) {
       integerPart = '0' + integerPart;
     }
 
     // eat any unneeded trailing zeros
-    while (fractionPart.length > minimumFractionDigits && fractionPart.slice(-1) === '0') {
+    while (fractionPart.length > minimumFractionDigits &amp;&amp; fractionPart.slice(-1) === '0') {
       fractionPart = fractionPart.slice(0, -1);
     }
 
     // left-truncate any integer digits over the maximum length
     var maximumIntegerDigits = this.maximumIntegerDigits();
-    if (maximumIntegerDigits !== undefined && maximumIntegerDigits !== null && integerPart.length > maximumIntegerDigits) {
+    if (maximumIntegerDigits !== undefined &amp;&amp; maximumIntegerDigits !== null &amp;&amp; integerPart.length > maximumIntegerDigits) {
       integerPart = integerPart.slice(-maximumIntegerDigits);
     }
 
@@ -766,7 +794,7 @@ class NumberFormatter extends Formatter {
       var copiedCharacterCount = 0;
 
       for (var i = integerPart.length - 1; i >= 0; i--) {
-        if (copiedCharacterCount > 0 && copiedCharacterCount % this.groupingSize() === 0) {
+        if (copiedCharacterCount > 0 &amp;&amp; copiedCharacterCount % this.groupingSize() === 0) {
           integerPartWithGroupingSeparators = this.groupingSeparator() + integerPartWithGroupingSeparators;
         }
         integerPartWithGroupingSeparators = integerPart[i] + integerPartWithGroupingSeparators;
@@ -823,32 +851,32 @@ class NumberFormatter extends Formatter {
     var negativeInfinitySymbol;
     var innerString;
 
-    if ((zeroSymbol = this.zeroSymbol()) !== undefined && zeroSymbol !== null && string === zeroSymbol) {
+    if ((zeroSymbol = this.zeroSymbol()) !== undefined &amp;&amp; zeroSymbol !== null &amp;&amp; string === zeroSymbol) {
       result = 0;
-    } else if ((nullSymbol = this.nullSymbol()) !== undefined && nullSymbol !== null && string === nullSymbol) {
+    } else if ((nullSymbol = this.nullSymbol()) !== undefined &amp;&amp; nullSymbol !== null &amp;&amp; string === nullSymbol) {
       result = null;
-    } else if ((notANumberSymbol = this.notANumberSymbol()) !== undefined && notANumberSymbol !== null && string === notANumberSymbol) {
+    } else if ((notANumberSymbol = this.notANumberSymbol()) !== undefined &amp;&amp; notANumberSymbol !== null &amp;&amp; string === notANumberSymbol) {
       result = NaN;
-    } else if ((positiveInfinitySymbol = this.positiveInfinitySymbol()) !== undefined && positiveInfinitySymbol !== null && string === positiveInfinitySymbol) {
+    } else if ((positiveInfinitySymbol = this.positiveInfinitySymbol()) !== undefined &amp;&amp; positiveInfinitySymbol !== null &amp;&amp; string === positiveInfinitySymbol) {
       result = Infinity;
-    } else if ((negativeInfinitySymbol = this.negativeInfinitySymbol()) !== undefined && negativeInfinitySymbol !== null && string === negativeInfinitySymbol) {
+    } else if ((negativeInfinitySymbol = this.negativeInfinitySymbol()) !== undefined &amp;&amp; negativeInfinitySymbol !== null &amp;&amp; string === negativeInfinitySymbol) {
       result = -Infinity;
     } else {
       var hasNegativePrefix = startsWith(negativePrefix, string);
       var hasNegativeSuffix = endsWith(negativeSuffix, string);
-      if (hasNegativePrefix && (this.isLenient() || hasNegativeSuffix)) {
+      if (hasNegativePrefix &amp;&amp; (this.isLenient() || hasNegativeSuffix)) {
         innerString = string.slice(negativePrefix.length);
         if (hasNegativeSuffix) {
           innerString = innerString.slice(0, innerString.length - negativeSuffix.length);
         }
         result = this._parseAbsoluteValue(innerString, error);
-        if (result !== undefined && result !== null) {
+        if (result !== undefined &amp;&amp; result !== null) {
           result *= -1;
         }
       } else {
         var hasPositivePrefix = startsWith(positivePrefix, string);
         var hasPositiveSuffix = endsWith(positiveSuffix, string);
-        if (this.isLenient() || (hasPositivePrefix && hasPositiveSuffix)) {
+        if (this.isLenient() || (hasPositivePrefix &amp;&amp; hasPositiveSuffix)) {
           innerString = string;
           if (hasPositivePrefix) {
             innerString = innerString.slice(positivePrefix.length);
@@ -866,9 +894,9 @@ class NumberFormatter extends Formatter {
       }
     }
 
-    if (result !== undefined && result !== null) {
+    if (result !== undefined &amp;&amp; result !== null) {
       var minimum = this.minimum();
-      if (minimum !== undefined && minimum !== null && result < minimum) {
+      if (minimum !== undefined &amp;&amp; minimum !== null &amp;&amp; result &lt; minimum) {
         if (typeof error === 'function') {
           error('number-formatter.out-of-bounds.below-minimum');
         }
@@ -876,7 +904,7 @@ class NumberFormatter extends Formatter {
       }
 
       var maximum = this.maximum();
-      if (maximum !== undefined && maximum !== null && result > maximum) {
+      if (maximum !== undefined &amp;&amp; maximum !== null &amp;&amp; result > maximum) {
         if (typeof error === 'function') {
           error('number-formatter.out-of-bounds.above-maximum');
         }
@@ -929,7 +957,7 @@ class NumberFormatter extends Formatter {
 
           // disallow 1,00
           var groupPartsTail = groupParts.slice(1);
-          for (var i = 0, l = groupPartsTail.length; i < l; i++) {
+          for (var i = 0, l = groupPartsTail.length; i &lt; l; i++) {
             if (groupPartsTail[i].length !== groupingSize) {
               if (typeof error === 'function') {
                 error('number-formatter.invalid-format.grouping-size');
@@ -952,7 +980,7 @@ class NumberFormatter extends Formatter {
     }
 
     var exponent = this.exponent();
-    if (exponent !== undefined && exponent !== null) {
+    if (exponent !== undefined &amp;&amp; exponent !== null) {
       var shifted = shiftParts([false, integerPart, fractionPart], -exponent);
       integerPart = shifted[1];
       fractionPart = shifted[2];
@@ -960,7 +988,7 @@ class NumberFormatter extends Formatter {
 
     number = Number(integerPart) + Number('.' + (fractionPart || '0'));
 
-    if (!this.allowsFloats() && number !== ~~number) {
+    if (!this.allowsFloats() &amp;&amp; number !== ~~number) {
       if (typeof error === 'function') {
         error('number-formatter.floats-not-allowed');
       }
@@ -1254,3 +1282,26 @@ var CurrencyDefaults = {
 };
 
 export default NumberFormatter;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="AdaptiveCardFormatter.html">AdaptiveCardFormatter</a></li><li><a href="AmexCardFormatter.html">AmexCardFormatter</a></li><li><a href="CardTextField.html">CardTextField</a></li><li><a href="DefaultCardFormatter.html">DefaultCardFormatter</a></li><li><a href="DelimitedTextFormatter.html">DelimitedTextFormatter</a></li><li><a href="ExpiryDateField.html">ExpiryDateField</a></li><li><a href="ExpiryDateFormatter.html">ExpiryDateFormatter</a></li><li><a href="Formatter.html">Formatter</a></li><li><a href="NumberFormatter.html">NumberFormatter</a></li><li><a href="PhoneFormatter.html">PhoneFormatter</a></li><li><a href="SocialSecurityNumberFormatter.html">SocialSecurityNumberFormatter</a></li><li><a href="TextField.html">TextField</a></li><li><a href="UndoManager.html">UndoManager</a></li></ul><h3>Namespaces</h3><ul><li><a href="CurrencyDefaults.html">CurrencyDefaults</a></li><li><a href="FieldKit.html">FieldKit</a></li><li><a href="KEYS.html">KEYS</a></li><li><a href="LocaleDefaults.html">LocaleDefaults</a></li><li><a href="RegionDefaults.html">RegionDefaults</a></li><li><a href="StyleDefaults.html">StyleDefaults</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Affinity">Affinity</a></li><li><a href="global.html#CardMaskStrategy">CardMaskStrategy</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a> on Tue Sep 16 2014 20:25:03 GMT-0700 (PDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
