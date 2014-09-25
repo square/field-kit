@@ -51,7 +51,7 @@ var Affinity = {
  * Tests is string passed in is a single word.
  *
  * @param {string} chr
- * @return {boolean}
+ * @returns {boolean}
  * @private
  */
 function isWordChar(chr) {
@@ -64,7 +64,7 @@ function isWordChar(chr) {
  *
  * @param {string} text
  * @param {number} index
- * @return {boolean}
+ * @returns {boolean}
  * @private
  */
 function hasLeftWordBreakAtIndex(text, index) {
@@ -81,7 +81,7 @@ function hasLeftWordBreakAtIndex(text, index) {
  *
  * @param {string} text
  * @param {number} index
- * @return {boolean}
+ * @returns {boolean}
  * @private
  */
 function hasRightWordBreakAtIndex(text, index) {
@@ -270,7 +270,7 @@ class TextField {
   /**
    * Gets the current delegate for this text field.
    *
-   * @return {TextFieldDelegate}
+   * @returns {TextFieldDelegate}
    */
   delegate() {
     return this._delegate;
@@ -470,7 +470,7 @@ class TextField {
    * Gets the current formatter. Formatters are used to translate between text
    * and value properties of the field.
    *
-   * @return {Formatter}
+   * @returns {Formatter}
    */
   formatter() {
     if (!this._formatter) {
@@ -498,7 +498,7 @@ class TextField {
   /**
    * Determines whether this field has any selection.
    *
-   * @return {boolean} true if there is at least one character selected
+   * @returns {boolean} true if there is at least one character selected
    */
   hasSelection() {
     return this.selectedRange().length !== 0;
@@ -546,7 +546,7 @@ class TextField {
   /**
    * Debug support
    *
-   * @return {string}
+   * @returns {string}
    */
   inspect() {
     return '#&lt;TextField text="' + this.text() + '">';
@@ -1199,7 +1199,7 @@ class TextField {
    *     rightWordBreakIndexes()
    *     //=> [3, 5, 9]
    *
-   * @return {number[]}
+   * @returns {number[]}
    */
   rightWordBreakIndexes() {
     var result = [];
@@ -1216,7 +1216,7 @@ class TextField {
    * Checks changes after invoking the passed function for validity and rolls
    * them back if the changes turned out to be invalid.
    *
-   * @return {Object} whatever object `callback` returns
+   * @returns {Object} whatever object `callback` returns
    */
   rollbackInvalidChanges(callback) {
     var result = null;
@@ -1278,7 +1278,7 @@ class TextField {
    * Gets the formatted text value. This is the same as the value of the
    * underlying input element.
    *
-   * @return {string}
+   * @returns {string}
    */
   text() {
     return this.element.value;
@@ -1298,7 +1298,7 @@ class TextField {
    * Gets the object value. This is the value that should be considered the
    * 'real' value of the field.
    *
-   * @return {Object}
+   * @returns {Object}
    */
   value() {
     var text = this.text();
@@ -1330,7 +1330,7 @@ class TextField {
   /**
    * Gets the range of the current selection.
    *
-   * @return {Object} {start: number, length: number}
+   * @returns {Object} {start: number, length: number}
    */
   selectedRange() {
     var caret = this._needsManualCaret ?
@@ -1373,7 +1373,7 @@ class TextField {
    * Gets the position of the current selection's anchor point, i.e. the point
    * that the selection extends from, if any.
    *
-   * @return {number}
+   * @returns {number}
    */
   selectionAnchor() {
     var range = this.selectedRange();
@@ -1395,7 +1395,7 @@ class TextField {
   /**
    * Gets whether this text field records undo actions with its undo manager.
    *
-   * @return {boolean}
+   * @returns {boolean}
    */
   allowsUndo() {
     return this._allowsUndo;
@@ -1437,7 +1437,7 @@ class TextField {
   /**
    * Gets the UndoManager for this text field.
    *
-   * @return {UndoManager}
+   * @returns {UndoManager}
    */
   undoManager() {
     return this._undoManager || (this._undoManager = new UndoManager());
@@ -1462,7 +1462,7 @@ class TextField {
   /**
    * Determines whether this field has focus.
    *
-   * @return {boolean} true if this field has focus
+   * @returns {boolean} true if this field has focus
    */
   hasFocus() {
     return this.element.ownerDocument.activeElement === this.element;
@@ -1471,7 +1471,7 @@ class TextField {
   /**
    * Determines whether this field is enabled or disabled.
    *
-   * @return {boolean} true if this field is enabled
+   * @returns {boolean} true if this field is enabled
    */
   isEnabled() {
     return this._enabled;
@@ -1510,7 +1510,7 @@ class TextField {
    * Gets the disabled placeholder if one
    * has been set.
    *
-   * @return {string}
+   * @returns {string}
    */
   disabledPlaceholder() {
     return this._disabledPlaceholder;
@@ -1530,7 +1530,7 @@ class TextField {
    * Gets the focused placeholder if one
    * has been set.
    *
-   * @return {string}
+   * @returns {string}
    */
   focusedPlaceholder() {
     return this._focusedPlaceholder;
@@ -1552,7 +1552,7 @@ class TextField {
    *
    * @TODO Does this do anything?
    *
-   * @return {string}
+   * @returns {string}
    */
   placeholder() {
     return this._placeholder;
@@ -1572,7 +1572,7 @@ class TextField {
    * Gets the unfocused placeholder if one
    * has been set.
    *
-   * @return {string}
+   * @returns {string}
    */
   unfocusedPlaceholder() {
     return this._unfocusedPlaceholder;
@@ -1743,7 +1743,7 @@ class TextField {
    * Finds the start of the 'word' before index.
    *
    * @param {number} index position at which to start looking
-   * @return {number} index in value less than or equal to the given index
+   * @returns {number} index in value less than or equal to the given index
    * @private
    */
   _lastWordBreakBeforeIndex(index) {
@@ -1768,7 +1768,7 @@ class TextField {
    *     leftWordBreakIndexes()
    *     // => [0, 3, 5]
    *
-   * @return {number[]} indexes in value of word starts.
+   * @returns {number[]} indexes in value of word starts.
    * @private
    */
   _leftWordBreakIndexes() {
@@ -1786,7 +1786,7 @@ class TextField {
    * Finds the end of the 'word' after index.
    *
    * @param {number} index position in value at which to start looking.
-   * @return {number}
+   * @returns {number}
    * @private
    */
   _nextWordBreakAfterIndex(index) {
@@ -1855,7 +1855,7 @@ class TextFieldStateChange {
   /**
    * Determines whether this field has changes.
    *
-   * @return {boolean} true if either the current text doesn't match the proposed text
+   * @returns {boolean} true if either the current text doesn't match the proposed text
    *    or the current selection range doesn't match the proposed selection range
    */
   hasChanges() {
@@ -1930,7 +1930,7 @@ class TextFieldStateChange {
  *    take place. Current will be calculated before this callback.
  *    Proposed will be calculated after this callback.
  *
- * @return {Object} change object with current and proposed properties
+ * @returns {Object} change object with current and proposed properties
  */
 TextFieldStateChange.build = function(field, callback) {
   var change = new this(field);
@@ -1964,7 +1964,7 @@ export default TextField;
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a> on Tue Sep 16 2014 20:25:03 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a> on Thu Sep 25 2014 09:51:09 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>
