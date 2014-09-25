@@ -45,7 +45,7 @@ var DEFAULT_COUNTRY = 'US';
 
 /**
  * @param {string} locale
- * @return {Object} {lang: lang, country: country}
+ * @returns {Object} {lang: lang, country: country}
  * @private
  */
 function splitLocaleComponents(locale) {
@@ -89,7 +89,7 @@ class NumberFormatter extends Formatter {
    * not apply to formatting. To prevent formatting floats, set
    * maximumFractionDigits to 0.
    *
-   * @return {boolean}
+   * @returns {boolean}
    */
   allowsFloats() {
     return this._get('allowsFloats');
@@ -99,7 +99,7 @@ class NumberFormatter extends Formatter {
    * Sets whether this formatter will parse float number values.
    *
    * @param {boolean} allowsFloats
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setAllowsFloats(allowsFloats) {
     this._allowsFloats = allowsFloats;
@@ -109,7 +109,7 @@ class NumberFormatter extends Formatter {
   /**
    * Gets whether this formatter should show the decimal separator.
    *
-   * @return {boolean}
+   * @returns {boolean}
    */
   alwaysShowsDecimalSeparator() {
     return this._get('alwaysShowsDecimalSeparator');
@@ -119,7 +119,7 @@ class NumberFormatter extends Formatter {
    * Sets whether this formatter will show the decimal separator.
    *
    * @param {boolean} alwaysShowsDecimalSeparator
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setAlwaysShowsDecimalSeparator(alwaysShowsDecimalSeparator) {
     this._alwaysShowsDecimalSeparator = alwaysShowsDecimalSeparator;
@@ -129,7 +129,7 @@ class NumberFormatter extends Formatter {
   /**
    * Gets the country code for formatter.
    *
-   * @return {string}
+   * @returns {string}
    */
   countryCode() {
     return this._countryCode || DEFAULT_COUNTRY;
@@ -139,7 +139,7 @@ class NumberFormatter extends Formatter {
    * Sets the country code for formatter.
    *
    * @param {string} countryCode
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setCountryCode(countryCode) {
     this._countryCode = countryCode;
@@ -149,7 +149,7 @@ class NumberFormatter extends Formatter {
   /**
    * Gets the currency code for formatter.
    *
-   * @return {string}
+   * @returns {string}
    */
   currencyCode() {
     return this._get('currencyCode');
@@ -159,7 +159,7 @@ class NumberFormatter extends Formatter {
    * Sets the currency code for formatter.
    *
    * @param {string} currencyCode
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setCurrencyCode(currencyCode) {
     this._currencyCode = currencyCode;
@@ -169,7 +169,7 @@ class NumberFormatter extends Formatter {
   /**
    * Gets the currency symbol for formatter.
    *
-   * @return {string}
+   * @returns {string}
    */
   currencySymbol() {
     if (this._shouldShowNativeCurrencySymbol()) {
@@ -183,7 +183,7 @@ class NumberFormatter extends Formatter {
    * Sets the currency symbol for formatter.
    *
    * @param {string} currencySymbol
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setCurrencySymbol(currencySymbol) {
     this._currencySymbol = currencySymbol;
@@ -191,7 +191,7 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @return {boolean}
+   * @returns {boolean}
    * @private
    */
   _shouldShowNativeCurrencySymbol() {
@@ -205,7 +205,7 @@ class NumberFormatter extends Formatter {
   /**
    * Gets the decimal separator for formatter.
    *
-   * @return {string}
+   * @returns {string}
    */
   decimalSeparator() {
     return this._get('decimalSeparator');
@@ -215,7 +215,7 @@ class NumberFormatter extends Formatter {
    * Sets the decimal separator for formatter.
    *
    * @param {string} decimalSeparator
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setDecimalSeparator(decimalSeparator) {
     this._decimalSeparator = decimalSeparator;
@@ -223,7 +223,7 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @return {string}
+   * @returns {string}
    */
   groupingSeparator() {
     return this._get('groupingSeparator');
@@ -231,7 +231,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {string} groupingSeparator
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setGroupingSeparator(groupingSeparator) {
     this._groupingSeparator = groupingSeparator;
@@ -241,7 +241,7 @@ class NumberFormatter extends Formatter {
   /**
    * Gets the grouping size for formatter.
    *
-   * @return {number}
+   * @returns {number}
    */
   groupingSize() {
     return this._get('groupingSize');
@@ -249,7 +249,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {number} groupingSize
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setGroupingSize(groupingSize) {
     this._groupingSize = groupingSize;
@@ -257,7 +257,7 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @return {string}
+   * @returns {string}
    */
   internationalCurrencySymbol() {
     return this._get('internationalCurrencySymbol');
@@ -265,7 +265,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {string} internationalCurrencySymbol
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setInternationalCurrencySymbol(internationalCurrencySymbol) {
     this._internationalCurrencySymbol = internationalCurrencySymbol;
@@ -273,7 +273,7 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @return {boolean}
+   * @returns {boolean}
    */
   isLenient() {
     return this._lenient;
@@ -281,7 +281,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {boolean} lenient
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setLenient(lenient) {
     this._lenient = lenient;
@@ -289,7 +289,7 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @return {string}
+   * @returns {string}
    */
   locale() {
     return this._locale || DEFAULT_LOCALE;
@@ -297,7 +297,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {string} locale
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setLocale(locale) {
     this._locale = locale;
@@ -305,7 +305,7 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @return {number}
+   * @returns {number}
    */
   maximum() {
     return this._maximum;
@@ -313,7 +313,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {number} max
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setMaximum(max) {
     this._maximum = max;
@@ -321,7 +321,7 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @return {number}
+   * @returns {number}
    */
   minimum() {
     return this._minimum;
@@ -329,7 +329,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {number} min
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setMinimum(min) {
     this._minimum = min;
@@ -337,7 +337,7 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @return {number}
+   * @returns {number}
    */
   maximumFractionDigits() {
     var result = this._get('maximumFractionDigits');
@@ -352,7 +352,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {number} maximumFractionDigits
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setMaximumFractionDigits(maximumFractionDigits) {
     this._maximumFractionDigits = maximumFractionDigits;
@@ -360,7 +360,7 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @return {number}
+   * @returns {number}
    */
   minimumFractionDigits() {
     var result = this._get('minimumFractionDigits');
@@ -375,7 +375,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {number} minimumFractionDigits
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setMinimumFractionDigits(minimumFractionDigits) {
     this._minimumFractionDigits = minimumFractionDigits;
@@ -383,7 +383,7 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @return {number}
+   * @returns {number}
    */
   maximumIntegerDigits() {
     var result = this._get('maximumIntegerDigits');
@@ -398,7 +398,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {number} maximumIntegerDigits
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setMaximumIntegerDigits(maximumIntegerDigits) {
     this._maximumIntegerDigits = maximumIntegerDigits;
@@ -406,7 +406,7 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @return {number}
+   * @returns {number}
    */
   minimumIntegerDigits() {
     var result = this._get('minimumIntegerDigits');
@@ -421,7 +421,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {number} minimumIntegerDigits
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setMinimumIntegerDigits(minimumIntegerDigits) {
     this._minimumIntegerDigits = minimumIntegerDigits;
@@ -429,7 +429,7 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @return {number}
+   * @returns {number}
    */
   exponent() {
     return this._get('exponent');
@@ -437,7 +437,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {number} exponent
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setExponent(exponent) {
     this._exponent = exponent;
@@ -445,7 +445,7 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @return {number}
+   * @returns {number}
    */
   negativeInfinitySymbol() {
     return this._get('negativeInfinitySymbol');
@@ -453,7 +453,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {number} negativeInfinitySymbol
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setNegativeInfinitySymbol(negativeInfinitySymbol) {
     this._negativeInfinitySymbol = negativeInfinitySymbol;
@@ -461,7 +461,7 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @return {string}
+   * @returns {string}
    */
   negativePrefix() {
     return this._get('negativePrefix');
@@ -469,7 +469,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {string} prefix
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setNegativePrefix(prefix) {
     this._negativePrefix = prefix;
@@ -477,7 +477,7 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @return {string}
+   * @returns {string}
    */
   negativeSuffix() {
     return this._get('negativeSuffix');
@@ -485,7 +485,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {string} prefix
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setNegativeSuffix(prefix) {
     this._negativeSuffix = prefix;
@@ -493,7 +493,7 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @return {string}
+   * @returns {string}
    */
   notANumberSymbol() {
     return this._get('notANumberSymbol');
@@ -501,7 +501,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {string} notANumberSymbol
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setNotANumberSymbol(notANumberSymbol) {
     this._notANumberSymbol = notANumberSymbol;
@@ -509,7 +509,7 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @return {string}
+   * @returns {string}
    */
   nullSymbol() {
     return this._get('nullSymbol');
@@ -517,7 +517,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {string} nullSymbol
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setNullSymbol(nullSymbol) {
     this._nullSymbol = nullSymbol;
@@ -525,7 +525,7 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @return {string}
+   * @returns {string}
    */
   numberStyle() {
     return this._numberStyle;
@@ -533,7 +533,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {string} numberStyle
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setNumberStyle(numberStyle) {
     this._numberStyle = numberStyle;
@@ -554,7 +554,7 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @return {string}
+   * @returns {string}
    */
   percentSymbol() {
     return this._get('percentSymbol');
@@ -562,7 +562,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {string} percentSymbol
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setPercentSymbol(percentSymbol) {
     this._percentSymbol = percentSymbol;
@@ -570,7 +570,7 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @return {string}
+   * @returns {string}
    */
   positiveInfinitySymbol() {
     return this._get('positiveInfinitySymbol');
@@ -578,7 +578,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {string} positiveInfinitySymbol
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setPositiveInfinitySymbol(positiveInfinitySymbol) {
     this._positiveInfinitySymbol = positiveInfinitySymbol;
@@ -586,7 +586,7 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @return {string}
+   * @returns {string}
    */
   positivePrefix() {
     return this._get('positivePrefix');
@@ -594,7 +594,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {string} prefix
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setPositivePrefix(prefix) {
     this._positivePrefix = prefix;
@@ -602,7 +602,7 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @return {string}
+   * @returns {string}
    */
   positiveSuffix() {
     return this._get('positiveSuffix');
@@ -610,7 +610,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {string} prefix
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setPositiveSuffix(prefix) {
     this._positiveSuffix = prefix;
@@ -618,7 +618,7 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @return {Function}
+   * @returns {Function}
    */
   roundingMode() {
     return this._get('roundingMode');
@@ -626,7 +626,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {Function} roundingMode
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setRoundingMode(roundingMode) {
     this._roundingMode = roundingMode;
@@ -634,7 +634,7 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @return {boolean}
+   * @returns {boolean}
    */
   usesGroupingSeparator() {
     return this._get('usesGroupingSeparator');
@@ -642,7 +642,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {boolean} usesGroupingSeparator
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setUsesGroupingSeparator(usesGroupingSeparator) {
     this._usesGroupingSeparator = usesGroupingSeparator;
@@ -650,7 +650,7 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @return {string}
+   * @returns {string}
    */
   zeroSymbol() {
     return this._get('zeroSymbol');
@@ -658,7 +658,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {string} zeroSymbol
-   * @return {NumberFormatter}
+   * @returns {NumberFormatter}
    */
   setZeroSymbol(zeroSymbol) {
     this._zeroSymbol = zeroSymbol;
@@ -667,7 +667,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {string} attr
-   * @return {*}
+   * @returns {*}
    * @private
    */
   _get(attr) {
@@ -699,7 +699,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {number} number
-   * @return {string}
+   * @returns {string}
    */
   format(number) {
     if (number === '') {
@@ -816,7 +816,7 @@ class NumberFormatter extends Formatter {
 
   /**
    * @param {number} number
-   * @return {number}
+   * @returns {number}
    * @private
    */
   _round(number) {
@@ -827,7 +827,7 @@ class NumberFormatter extends Formatter {
    * Will call parse on the formatter.
    * @param {string} string
    * @param {function(string)} error
-   * @return {string} returns value with delimiters removed
+   * @returns {string} returns value with delimiters removed
    */
   parse(string, error) {
     var result;
@@ -918,7 +918,7 @@ class NumberFormatter extends Formatter {
   /**
    * @param {string} string
    * @param {function(string)} error
-   * @return {?Number} returns value with delimiters removed
+   * @returns {?Number} returns value with delimiters removed
    * @private
    */
   _parseAbsoluteValue(string, error) {
@@ -1001,7 +1001,7 @@ class NumberFormatter extends Formatter {
   /**
    * Gets defaults.
    *
-   * @return {Array}
+   * @returns {Array}
    * @private
    */
   _currencyDefaults() {
@@ -1021,7 +1021,7 @@ class NumberFormatter extends Formatter {
   /**
    * Gets defaults.
    *
-   * @return {Array}
+   * @returns {Array}
    * @private
    */
   _regionDefaults() {
@@ -1041,7 +1041,7 @@ class NumberFormatter extends Formatter {
   /**
    * Gets defaults.
    *
-   * @return {Array}
+   * @returns {Array}
    * @private
    */
   _localeDefaults() {
@@ -1298,7 +1298,7 @@ export default NumberFormatter;
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a> on Tue Sep 16 2014 20:25:03 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a> on Thu Sep 25 2014 09:51:09 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>
