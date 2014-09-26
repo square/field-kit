@@ -33,6 +33,7 @@
  */
 
 import Formatter from './formatter';
+import NumberFormatterSettingsFormatter from './number_formatter_settings_formatter';
 import { isDigits, startsWith, endsWith, trim, forEach } from './utils';
 import { modes, shiftParts, round } from 'stround';
 
@@ -73,6 +74,35 @@ function get(object, key, ...args) {
       return value;
     }
   }
+}
+
+/**
+ * @param {string} string
+ * @param {string} currencySymbol
+ * @return {string}
+ * @private
+ */
+function replaceCurrencySymbol(string, currencySymbol) {
+  return string.replace(/¤/g, currencySymbol);
+}
+
+/**
+ * @param {string} string
+ * @param {string} plusSign
+ * @returns {string}
+ * @private
+ */
+function replacePlusSign(string, plusSign) {
+  return string.replace(/\+/g, plusSign);
+}
+/**
+ * @param {string} string
+ * @param {string} minusSign
+ * @returns {string}
+ * @private
+ */
+function replaceMinusSign(string, minusSign) {
+  return string.replace(/-/g, minusSign);
 }
 
 /**
@@ -467,14 +497,53 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @returns {number}
+   * Gets the positive number format string for the current settings. For
+   * example, changing `minimumFractionDigits` from 0 to 3 would change this
+   * value from "#" to "#.000".
+   *
+   * @return {string}
+   */
+  negativeFormat() {
+    return this.numberFormatFormatter().format({
+      alwaysShowsDecimalSeparator: this.alwaysShowsDecimalSeparator(),
+      groupingSize: this.groupingSize(),
+      maximumFractionDigits: this.maximumFractionDigits(),
+      minimumFractionDigits: this.minimumFractionDigits(),
+      minimumIntegerDigits: this.minimumIntegerDigits(),
+      prefix: this._get('negativePrefix'),
+      suffix: this._get('negativeSuffix'),
+      usesGroupingSeparator: this.usesGroupingSeparator()
+    });
+  }
+
+  /**
+   * Configures this number formatter according to the given format string.
+   * For most usages you should simply use
+   * {@link NumberFormatter#setPositiveFormat} and configure the negative
+   * prefix and suffix separately.
+   *
+   * @param negativeFormat
+   */
+  setNegativeFormat(negativeFormat) {
+    var settings = this.numberFormatFormatter().parse(negativeFormat);
+    this.setNegativePrefix(settings.prefix);
+    this.setNegativeSuffix(settings.suffix);
+    this.setGroupingSize(settings.groupingSize);
+    this.setMaximumFractionDigits(settings.maximumFractionDigits);
+    this.setMinimumFractionDigits(settings.minimumFractionDigits);
+    this.setMinimumIntegerDigits(settings.minimumIntegerDigits);
+    this.setUsesGroupingSeparator(settings.usesGroupingSeparator);
+  }
+
+  /**
+   * @returns {string}
    */
   negativeInfinitySymbol() {
     return this._get('negativeInfinitySymbol');
   }
 
   /**
-   * @param {number} negativeInfinitySymbol
+   * @param {string} negativeInfinitySymbol
    * @returns {NumberFormatter}
    */
   setNegativeInfinitySymbol(negativeInfinitySymbol) {
@@ -486,7 +555,13 @@ class NumberFormatter extends Formatter {
    * @returns {string}
    */
   negativePrefix() {
-    return this._get('negativePrefix');
+    return replaceCurrencySymbol(
+      replaceMinusSign(
+        this._get('negativePrefix'),
+        this._get('minusSign')
+      ),
+      this.currencySymbol()
+    );
   }
 
   /**
@@ -502,7 +577,13 @@ class NumberFormatter extends Formatter {
    * @returns {string}
    */
   negativeSuffix() {
-    return this._get('negativeSuffix');
+    return replaceCurrencySymbol(
+      replaceMinusSign(
+        this._get('negativeSuffix'),
+        this._get('minusSign')
+      ),
+      this.currencySymbol()
+    );
   }
 
   /**
@@ -547,8 +628,16 @@ class NumberFormatter extends Formatter {
   }
 
   /**
-   * @returns {string}
+   * @return {NumberFormatterSettingsFormatter}
+   * @private
    */
+  numberFormatFormatter() {
+    if (!this._numberFormatFormatter) {
+      this._numberFormatFormatter = new NumberFormatterSettingsFormatter();
+    }
+    return this._numberFormatFormatter;
+  }
+
   numberStyle() {
     return this._numberStyle;
   }
@@ -611,6 +700,70 @@ class NumberFormatter extends Formatter {
     return this;
   }
 
+  /**
+   * Gets the positive number format string for the current settings. For
+   * example, changing `minimumFractionDigits` from 0 to 3 would change this
+   * value from "#" to "#.000".
+   *
+   * @return {string}
+   */
+  positiveFormat() {
+    return this.numberFormatFormatter().format({
+      alwaysShowsDecimalSeparator: this.alwaysShowsDecimalSeparator(),
+      groupingSize: this.groupingSize(),
+      maximumFractionDigits: this.maximumFractionDigits(),
+      minimumFractionDigits: this.minimumFractionDigits(),
+      minimumIntegerDigits: this.minimumIntegerDigits(),
+      prefix: this._get('positivePrefix'),
+      suffix: this._get('positiveSuffix'),
+      usesGroupingSeparator: this.usesGroupingSeparator()
+    });
+  }
+
+  /**
+   * Configures this number formatter according to the given format string.
+   *
+   * @example
+   *
+   *   // Use '0' for padding, '.' for decimal separator.
+   *   formatter.setPositiveFormat('00.000');
+   *   formatter.format(2);     // '02.000'
+   *   formatter.format(-5.03); // '-05.030'
+   *   formatter.setLocale('fr-FR');
+   *   formatter.format(2);     // '02,000'
+   *
+   *   // Use '#' for maximum fraction digits.
+   *   formatter.setPositiveFormat('#.##');
+   *   formatter.format(3.456); // '3.46'
+   *
+   *   // Use '¤' as the currency placeholder.
+   *   formatter.setPositiveFormat('¤#0.00');
+   *   formatter.format(1.23); // '$1.23'
+   *   formatter.setCurrencyCode('JPY');
+   *   formatter.format(81);   // 'JP¥81.00'
+   *   formatter.setLocale('jp-JP');
+   *   formatter.format(7);   // '¥7.00'
+   *
+   *   // Use ',' for grouping separator placement.
+   *   formatter.setPositiveFormat('#,##');
+   *   formatter.format(123); // '1,23'
+   *
+   * @param positiveFormat
+   */
+  setPositiveFormat(positiveFormat) {
+    var settings = this.numberFormatFormatter().parse(positiveFormat);
+    this.setPositivePrefix(settings.prefix);
+    this.setPositiveSuffix(settings.suffix);
+    this.setGroupingSize(settings.groupingSize);
+    this.setMaximumFractionDigits(settings.maximumFractionDigits);
+    this.setMinimumFractionDigits(settings.minimumFractionDigits);
+    this.setMinimumIntegerDigits(settings.minimumIntegerDigits);
+    this.setUsesGroupingSeparator(settings.usesGroupingSeparator);
+  }
+
+  /**
+   * @returns {string}
+   */
   positiveInfinitySymbol() {
     return this._get('positiveInfinitySymbol');
   }
@@ -628,7 +781,13 @@ class NumberFormatter extends Formatter {
    * @returns {string}
    */
   positivePrefix() {
-    return this._get('positivePrefix');
+    return replaceCurrencySymbol(
+      replacePlusSign(
+        this._get('positivePrefix'),
+        this._get('plusSign')
+      ),
+      this.currencySymbol()
+    );
   }
 
   /**
@@ -644,7 +803,13 @@ class NumberFormatter extends Formatter {
    * @returns {string}
    */
   positiveSuffix() {
-    return this._get('positiveSuffix');
+    return replaceCurrencySymbol(
+      replacePlusSign(
+        this._get('positiveSuffix'),
+        this._get('plusSign')
+      ),
+      this.currencySymbol()
+    );
   }
 
   /**
@@ -1211,6 +1376,14 @@ var StyleDefaults = {
 };
 
 /**
+ * Contains the default values for various number formatter settings, including
+ * per-locale overrides. Some of these characters will not be used as-is and
+ * instead serve as placeholders:
+ *
+ *   "¤"  placeholder for `currencySymbol()`.
+ *   "-"  placeholder for `minusSign()`.
+ *   "+"  placeholder for `plusSign()`.
+ *
  * @namespace LocaleDefaults
  */
 var LocaleDefaults = {
@@ -1221,20 +1394,20 @@ var LocaleDefaults = {
     groupingSeparator: ',',
     groupingSize: 3,
     minusSign: '-',
-    negativeInfinitySymbol: formatter => formatter.minusSign() + '∞',
-    negativePrefix: formatter => formatter.minusSign(),
+    negativeInfinitySymbol: '-∞',
+    negativePrefix: '-',
     negativeSuffix: '',
     notANumberSymbol: 'NaN',
     nullSymbol: '',
     percentSymbol: '%',
-    positiveInfinitySymbol: formatter => formatter.plusSign() + '∞',
+    positiveInfinitySymbol: '+∞',
     positivePrefix: '',
     positiveSuffix: '',
     plusSign: '+',
     roundingMode: NumberFormatter.Rounding.HALF_EVEN,
-    positiveCurrencyPrefix: formatter => formatter.currencySymbol(),
+    positiveCurrencyPrefix: '¤',
     positiveCurrencySuffix: '',
-    negativeCurrencyPrefix: formatter => '(' + formatter.currencySymbol(),
+    negativeCurrencyPrefix: '(¤',
     negativeCurrencySuffix: ')'
   },
   fr: {
@@ -1242,16 +1415,16 @@ var LocaleDefaults = {
     groupingSeparator: ' ',
     percentSymbol: ' %',
     positiveCurrencyPrefix: '',
-    positiveCurrencySuffix: formatter => ' ' + formatter.currencySymbol(),
+    positiveCurrencySuffix: ' ¤',
     negativeCurrencyPrefix: '(',
-    negativeCurrencySuffix: formatter => ' ' + formatter.currencySymbol() + ')'
+    negativeCurrencySuffix: ' ¤)'
   },
   ja: {
-    negativeCurrencyPrefix: formatter => formatter.minusSign() + formatter.currencySymbol(),
+    negativeCurrencyPrefix: '-¤',
     negativeCurrencySuffix: ''
   },
   'en-GB': {
-    negativeCurrencyPrefix: formatter => formatter.minusSign() + formatter.currencySymbol(),
+    negativeCurrencyPrefix: '-¤',
     negativeCurrencySuffix: ''
   }
 };
@@ -1329,13 +1502,13 @@ export default NumberFormatter;
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="AdaptiveCardFormatter.html">AdaptiveCardFormatter</a></li><li><a href="AmexCardFormatter.html">AmexCardFormatter</a></li><li><a href="CardTextField.html">CardTextField</a></li><li><a href="DefaultCardFormatter.html">DefaultCardFormatter</a></li><li><a href="DelimitedTextFormatter.html">DelimitedTextFormatter</a></li><li><a href="ExpiryDateField.html">ExpiryDateField</a></li><li><a href="ExpiryDateFormatter.html">ExpiryDateFormatter</a></li><li><a href="Formatter.html">Formatter</a></li><li><a href="NumberFormatter.html">NumberFormatter</a></li><li><a href="PhoneFormatter.html">PhoneFormatter</a></li><li><a href="SocialSecurityNumberFormatter.html">SocialSecurityNumberFormatter</a></li><li><a href="TextField.html">TextField</a></li><li><a href="UndoManager.html">UndoManager</a></li></ul><h3>Namespaces</h3><ul><li><a href="CurrencyDefaults.html">CurrencyDefaults</a></li><li><a href="FieldKit.html">FieldKit</a></li><li><a href="KEYS.html">KEYS</a></li><li><a href="LocaleDefaults.html">LocaleDefaults</a></li><li><a href="RegionDefaults.html">RegionDefaults</a></li><li><a href="StyleDefaults.html">StyleDefaults</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Affinity">Affinity</a></li><li><a href="global.html#CardMaskStrategy">CardMaskStrategy</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="AdaptiveCardFormatter.html">AdaptiveCardFormatter</a></li><li><a href="AmexCardFormatter.html">AmexCardFormatter</a></li><li><a href="CardTextField.html">CardTextField</a></li><li><a href="DefaultCardFormatter.html">DefaultCardFormatter</a></li><li><a href="DelimitedTextFormatter.html">DelimitedTextFormatter</a></li><li><a href="ExpiryDateField.html">ExpiryDateField</a></li><li><a href="ExpiryDateFormatter.html">ExpiryDateFormatter</a></li><li><a href="Formatter.html">Formatter</a></li><li><a href="NumberFormatter.html">NumberFormatter</a></li><li><a href="PhoneFormatter.html">PhoneFormatter</a></li><li><a href="SocialSecurityNumberFormatter.html">SocialSecurityNumberFormatter</a></li><li><a href="TextField.html">TextField</a></li><li><a href="UndoManager.html">UndoManager</a></li></ul><h3>Namespaces</h3><ul><li><a href="CurrencyDefaults.html">CurrencyDefaults</a></li><li><a href="FieldKit.html">FieldKit</a></li><li><a href="KEYS.html">KEYS</a></li><li><a href="LocaleDefaults.html">LocaleDefaults</a></li><li><a href="RegionDefaults.html">RegionDefaults</a></li><li><a href="StyleDefaults.html">StyleDefaults</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Affinity">Affinity</a></li><li><a href="global.html#CardMaskStrategy">CardMaskStrategy</a></li><li><a href="global.html#chars">chars</a></li><li><a href="global.html#DECIMAL_SEPARATOR">DECIMAL_SEPARATOR</a></li><li><a href="global.html#DIGIT">DIGIT</a></li><li><a href="global.html#GROUPING_SEPARATOR">GROUPING_SEPARATOR</a></li><li><a href="global.html#PADDING">PADDING</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a> on Fri Sep 26 2014 09:36:07 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a> on Fri Sep 26 2014 10:28:49 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>

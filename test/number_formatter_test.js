@@ -100,6 +100,14 @@ describe('FieldKit.NumberFormatter', function() {
     it('has US English-standard symbol for currency', function() {
       expect(formatter.currencySymbol()).to.equal('$');
     });
+
+    it('has a positive number format for US English', function() {
+      expect(formatter.positiveFormat()).to.equal('#');
+    });
+
+    it('has a negative number format for US English', function() {
+      expect(formatter.negativeFormat()).to.equal('-#');
+    });
   });
 
   describe('#numberFromString', function() {
@@ -1004,6 +1012,49 @@ describe('FieldKit.NumberFormatter', function() {
       it('does not allow complete garbage', function() {
         expect(formatter.parse('4##@238420@(!)@*)#!')).to.be.null();
       });
+    });
+  });
+
+  describe('#positiveFormat', function() {
+    it('updates when changing the settings that affect it', function() {
+      formatter.setPositivePrefix('USD');
+      expect(formatter.positiveFormat()).to.equal('USD#');
+    });
+
+    it('leaves the currency symbol intact', function() {
+      formatter.setNumberStyle(FieldKit.NumberFormatter.Style.CURRENCY);
+      expect(formatter.positiveFormat()).to.equal('¤#0.00');
+    });
+
+    it('updates the settings that affect it when set', function() {
+      formatter.setPositiveFormat('pfix#,##00.0##suf');
+      expect(formatter.alwaysShowsDecimalSeparator()).to.equal(false);
+      expect(formatter.groupingSize()).to.equal(4);
+      expect(formatter.positivePrefix()).to.equal('pfix');
+      expect(formatter.positiveSuffix()).to.equal('suf');
+      expect(formatter.usesGroupingSeparator()).to.equal(true);
+      expect(formatter.maximumFractionDigits()).to.equal(3);
+      expect(formatter.minimumFractionDigits()).to.equal(1);
+      expect(formatter.minimumIntegerDigits()).to.equal(2);
+    });
+  });
+
+  describe('#negativeFormat', function() {
+    it('updates when changing the settings that affect it', function() {
+      formatter.setNegativeSuffix('USD');
+      expect(formatter.negativeFormat()).to.equal('-#USD');
+    });
+
+    it('updates the settings that affect it when set', function() {
+      formatter.setNegativeFormat('pfix#,##00.0##suf');
+      expect(formatter.alwaysShowsDecimalSeparator()).to.equal(false);
+      expect(formatter.groupingSize()).to.equal(4);
+      expect(formatter.negativePrefix()).to.equal('pfix');
+      expect(formatter.negativeSuffix()).to.equal('suf');
+      expect(formatter.usesGroupingSeparator()).to.equal(true);
+      expect(formatter.maximumFractionDigits()).to.equal(3);
+      expect(formatter.minimumFractionDigits()).to.equal(1);
+      expect(formatter.minimumIntegerDigits()).to.equal(2);
     });
   });
 });
