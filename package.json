@@ -18,7 +18,7 @@
   "devDependencies": {
     "chokidar": "^0.8.2",
     "es6-module-transpiler": "^0.5.1",
-    "esnext": "^0.7.13",
+    "esnext": "^0.10.0",
     "jsdoc": "git://github.com/eventualbuddha/jsdoc.git#add-support-for-es6-classes",
     "jshint": "^2.5.1",
     "karma": "^0.12.23",
