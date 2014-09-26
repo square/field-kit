@@ -3,6 +3,7 @@
     var $$formatter$$$__Object$defineProperty = Object.defineProperty;
 
     var $$formatter$$Formatter = function() {
+      "use strict";
       function Formatter() {}
 
       $$formatter$$$__Object$defineProperty(Formatter.prototype, "format", {
@@ -63,6 +64,8 @@
     var $$delimited_text_formatter$$$__Object$create = Object.create;
 
     var $$delimited_text_formatter$$DelimitedTextFormatter = function($__super) {
+      "use strict";
+
       function DelimitedTextFormatter() {
         var delimiter = (arguments[0] !== void 0 ? arguments[0] : this.delimiter);
         var isLazy = (arguments[1] !== void 0 ? arguments[1] : false);
@@ -358,6 +361,8 @@
     var $$default_card_formatter$$$__Object$create = Object.create;
 
     var $$default_card_formatter$$DefaultCardFormatter = function($__super) {
+      "use strict";
+
       function DefaultCardFormatter() {
         $$default_card_formatter$$$__Object$getPrototypeOf(DefaultCardFormatter.prototype).constructor.call(this, ' ');
       }
@@ -410,7 +415,8 @@
           return 16 + 3;
         },
 
-        enumerable: false
+        enumerable: true,
+        configurable: true
       });
 
       return DefaultCardFormatter;
@@ -422,6 +428,8 @@
     var $$amex_card_formatter$$$__Object$getPrototypeOf = Object.getPrototypeOf;
 
     var $$amex_card_formatter$$AmexCardFormatter = function($__super) {
+     "use strict";
+
      function AmexCardFormatter() {
       var $__0 = $$amex_card_formatter$$$__Object$getPrototypeOf(AmexCardFormatter.prototype);
 
@@ -450,7 +458,8 @@
         return 15 + 2;
       },
 
-      enumerable: false
+      enumerable: true,
+      configurable: true
      });
 
      return AmexCardFormatter;
@@ -460,6 +469,8 @@
     var $$adaptive_card_formatter$$$__Object$defineProperty = Object.defineProperty;
 
     var $$adaptive_card_formatter$$AdaptiveCardFormatter = function() {
+      "use strict";
+
       function AdaptiveCardFormatter() {
         /** @private */
         this.amexCardFormatter = new $$amex_card_formatter$$default();
@@ -659,6 +670,8 @@
     var $$undo_manager$$$__Object$defineProperty = Object.defineProperty;
 
     var $$undo_manager$$UndoManager = function() {
+      "use strict";
+
       function UndoManager() {
         /** @private */
         this._undos = [];
@@ -973,6 +986,8 @@
     }
 
     var $$keybindings$$BindingSet = function() {
+      "use strict";
+
       function BindingSet() {
         this.bindings = {};
       }
@@ -1068,6 +1083,8 @@
     }
 
     var $$text_field$$TextField = function() {
+      "use strict";
+
       function TextField(element, formatter) {
         if (typeof element.get === 'function') {
           console.warn(
@@ -2423,6 +2440,8 @@
     }();
 
     var $$text_field$$TextFieldStateChange = function() {
+      "use strict";
+
       function TextFieldStateChange(field) {
         this.field = field;
       }
@@ -2541,6 +2560,8 @@
     };
 
     var $$card_text_field$$CardTextField = function($__super) {
+      "use strict";
+
       function CardTextField(element) {
         $$card_text_field$$$__Object$getPrototypeOf(CardTextField.prototype).constructor.call(this, element, new $$adaptive_card_formatter$$default());
         this.setCardMaskStrategy($$card_text_field$$CardMaskStrategy.None);
@@ -2697,12 +2718,13 @@
         writable: true
       });
 
-      $$card_text_field$$$__Object$defineProperty(CardTextField.prototype, "CardMaskStrategy", {
+      $$card_text_field$$$__Object$defineProperty(CardTextField, "CardMaskStrategy", {
         get: function() {
           return $$card_text_field$$CardMaskStrategy;
         },
 
-        enumerable: false
+        enumerable: true,
+        configurable: true
       });
 
       return CardTextField;
@@ -2735,6 +2757,8 @@
     }
 
     var $$expiry_date_formatter$$ExpiryDateFormatter = function($__super) {
+      "use strict";
+
       function ExpiryDateFormatter() {
         $$expiry_date_formatter$$$__Object$getPrototypeOf(ExpiryDateFormatter.prototype).constructor.call(this, '/');
         this.maximumLength = 5;
@@ -2859,6 +2883,8 @@
     var $$expiry_date_field$$$__Object$create = Object.create;
 
     var $$expiry_date_field$$ExpiryDateField = function($__super) {
+      "use strict";
+
       function ExpiryDateField(element) {
         $$expiry_date_field$$$__Object$getPrototypeOf(ExpiryDateField.prototype).constructor.call(this, element, new $$expiry_date_formatter$$default());
       }
@@ -2886,6 +2912,193 @@
     }($$text_field$$default);
 
     var $$expiry_date_field$$default = $$expiry_date_field$$ExpiryDateField;
+    var $$number_formatter_settings_formatter$$$__Object$defineProperty = Object.defineProperty;
+    var $$number_formatter_settings_formatter$$$__Object$create = Object.create;
+    var $$number_formatter_settings_formatter$$$__Object$getPrototypeOf = Object.getPrototypeOf;
+
+    var $$number_formatter_settings_formatter$$NumberFormatterSettings = function() {
+      "use strict";
+
+      function NumberFormatterSettings() {
+        /** @type boolean */
+        this.alwaysShowsDecimalSeparator = false;
+
+        /** @type number */
+        this.groupingSize = 0;
+
+        /** @type number */
+        this.maximumFractionDigits = 0;
+
+        /** @type number */
+        this.minimumFractionDigits = 0;
+
+        /** @type number */
+        this.minimumIntegerDigits = 0;
+
+        /** @type string */
+        this.prefix = '';
+
+        /** @type string */
+        this.suffix = '';
+
+        /** @type boolean */
+        this.usesGroupingSeparator = false;
+      }
+
+      return NumberFormatterSettings;
+    }();
+
+    /**
+     * Returns a string composed of the given character repeated `length` times.
+     *
+     * @param {string} character
+     * @param {number} length
+     * @returns {string}
+     */
+    function $$number_formatter_settings_formatter$$chars(character, length) {
+      return new Array(length + 1).join(character);
+    }
+
+    /** @const */
+    var $$number_formatter_settings_formatter$$DIGIT = '#';
+
+    /** @const */
+    var $$number_formatter_settings_formatter$$PADDING = '0';
+
+    /** @const */
+    var $$number_formatter_settings_formatter$$DECIMAL_SEPARATOR = '.';
+
+    /** @const */
+    var $$number_formatter_settings_formatter$$GROUPING_SEPARATOR = ',';
+
+    var $$number_formatter_settings_formatter$$NumberFormatterSettingsFormatter = function($__super) {
+      "use strict";
+
+      function NumberFormatterSettingsFormatter() {
+        var $__0 = $$number_formatter_settings_formatter$$$__Object$getPrototypeOf(NumberFormatterSettingsFormatter.prototype);
+
+        if ($__0 !== null)
+          $__0.constructor.apply(this, arguments);
+      }
+
+      NumberFormatterSettingsFormatter.__proto__ = ($__super !== null ? $__super : Function.prototype);
+      NumberFormatterSettingsFormatter.prototype = $$number_formatter_settings_formatter$$$__Object$create(($__super !== null ? $__super.prototype : null));
+
+      $$number_formatter_settings_formatter$$$__Object$defineProperty(NumberFormatterSettingsFormatter.prototype, "constructor", {
+        value: NumberFormatterSettingsFormatter
+      });
+
+      $$number_formatter_settings_formatter$$$__Object$defineProperty(NumberFormatterSettingsFormatter.prototype, "format", {
+        value: function(settings) {
+          var result = '';
+
+          var minimumIntegerDigits = settings.minimumIntegerDigits;
+          if (minimumIntegerDigits !== 0) {
+            result += $$number_formatter_settings_formatter$$chars($$number_formatter_settings_formatter$$PADDING, minimumIntegerDigits);
+          }
+
+          result = $$number_formatter_settings_formatter$$DIGIT + result;
+
+          var minimumFractionDigits = settings.minimumFractionDigits;
+          var maximumFractionDigits = settings.maximumFractionDigits;
+          var hasFractionalPart = settings.alwaysShowsDecimalSeparator ||
+            minimumFractionDigits > 0 ||
+            maximumFractionDigits > 0;
+
+          if (hasFractionalPart) {
+            result += $$number_formatter_settings_formatter$$DECIMAL_SEPARATOR;
+            for (var i = 0, length = maximumFractionDigits; i < length; i++) {
+              result += (i < minimumFractionDigits) ? $$number_formatter_settings_formatter$$PADDING : $$number_formatter_settings_formatter$$DIGIT;
+            }
+          }
+
+          return settings.prefix + result + settings.suffix;
+        },
+
+        enumerable: false,
+        writable: true
+      });
+
+      $$number_formatter_settings_formatter$$$__Object$defineProperty(NumberFormatterSettingsFormatter.prototype, "parse", {
+        value: function(string) {
+          var result = new $$number_formatter_settings_formatter$$NumberFormatterSettings();
+
+          var hasPassedPrefix = false;
+          var hasStartedSuffix = false;
+          var decimalSeparatorIndex = null;
+          var groupingSeparatorIndex = null;
+          var lastIntegerDigitIndex = null;
+
+          for (var i = 0, length = string.length; i < length; i++) {
+            var c = string[i];
+
+            switch (c) {
+              case $$number_formatter_settings_formatter$$DIGIT:
+                if (hasStartedSuffix) { return null; }
+                hasPassedPrefix = true;
+                if (decimalSeparatorIndex !== null) {
+                  result.maximumFractionDigits++;
+                }
+                break;
+
+              case $$number_formatter_settings_formatter$$PADDING:
+                if (hasStartedSuffix) { return null; }
+                hasPassedPrefix = true;
+                if (decimalSeparatorIndex === null) {
+                  result.minimumIntegerDigits++;
+                } else {
+                  result.minimumFractionDigits++;
+                  result.maximumFractionDigits++;
+                }
+                break;
+
+              case $$number_formatter_settings_formatter$$DECIMAL_SEPARATOR:
+                if (hasStartedSuffix) { return null; }
+                hasPassedPrefix = true;
+                decimalSeparatorIndex = i;
+                lastIntegerDigitIndex = i - 1;
+                break;
+
+              case $$number_formatter_settings_formatter$$GROUPING_SEPARATOR:
+                if (hasStartedSuffix) { return null; }
+                hasPassedPrefix = true;
+                groupingSeparatorIndex = i;
+                break;
+
+              default:
+                if (hasPassedPrefix) {
+                  hasStartedSuffix = true;
+                  result.suffix += c;
+                } else {
+                  result.prefix += c;
+                }
+            }
+          }
+
+          if (decimalSeparatorIndex === null) {
+            lastIntegerDigitIndex = length - 1;
+          }
+
+          if (decimalSeparatorIndex === length - 1) {
+            result.alwaysShowsDecimalSeparator = true;
+          }
+
+          if (groupingSeparatorIndex !== null) {
+            result.groupingSize = lastIntegerDigitIndex - groupingSeparatorIndex;
+            result.usesGroupingSeparator = true;
+          }
+
+          return result;
+        },
+
+        enumerable: false,
+        writable: true
+      });
+
+      return NumberFormatterSettingsFormatter;
+    }($$formatter$$default);
+
+    var $$number_formatter_settings_formatter$$default = $$number_formatter_settings_formatter$$NumberFormatterSettingsFormatter;
 
     var stround$$modes = {
       CEILING: 0,
@@ -3170,7 +3383,39 @@
       }
     }
 
+    /**
+     * @param {string} string
+     * @param {string} currencySymbol
+     * @return {string}
+     * @private
+     */
+    function $$number_formatter$$replaceCurrencySymbol(string, currencySymbol) {
+      return string.replace(/¤/g, currencySymbol);
+    }
+
+    /**
+     * @param {string} string
+     * @param {string} plusSign
+     * @returns {string}
+     * @private
+     */
+    function $$number_formatter$$replacePlusSign(string, plusSign) {
+      return string.replace(/\+/g, plusSign);
+    }
+
+    /**
+     * @param {string} string
+     * @param {string} minusSign
+     * @returns {string}
+     * @private
+     */
+    function $$number_formatter$$replaceMinusSign(string, minusSign) {
+      return string.replace(/-/g, minusSign);
+    }
+
     var $$number_formatter$$NumberFormatter = function($__super) {
+      "use strict";
+
       function NumberFormatter() {
         $$number_formatter$$$__Object$getPrototypeOf(NumberFormatter.prototype).constructor.call(this);
         this._locale = 'en';
@@ -3590,6 +3835,40 @@
         writable: true
       });
 
+      $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "negativeFormat", {
+        value: function() {
+          return this.numberFormatFormatter().format({
+            alwaysShowsDecimalSeparator: this.alwaysShowsDecimalSeparator(),
+            groupingSize: this.groupingSize(),
+            maximumFractionDigits: this.maximumFractionDigits(),
+            minimumFractionDigits: this.minimumFractionDigits(),
+            minimumIntegerDigits: this.minimumIntegerDigits(),
+            prefix: this._get('negativePrefix'),
+            suffix: this._get('negativeSuffix'),
+            usesGroupingSeparator: this.usesGroupingSeparator()
+          });
+        },
+
+        enumerable: false,
+        writable: true
+      });
+
+      $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "setNegativeFormat", {
+        value: function(negativeFormat) {
+          var settings = this.numberFormatFormatter().parse(negativeFormat);
+          this.setNegativePrefix(settings.prefix);
+          this.setNegativeSuffix(settings.suffix);
+          this.setGroupingSize(settings.groupingSize);
+          this.setMaximumFractionDigits(settings.maximumFractionDigits);
+          this.setMinimumFractionDigits(settings.minimumFractionDigits);
+          this.setMinimumIntegerDigits(settings.minimumIntegerDigits);
+          this.setUsesGroupingSeparator(settings.usesGroupingSeparator);
+        },
+
+        enumerable: false,
+        writable: true
+      });
+
       $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "negativeInfinitySymbol", {
         value: function() {
           return this._get('negativeInfinitySymbol');
@@ -3611,7 +3890,13 @@
 
       $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "negativePrefix", {
         value: function() {
-          return this._get('negativePrefix');
+          return $$number_formatter$$replaceCurrencySymbol(
+            $$number_formatter$$replaceMinusSign(
+              this._get('negativePrefix'),
+              this._get('minusSign')
+            ),
+            this.currencySymbol()
+          );
         },
 
         enumerable: false,
@@ -3630,7 +3915,13 @@
 
       $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "negativeSuffix", {
         value: function() {
-          return this._get('negativeSuffix');
+          return $$number_formatter$$replaceCurrencySymbol(
+            $$number_formatter$$replaceMinusSign(
+              this._get('negativeSuffix'),
+              this._get('minusSign')
+            ),
+            this.currencySymbol()
+          );
         },
 
         enumerable: false,
@@ -3679,6 +3970,18 @@
         value: function(nullSymbol) {
           this._nullSymbol = nullSymbol;
           return this;
+        },
+
+        enumerable: false,
+        writable: true
+      });
+
+      $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "numberFormatFormatter", {
+        value: function() {
+          if (!this._numberFormatFormatter) {
+            this._numberFormatFormatter = new $$number_formatter_settings_formatter$$default();
+          }
+          return this._numberFormatFormatter;
         },
 
         enumerable: false,
@@ -3755,6 +4058,40 @@
         writable: true
       });
 
+      $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "positiveFormat", {
+        value: function() {
+          return this.numberFormatFormatter().format({
+            alwaysShowsDecimalSeparator: this.alwaysShowsDecimalSeparator(),
+            groupingSize: this.groupingSize(),
+            maximumFractionDigits: this.maximumFractionDigits(),
+            minimumFractionDigits: this.minimumFractionDigits(),
+            minimumIntegerDigits: this.minimumIntegerDigits(),
+            prefix: this._get('positivePrefix'),
+            suffix: this._get('positiveSuffix'),
+            usesGroupingSeparator: this.usesGroupingSeparator()
+          });
+        },
+
+        enumerable: false,
+        writable: true
+      });
+
+      $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "setPositiveFormat", {
+        value: function(positiveFormat) {
+          var settings = this.numberFormatFormatter().parse(positiveFormat);
+          this.setPositivePrefix(settings.prefix);
+          this.setPositiveSuffix(settings.suffix);
+          this.setGroupingSize(settings.groupingSize);
+          this.setMaximumFractionDigits(settings.maximumFractionDigits);
+          this.setMinimumFractionDigits(settings.minimumFractionDigits);
+          this.setMinimumIntegerDigits(settings.minimumIntegerDigits);
+          this.setUsesGroupingSeparator(settings.usesGroupingSeparator);
+        },
+
+        enumerable: false,
+        writable: true
+      });
+
       $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "positiveInfinitySymbol", {
         value: function() {
           return this._get('positiveInfinitySymbol');
@@ -3776,7 +4113,13 @@
 
       $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "positivePrefix", {
         value: function() {
-          return this._get('positivePrefix');
+          return $$number_formatter$$replaceCurrencySymbol(
+            $$number_formatter$$replacePlusSign(
+              this._get('positivePrefix'),
+              this._get('plusSign')
+            ),
+            this.currencySymbol()
+          );
         },
 
         enumerable: false,
@@ -3795,7 +4138,13 @@
 
       $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "positiveSuffix", {
         value: function() {
-          return this._get('positiveSuffix');
+          return $$number_formatter$$replaceCurrencySymbol(
+            $$number_formatter$$replacePlusSign(
+              this._get('positiveSuffix'),
+              this._get('plusSign')
+            ),
+            this.currencySymbol()
+          );
         },
 
         enumerable: false,
@@ -4399,6 +4748,14 @@
     };
 
     /**
+     * Contains the default values for various number formatter settings, including
+     * per-locale overrides. Some of these characters will not be used as-is and
+     * instead serve as placeholders:
+     *
+     *   "¤"  placeholder for `currencySymbol()`.
+     *   "-"  placeholder for `minusSign()`.
+     *   "+"  placeholder for `plusSign()`.
+     *
      * @namespace LocaleDefaults
      */
     var $$number_formatter$$LocaleDefaults = {
@@ -4409,30 +4766,20 @@
         groupingSeparator: ',',
         groupingSize: 3,
         minusSign: '-',
-        negativeInfinitySymbol: function(formatter) {
-          return formatter.minusSign() + '∞';
-        },
-        negativePrefix: function(formatter) {
-          return formatter.minusSign();
-        },
+        negativeInfinitySymbol: '-∞',
+        negativePrefix: '-',
         negativeSuffix: '',
         notANumberSymbol: 'NaN',
         nullSymbol: '',
         percentSymbol: '%',
-        positiveInfinitySymbol: function(formatter) {
-          return formatter.plusSign() + '∞';
-        },
+        positiveInfinitySymbol: '+∞',
         positivePrefix: '',
         positiveSuffix: '',
         plusSign: '+',
         roundingMode: $$number_formatter$$NumberFormatter.Rounding.HALF_EVEN,
-        positiveCurrencyPrefix: function(formatter) {
-          return formatter.currencySymbol();
-        },
+        positiveCurrencyPrefix: '¤',
         positiveCurrencySuffix: '',
-        negativeCurrencyPrefix: function(formatter) {
-          return '(' + formatter.currencySymbol();
-        },
+        negativeCurrencyPrefix: '(¤',
         negativeCurrencySuffix: ')'
       },
       fr: {
@@ -4440,24 +4787,16 @@
         groupingSeparator: ' ',
         percentSymbol: ' %',
         positiveCurrencyPrefix: '',
-        positiveCurrencySuffix: function(formatter) {
-          return ' ' + formatter.currencySymbol();
-        },
+        positiveCurrencySuffix: ' ¤',
         negativeCurrencyPrefix: '(',
-        negativeCurrencySuffix: function(formatter) {
-          return ' ' + formatter.currencySymbol() + ')';
-        }
+        negativeCurrencySuffix: ' ¤)'
       },
       ja: {
-        negativeCurrencyPrefix: function(formatter) {
-          return formatter.minusSign() + formatter.currencySymbol();
-        },
+        negativeCurrencyPrefix: '-¤',
         negativeCurrencySuffix: ''
       },
       'en-GB': {
-        negativeCurrencyPrefix: function(formatter) {
-          return formatter.minusSign() + formatter.currencySymbol();
-        },
+        negativeCurrencyPrefix: '-¤',
         negativeCurrencySuffix: ''
       }
     };
@@ -4577,6 +4916,8 @@
     var $$phone_formatter$$DELIMITER_PATTERN = /[-\(\) ]/g;
 
     var $$phone_formatter$$PhoneFormatter = function($__super) {
+      "use strict";
+
       function PhoneFormatter() {
         var args = [].slice.call(arguments, 0);
 
@@ -4766,6 +5107,8 @@
     var $$social_security_number_formatter$$DIGITS_PATTERN = /^\d*$/;
 
     var $$social_security_number_formatter$$SocialSecurityNumberFormatter = function($__super) {
+      "use strict";
+
       function SocialSecurityNumberFormatter() {
         $$social_security_number_formatter$$$__Object$getPrototypeOf(SocialSecurityNumberFormatter.prototype).constructor.call(this, '-');
         this.maximumLength = 9 + 2;
@@ -4828,6 +5171,7 @@
       ExpiryDateFormatter: $$expiry_date_formatter$$default,
       Formatter: $$formatter$$default,
       NumberFormatter: $$number_formatter$$default,
+      NumberFormatterSettingsFormatter: $$number_formatter_settings_formatter$$default,
       PhoneFormatter: $$phone_formatter$$default,
       SocialSecurityNumberFormatter: $$social_security_number_formatter$$default,
       TextField: $$text_field$$default,
