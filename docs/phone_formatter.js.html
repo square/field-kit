@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: phone_formatter.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: phone_formatter.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*! jshint esnext:true, undef:true, unused:true */
+
+import DelimitedTextFormatter from './delimited_text_formatter';
+
+/**
+ * @const
+ * @private
+ */
+var NANPPhoneDelimiters = {
+  0: '(',
+  4: ')',
+  5: ' ',
+  9: '-'
+};
+
+/**
+ * @const
+ * @private
+ */
+var NANPPhoneDelimitersWithOne = {
+  1:  ' ',
+  2:  '(',
+  6:  ')',
+  7:  ' ',
+  11: '-'
+};
+
+/**
+ * @const
+ * @private
+ */
+var NANPPhoneDelimitersWithPlus = {
+  2:  ' ',
+  3:  '(',
+  7:  ')',
+  8:  ' ',
+  12: '-'
+};
+
+/**
+ * This should match any characters in the maps above.
+ *
+ * @const
+ * @private
+ */
+var DELIMITER_PATTERN = /[-\(\) ]/g;
+
+/**
+ * @extends DelimitedTextFormatter
+ */
+class PhoneFormatter extends DelimitedTextFormatter {
+  /**
+   * @throws {Error} if anything is passed in
+   * @param {Array} args
+   */
+  constructor(...args) {
+    if (args.length !== 0) {
+      throw new Error('were you trying to set a delimiter ('+args[0]+')?');
+    }
+  }
+
+  /**
+   * @param {string} chr
+   * @returns {boolean}
+   */
+  isDelimiter(chr) {
+    var map = this.delimiterMap;
+    for (var index in map) {
+      if (map.hasOwnProperty(index)) {
+        if (map[index] === chr) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * @param {number} index
+   * @returns {?string}
+   */
+  delimiterAt(index) {
+    return this.delimiterMap[index];
+  }
+
+  /**
+   * @param {number} index
+   * @returns {boolean}
+   */
+  hasDelimiterAtIndex(index) {
+    var delimiter = this.delimiterAt(index);
+    return delimiter !== undefined &amp;&amp; delimiter !== null;
+  }
+
+  /**
+   * Will call parse on the formatter.
+   *
+   * @param {string} text
+   * @param {function(string)} error
+   * @returns {string} returns value with delimiters removed
+   */
+  parse(text, error) {
+    if (!error) { error = function(){}; }
+    var digits = this.digitsWithoutCountryCode(text);
+    // Source: http://en.wikipedia.org/wiki/North_American_Numbering_Plan
+    //
+    // Area Code
+    if (text.length &lt; 10) {
+      error('phone-formatter.number-too-short');
+    }
+    if (digits[0] === '0') {
+      error('phone-formatter.area-code-zero');
+    }
+    if (digits[0] === '1') {
+      error('phone-formatter.area-code-one');
+    }
+    if (digits[1] === '9') {
+      error('phone-formatter.area-code-n9n');
+    }
+    // Central Office Code
+    if (digits[3] === '1') {
+      error('phone-formatter.central-office-one');
+    }
+    if (digits.slice(4, 6) === '11') {
+      error('phone-formatter.central-office-n11');
+    }
+    return super(text, error);
+  }
+
+  /**
+   * @param {string} value
+   * @returns {string}
+   */
+  format(value) {
+    this.guessFormatFromText(value);
+    return super(this.removeDelimiterMapChars(value));
+  }
+
+  /**
+   * Determines whether the given change should be allowed and, if so, whether
+   * it should be altered.
+   *
+   * @param {TextFieldStateChange} change
+   * @param {function(string)} error
+   * @returns {boolean}
+   */
+  isChangeValid(change, error) {
+    this.guessFormatFromText(change.proposed.text);
+
+    if (change.inserted.text.length > 1) {
+      // handle pastes
+      var text = change.current.text;
+      var selectedRange = change.current.selectedRange;
+      var toInsert = change.inserted.text;
+
+      // Replace the selection with the new text, remove non-digits, then format.
+      var formatted = this.format((
+        text.slice(0, selectedRange.start) +
+        toInsert +
+        text.slice(selectedRange.start+selectedRange.length)
+      ).replace(/[^\d]/g, ''));
+
+      change.proposed = {
+        text: formatted,
+        selectedRange: {
+          start: formatted.length - (text.length - (selectedRange.start + selectedRange.length)),
+          length: 0
+        }
+      };
+
+      return super(change, error);
+    }
+
+    if (/^\d*$/.test(change.inserted.text) || change.proposed.text.indexOf('+') === 0) {
+      return super(change, error);
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Re-configures this formatter to use the delimiters appropriate
+   * for the given text.
+   *
+   * @param {string} text A potentially formatted string containing a phone number.
+   * @private
+   */
+  guessFormatFromText(text) {
+    if (text &amp;&amp; text[0] === '+') {
+      this.delimiterMap = NANPPhoneDelimitersWithPlus;
+      this.maximumLength = 1 + 1 + 10 + 5;
+    } else if (text &amp;&amp; text[0] === '1') {
+      this.delimiterMap = NANPPhoneDelimitersWithOne;
+      this.maximumLength = 1 + 10 + 5;
+    } else {
+      this.delimiterMap = NANPPhoneDelimiters;
+      this.maximumLength = 10 + 4;
+    }
+  }
+
+  /**
+   * Gives back just the phone number digits as a string without the
+   * country code. Future-proofing internationalization where the country code
+   * isn't just +1.
+   *
+   * @param {string} text
+   * @private
+   */
+  digitsWithoutCountryCode(text) {
+    var digits = (text || '').replace(/[^\d]/g, '');
+    var extraDigits = digits.length - 10;
+    if (extraDigits > 0) {
+      digits = digits.substr(extraDigits);
+    }
+    return digits;
+  }
+
+  /**
+   * Removes characters from the phone number that will be added
+   * by the formatter.
+   *
+   * @param {string} text
+   * @private
+   */
+  removeDelimiterMapChars(text) {
+    return (text || '').replace(DELIMITER_PATTERN, '');
+  }
+}
+
+export default PhoneFormatter;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="AdaptiveCardFormatter.html">AdaptiveCardFormatter</a></li><li><a href="AmexCardFormatter.html">AmexCardFormatter</a></li><li><a href="CardTextField.html">CardTextField</a></li><li><a href="DefaultCardFormatter.html">DefaultCardFormatter</a></li><li><a href="DelimitedTextFormatter.html">DelimitedTextFormatter</a></li><li><a href="ExpiryDateField.html">ExpiryDateField</a></li><li><a href="ExpiryDateFormatter.html">ExpiryDateFormatter</a></li><li><a href="Formatter.html">Formatter</a></li><li><a href="NumberFormatter.html">NumberFormatter</a></li><li><a href="PhoneFormatter.html">PhoneFormatter</a></li><li><a href="SocialSecurityNumberFormatter.html">SocialSecurityNumberFormatter</a></li><li><a href="TextField.html">TextField</a></li><li><a href="UndoManager.html">UndoManager</a></li></ul><h3>Namespaces</h3><ul><li><a href="CurrencyDefaults.html">CurrencyDefaults</a></li><li><a href="FieldKit.html">FieldKit</a></li><li><a href="KEYS.html">KEYS</a></li><li><a href="LocaleDefaults.html">LocaleDefaults</a></li><li><a href="RegionDefaults.html">RegionDefaults</a></li><li><a href="StyleDefaults.html">StyleDefaults</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Affinity">Affinity</a></li><li><a href="global.html#CardMaskStrategy">CardMaskStrategy</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a> on Thu Sep 25 2014 09:51:09 GMT-0700 (PDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
