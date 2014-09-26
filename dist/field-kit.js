@@ -3,6 +3,7 @@
     var $$formatter$$$__Object$defineProperty = Object.defineProperty;
 
     var $$formatter$$Formatter = function() {
+      "use strict";
       function Formatter() {}
 
       $$formatter$$$__Object$defineProperty(Formatter.prototype, "format", {
@@ -63,9 +64,11 @@
     var $$delimited_text_formatter$$$__Object$create = Object.create;
 
     var $$delimited_text_formatter$$DelimitedTextFormatter = function($__super) {
-      function DelimitedTextFormatter(delimiter) {
+      "use strict";
+
+      function DelimitedTextFormatter() {
+        var delimiter = (arguments[0] !== void 0 ? arguments[0] : this.delimiter);
         var isLazy = (arguments[1] !== void 0 ? arguments[1] : false);
-        if (!delimiter) { delimiter = this.delimiter; }
 
         if (delimiter === null || delimiter === undefined || delimiter.length !== 1) {
           throw new Error('delimiter must have just one character');
@@ -358,6 +361,8 @@
     var $$default_card_formatter$$$__Object$create = Object.create;
 
     var $$default_card_formatter$$DefaultCardFormatter = function($__super) {
+      "use strict";
+
       function DefaultCardFormatter() {
         $$default_card_formatter$$$__Object$getPrototypeOf(DefaultCardFormatter.prototype).constructor.call(this, ' ');
       }
@@ -405,19 +410,31 @@
         writable: true
       });
 
+      $$default_card_formatter$$$__Object$defineProperty(DefaultCardFormatter.prototype, "maximumLength", {
+        get: function() {
+          return 16 + 3;
+        },
+
+        enumerable: true,
+        configurable: true
+      });
+
       return DefaultCardFormatter;
     }($$delimited_text_formatter$$default);
 
-    $$default_card_formatter$$DefaultCardFormatter.prototype.maximumLength = 16 + 3;
     var $$default_card_formatter$$default = $$default_card_formatter$$DefaultCardFormatter;
-    var $$amex_card_formatter$$$__Object$getPrototypeOf = Object.getPrototypeOf;
     var $$amex_card_formatter$$$__Object$defineProperty = Object.defineProperty;
     var $$amex_card_formatter$$$__Object$create = Object.create;
+    var $$amex_card_formatter$$$__Object$getPrototypeOf = Object.getPrototypeOf;
 
     var $$amex_card_formatter$$AmexCardFormatter = function($__super) {
+     "use strict";
+
      function AmexCardFormatter() {
-       $$amex_card_formatter$$$__Object$getPrototypeOf(AmexCardFormatter.prototype).constructor.call(this);
-       this.maximumLength = 15 + 2;
+      var $__0 = $$amex_card_formatter$$$__Object$getPrototypeOf(AmexCardFormatter.prototype);
+
+      if ($__0 !== null)
+       $__0.constructor.apply(this, arguments);
      }
 
      AmexCardFormatter.__proto__ = ($__super !== null ? $__super : Function.prototype);
@@ -436,6 +453,15 @@
       writable: true
      });
 
+     $$amex_card_formatter$$$__Object$defineProperty(AmexCardFormatter.prototype, "maximumLength", {
+      get: function() {
+        return 15 + 2;
+      },
+
+      enumerable: true,
+      configurable: true
+     });
+
      return AmexCardFormatter;
     }($$default_card_formatter$$default);
 
@@ -443,9 +469,14 @@
     var $$adaptive_card_formatter$$$__Object$defineProperty = Object.defineProperty;
 
     var $$adaptive_card_formatter$$AdaptiveCardFormatter = function() {
+      "use strict";
+
       function AdaptiveCardFormatter() {
+        /** @private */
         this.amexCardFormatter = new $$amex_card_formatter$$default();
+        /** @private */
         this.defaultCardFormatter = new $$default_card_formatter$$default();
+        /** @private */
         this.formatter = this.defaultCardFormatter;
       }
 
@@ -496,6 +527,11 @@
     var $$adaptive_card_formatter$$default = $$adaptive_card_formatter$$AdaptiveCardFormatter;
     var $$utils$$$__Array$prototype$slice = Array.prototype.slice;
     var $$utils$$DIGITS_PATTERN = /^\d*$/;
+
+    /**
+     * @const
+     * @private
+     */
     var $$utils$$SURROUNDING_SPACE_PATTERN = /(^\s+|\s+$)/;
 
     function $$utils$$isDigits(string) {
@@ -634,10 +670,16 @@
     var $$undo_manager$$$__Object$defineProperty = Object.defineProperty;
 
     var $$undo_manager$$UndoManager = function() {
+      "use strict";
+
       function UndoManager() {
+        /** @private */
         this._undos = [];
+        /** @private */
         this._redos = [];
+        /** @private */
         this._isUndoing = false;
+        /** @private */
         this._isRedoing = false;
       }
 
@@ -689,8 +731,6 @@
             }
             this._appendUndo.apply(this, [target, selector].concat($$undo_manager$$$__Array$prototype$slice.call(args)));
           }
-
-          return null;
         },
 
         enumerable: false,
@@ -757,7 +797,6 @@
           this._isRedoing = true;
           target[selector].apply(target, args);
           this._isRedoing = false;
-          return null;
         },
 
         enumerable: false,
@@ -802,17 +841,41 @@
     var $$keybindings$$$__Array$prototype$slice = Array.prototype.slice;
     var $$keybindings$$$__Object$defineProperty = Object.defineProperty;
     var $$keybindings$$A = 65;
+
+    /** @private */
     var $$keybindings$$Y = 89;
+
+    /** @private */
     var $$keybindings$$Z = 90;
+
+    /** @private */
     var $$keybindings$$ZERO = 48;
+
+    /** @private */
     var $$keybindings$$NINE = 57;
+
+    /** @private */
     var $$keybindings$$LEFT = 37;
+
+    /** @private */
     var $$keybindings$$RIGHT = 39;
+
+    /** @private */
     var $$keybindings$$UP = 38;
+
+    /** @private */
     var $$keybindings$$DOWN = 40;
+
+    /** @private */
     var $$keybindings$$BACKSPACE = 8;
+
+    /** @private */
     var $$keybindings$$DELETE = 46;
+
+    /** @private */
     var $$keybindings$$TAB = 9;
+
+    /** @private */
     var $$keybindings$$ENTER = 13;
 
     var $$keybindings$$KEYS = {
@@ -831,8 +894,8 @@
       ENTER: $$keybindings$$ENTER,
 
       /**
-       * @param {Number} keyCode
-       * @returns {Boolean}
+       * @param {number} keyCode
+       * @returns {boolean}
        */
       isDigit: function(keyCode) {
         return $$keybindings$$ZERO <= keyCode && keyCode <= $$keybindings$$NINE;
@@ -841,8 +904,8 @@
       /**
        * Is an arrow keyCode.
        *
-       * @param {Number} keyCode
-       * @returns {Boolean}
+       * @param {number} keyCode
+       * @returns {boolean}
        */
       isDirectional: function(keyCode) {
         return keyCode === $$keybindings$$LEFT || keyCode === $$keybindings$$RIGHT || keyCode === $$keybindings$$UP || keyCode === $$keybindings$$DOWN;
@@ -860,7 +923,7 @@
       var ctrl = osx ? $$keybindings$$META : $$keybindings$$CTRL;
 
       if (!$$keybindings$$cache[platform]) {
-        $$keybindings$$cache[platform] = $$keybindings$$build(platform, function(bind) {
+        $$keybindings$$cache[platform] = $$keybindings$$build(function(bind) {
           bind($$keybindings$$A         , ctrl       , 'selectAll');
           bind($$keybindings$$LEFT      , null       , 'moveLeft');
           bind($$keybindings$$LEFT      , $$keybindings$$ALT        , 'moveWordLeft');
@@ -912,8 +975,8 @@
       return $$keybindings$$cache[platform];
     }
 
-    function $$keybindings$$build(platform, callback) {
-      var result = new $$keybindings$$BindingSet(platform);
+    function $$keybindings$$build(callback) {
+      var result = new $$keybindings$$BindingSet();
       callback(function() {
         var $__0;
         var args = [].slice.call(arguments, 0);
@@ -923,8 +986,9 @@
     }
 
     var $$keybindings$$BindingSet = function() {
-      function BindingSet(platform) {
-        this.platform = platform;
+      "use strict";
+
+      function BindingSet() {
         this.bindings = {};
       }
 
@@ -962,8 +1026,9 @@
     var $$text_field$$$__Object$defineProperty = Object.defineProperty;
 
     /**
-     * Enum for Affinity values.
-     * @readonly
+     * Enum for text direction affinity.
+     *
+     * @const
      * @enum {number}
      */
     var $$text_field$$Affinity = {
@@ -975,8 +1040,9 @@
     /**
      * Tests is string passed in is a single word.
      *
-     * @param {String} chr
-     * @returns {Boolean}
+     * @param {string} chr
+     * @returns {boolean}
+     * @private
      */
     function $$text_field$$isWordChar(chr) {
       return chr && /^\w$/.test(chr);
@@ -986,9 +1052,10 @@
      * Checks if char to the left of {index} in {string}
      * is a break (non-char).
      *
-     * @param {String} text
-     * @param {Number} index
-     * @returns {Boolean}
+     * @param {string} text
+     * @param {number} index
+     * @returns {boolean}
+     * @private
      */
     function $$text_field$$hasLeftWordBreakAtIndex(text, index) {
       if (index === 0) {
@@ -1002,9 +1069,10 @@
      * Checks if char to the right of {index} in {string}
      * is a break (non-char).
      *
-     * @param {String} text
-     * @param {Number} index
-     * @returns {Boolean}
+     * @param {string} text
+     * @param {number} index
+     * @returns {boolean}
+     * @private
      */
     function $$text_field$$hasRightWordBreakAtIndex(text, index) {
       if (index === text.length) {
@@ -1015,6 +1083,8 @@
     }
 
     var $$text_field$$TextField = function() {
+      "use strict";
+
       function TextField(element, formatter) {
         if (typeof element.get === 'function') {
           console.warn(
@@ -1061,6 +1131,8 @@
          * to place inserted characters in the wrong place
          * Expected: 1234 5678|  =>  1234 5678 9|
          * Bug: 1234 5678|  =>  1234 5679| 8
+         *
+         * @private
          */
         this._needsManualCaret = window.navigator.userAgent.toLowerCase().indexOf('android') > -1;
 
@@ -1163,7 +1235,6 @@
       $$text_field$$$__Object$defineProperty(TextField.prototype, "setDelegate", {
         value: function(delegate) {
           this._delegate = delegate;
-          return null;
         },
 
         enumerable: false,
@@ -1278,7 +1349,6 @@
           element.removeEventListener('focus', this._focus);
           element.removeEventListener('blur', this._blur);
           delete element['field-kit-text-field'];
-          return null;
         },
 
         enumerable: false,
@@ -1946,7 +2016,7 @@
             case $$text_field$$Affinity.DOWNSTREAM:
               return range.start;
             default:
-              return null;
+              return $$text_field$$Affinity.NONE;
           }
         },
 
@@ -2069,8 +2139,8 @@
       });
 
       $$text_field$$$__Object$defineProperty(TextField.prototype, "setDisabledPlaceholder", {
-        value: function(_disabledPlaceholder) {
-          this._disabledPlaceholder = _disabledPlaceholder;
+        value: function(disabledPlaceholder) {
+          this._disabledPlaceholder = disabledPlaceholder;
           this._syncPlaceholder();
         },
 
@@ -2088,8 +2158,8 @@
       });
 
       $$text_field$$$__Object$defineProperty(TextField.prototype, "setFocusedPlaceholder", {
-        value: function(_focusedPlaceholder) {
-          this._focusedPlaceholder = _focusedPlaceholder;
+        value: function(focusedPlaceholder) {
+          this._focusedPlaceholder = focusedPlaceholder;
           this._syncPlaceholder();
         },
 
@@ -2107,8 +2177,8 @@
       });
 
       $$text_field$$$__Object$defineProperty(TextField.prototype, "setPlaceholder", {
-        value: function(_placeholder) {
-          this._placeholder = _placeholder;
+        value: function(placeholder) {
+          this._placeholder = placeholder;
           this.element.setAttribute('placeholder', this._placeholder);
         },
 
@@ -2126,8 +2196,8 @@
       });
 
       $$text_field$$$__Object$defineProperty(TextField.prototype, "setUnfocusedPlaceholder", {
-        value: function(_unfocusedPlaceholder) {
-          this._unfocusedPlaceholder = _unfocusedPlaceholder;
+        value: function(unfocusedPlaceholder) {
+          this._unfocusedPlaceholder = unfocusedPlaceholder;
           this._syncPlaceholder();
         },
 
@@ -2370,6 +2440,8 @@
     }();
 
     var $$text_field$$TextFieldStateChange = function() {
+      "use strict";
+
       function TextFieldStateChange(field) {
         this.field = field;
       }
@@ -2436,7 +2508,6 @@
               text: ''
             };
           }
-          return null;
         },
 
         enumerable: false,
@@ -2450,7 +2521,7 @@
      * Builds a new {TextFieldStateChange} that will allow you to
      * compute differences, and see the current vs proposed changes.
      *
-     * @param {FieldKitField} field
+     * @param {TextField} field
      * @param {Function} callback called when you want changes to the field
      *    take place. Current will be calculated before this callback.
      *    Proposed will be calculated after this callback.
@@ -2478,7 +2549,8 @@
     var $$card_text_field$$$__Object$create = Object.create;
 
     /**
-     * Enum for Affinity values.
+     * Enum for card mask strategies.
+     *
      * @readonly
      * @enum {number}
      */
@@ -2488,17 +2560,23 @@
     };
 
     var $$card_text_field$$CardTextField = function($__super) {
+      "use strict";
+
       function CardTextField(element) {
         $$card_text_field$$$__Object$getPrototypeOf(CardTextField.prototype).constructor.call(this, element, new $$adaptive_card_formatter$$default());
         this.setCardMaskStrategy($$card_text_field$$CardMaskStrategy.None);
 
         /**
          * Whether we are currently masking the displayed text.
+         *
+         * @private
          */
         this._masked = false;
 
         /**
          * Whether we are currently editing.
+         *
+         * @private
          */
         this._editing = false;
       }
@@ -2534,8 +2612,6 @@
             this._cardMaskStrategy = cardMaskStrategy;
             this._syncMask();
           }
-
-          return null;
         },
 
         enumerable: false,
@@ -2642,10 +2718,18 @@
         writable: true
       });
 
+      $$card_text_field$$$__Object$defineProperty(CardTextField, "CardMaskStrategy", {
+        get: function() {
+          return $$card_text_field$$CardMaskStrategy;
+        },
+
+        enumerable: true,
+        configurable: true
+      });
+
       return CardTextField;
     }($$text_field$$default);
 
-    $$card_text_field$$CardTextField.CardMaskStrategy = $$card_text_field$$CardMaskStrategy;
     var $$card_text_field$$default = $$card_text_field$$CardTextField;
     var $$expiry_date_formatter$$$__Object$getPrototypeOf = Object.getPrototypeOf;
     var $$expiry_date_formatter$$$__Object$defineProperty = Object.defineProperty;
@@ -2655,12 +2739,13 @@
      * Give this function a 2 digit year it'll return with 4.
      *
      * @example
-     *   interpretTwoDigitYear(15);
-     *   // => 2015
-     *   interpretTwoDigitYear(97);
-     *   // => 1997
-     * @param {Number} year
-     * @returns {Number}
+     *     interpretTwoDigitYear(15);
+     *     // => 2015
+     *     interpretTwoDigitYear(97);
+     *     // => 1997
+     * @param {number} year
+     * @returns {number}
+     * @private
      */
     function $$expiry_date_formatter$$interpretTwoDigitYear(year) {
       var thisYear = new Date().getFullYear();
@@ -2672,6 +2757,8 @@
     }
 
     var $$expiry_date_formatter$$ExpiryDateFormatter = function($__super) {
+      "use strict";
+
       function ExpiryDateFormatter() {
         $$expiry_date_formatter$$$__Object$getPrototypeOf(ExpiryDateFormatter.prototype).constructor.call(this, '/');
         this.maximumLength = 5;
@@ -2796,6 +2883,8 @@
     var $$expiry_date_field$$$__Object$create = Object.create;
 
     var $$expiry_date_field$$ExpiryDateField = function($__super) {
+      "use strict";
+
       function ExpiryDateField(element) {
         $$expiry_date_field$$$__Object$getPrototypeOf(ExpiryDateField.prototype).constructor.call(this, element, new $$expiry_date_formatter$$default());
       }
@@ -3075,8 +3164,9 @@
     var $$number_formatter$$DEFAULT_COUNTRY = 'US';
 
     /**
-     * @param {String} locale
+     * @param {string} locale
      * @returns {Object} {lang: lang, country: country}
+     * @private
      */
     function $$number_formatter$$splitLocaleComponents(locale) {
       var match = locale.match(/^([a-z][a-z])(?:[-_]([a-z][a-z]))?$/i);
@@ -3090,6 +3180,8 @@
     /**
      * This simple property getter assumes that properties will never be functions
      * and so attempts to run those functions using the given args.
+     *
+     * @private
      */
     function $$number_formatter$$get(object, key) {
       var args = [].slice.call(arguments, 2);
@@ -3105,6 +3197,8 @@
     }
 
     var $$number_formatter$$NumberFormatter = function($__super) {
+      "use strict";
+
       function NumberFormatter() {
         $$number_formatter$$$__Object$getPrototypeOf(NumberFormatter.prototype).constructor.call(this);
         this._locale = 'en';
@@ -4170,28 +4264,70 @@
      * Defaults
      */
 
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._allowsFloats = null;
 
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._alwaysShowsDecimalSeparator = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._countryCode = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._currencyCode = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._exponent = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._groupingSeparator = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._groupingSize = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._lenient = false;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._locale = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._internationalCurrencySymbol = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._maximumFractionDigits = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._minimumFractionDigits = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._maximumIntegerDigits = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._minimumIntegerDigits = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._maximum = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._minimum = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._notANumberSymbol = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._nullSymbol = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._numberStyle = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._roundingMode = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._usesGroupingSeparator = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._zeroSymbol = null;
 
     /**
@@ -4208,7 +4344,7 @@
     $$number_formatter$$NumberFormatter.Rounding = stround$$modes;
 
     /**
-     * @enum
+     * @enum {number}
      * @readonly
      */
     $$number_formatter$$NumberFormatter.Style = {
@@ -4388,10 +4524,8 @@
     var $$phone_formatter$$$__Object$create = Object.create;
 
     /**
-     * @enum
-     * @example
-     *   (415) 555-1212
-     * @readonly
+     * @const
+     * @private
      */
     var $$phone_formatter$$NANPPhoneDelimiters = {
       0: '(',
@@ -4401,10 +4535,8 @@
     };
 
     /**
-     * @enum
-     * @example
-     *  1 (415) 555-1212
-     * @readonly
+     * @const
+     * @private
      */
     var $$phone_formatter$$NANPPhoneDelimitersWithOne = {
       1:  ' ',
@@ -4415,10 +4547,8 @@
     };
 
     /**
-     * @enum
-     * @example
-     *  +1 (415) 555-1212
-     * @readonly
+     * @const
+     * @private
      */
     var $$phone_formatter$$NANPPhoneDelimitersWithPlus = {
       2:  ' ',
@@ -4428,10 +4558,17 @@
       12: '-'
     };
 
-    // This should match any characters in the maps above.
+    /**
+     * This should match any characters in the maps above.
+     *
+     * @const
+     * @private
+     */
     var $$phone_formatter$$DELIMITER_PATTERN = /[-\(\) ]/g;
 
     var $$phone_formatter$$PhoneFormatter = function($__super) {
+      "use strict";
+
       function PhoneFormatter() {
         var args = [].slice.call(arguments, 0);
 
@@ -4613,9 +4750,16 @@
     var $$social_security_number_formatter$$$__Object$getPrototypeOf = Object.getPrototypeOf;
     var $$social_security_number_formatter$$$__Object$defineProperty = Object.defineProperty;
     var $$social_security_number_formatter$$$__Object$create = Object.create;
+
+    /**
+     * @const
+     * @private
+     */
     var $$social_security_number_formatter$$DIGITS_PATTERN = /^\d*$/;
 
     var $$social_security_number_formatter$$SocialSecurityNumberFormatter = function($__super) {
+      "use strict";
+
       function SocialSecurityNumberFormatter() {
         $$social_security_number_formatter$$$__Object$getPrototypeOf(SocialSecurityNumberFormatter.prototype).constructor.call(this, '-');
         this.maximumLength = 9 + 2;
