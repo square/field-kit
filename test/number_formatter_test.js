@@ -1023,7 +1023,7 @@ describe('FieldKit.NumberFormatter', function() {
 
     it('leaves the currency symbol intact', function() {
       formatter.setNumberStyle(FieldKit.NumberFormatter.Style.CURRENCY);
-      expect(formatter.positiveFormat()).to.equal('¤#0.00');
+      expect(formatter.positiveFormat()).to.equal('¤#,##0.00');
     });
 
     it('updates the settings that affect it when set', function() {
