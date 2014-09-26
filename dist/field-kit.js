@@ -3,7 +3,6 @@
     var $$formatter$$$__Object$defineProperty = Object.defineProperty;
 
     var $$formatter$$Formatter = function() {
-      "use strict";
       function Formatter() {}
 
       $$formatter$$$__Object$defineProperty(Formatter.prototype, "format", {
@@ -64,8 +63,6 @@
     var $$delimited_text_formatter$$$__Object$create = Object.create;
 
     var $$delimited_text_formatter$$DelimitedTextFormatter = function($__super) {
-      "use strict";
-
       function DelimitedTextFormatter() {
         var delimiter = (arguments[0] !== void 0 ? arguments[0] : this.delimiter);
         var isLazy = (arguments[1] !== void 0 ? arguments[1] : false);
@@ -361,8 +358,6 @@
     var $$default_card_formatter$$$__Object$create = Object.create;
 
     var $$default_card_formatter$$DefaultCardFormatter = function($__super) {
-      "use strict";
-
       function DefaultCardFormatter() {
         $$default_card_formatter$$$__Object$getPrototypeOf(DefaultCardFormatter.prototype).constructor.call(this, ' ');
       }
@@ -415,8 +410,7 @@
           return 16 + 3;
         },
 
-        enumerable: true,
-        configurable: true
+        enumerable: false
       });
 
       return DefaultCardFormatter;
@@ -428,8 +422,6 @@
     var $$amex_card_formatter$$$__Object$getPrototypeOf = Object.getPrototypeOf;
 
     var $$amex_card_formatter$$AmexCardFormatter = function($__super) {
-     "use strict";
-
      function AmexCardFormatter() {
       var $__0 = $$amex_card_formatter$$$__Object$getPrototypeOf(AmexCardFormatter.prototype);
 
@@ -458,8 +450,7 @@
         return 15 + 2;
       },
 
-      enumerable: true,
-      configurable: true
+      enumerable: false
      });
 
      return AmexCardFormatter;
@@ -469,8 +460,6 @@
     var $$adaptive_card_formatter$$$__Object$defineProperty = Object.defineProperty;
 
     var $$adaptive_card_formatter$$AdaptiveCardFormatter = function() {
-      "use strict";
-
       function AdaptiveCardFormatter() {
         /** @private */
         this.amexCardFormatter = new $$amex_card_formatter$$default();
@@ -670,8 +659,6 @@
     var $$undo_manager$$$__Object$defineProperty = Object.defineProperty;
 
     var $$undo_manager$$UndoManager = function() {
-      "use strict";
-
       function UndoManager() {
         /** @private */
         this._undos = [];
@@ -986,8 +973,6 @@
     }
 
     var $$keybindings$$BindingSet = function() {
-      "use strict";
-
       function BindingSet() {
         this.bindings = {};
       }
@@ -1083,8 +1068,6 @@
     }
 
     var $$text_field$$TextField = function() {
-      "use strict";
-
       function TextField(element, formatter) {
         if (typeof element.get === 'function') {
           console.warn(
@@ -2440,8 +2423,6 @@
     }();
 
     var $$text_field$$TextFieldStateChange = function() {
-      "use strict";
-
       function TextFieldStateChange(field) {
         this.field = field;
       }
@@ -2560,8 +2541,6 @@
     };
 
     var $$card_text_field$$CardTextField = function($__super) {
-      "use strict";
-
       function CardTextField(element) {
         $$card_text_field$$$__Object$getPrototypeOf(CardTextField.prototype).constructor.call(this, element, new $$adaptive_card_formatter$$default());
         this.setCardMaskStrategy($$card_text_field$$CardMaskStrategy.None);
@@ -2718,13 +2697,12 @@
         writable: true
       });
 
-      $$card_text_field$$$__Object$defineProperty(CardTextField, "CardMaskStrategy", {
+      $$card_text_field$$$__Object$defineProperty(CardTextField.prototype, "CardMaskStrategy", {
         get: function() {
           return $$card_text_field$$CardMaskStrategy;
         },
 
-        enumerable: true,
-        configurable: true
+        enumerable: false
       });
 
       return CardTextField;
@@ -2757,8 +2735,6 @@
     }
 
     var $$expiry_date_formatter$$ExpiryDateFormatter = function($__super) {
-      "use strict";
-
       function ExpiryDateFormatter() {
         $$expiry_date_formatter$$$__Object$getPrototypeOf(ExpiryDateFormatter.prototype).constructor.call(this, '/');
         this.maximumLength = 5;
@@ -2883,8 +2859,6 @@
     var $$expiry_date_field$$$__Object$create = Object.create;
 
     var $$expiry_date_field$$ExpiryDateField = function($__super) {
-      "use strict";
-
       function ExpiryDateField(element) {
         $$expiry_date_field$$$__Object$getPrototypeOf(ExpiryDateField.prototype).constructor.call(this, element, new $$expiry_date_formatter$$default());
       }
@@ -3197,8 +3171,6 @@
     }
 
     var $$number_formatter$$NumberFormatter = function($__super) {
-      "use strict";
-
       function NumberFormatter() {
         $$number_formatter$$$__Object$getPrototypeOf(NumberFormatter.prototype).constructor.call(this);
         this._locale = 'en';
@@ -3336,6 +3308,25 @@
       $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "setDecimalSeparator", {
         value: function(decimalSeparator) {
           this._decimalSeparator = decimalSeparator;
+          return this;
+        },
+
+        enumerable: false,
+        writable: true
+      });
+
+      $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "exponent", {
+        value: function() {
+          return this._get('exponent');
+        },
+
+        enumerable: false,
+        writable: true
+      });
+
+      $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "setExponent", {
+        value: function(exponent) {
+          this._exponent = exponent;
           return this;
         },
 
@@ -3580,18 +3571,18 @@
         writable: true
       });
 
-      $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "exponent", {
+      $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "minusSign", {
         value: function() {
-          return this._get('exponent');
+          return this._get('minusSign');
         },
 
         enumerable: false,
         writable: true
       });
 
-      $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "setExponent", {
-        value: function(exponent) {
-          this._exponent = exponent;
+      $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "setMinusSign", {
+        value: function(minusSign) {
+          this._minusSign = minusSign;
           return this;
         },
 
@@ -3738,6 +3729,25 @@
       $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "setPercentSymbol", {
         value: function(percentSymbol) {
           this._percentSymbol = percentSymbol;
+          return this;
+        },
+
+        enumerable: false,
+        writable: true
+      });
+
+      $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "plusSign", {
+        value: function() {
+          return this._get('plusSign');
+        },
+
+        enumerable: false,
+        writable: true
+      });
+
+      $$number_formatter$$$__Object$defineProperty(NumberFormatter.prototype, "setPlusSign", {
+        value: function(plusSign) {
+          this._plusSign = plusSign;
           return this;
         },
 
@@ -4337,10 +4347,6 @@
     $$number_formatter$$NumberFormatter.prototype.stringFromNumber = $$number_formatter$$NumberFormatter.prototype.format;
 
     $$number_formatter$$NumberFormatter.prototype.numberFromString = $$number_formatter$$NumberFormatter.prototype.parse;
-    $$number_formatter$$NumberFormatter.prototype.minusSign = $$number_formatter$$NumberFormatter.prototype.negativePrefix;
-    $$number_formatter$$NumberFormatter.prototype.setMinusSign = $$number_formatter$$NumberFormatter.prototype.setNegativePrefix;
-    $$number_formatter$$NumberFormatter.prototype.plusSign = $$number_formatter$$NumberFormatter.prototype.positivePrefix;
-    $$number_formatter$$NumberFormatter.prototype.setPlusSign = $$number_formatter$$NumberFormatter.prototype.setPositivePrefix;
     $$number_formatter$$NumberFormatter.Rounding = stround$$modes;
 
     /**
@@ -4402,15 +4408,23 @@
         decimalSeparator: '.',
         groupingSeparator: ',',
         groupingSize: 3,
-        negativeInfinitySymbol: '-∞',
-        negativePrefix: '-',
+        minusSign: '-',
+        negativeInfinitySymbol: function(formatter) {
+          return formatter.minusSign() + '∞';
+        },
+        negativePrefix: function(formatter) {
+          return formatter.minusSign();
+        },
         negativeSuffix: '',
         notANumberSymbol: 'NaN',
         nullSymbol: '',
         percentSymbol: '%',
-        positiveInfinitySymbol: '+∞',
+        positiveInfinitySymbol: function(formatter) {
+          return formatter.plusSign() + '∞';
+        },
         positivePrefix: '',
         positiveSuffix: '',
+        plusSign: '+',
         roundingMode: $$number_formatter$$NumberFormatter.Rounding.HALF_EVEN,
         positiveCurrencyPrefix: function(formatter) {
           return formatter.currencySymbol();
@@ -4419,9 +4433,7 @@
         negativeCurrencyPrefix: function(formatter) {
           return '(' + formatter.currencySymbol();
         },
-        negativeCurrencySuffix: function() {
-          return ')';
-        }
+        negativeCurrencySuffix: ')'
       },
       fr: {
         decimalSeparator: ',',
@@ -4431,22 +4443,20 @@
         positiveCurrencySuffix: function(formatter) {
           return ' ' + formatter.currencySymbol();
         },
-        negativeCurrencyPrefix: function() {
-          return '(';
-        },
+        negativeCurrencyPrefix: '(',
         negativeCurrencySuffix: function(formatter) {
           return ' ' + formatter.currencySymbol() + ')';
         }
       },
       ja: {
         negativeCurrencyPrefix: function(formatter) {
-          return '-' + formatter.currencySymbol();
+          return formatter.minusSign() + formatter.currencySymbol();
         },
         negativeCurrencySuffix: ''
       },
       'en-GB': {
         negativeCurrencyPrefix: function(formatter) {
-          return '-' + formatter.currencySymbol();
+          return formatter.minusSign() + formatter.currencySymbol();
         },
         negativeCurrencySuffix: ''
       }
@@ -4567,8 +4577,6 @@
     var $$phone_formatter$$DELIMITER_PATTERN = /[-\(\) ]/g;
 
     var $$phone_formatter$$PhoneFormatter = function($__super) {
-      "use strict";
-
       function PhoneFormatter() {
         var args = [].slice.call(arguments, 0);
 
@@ -4758,8 +4766,6 @@
     var $$social_security_number_formatter$$DIGITS_PATTERN = /^\d*$/;
 
     var $$social_security_number_formatter$$SocialSecurityNumberFormatter = function($__super) {
-      "use strict";
-
       function SocialSecurityNumberFormatter() {
         $$social_security_number_formatter$$$__Object$getPrototypeOf(SocialSecurityNumberFormatter.prototype).constructor.call(this, '-');
         this.maximumLength = 9 + 2;
