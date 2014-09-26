@@ -1030,6 +1030,7 @@
      *
      * @const
      * @enum {number}
+     * @private
      */
     var $$text_field$$Affinity = {
       UPSTREAM: 0,
@@ -2553,6 +2554,7 @@
      *
      * @readonly
      * @enum {number}
+     * @private
      */
     var $$card_text_field$$CardMaskStrategy = {
       None: 'None',
@@ -2954,21 +2956,34 @@
      * @param {string} character
      * @param {number} length
      * @returns {string}
+     * @private
      */
     function $$number_formatter_settings_formatter$$chars(character, length) {
       return new Array(length + 1).join(character);
     }
 
-    /** @const */
+    /**
+     * @const
+     * @private
+     */
     var $$number_formatter_settings_formatter$$DIGIT = '#';
 
-    /** @const */
+    /**
+     * @const
+     * @private
+     */
     var $$number_formatter_settings_formatter$$PADDING = '0';
 
-    /** @const */
+    /**
+     * @const
+     * @private
+     */
     var $$number_formatter_settings_formatter$$DECIMAL_SEPARATOR = '.';
 
-    /** @const */
+    /**
+     * @const
+     * @private
+     */
     var $$number_formatter_settings_formatter$$GROUPING_SEPARATOR = ',';
 
     var $$number_formatter_settings_formatter$$NumberFormatterSettingsFormatter = function($__super) {
@@ -2998,6 +3013,16 @@
           }
 
           result = $$number_formatter_settings_formatter$$DIGIT + result;
+
+          if (settings.usesGroupingSeparator) {
+            while (result.length <= settings.groupingSize) {
+              result = $$number_formatter_settings_formatter$$DIGIT + result;
+            }
+
+            result = result.slice(0, -settings.groupingSize) +
+              $$number_formatter_settings_formatter$$GROUPING_SEPARATOR +
+              result.slice(-settings.groupingSize);
+          }
 
           var minimumFractionDigits = settings.minimumFractionDigits;
           var maximumFractionDigits = settings.maximumFractionDigits;
@@ -3418,7 +3443,6 @@
 
       function NumberFormatter() {
         $$number_formatter$$$__Object$getPrototypeOf(NumberFormatter.prototype).constructor.call(this);
-        this._locale = 'en';
         this.setNumberStyle($$number_formatter$$NONE);
       }
 

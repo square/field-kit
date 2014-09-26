@@ -49,6 +49,15 @@
 <dd>
 
     
+    <div class="description">
+        Formats and parses numbers. There are many configuration options for how to
+format numbers as strings, but for many users simply adjusting the
+<a href="NumberFormatter.html#numberStyle">NumberFormatter#numberStyle</a>, <a href="NumberFormatter.html#locale">NumberFormatter#locale</a>,
+<a href="NumberFormatter.html#currencyCode">NumberFormatter#currencyCode</a>, and <a href="NumberFormatter.html#countryCode">NumberFormatter#countryCode</a>
+values will be sufficient. NumberFormatter natively understands how to
+format numbers, currencies, and percentages for a variety of locales.
+    </div>
+    
 
     
 
@@ -86,7 +95,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line83">line 83</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line136">line 136</a>
     </li></ul></dd>
     
 
@@ -109,6 +118,57 @@
     
 
     
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>// Configure a NumberFormatter to display currencies.
+var f = new FieldKit.NumberFormatter();
+f.setNumberStyle(FieldKit.NumberFormatter.Style.CURRENCY);
+
+// Configure the current locale info.
+f.setLocale('en-US');
+f.setCountryCode('US');
+f.setCurrencyCode('USD');
+
+// Showing USD in US uses abbreviated currency.
+f.format(6.17);  // '$6.17'
+
+// Showing CAD in US uses fully-qualified currency.
+f.setCurrencyCode('CAD');
+f.format(6.17);  // 'CA$6.17'
+
+// Showing CAD in CA again uses abbreviated currency.
+f.setLocale('en-CA');
+f.setCountryCode('CA');
+f.format(6.17);  // '$6.17'
+
+// Showing CAD in CA to a French speaker uses correct formatting.
+f.setLocale('fr-CA');
+f.format(6.17);  // '6,17 $'
+
+// You may customize the behavior of NumberFormatter to achieve whatever
+// number formatting you need using the setter methods for the various
+// settings, or you can use the <a href="NumberFormatter.html#positiveFormat">NumberFormatter#positiveFormat</a> and
+// <a href="NumberFormatter.html#negativeFormat">NumberFormatter#negativeFormat</a> shorthand templates.
+
+var f = new FieldKit.NumberFormatter();
+
+// Using this template string…
+f.setPositiveFormat('¤#0.00');
+
+// …is equivalent to this:
+f.setPositivePrefix('¤');
+f.setPositiveSuffix('');
+f.setMinimumIntegerDigits(1);
+f.setMinimumFractionDigits(2);
+f.setMaximumFractionDigits(2);
+
+// And you can determine what the template string is for however you've
+// configured the NumberFormatter:
+f.setUsesGroupingSeparator(true);
+f.setGroupingSize(2);
+f.positiveFormat(); // '¤#,#0.00'</code></pre>
 
     
 </dd>
@@ -285,7 +345,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line1309">line 1309</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line1416">line 1416</a>
     </li></ul></dd>
     
 
@@ -348,7 +408,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line1300">line 1300</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line1407">line 1407</a>
     </li></ul></dd>
     
 
@@ -426,7 +486,7 @@ maximumFractionDigits to 0.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line97">line 97</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line149">line 149</a>
     </li></ul></dd>
     
 
@@ -524,7 +584,7 @@ maximumFractionDigits to 0.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line117">line 117</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line169">line 169</a>
     </li></ul></dd>
     
 
@@ -622,7 +682,7 @@ maximumFractionDigits to 0.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line137">line 137</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line189">line 189</a>
     </li></ul></dd>
     
 
@@ -720,7 +780,7 @@ maximumFractionDigits to 0.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line157">line 157</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line209">line 209</a>
     </li></ul></dd>
     
 
@@ -818,7 +878,7 @@ maximumFractionDigits to 0.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line177">line 177</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line229">line 229</a>
     </li></ul></dd>
     
 
@@ -916,7 +976,7 @@ maximumFractionDigits to 0.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line213">line 213</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line265">line 265</a>
     </li></ul></dd>
     
 
@@ -1014,7 +1074,7 @@ maximumFractionDigits to 0.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line233">line 233</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line285">line 285</a>
     </li></ul></dd>
     
 
@@ -1070,6 +1130,12 @@ maximumFractionDigits to 0.
 </dt>
 <dd>
 
+    
+    <div class="description">
+        Formats the given number as a string according to the settings applied to
+this formatter. This may cause the number to be truncated, rounded, or
+otherwise differ from what you might expect.
+    </div>
     
 
     
@@ -1156,7 +1222,7 @@ maximumFractionDigits to 0.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line880">line 880</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line976">line 976</a>
     </li></ul></dd>
     
 
@@ -1197,6 +1263,32 @@ maximumFractionDigits to 0.
 </dl>
 
         
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>// By default no fraction digits are shown.
+var f = new FieldKit.NumberFormatter();
+f.format(Math.PI);  // '3'
+
+// Let's format as a currency.
+f.setNumberStyle(FieldKit.NumberFormatter.Style.CURRENCY);
+f.format(Math.PI);  // '$3.14'
+
+// Or as a percentage, which illustrates usage of <a href="NumberFormatter.html#exponent">NumberFormatter#exponent</a>.
+f.setNumberStyle(FieldKit.NumberFormatter.Style.PERCENT);
+f.format(Math.PI);  // '314%'
+
+// For the rest of the examples we'll go back to normal.
+f.setNumberStyle(FieldKit.NumberFormatter.Style.NONE);
+
+// The default rounding mode is NumberFormatter.Rounding.HALF_EVEN.
+f.setMaximumFractionDigits(4);
+f.format(Math.PI);  // '3.1416'
+
+// And we can change the rounding mode if we like.
+f.setRoundingMode(FieldKit.NumberFormatter.Rounding.FLOOR);
+f.format(Math.PI);  // '3.1415'</code></pre>
 
     
 </dd>
@@ -1254,7 +1346,7 @@ maximumFractionDigits to 0.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line266">line 266</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line318">line 318</a>
     </li></ul></dd>
     
 
@@ -1348,7 +1440,7 @@ maximumFractionDigits to 0.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line282">line 282</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line334">line 334</a>
     </li></ul></dd>
     
 
@@ -1594,7 +1686,7 @@ it should be altered.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line298">line 298</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line350">line 350</a>
     </li></ul></dd>
     
 
@@ -1651,6 +1743,13 @@ it should be altered.
 <dd>
 
     
+    <div class="description">
+        Gets the locale identifier for which this formatter is currently
+configured to format strings. This setting controls default settings such
+as the grouping separator character, decimal separator character, placement
+of currency and percent symbols, etc.
+    </div>
+    
 
     
 
@@ -1688,7 +1787,7 @@ it should be altered.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line314">line 314</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line371">line 371</a>
     </li></ul></dd>
     
 
@@ -1782,7 +1881,7 @@ it should be altered.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line330">line 330</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line390">line 390</a>
     </li></ul></dd>
     
 
@@ -1876,7 +1975,7 @@ it should be altered.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line362">line 362</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line422">line 422</a>
     </li></ul></dd>
     
 
@@ -1970,7 +2069,7 @@ it should be altered.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line408">line 408</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line468">line 468</a>
     </li></ul></dd>
     
 
@@ -2064,7 +2163,7 @@ it should be altered.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line346">line 346</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line406">line 406</a>
     </li></ul></dd>
     
 
@@ -2158,7 +2257,7 @@ it should be altered.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line385">line 385</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line445">line 445</a>
     </li></ul></dd>
     
 
@@ -2252,7 +2351,7 @@ it should be altered.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line431">line 431</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line491">line 491</a>
     </li></ul></dd>
     
 
@@ -2350,7 +2449,7 @@ it should be altered.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line456">line 456</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line516">line 516</a>
     </li></ul></dd>
     
 
@@ -2408,9 +2507,9 @@ it should be altered.
 
     
     <div class="description">
-        Gets the positive number format string for the current settings. For
+        Gets the negative number format string for the current settings. For
 example, changing `minimumFractionDigits` from 0 to 3 would change this
-value from "#" to "#.000".
+value from "-#" to "-#.000".
     </div>
     
 
@@ -2450,7 +2549,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line478">line 478</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line538">line 538</a>
     </li></ul></dd>
     
 
@@ -2544,7 +2643,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line513">line 513</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line573">line 573</a>
     </li></ul></dd>
     
 
@@ -2638,7 +2737,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line529">line 529</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line589">line 589</a>
     </li></ul></dd>
     
 
@@ -2732,7 +2831,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line551">line 551</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line611">line 611</a>
     </li></ul></dd>
     
 
@@ -2826,7 +2925,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line573">line 573</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line633">line 633</a>
     </li></ul></dd>
     
 
@@ -2920,7 +3019,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line589">line 589</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line649">line 649</a>
     </li></ul></dd>
     
 
@@ -2969,7 +3068,7 @@ value from "#" to "#.000".
             
 <dt>
     
-        <h4 class="name" id="parse"><span class="type-signature"></span>parse<span class="signature">(string, error)</span><span class="type-signature"> &rarr; {string}</span></h4>
+        <h4 class="name" id="numberStyle"><span class="type-signature"></span>numberStyle<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="NumberFormatter.html#Style">NumberFormatter.Style</a>}</span></h4>
 
         
     
@@ -2978,7 +3077,110 @@ value from "#" to "#.000".
 
     
     <div class="description">
-        Will call parse on the formatter.
+        Gets the number style used to configure various default setting values.
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line678">line 678</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="NumberFormatter.html#Style">NumberFormatter.Style</a></span>
+
+
+    </dd>
+</dl>
+
+        
+
+    
+</dd>
+
+        
+            
+<dt>
+    
+        <h4 class="name" id="parse"><span class="type-signature"></span>parse<span class="signature">(string, error)</span><span class="type-signature"> &rarr; (nullable) {number}</span></h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Parses the given string according to the current formatting settings.
+When parsing values with a guaranteed regular format you can simply
+configure the formatter correctly and call this method. However, when
+dealing with human input it is often useful to configure
+<a href="NumberFormatter.html#isLenient">NumberFormatter#isLenient</a> to be true, allowing more leeway in what
+may be parsed as a valid number.
     </div>
     
 
@@ -3089,7 +3291,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line1008">line 1008</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line1115">line 1115</a>
     </li></ul></dd>
     
 
@@ -3115,10 +3317,6 @@ value from "#" to "#.000".
     <h5>Returns:</h5>
     
             
-<div class="param-desc">
-    returns value with delimiters removed
-</div>
-
 
 
 <dl>
@@ -3127,13 +3325,19 @@ value from "#" to "#.000".
     </dt>
     <dd>
         
-<span class="param-type">string</span>
+<span class="param-type">number</span>
 
 
     </dd>
 </dl>
 
         
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>var f = new FieldKit.NumberFormatter();
+f.parse('89'); // 89</code></pre>
 
     
 </dd>
@@ -3187,7 +3391,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line642">line 642</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line709">line 709</a>
     </li></ul></dd>
     
 
@@ -3285,7 +3489,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line660">line 660</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line727">line 727</a>
     </li></ul></dd>
     
 
@@ -3385,7 +3589,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line682">line 682</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line749">line 749</a>
     </li></ul></dd>
     
 
@@ -3479,7 +3683,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line739">line 739</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line806">line 806</a>
     </li></ul></dd>
     
 
@@ -3573,7 +3777,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line755">line 755</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line822">line 822</a>
     </li></ul></dd>
     
 
@@ -3667,7 +3871,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line777">line 777</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line844">line 844</a>
     </li></ul></dd>
     
 
@@ -3761,7 +3965,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line799">line 799</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line866">line 866</a>
     </li></ul></dd>
     
 
@@ -3907,7 +4111,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line107">line 107</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line159">line 159</a>
     </li></ul></dd>
     
 
@@ -4053,7 +4257,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line127">line 127</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line179">line 179</a>
     </li></ul></dd>
     
 
@@ -4199,7 +4403,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line147">line 147</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line199">line 199</a>
     </li></ul></dd>
     
 
@@ -4345,7 +4549,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line167">line 167</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line219">line 219</a>
     </li></ul></dd>
     
 
@@ -4491,7 +4695,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line191">line 191</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line243">line 243</a>
     </li></ul></dd>
     
 
@@ -4637,7 +4841,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line223">line 223</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line275">line 275</a>
     </li></ul></dd>
     
 
@@ -4778,7 +4982,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line243">line 243</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line295">line 295</a>
     </li></ul></dd>
     
 
@@ -4920,7 +5124,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line256">line 256</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line308">line 308</a>
     </li></ul></dd>
     
 
@@ -5062,7 +5266,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line274">line 274</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line326">line 326</a>
     </li></ul></dd>
     
 
@@ -5204,7 +5408,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line290">line 290</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line342">line 342</a>
     </li></ul></dd>
     
 
@@ -5346,7 +5550,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line306">line 306</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line358">line 358</a>
     </li></ul></dd>
     
 
@@ -5402,6 +5606,10 @@ value from "#" to "#.000".
 </dt>
 <dd>
 
+    
+    <div class="description">
+        Sets the locale identifier used for default settings values.
+    </div>
     
 
     
@@ -5488,12 +5696,19 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line322">line 322</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line382">line 382</a>
     </li></ul></dd>
     
 
     
 
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="NumberFormatter.html#locale">NumberFormatter#locale</a></li>
+        </ul>
+    </dd>
     
 
     
@@ -5630,7 +5845,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line338">line 338</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line398">line 398</a>
     </li></ul></dd>
     
 
@@ -5772,7 +5987,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line377">line 377</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line437">line 437</a>
     </li></ul></dd>
     
 
@@ -5914,7 +6129,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line423">line 423</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line483">line 483</a>
     </li></ul></dd>
     
 
@@ -6056,7 +6271,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line354">line 354</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line414">line 414</a>
     </li></ul></dd>
     
 
@@ -6198,7 +6413,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line400">line 400</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line460">line 460</a>
     </li></ul></dd>
     
 
@@ -6340,7 +6555,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line446">line 446</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line506">line 506</a>
     </li></ul></dd>
     
 
@@ -6498,7 +6713,7 @@ value from "#" to "#.000".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line466">line 466</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line526">line 526</a>
     </li></ul></dd>
     
 
@@ -6642,7 +6857,7 @@ prefix and suffix separately.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line499">line 499</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line559">line 559</a>
     </li></ul></dd>
     
 
@@ -6766,7 +6981,7 @@ prefix and suffix separately.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line521">line 521</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line581">line 581</a>
     </li></ul></dd>
     
 
@@ -6908,7 +7123,7 @@ prefix and suffix separately.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line543">line 543</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line603">line 603</a>
     </li></ul></dd>
     
 
@@ -7050,7 +7265,7 @@ prefix and suffix separately.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line565">line 565</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line625">line 625</a>
     </li></ul></dd>
     
 
@@ -7192,7 +7407,7 @@ prefix and suffix separately.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line581">line 581</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line641">line 641</a>
     </li></ul></dd>
     
 
@@ -7334,7 +7549,7 @@ prefix and suffix separately.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line597">line 597</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line657">line 657</a>
     </li></ul></dd>
     
 
@@ -7390,6 +7605,10 @@ prefix and suffix separately.
 </dt>
 <dd>
 
+    
+    <div class="description">
+        Sets the number style used to configure various default setting values.
+    </div>
     
 
     
@@ -7476,7 +7695,7 @@ prefix and suffix separately.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line621">line 621</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line688">line 688</a>
     </li></ul></dd>
     
 
@@ -7618,7 +7837,7 @@ prefix and suffix separately.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line650">line 650</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line717">line 717</a>
     </li></ul></dd>
     
 
@@ -7776,7 +7995,7 @@ prefix and suffix separately.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line670">line 670</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line737">line 737</a>
     </li></ul></dd>
     
 
@@ -7917,7 +8136,7 @@ prefix and suffix separately.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line725">line 725</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line792">line 792</a>
     </li></ul></dd>
     
 
@@ -8067,7 +8286,7 @@ formatter.format(123); // '1,23'</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line747">line 747</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line814">line 814</a>
     </li></ul></dd>
     
 
@@ -8209,7 +8428,7 @@ formatter.format(123); // '1,23'</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line769">line 769</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line836">line 836</a>
     </li></ul></dd>
     
 
@@ -8351,7 +8570,7 @@ formatter.format(123); // '1,23'</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line791">line 791</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line858">line 858</a>
     </li></ul></dd>
     
 
@@ -8493,7 +8712,7 @@ formatter.format(123); // '1,23'</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line807">line 807</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line874">line 874</a>
     </li></ul></dd>
     
 
@@ -8635,7 +8854,7 @@ formatter.format(123); // '1,23'</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line823">line 823</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line890">line 890</a>
     </li></ul></dd>
     
 
@@ -8777,7 +8996,7 @@ formatter.format(123); // '1,23'</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line839">line 839</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line906">line 906</a>
     </li></ul></dd>
     
 
@@ -8871,7 +9090,7 @@ formatter.format(123); // '1,23'</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line815">line 815</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line882">line 882</a>
     </li></ul></dd>
     
 
@@ -8965,7 +9184,7 @@ formatter.format(123); // '1,23'</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line831">line 831</a>
+        <a href="number_formatter.js.html">number_formatter.js</a>, <a href="number_formatter.js.html#line898">line 898</a>
     </li></ul></dd>
     
 
@@ -9026,13 +9245,13 @@ formatter.format(123); // '1,23'</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="AdaptiveCardFormatter.html">AdaptiveCardFormatter</a></li><li><a href="AmexCardFormatter.html">AmexCardFormatter</a></li><li><a href="CardTextField.html">CardTextField</a></li><li><a href="DefaultCardFormatter.html">DefaultCardFormatter</a></li><li><a href="DelimitedTextFormatter.html">DelimitedTextFormatter</a></li><li><a href="ExpiryDateField.html">ExpiryDateField</a></li><li><a href="ExpiryDateFormatter.html">ExpiryDateFormatter</a></li><li><a href="Formatter.html">Formatter</a></li><li><a href="NumberFormatter.html">NumberFormatter</a></li><li><a href="PhoneFormatter.html">PhoneFormatter</a></li><li><a href="SocialSecurityNumberFormatter.html">SocialSecurityNumberFormatter</a></li><li><a href="TextField.html">TextField</a></li><li><a href="UndoManager.html">UndoManager</a></li></ul><h3>Namespaces</h3><ul><li><a href="CurrencyDefaults.html">CurrencyDefaults</a></li><li><a href="FieldKit.html">FieldKit</a></li><li><a href="KEYS.html">KEYS</a></li><li><a href="LocaleDefaults.html">LocaleDefaults</a></li><li><a href="RegionDefaults.html">RegionDefaults</a></li><li><a href="StyleDefaults.html">StyleDefaults</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Affinity">Affinity</a></li><li><a href="global.html#CardMaskStrategy">CardMaskStrategy</a></li><li><a href="global.html#chars">chars</a></li><li><a href="global.html#DECIMAL_SEPARATOR">DECIMAL_SEPARATOR</a></li><li><a href="global.html#DIGIT">DIGIT</a></li><li><a href="global.html#GROUPING_SEPARATOR">GROUPING_SEPARATOR</a></li><li><a href="global.html#PADDING">PADDING</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="AdaptiveCardFormatter.html">AdaptiveCardFormatter</a></li><li><a href="AmexCardFormatter.html">AmexCardFormatter</a></li><li><a href="CardTextField.html">CardTextField</a></li><li><a href="DefaultCardFormatter.html">DefaultCardFormatter</a></li><li><a href="DelimitedTextFormatter.html">DelimitedTextFormatter</a></li><li><a href="ExpiryDateField.html">ExpiryDateField</a></li><li><a href="ExpiryDateFormatter.html">ExpiryDateFormatter</a></li><li><a href="Formatter.html">Formatter</a></li><li><a href="NumberFormatter.html">NumberFormatter</a></li><li><a href="PhoneFormatter.html">PhoneFormatter</a></li><li><a href="SocialSecurityNumberFormatter.html">SocialSecurityNumberFormatter</a></li><li><a href="TextField.html">TextField</a></li><li><a href="UndoManager.html">UndoManager</a></li></ul><h3>Namespaces</h3><ul><li><a href="CurrencyDefaults.html">CurrencyDefaults</a></li><li><a href="FieldKit.html">FieldKit</a></li><li><a href="KEYS.html">KEYS</a></li><li><a href="LocaleDefaults.html">LocaleDefaults</a></li><li><a href="RegionDefaults.html">RegionDefaults</a></li><li><a href="StyleDefaults.html">StyleDefaults</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a> on Fri Sep 26 2014 10:28:49 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a> on Fri Sep 26 2014 12:38:50 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>
