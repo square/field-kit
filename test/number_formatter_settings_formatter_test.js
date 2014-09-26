@@ -81,6 +81,14 @@ describe('FieldKit.NumberFormatterSettingsFormatter', function() {
       var settings = buildSettings({ suffix: '¤' });
       expect(formatter.format(settings)).to.equal('#¤');
     });
+
+    it('pads the integer part with digit placeholders when using grouping separators', function() {
+      var settings = buildSettings({ usesGroupingSeparator: true, groupingSize: 4 });
+      expect(formatter.format(settings)).to.equal('#,####');
+
+      settings = buildSettings({ usesGroupingSeparator: true, groupingSize: 2, minimumIntegerDigits: 4 });
+      expect(formatter.format(settings)).to.equal('#00,00');
+    });
   });
 
   describe('#parse', function() {
