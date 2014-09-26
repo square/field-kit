@@ -3,6 +3,7 @@
     var $$formatter$$$__Object$defineProperty = Object.defineProperty;
 
     var $$formatter$$Formatter = function() {
+      "use strict";
       function Formatter() {}
 
       $$formatter$$$__Object$defineProperty(Formatter.prototype, "format", {
@@ -63,9 +64,11 @@
     var $$delimited_text_formatter$$$__Object$create = Object.create;
 
     var $$delimited_text_formatter$$DelimitedTextFormatter = function($__super) {
-      function DelimitedTextFormatter(delimiter) {
+      "use strict";
+
+      function DelimitedTextFormatter() {
+        var delimiter = (arguments[0] !== void 0 ? arguments[0] : this.delimiter);
         var isLazy = (arguments[1] !== void 0 ? arguments[1] : false);
-        if (!delimiter) { delimiter = this.delimiter; }
 
         if (delimiter === null || delimiter === undefined || delimiter.length !== 1) {
           throw new Error('delimiter must have just one character');
@@ -358,6 +361,8 @@
     var $$default_card_formatter$$$__Object$create = Object.create;
 
     var $$default_card_formatter$$DefaultCardFormatter = function($__super) {
+      "use strict";
+
       function DefaultCardFormatter() {
         $$default_card_formatter$$$__Object$getPrototypeOf(DefaultCardFormatter.prototype).constructor.call(this, ' ');
       }
@@ -405,47 +410,73 @@
         writable: true
       });
 
+      $$default_card_formatter$$$__Object$defineProperty(DefaultCardFormatter.prototype, "maximumLength", {
+        get: function() {
+          return 16 + 3;
+        },
+
+        enumerable: true,
+        configurable: true
+      });
+
       return DefaultCardFormatter;
     }($$delimited_text_formatter$$default);
 
-    $$default_card_formatter$$DefaultCardFormatter.prototype.maximumLength = 16 + 3;
     var $$default_card_formatter$$default = $$default_card_formatter$$DefaultCardFormatter;
-    var $$amex_card_formatter$$$__Object$getPrototypeOf = Object.getPrototypeOf;
     var $$amex_card_formatter$$$__Object$defineProperty = Object.defineProperty;
     var $$amex_card_formatter$$$__Object$create = Object.create;
+    var $$amex_card_formatter$$$__Object$getPrototypeOf = Object.getPrototypeOf;
 
     var $$amex_card_formatter$$AmexCardFormatter = function($__super) {
-      function AmexCardFormatter() {
-        $$amex_card_formatter$$$__Object$getPrototypeOf(AmexCardFormatter.prototype).constructor.call(this);
-        this.maximumLength = 15 + 2;
-      }
+     "use strict";
 
-      AmexCardFormatter.__proto__ = ($__super !== null ? $__super : Function.prototype);
-      AmexCardFormatter.prototype = $$amex_card_formatter$$$__Object$create(($__super !== null ? $__super.prototype : null));
+     function AmexCardFormatter() {
+      var $__0 = $$amex_card_formatter$$$__Object$getPrototypeOf(AmexCardFormatter.prototype);
 
-      $$amex_card_formatter$$$__Object$defineProperty(AmexCardFormatter.prototype, "constructor", {
-        value: AmexCardFormatter
-      });
+      if ($__0 !== null)
+       $__0.constructor.apply(this, arguments);
+     }
 
-      $$amex_card_formatter$$$__Object$defineProperty(AmexCardFormatter.prototype, "hasDelimiterAtIndex", {
-        value: function(index) {
-          return index === 4 || index === 11;
-        },
+     AmexCardFormatter.__proto__ = ($__super !== null ? $__super : Function.prototype);
+     AmexCardFormatter.prototype = $$amex_card_formatter$$$__Object$create(($__super !== null ? $__super.prototype : null));
 
-        enumerable: false,
-        writable: true
-      });
+     $$amex_card_formatter$$$__Object$defineProperty(AmexCardFormatter.prototype, "constructor", {
+      value: AmexCardFormatter
+     });
 
-      return AmexCardFormatter;
+     $$amex_card_formatter$$$__Object$defineProperty(AmexCardFormatter.prototype, "hasDelimiterAtIndex", {
+      value: function(index) {
+        return index === 4 || index === 11;
+      },
+
+      enumerable: false,
+      writable: true
+     });
+
+     $$amex_card_formatter$$$__Object$defineProperty(AmexCardFormatter.prototype, "maximumLength", {
+      get: function() {
+        return 15 + 2;
+      },
+
+      enumerable: true,
+      configurable: true
+     });
+
+     return AmexCardFormatter;
     }($$default_card_formatter$$default);
 
     var $$amex_card_formatter$$default = $$amex_card_formatter$$AmexCardFormatter;
     var $$adaptive_card_formatter$$$__Object$defineProperty = Object.defineProperty;
 
     var $$adaptive_card_formatter$$AdaptiveCardFormatter = function() {
+      "use strict";
+
       function AdaptiveCardFormatter() {
+        /** @private */
         this.amexCardFormatter = new $$amex_card_formatter$$default();
+        /** @private */
         this.defaultCardFormatter = new $$default_card_formatter$$default();
+        /** @private */
         this.formatter = this.defaultCardFormatter;
       }
 
@@ -468,9 +499,9 @@
       });
 
       $$adaptive_card_formatter$$$__Object$defineProperty(AdaptiveCardFormatter.prototype, "isChangeValid", {
-        value: function(change) {
+        value: function(change, error) {
           this.formatter = this._formatterForPan(change.proposed.text);
-          return this.formatter.isChangeValid(change);
+          return this.formatter.isChangeValid(change, error);
         },
 
         enumerable: false,
@@ -496,6 +527,11 @@
     var $$adaptive_card_formatter$$default = $$adaptive_card_formatter$$AdaptiveCardFormatter;
     var $$utils$$$__Array$prototype$slice = Array.prototype.slice;
     var $$utils$$DIGITS_PATTERN = /^\d*$/;
+
+    /**
+     * @const
+     * @private
+     */
     var $$utils$$SURROUNDING_SPACE_PATTERN = /(^\s+|\s+$)/;
 
     function $$utils$$isDigits(string) {
@@ -634,10 +670,16 @@
     var $$undo_manager$$$__Object$defineProperty = Object.defineProperty;
 
     var $$undo_manager$$UndoManager = function() {
+      "use strict";
+
       function UndoManager() {
+        /** @private */
         this._undos = [];
+        /** @private */
         this._redos = [];
+        /** @private */
         this._isUndoing = false;
+        /** @private */
         this._isRedoing = false;
       }
 
@@ -689,8 +731,6 @@
             }
             this._appendUndo.apply(this, [target, selector].concat($$undo_manager$$$__Array$prototype$slice.call(args)));
           }
-
-          return null;
         },
 
         enumerable: false,
@@ -757,7 +797,6 @@
           this._isRedoing = true;
           target[selector].apply(target, args);
           this._isRedoing = false;
-          return null;
         },
 
         enumerable: false,
@@ -802,17 +841,41 @@
     var $$keybindings$$$__Array$prototype$slice = Array.prototype.slice;
     var $$keybindings$$$__Object$defineProperty = Object.defineProperty;
     var $$keybindings$$A = 65;
+
+    /** @private */
     var $$keybindings$$Y = 89;
+
+    /** @private */
     var $$keybindings$$Z = 90;
+
+    /** @private */
     var $$keybindings$$ZERO = 48;
+
+    /** @private */
     var $$keybindings$$NINE = 57;
+
+    /** @private */
     var $$keybindings$$LEFT = 37;
+
+    /** @private */
     var $$keybindings$$RIGHT = 39;
+
+    /** @private */
     var $$keybindings$$UP = 38;
+
+    /** @private */
     var $$keybindings$$DOWN = 40;
+
+    /** @private */
     var $$keybindings$$BACKSPACE = 8;
+
+    /** @private */
     var $$keybindings$$DELETE = 46;
+
+    /** @private */
     var $$keybindings$$TAB = 9;
+
+    /** @private */
     var $$keybindings$$ENTER = 13;
 
     var $$keybindings$$KEYS = {
@@ -830,10 +893,20 @@
       TAB: $$keybindings$$TAB,
       ENTER: $$keybindings$$ENTER,
 
+      /**
+       * @param {number} keyCode
+       * @returns {boolean}
+       */
       isDigit: function(keyCode) {
         return $$keybindings$$ZERO <= keyCode && keyCode <= $$keybindings$$NINE;
       },
 
+      /**
+       * Is an arrow keyCode.
+       *
+       * @param {number} keyCode
+       * @returns {boolean}
+       */
       isDirectional: function(keyCode) {
         return keyCode === $$keybindings$$LEFT || keyCode === $$keybindings$$RIGHT || keyCode === $$keybindings$$UP || keyCode === $$keybindings$$DOWN;
       }
@@ -850,7 +923,7 @@
       var ctrl = osx ? $$keybindings$$META : $$keybindings$$CTRL;
 
       if (!$$keybindings$$cache[platform]) {
-        $$keybindings$$cache[platform] = $$keybindings$$build(platform, function(bind) {
+        $$keybindings$$cache[platform] = $$keybindings$$build(function(bind) {
           bind($$keybindings$$A         , ctrl       , 'selectAll');
           bind($$keybindings$$LEFT      , null       , 'moveLeft');
           bind($$keybindings$$LEFT      , $$keybindings$$ALT        , 'moveWordLeft');
@@ -902,8 +975,8 @@
       return $$keybindings$$cache[platform];
     }
 
-    function $$keybindings$$build(platform, callback) {
-      var result = new $$keybindings$$BindingSet(platform);
+    function $$keybindings$$build(callback) {
+      var result = new $$keybindings$$BindingSet();
       callback(function() {
         var $__0;
         var args = [].slice.call(arguments, 0);
@@ -913,8 +986,9 @@
     }
 
     var $$keybindings$$BindingSet = function() {
-      function BindingSet(platform) {
-        this.platform = platform;
+      "use strict";
+
+      function BindingSet() {
         this.bindings = {};
       }
 
@@ -951,16 +1025,38 @@
     var $$caret$$default = Caret;
     var $$text_field$$$__Object$defineProperty = Object.defineProperty;
 
-    var $$text_field$$AFFINITY = {
+    /**
+     * Enum for text direction affinity.
+     *
+     * @const
+     * @enum {number}
+     */
+    var $$text_field$$Affinity = {
       UPSTREAM: 0,
       DOWNSTREAM: 1,
       NONE: null
     };
 
+    /**
+     * Tests is string passed in is a single word.
+     *
+     * @param {string} chr
+     * @returns {boolean}
+     * @private
+     */
     function $$text_field$$isWordChar(chr) {
       return chr && /^\w$/.test(chr);
     }
 
+    /**
+     * Checks if char to the left of {index} in {string}
+     * is a break (non-char).
+     *
+     * @param {string} text
+     * @param {number} index
+     * @returns {boolean}
+     * @private
+     */
     function $$text_field$$hasLeftWordBreakAtIndex(text, index) {
       if (index === 0) {
         return true;
@@ -969,6 +1065,15 @@
       }
     }
 
+    /**
+     * Checks if char to the right of {index} in {string}
+     * is a break (non-char).
+     *
+     * @param {string} text
+     * @param {number} index
+     * @returns {boolean}
+     * @private
+     */
     function $$text_field$$hasRightWordBreakAtIndex(text, index) {
       if (index === text.length) {
         return true;
@@ -978,6 +1083,8 @@
     }
 
     var $$text_field$$TextField = function() {
+      "use strict";
+
       function TextField(element, formatter) {
         if (typeof element.get === 'function') {
           console.warn(
@@ -1024,16 +1131,18 @@
          * to place inserted characters in the wrong place
          * Expected: 1234 5678|  =>  1234 5678 9|
          * Bug: 1234 5678|  =>  1234 5679| 8
+         *
+         * @private
          */
         this._needsManualCaret = window.navigator.userAgent.toLowerCase().indexOf('android') > -1;
 
         /**
-         * Contains one of the AFFINITY enum to indicate the preferred direction of
+         * Contains one of the Affinity enum to indicate the preferred direction of
          * selection.
          *
          * @private
          */
-        this.selectionAffinity = $$text_field$$AFFINITY.NONE;
+        this.selectionAffinity = $$text_field$$Affinity.NONE;
       }
 
       $$text_field$$$__Object$defineProperty(TextField.prototype, "textDidChange", {
@@ -1126,7 +1235,6 @@
       $$text_field$$$__Object$defineProperty(TextField.prototype, "setDelegate", {
         value: function(delegate) {
           this._delegate = delegate;
-          return null;
         },
 
         enumerable: false,
@@ -1203,7 +1311,7 @@
             range.length++;
             this.setSelectedRange(range);
           }
-          return this.clearSelection();
+          this.clearSelection();
         },
 
         enumerable: false,
@@ -1241,7 +1349,6 @@
           element.removeEventListener('focus', this._focus);
           element.removeEventListener('blur', this._blur);
           delete element['field-kit-text-field'];
-          return null;
         },
 
         enumerable: false,
@@ -1308,7 +1415,7 @@
           range = this.selectedRange();
           range.start += range.length;
           range.length = 0;
-          return this.setSelectedRange(range);
+          this.setSelectedRange(range);
         },
 
         enumerable: false,
@@ -1361,19 +1468,19 @@
           event.preventDefault();
           var range = this.selectedRange();
           switch (this.selectionAffinity) {
-            case $$text_field$$AFFINITY.UPSTREAM:
-            case $$text_field$$AFFINITY.NONE:
+            case $$text_field$$Affinity.UPSTREAM:
+            case $$text_field$$Affinity.NONE:
               // 12<34 56|78  =>  <1234 56|78
               range.length += range.start;
               range.start = 0;
               break;
-            case $$text_field$$AFFINITY.DOWNSTREAM:
+            case $$text_field$$Affinity.DOWNSTREAM:
               // 12|34 56>78   =>   <12|34 5678
               range.length = range.start;
               range.start = 0;
               break;
           }
-          this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.UPSTREAM);
+          this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.UPSTREAM);
         },
 
         enumerable: false,
@@ -1385,18 +1492,18 @@
           event.preventDefault();
           var range = this.selectedRange();
           switch (this.selectionAffinity) {
-            case $$text_field$$AFFINITY.UPSTREAM:
-            case $$text_field$$AFFINITY.NONE:
+            case $$text_field$$Affinity.UPSTREAM:
+            case $$text_field$$Affinity.NONE:
               // 12<34 56|78  =>  <1234 56|78
               range.length += range.start;
               range.start = 0;
               break;
-            case $$text_field$$AFFINITY.DOWNSTREAM:
+            case $$text_field$$Affinity.DOWNSTREAM:
               // 12|34 56>78  =>  12|34 5678
               range.length = 0;
               break;
           }
-          this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.UPSTREAM);
+          this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.UPSTREAM);
         },
 
         enumerable: false,
@@ -1419,7 +1526,7 @@
           var range = this.selectedRange();
           range.length += range.start;
           range.start = 0;
-          return this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.UPSTREAM);
+          this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.UPSTREAM);
         },
 
         enumerable: false,
@@ -1434,7 +1541,7 @@
             start: this.text().length,
             length: 0
           };
-          this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.NONE);
+          this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.NONE);
         },
 
         enumerable: false,
@@ -1455,11 +1562,11 @@
           event.preventDefault();
           var range = this.selectedRange();
           var end = this.text().length;
-          if (this.selectionAffinity === $$text_field$$AFFINITY.UPSTREAM) {
+          if (this.selectionAffinity === $$text_field$$Affinity.UPSTREAM) {
             range.start += range.length;
           }
           range.length = end - range.start;
-          this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.DOWNSTREAM);
+          this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.DOWNSTREAM);
         },
 
         enumerable: false,
@@ -1471,18 +1578,18 @@
           event.preventDefault();
           var range = this.selectedRange();
           switch (this.selectionAffinity) {
-            case $$text_field$$AFFINITY.DOWNSTREAM:
-            case $$text_field$$AFFINITY.NONE:
+            case $$text_field$$Affinity.DOWNSTREAM:
+            case $$text_field$$Affinity.NONE:
               // 12|34 56>78  =>  12|34 5678>
               range.length = this.text().length - range.start;
               break;
-            case $$text_field$$AFFINITY.UPSTREAM:
+            case $$text_field$$Affinity.UPSTREAM:
               // 12<34 56|78  =>  12|34 5678
               range.start += range.length;
               range.length = 0;
               break;
           }
-          this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.DOWNSTREAM);
+          this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.DOWNSTREAM);
         },
 
         enumerable: false,
@@ -1504,7 +1611,7 @@
           event.preventDefault();
           var range = this.selectedRange();
           range.length = this.text().length - range.start;
-          this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.DOWNSTREAM);
+          this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.DOWNSTREAM);
         },
 
         enumerable: false,
@@ -1520,7 +1627,7 @@
           } else {
             range.start--;
           }
-          this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.NONE);
+          this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.NONE);
         },
 
         enumerable: false,
@@ -1532,13 +1639,13 @@
           event.preventDefault();
           var range = this.selectedRange();
           switch (this.selectionAffinity) {
-            case $$text_field$$AFFINITY.UPSTREAM:
-            case $$text_field$$AFFINITY.NONE:
-              this.selectionAffinity = $$text_field$$AFFINITY.UPSTREAM;
+            case $$text_field$$Affinity.UPSTREAM:
+            case $$text_field$$Affinity.NONE:
+              this.selectionAffinity = $$text_field$$Affinity.UPSTREAM;
               range.start--;
               range.length++;
               break;
-            case $$text_field$$AFFINITY.DOWNSTREAM:
+            case $$text_field$$Affinity.DOWNSTREAM:
               range.length--;
               break;
           }
@@ -1565,14 +1672,14 @@
           event.preventDefault();
           var range = this.selectedRange();
           switch (this.selectionAffinity) {
-            case $$text_field$$AFFINITY.UPSTREAM:
-            case $$text_field$$AFFINITY.NONE:
-              this.selectionAffinity = $$text_field$$AFFINITY.UPSTREAM;
+            case $$text_field$$Affinity.UPSTREAM:
+            case $$text_field$$Affinity.NONE:
+              this.selectionAffinity = $$text_field$$Affinity.UPSTREAM;
               var start = this._lastWordBreakBeforeIndex(range.start - 1);
               range.length += range.start - start;
               range.start = start;
               break;
-            case $$text_field$$AFFINITY.DOWNSTREAM:
+            case $$text_field$$Affinity.DOWNSTREAM:
               var end = this._lastWordBreakBeforeIndex(range.start + range.length);
               if (end < range.start) {
                 end = range.start;
@@ -1603,7 +1710,7 @@
           var range = this.selectedRange();
           range.length += range.start;
           range.start = 0;
-          this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.UPSTREAM);
+          this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.UPSTREAM);
         },
 
         enumerable: false,
@@ -1620,7 +1727,7 @@
           } else {
             range.start++;
           }
-          this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.NONE);
+          this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.NONE);
         },
 
         enumerable: false,
@@ -1632,13 +1739,13 @@
           event.preventDefault();
           var range = this.selectedRange();
           switch (this.selectionAffinity) {
-            case $$text_field$$AFFINITY.UPSTREAM:
+            case $$text_field$$Affinity.UPSTREAM:
               range.start++;
               range.length--;
               break;
-            case $$text_field$$AFFINITY.DOWNSTREAM:
-            case $$text_field$$AFFINITY.NONE:
-              this.selectionAffinity = $$text_field$$AFFINITY.DOWNSTREAM;
+            case $$text_field$$Affinity.DOWNSTREAM:
+            case $$text_field$$Affinity.NONE:
+              this.selectionAffinity = $$text_field$$Affinity.DOWNSTREAM;
               range.length++;
               break;
           }
@@ -1668,12 +1775,12 @@
           var start = range.start;
           var end = range.start + range.length;
           switch (this.selectionAffinity) {
-            case $$text_field$$AFFINITY.UPSTREAM:
+            case $$text_field$$Affinity.UPSTREAM:
               start = Math.min(this._nextWordBreakAfterIndex(start), end);
               break;
-            case $$text_field$$AFFINITY.DOWNSTREAM:
-            case $$text_field$$AFFINITY.NONE:
-              this.selectionAffinity = $$text_field$$AFFINITY.DOWNSTREAM;
+            case $$text_field$$Affinity.DOWNSTREAM:
+            case $$text_field$$Affinity.NONE:
+              this.selectionAffinity = $$text_field$$Affinity.DOWNSTREAM;
               end = this._nextWordBreakAfterIndex(range.start + range.length);
               break;
           }
@@ -1699,7 +1806,7 @@
           event.preventDefault();
           var range = this.selectedRange();
           range.length = this.text().length - range.start;
-          this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.DOWNSTREAM);
+          this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.DOWNSTREAM);
         },
 
         enumerable: false,
@@ -1729,7 +1836,7 @@
           text = text.substring(0, range.start) + replacement + text.substring(end);
           range.length = replacement.length;
           this.setText(text);
-          this.setSelectedRangeWithAffinity(range, $$text_field$$AFFINITY.NONE);
+          this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.NONE);
         },
 
         enumerable: false,
@@ -1801,7 +1908,7 @@
           this.setSelectedRangeWithAffinity({
             start: 0,
             length: this.text().length
-          }, $$text_field$$AFFINITY.NONE);
+          }, $$text_field$$Affinity.NONE);
         },
 
         enumerable: false,
@@ -1876,7 +1983,7 @@
 
       $$text_field$$$__Object$defineProperty(TextField.prototype, "setSelectedRange", {
         value: function(range) {
-          return this.setSelectedRangeWithAffinity(range, this.selectionAffinity);
+          this.setSelectedRangeWithAffinity(range, this.selectionAffinity);
         },
 
         enumerable: false,
@@ -1893,7 +2000,7 @@
           };
           this._manualCaret = caret;
           $$caret$$default.set(this.element, caret.start, caret.end);
-          this.selectionAffinity = range.length === 0 ? $$text_field$$AFFINITY.NONE : affinity;
+          this.selectionAffinity = range.length === 0 ? $$text_field$$Affinity.NONE : affinity;
         },
 
         enumerable: false,
@@ -1904,12 +2011,12 @@
         value: function() {
           var range = this.selectedRange();
           switch (this.selectionAffinity) {
-            case $$text_field$$AFFINITY.UPSTREAM:
+            case $$text_field$$Affinity.UPSTREAM:
               return range.start + range.length;
-            case $$text_field$$AFFINITY.DOWNSTREAM:
+            case $$text_field$$Affinity.DOWNSTREAM:
               return range.start;
             default:
-              return null;
+              return $$text_field$$Affinity.NONE;
           }
         },
 
@@ -2032,8 +2139,8 @@
       });
 
       $$text_field$$$__Object$defineProperty(TextField.prototype, "setDisabledPlaceholder", {
-        value: function(_disabledPlaceholder) {
-          this._disabledPlaceholder = _disabledPlaceholder;
+        value: function(disabledPlaceholder) {
+          this._disabledPlaceholder = disabledPlaceholder;
           this._syncPlaceholder();
         },
 
@@ -2051,8 +2158,8 @@
       });
 
       $$text_field$$$__Object$defineProperty(TextField.prototype, "setFocusedPlaceholder", {
-        value: function(_focusedPlaceholder) {
-          this._focusedPlaceholder = _focusedPlaceholder;
+        value: function(focusedPlaceholder) {
+          this._focusedPlaceholder = focusedPlaceholder;
           this._syncPlaceholder();
         },
 
@@ -2070,8 +2177,8 @@
       });
 
       $$text_field$$$__Object$defineProperty(TextField.prototype, "setPlaceholder", {
-        value: function(_placeholder) {
-          this._placeholder = _placeholder;
+        value: function(placeholder) {
+          this._placeholder = placeholder;
           this.element.setAttribute('placeholder', this._placeholder);
         },
 
@@ -2089,8 +2196,8 @@
       });
 
       $$text_field$$$__Object$defineProperty(TextField.prototype, "setUnfocusedPlaceholder", {
-        value: function(_unfocusedPlaceholder) {
-          this._unfocusedPlaceholder = _unfocusedPlaceholder;
+        value: function(unfocusedPlaceholder) {
+          this._unfocusedPlaceholder = unfocusedPlaceholder;
           this._syncPlaceholder();
         },
 
@@ -2135,7 +2242,7 @@
           if (this._needsManualCaret) {
             this._manualCaret = $$caret$$default.get(this.element);
           }
-          this.selectionAffinity = $$text_field$$AFFINITY.NONE;
+          this.selectionAffinity = $$text_field$$Affinity.NONE;
         },
 
         enumerable: false,
@@ -2160,7 +2267,7 @@
       $$text_field$$$__Object$defineProperty(TextField.prototype, "_focus", {
         value: function() {
           this._textFieldDidBeginEditing();
-          return this._syncPlaceholder();
+          this._syncPlaceholder();
         },
 
         enumerable: false,
@@ -2170,7 +2277,7 @@
       $$text_field$$$__Object$defineProperty(TextField.prototype, "_blur", {
         value: function() {
           this._textFieldDidEndEditing();
-          return this._syncPlaceholder();
+          this._syncPlaceholder();
         },
 
         enumerable: false,
@@ -2333,6 +2440,8 @@
     }();
 
     var $$text_field$$TextFieldStateChange = function() {
+      "use strict";
+
       function TextFieldStateChange(field) {
         this.field = field;
       }
@@ -2399,7 +2508,6 @@
               text: ''
             };
           }
-          return null;
         },
 
         enumerable: false,
@@ -2413,12 +2521,12 @@
      * Builds a new {TextFieldStateChange} that will allow you to
      * compute differences, and see the current vs proposed changes.
      *
-     * @param {FieldKitField} field
-     * @param {function} callback called when you want changes to the field
+     * @param {TextField} field
+     * @param {Function} callback called when you want changes to the field
      *    take place. Current will be calculated before this callback.
      *    Proposed will be calculated after this callback.
      *
-     * @return {object} change object with current and proposed properties
+     * @returns {Object} change object with current and proposed properties
      */
     $$text_field$$TextFieldStateChange.build = function(field, callback) {
       var change = new this(field);
@@ -2440,23 +2548,35 @@
     var $$card_text_field$$$__Object$defineProperty = Object.defineProperty;
     var $$card_text_field$$$__Object$create = Object.create;
 
+    /**
+     * Enum for card mask strategies.
+     *
+     * @readonly
+     * @enum {number}
+     */
     var $$card_text_field$$CardMaskStrategy = {
       None: 'None',
       DoneEditing: 'DoneEditing'
     };
 
     var $$card_text_field$$CardTextField = function($__super) {
+      "use strict";
+
       function CardTextField(element) {
         $$card_text_field$$$__Object$getPrototypeOf(CardTextField.prototype).constructor.call(this, element, new $$adaptive_card_formatter$$default());
         this.setCardMaskStrategy($$card_text_field$$CardMaskStrategy.None);
 
         /**
          * Whether we are currently masking the displayed text.
+         *
+         * @private
          */
         this._masked = false;
 
         /**
          * Whether we are currently editing.
+         *
+         * @private
          */
         this._editing = false;
       }
@@ -2492,8 +2612,6 @@
             this._cardMaskStrategy = cardMaskStrategy;
             this._syncMask();
           }
-
-          return null;
         },
 
         enumerable: false,
@@ -2600,15 +2718,35 @@
         writable: true
       });
 
+      $$card_text_field$$$__Object$defineProperty(CardTextField, "CardMaskStrategy", {
+        get: function() {
+          return $$card_text_field$$CardMaskStrategy;
+        },
+
+        enumerable: true,
+        configurable: true
+      });
+
       return CardTextField;
     }($$text_field$$default);
 
-    $$card_text_field$$CardTextField.CardMaskStrategy = $$card_text_field$$CardMaskStrategy;
     var $$card_text_field$$default = $$card_text_field$$CardTextField;
     var $$expiry_date_formatter$$$__Object$getPrototypeOf = Object.getPrototypeOf;
     var $$expiry_date_formatter$$$__Object$defineProperty = Object.defineProperty;
     var $$expiry_date_formatter$$$__Object$create = Object.create;
 
+    /**
+     * Give this function a 2 digit year it'll return with 4.
+     *
+     * @example
+     *     interpretTwoDigitYear(15);
+     *     // => 2015
+     *     interpretTwoDigitYear(97);
+     *     // => 1997
+     * @param {number} year
+     * @returns {number}
+     * @private
+     */
     function $$expiry_date_formatter$$interpretTwoDigitYear(year) {
       var thisYear = new Date().getFullYear();
       var thisCentury = thisYear - (thisYear % 100);
@@ -2619,6 +2757,8 @@
     }
 
     var $$expiry_date_formatter$$ExpiryDateFormatter = function($__super) {
+      "use strict";
+
       function ExpiryDateFormatter() {
         $$expiry_date_formatter$$$__Object$getPrototypeOf(ExpiryDateFormatter.prototype).constructor.call(this, '/');
         this.maximumLength = 5;
@@ -2743,6 +2883,8 @@
     var $$expiry_date_field$$$__Object$create = Object.create;
 
     var $$expiry_date_field$$ExpiryDateField = function($__super) {
+      "use strict";
+
       function ExpiryDateField(element) {
         $$expiry_date_field$$$__Object$getPrototypeOf(ExpiryDateField.prototype).constructor.call(this, element, new $$expiry_date_formatter$$default());
       }
@@ -2758,7 +2900,7 @@
         value: function() {
           var value = this.value();
           if (value) {
-            return this.setText(this.formatter().format(value));
+            this.setText(this.formatter().format(value));
           }
         },
 
@@ -3021,6 +3163,11 @@
     var $$number_formatter$$DEFAULT_LOCALE = 'en-US';
     var $$number_formatter$$DEFAULT_COUNTRY = 'US';
 
+    /**
+     * @param {string} locale
+     * @returns {Object} {lang: lang, country: country}
+     * @private
+     */
     function $$number_formatter$$splitLocaleComponents(locale) {
       var match = locale.match(/^([a-z][a-z])(?:[-_]([a-z][a-z]))?$/i);
       if (match) {
@@ -3033,6 +3180,8 @@
     /**
      * This simple property getter assumes that properties will never be functions
      * and so attempts to run those functions using the given args.
+     *
+     * @private
      */
     function $$number_formatter$$get(object, key) {
       var args = [].slice.call(arguments, 2);
@@ -3048,6 +3197,8 @@
     }
 
     var $$number_formatter$$NumberFormatter = function($__super) {
+      "use strict";
+
       function NumberFormatter() {
         $$number_formatter$$$__Object$getPrototypeOf(NumberFormatter.prototype).constructor.call(this);
         this._locale = 'en';
@@ -4113,28 +4264,70 @@
      * Defaults
      */
 
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._allowsFloats = null;
 
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._alwaysShowsDecimalSeparator = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._countryCode = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._currencyCode = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._exponent = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._groupingSeparator = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._groupingSize = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._lenient = false;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._locale = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._internationalCurrencySymbol = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._maximumFractionDigits = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._minimumFractionDigits = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._maximumIntegerDigits = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._minimumIntegerDigits = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._maximum = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._minimum = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._notANumberSymbol = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._nullSymbol = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._numberStyle = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._roundingMode = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._usesGroupingSeparator = null;
+
+    /** @private */
     $$number_formatter$$NumberFormatter.prototype._zeroSymbol = null;
 
     /**
@@ -4150,12 +4343,19 @@
     $$number_formatter$$NumberFormatter.prototype.setPlusSign = $$number_formatter$$NumberFormatter.prototype.setPositivePrefix;
     $$number_formatter$$NumberFormatter.Rounding = stround$$modes;
 
+    /**
+     * @enum {number}
+     * @readonly
+     */
     $$number_formatter$$NumberFormatter.Style = {
       NONE: $$number_formatter$$NONE,
       CURRENCY: $$number_formatter$$CURRENCY,
       PERCENT: $$number_formatter$$PERCENT
     };
 
+    /**
+     * @namespace StyleDefaults
+     */
     var $$number_formatter$$StyleDefaults = {
       NONE: {
         usesGroupingSeparator: false,
@@ -4192,6 +4392,9 @@
       }
     };
 
+    /**
+     * @namespace LocaleDefaults
+     */
     var $$number_formatter$$LocaleDefaults = {
       'default': {
         allowsFloats: true,
@@ -4249,6 +4452,9 @@
       }
     };
 
+    /**
+     * @namespace RegionDefaults
+     */
     var $$number_formatter$$RegionDefaults = {
       CA: {
         currencyCode: 'CAD'
@@ -4273,6 +4479,9 @@
       }
     };
 
+    /**
+     * @namespace CurrencyDefaults
+     */
     var $$number_formatter$$CurrencyDefaults = {
       'default': {
         currencySymbol: function(formatter) {
@@ -4314,16 +4523,22 @@
     var $$phone_formatter$$$__Object$defineProperty = Object.defineProperty;
     var $$phone_formatter$$$__Object$create = Object.create;
 
-    // (415) 555-1212
-    var $$phone_formatter$$NANP_PHONE_DELIMITERS = {
+    /**
+     * @const
+     * @private
+     */
+    var $$phone_formatter$$NANPPhoneDelimiters = {
       0: '(',
       4: ')',
       5: ' ',
       9: '-'
     };
 
-    // 1 (415) 555-1212
-    var $$phone_formatter$$NANP_PHONE_DELIMITERS_WITH_1 = {
+    /**
+     * @const
+     * @private
+     */
+    var $$phone_formatter$$NANPPhoneDelimitersWithOne = {
       1:  ' ',
       2:  '(',
       6:  ')',
@@ -4331,8 +4546,11 @@
       11: '-'
     };
 
-    // +1 (415) 555-1212
-    var $$phone_formatter$$NANP_PHONE_DELIMITERS_WITH_PLUS = {
+    /**
+     * @const
+     * @private
+     */
+    var $$phone_formatter$$NANPPhoneDelimitersWithPlus = {
       2:  ' ',
       3:  '(',
       7:  ')',
@@ -4340,10 +4558,17 @@
       12: '-'
     };
 
-    // This should match any characters in the maps above.
+    /**
+     * This should match any characters in the maps above.
+     *
+     * @const
+     * @private
+     */
     var $$phone_formatter$$DELIMITER_PATTERN = /[-\(\) ]/g;
 
     var $$phone_formatter$$PhoneFormatter = function($__super) {
+      "use strict";
+
       function PhoneFormatter() {
         var args = [].slice.call(arguments, 0);
 
@@ -4480,13 +4705,13 @@
       $$phone_formatter$$$__Object$defineProperty(PhoneFormatter.prototype, "guessFormatFromText", {
         value: function(text) {
           if (text && text[0] === '+') {
-            this.delimiterMap = $$phone_formatter$$NANP_PHONE_DELIMITERS_WITH_PLUS;
+            this.delimiterMap = $$phone_formatter$$NANPPhoneDelimitersWithPlus;
             this.maximumLength = 1 + 1 + 10 + 5;
           } else if (text && text[0] === '1') {
-            this.delimiterMap = $$phone_formatter$$NANP_PHONE_DELIMITERS_WITH_1;
+            this.delimiterMap = $$phone_formatter$$NANPPhoneDelimitersWithOne;
             this.maximumLength = 1 + 10 + 5;
           } else {
-            this.delimiterMap = $$phone_formatter$$NANP_PHONE_DELIMITERS;
+            this.delimiterMap = $$phone_formatter$$NANPPhoneDelimiters;
             this.maximumLength = 10 + 4;
           }
         },
@@ -4525,9 +4750,16 @@
     var $$social_security_number_formatter$$$__Object$getPrototypeOf = Object.getPrototypeOf;
     var $$social_security_number_formatter$$$__Object$defineProperty = Object.defineProperty;
     var $$social_security_number_formatter$$$__Object$create = Object.create;
+
+    /**
+     * @const
+     * @private
+     */
     var $$social_security_number_formatter$$DIGITS_PATTERN = /^\d*$/;
 
     var $$social_security_number_formatter$$SocialSecurityNumberFormatter = function($__super) {
+      "use strict";
+
       function SocialSecurityNumberFormatter() {
         $$social_security_number_formatter$$$__Object$getPrototypeOf(SocialSecurityNumberFormatter.prototype).constructor.call(this, '-');
         this.maximumLength = 9 + 2;
@@ -4550,9 +4782,9 @@
       });
 
       $$social_security_number_formatter$$$__Object$defineProperty(SocialSecurityNumberFormatter.prototype, "isChangeValid", {
-        value: function(change) {
+        value: function(change, error) {
           if ($$social_security_number_formatter$$DIGITS_PATTERN.test(change.inserted.text)) {
-            return $$social_security_number_formatter$$$__Object$getPrototypeOf(SocialSecurityNumberFormatter.prototype).isChangeValid.call(this, change);
+            return $$social_security_number_formatter$$$__Object$getPrototypeOf(SocialSecurityNumberFormatter.prototype).isChangeValid.call(this, change, error);
           } else {
             return false;
           }
@@ -4567,6 +4799,10 @@
 
     var $$social_security_number_formatter$$default = $$social_security_number_formatter$$SocialSecurityNumberFormatter;
 
+    /**
+     * @namespace FieldKit
+     * @readonly
+     */
     var index$$FieldKit = {
       AdaptiveCardFormatter: $$adaptive_card_formatter$$default,
       AmexCardFormatter: $$amex_card_formatter$$default,
