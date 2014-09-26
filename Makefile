@@ -17,7 +17,7 @@ dist: dist/field-kit.js dist/field-kit.min.js docs
 #           esnext -o $@ $<
 #
 define esnextbuild
-$(patsubst %.js, $(2)/%.js, $(notdir $(1))): $(ESNEXT) $(1)
+$(patsubst %.js, $(2)/%.js, $(notdir $(1))): $(1)
 	@mkdir -p $(2)
 	$(ESNEXT) -o $$@ $$<
 endef
