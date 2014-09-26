@@ -4,7 +4,7 @@ COMPILE_MODULES=$(NPMBIN)/compile-modules
 JSHINT=$(NPMBIN)/jshint
 JSDOC=$(NPMBIN)/jsdoc
 
-all: dist
+all: dist test
 
 clean: clean-docs
 	rm -rf build dist
