@@ -83,6 +83,10 @@ helpers for entering text that do the right thing and then use them everywhere.
 
 ### Setup
 
+Prerequisites:
+
+* closure-compiler (`$ brew install closure-compiler`)
+
 First, install the development dependencies:
 
 ```
