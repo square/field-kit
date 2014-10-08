@@ -169,7 +169,7 @@
         </div>
 
         <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="text-field-example" /&gt;</code></pre>
-        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField($('#text-field-example'));
+        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField(document.getElementById('text-field-example'));
 field.setFocusedPlaceholder('John Smith');
 field.setUnfocusedPlaceholder('First Name');</code></pre>
       </div>
@@ -200,7 +200,7 @@ field.setUnfocusedPlaceholder('First Name');</code></pre>
         </div>
 
         <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="number"&gt;</code></pre>
-        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField($('#number'));
+        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField(document.getElementById('number'));
 field.setFormatter(new FieldKit.NumberFormatter()
   .setNumberStyle(Math.random() &gt; 0.5 ?
     FieldKit.NumberFormatter.Style.PERCENT :
@@ -241,7 +241,7 @@ field.setValue((Math.random() &gt; 0.5 ? 1 : -1) * Math.random()*10);</code></pr
         </div>
 
         <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="expiry" placeholder="mm/yy"&gt;</code></pre>
-        <pre class="prettyprint docs-example-code docs-example-code-js"><code>new FieldKit.ExpiryDateField($('#expiry'));</code></pre>
+        <pre class="prettyprint docs-example-code docs-example-code-js"><code>new FieldKit.ExpiryDateField(document.getElementById('expiry'));</code></pre>
       </div>
     </div>
 
@@ -274,12 +274,12 @@ field.setValue((Math.random() &gt; 0.5 ? 1 : -1) * Math.random()*10);</code></pr
         </div>
 
         <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="card-number" placeholder="1234 5678 9012 3456"&gt;
-&lt;div id="card-type"&gt;Card type: &lt;span&gt;unknown&lt;/span&gt;&lt;/div&gt;</code></pre>
-        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.CardTextField($('#card-number'));
+&lt;div id="card-type"&gt;Card type: &lt;span id="card-type-span"&gt;unknown&lt;/span&gt;&lt;/div&gt;</code></pre>
+        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.CardTextField(document.getElementById('card-number'));
 field.setCardMaskStrategy(FieldKit.CardTextField.CardMaskStrategy.DoneEditing);
 field.setDelegate({
   textDidChange: function() {
-    $('#card-type span').text(field.cardType() || 'unknown');
+    document.getElementById('card-type-span').innerHTML = (field.cardType() || 'unknown');
   }
 });</code></pre>
       </div>
@@ -313,7 +313,7 @@ field.setDelegate({
         </div>
 
         <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="ssn" placeholder="123-45-6789"&gt;</code></pre>
-        <pre class="prettyprint docs-example-code docs-example-code-js"><code>new FieldKit.TextField($('#ssn'), new FieldKit.SocialSecurityNumberFormatter());</code></pre>
+        <pre class="prettyprint docs-example-code docs-example-code-js"><code>new FieldKit.TextField(document.getElementById('ssn'), new FieldKit.SocialSecurityNumberFormatter());</code></pre>
       </div>
     </div>
 
@@ -343,7 +343,7 @@ field.setDelegate({
         </div>
 
         <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="tel" id="phone" placeholder="(415) 555-1212"&gt;</code></pre>
-        <pre class="prettyprint docs-example-code docs-example-code-js"><code>new FieldKit.TextField($('#phone'), new FieldKit.PhoneFormatter());</code></pre>
+        <pre class="prettyprint docs-example-code docs-example-code-js"><code>new FieldKit.TextField(document.getElementById('phone'), new FieldKit.PhoneFormatter());</code></pre>
       </div>
     </div>
 
@@ -416,7 +416,7 @@ interface Range
         </div>
 
         <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="b-to-a" placeholder="changes 'b' to 'a'"&gt;</code></pre>
-        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField($('#b-to-a'));
+        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField(document.getElementById('b-to-a'));
 field.setFormatter({
   format: function(value){ return value.replace(/b/g, 'a').replace(/B/g, 'A'); },
   parse: function(value){ return value; },
@@ -450,7 +450,7 @@ field.setFormatter({
         </div>
 
         <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="no-selection" placeholder="no selection"&gt;</code></pre>
-        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField($('#no-selection'));
+        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField(document.getElementById('no-selection'));
 field.setFormatter({
   format: function(value){ return value; },
   parse: function(value){ return value; },
@@ -492,17 +492,25 @@ field.setFormatter({
         </div>
 
         <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;form id="form-test"&gt;
-  &lt;input type="text" placeholder="first name"&gt;
-  &lt;input type="text" placeholder="last name"&gt;
+  &lt;input type="text" class="form-test" placeholder="first name"&gt;
+  &lt;input type="text" class="form-test" placeholder="last name"&gt;
   &lt;input type="submit" class="btn btn-primary"&gt;
 &lt;/form&gt;</code></pre>
-        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var fields = $('#form-test :text').map(function() {
-  return new FieldKit.TextField($(this));
+        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var fields = Array.prototype.filter.call(document.getElementsByClassName('form-test'), function(el) {
+  return new FieldKit.TextField(el);
 });
-$('#form-test').submit(function() {
-  alert("Hello, " + fields[0].value() + " " + fields[1].value());
-  return false;
-});
+var form = document.getElementById('form-test'),
+    popup = function(event) {
+      event&&event.preventDefault();
+      alert('Hello, ' + fields[0].value + ' ' + fields[1].value);
+      return false;
+    };
+
+if (form.addEventListener) {
+  form.addEventListener('submit', popup, false);  //Modern browsers
+} else if (form.attachEvent) {
+  form.attachEvent('onsubmit', popup);            //Old IE
+}
       </div>
     </div>
 
@@ -514,11 +522,12 @@ $('#form-test').submit(function() {
   </div>
 
 
-  <script src="jquery.js" type="text/javascript" charset="utf-8"></script>
   <script src="jquery.caret.js" type="text/javascript" charset="utf-8"></script>
   <script src="field-kit.js" type="text/javascript" charset="utf-8"></script>
-  <script src="index.js" type="text/javascript" charset="utf-8"></script>
 
+  <!-- Demo JS -->
+  <script src="jquery.js" type="text/javascript" charset="utf-8"></script>
+  <script src="index.js" type="text/javascript" charset="utf-8"></script>
   <script src="google-code-prettify/prettify.js" type="text/javascript" charset="utf-8"></script>
 </body>
 </html>
