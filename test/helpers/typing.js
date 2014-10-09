@@ -20,8 +20,7 @@ class Type {
   perform() {
     FakeEvent.eventsForKeys(this.keys).forEach(event => {
       event.type = 'keydown';
-      this.element.dispatchEvent(event);
-      if (shouldFireKeypress(this.element, event)) {
+      if (shouldFireKeypress(this.element, !this.element.dispatchEvent(event))) {
         event.type = 'keypress';
         this.element.dispatchEvent(event);
       }
@@ -31,10 +30,10 @@ class Type {
   }
 }
 
-function shouldFireKeypress(element, keyDownEvent) {
+function shouldFireKeypress(element, keyDownEventPreventedDefault) {
   var document = element.ownerDocument;
   var window = document.defaultView;
-  return !keyDownEvent.isDefaultPrevented() ||
+  return !keyDownEventPreventedDefault ||
     window.navigator.FK_firesKeyPressWhenKeydownPrevented;
 }
 

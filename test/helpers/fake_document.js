@@ -3,6 +3,7 @@
 import FakeElement from './fake_element';
 import FakeInput from './fake_input';
 import FakeWindow from './fake_window';
+import FakeEvent from './fake_event';
 
 class FakeDocument {
   constructor() {
@@ -19,6 +20,10 @@ class FakeDocument {
     } else {
       return new FakeElement(this, tagName);
     }
+  }
+
+  createEvent() {
+    return new FakeEvent();
   }
 
   toString() {
