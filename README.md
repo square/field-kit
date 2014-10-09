@@ -118,6 +118,6 @@ Contributions via pull requests are very welcome! Follow the steps in
 Developing above, then add your feature or bugfix with tests to cover it, push
 to a branch, and open a pull request. Don't worry about rebuilding
 dist/field-kit.js. If you need to for some reason, run `npm run build`.
-[demo-page]: https://stash.corp.squareup.com/www/JS/field-kit/gh-pages/
+[demo-page]: https://stash.corp.squareup.com/www/JS/field-kit/gh-pages/public/
 [nsformatter]: https://developer.apple.com/library/mac/documentation/cocoa/reference/foundation/classes/NSFormatter_Class/Reference/Reference.html
 [stround]: https://github.com/square/stround
