@@ -45,6 +45,10 @@ class FakeEvent {
     this._defaultPrevented = false;
   }
 
+  initEvent(type, bubbles, cancelable) {
+    this.type = type;
+  }
+
   preventDefault() {
     this._defaultPrevented = true;
   }

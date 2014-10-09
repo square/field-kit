@@ -101,6 +101,7 @@ class FakeElement {
       }
     }
     this.emit(event.type, event);
+    return !event.isDefaultPrevented();
   }
 
   emit(event, ...data) {
