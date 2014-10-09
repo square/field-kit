@@ -12,6 +12,7 @@ class FakeElement {
 
     if (tagName) {
       this.tagName = tagName;
+      this.nodeName = tagName;
     } else {
       throw new Error("cannot create elements without a tag name");
     }
