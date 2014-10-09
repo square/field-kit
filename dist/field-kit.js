@@ -2252,8 +2252,10 @@
 
       $$text_field$$$__Object$defineProperty(TextField.prototype, "_fireEvent", {
         value: function(eventType) {
-          if (typeof CustomEvent === 'function') {
-            this.element.dispatchEvent(new CustomEvent(eventType, {}));
+          var document = this.element.ownerDocument;
+          var window = document.defaultView;
+          if (typeof window.CustomEvent === 'function') {
+            this.element.dispatchEvent(new window.CustomEvent(eventType, {}));
           } else {
             var event = document.createEvent('Event');
             event.initEvent(eventType, false, false);
