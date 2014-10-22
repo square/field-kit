@@ -4829,6 +4829,9 @@
      * @namespace RegionDefaults
      */
     var $$number_formatter$$RegionDefaults = {
+      AU: {
+        currencyCode: 'AUD'
+      },
       CA: {
         currencyCode: 'CAD'
       },
@@ -4867,6 +4870,10 @@
         maximumFractionDigits: 2,
         minimumIntegerDigits: 1,
         usesGroupingSeparator: true
+      },
+      AUD: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: 'AU$'
       },
       CAD: {
         currencySymbol: '$',
