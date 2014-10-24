@@ -4829,28 +4829,523 @@
      * @namespace RegionDefaults
      */
     var $$number_formatter$$RegionDefaults = {
+      AE: {
+        currencyCode: 'AED'
+      },
+      AG: {
+        currencyCode: 'XCD'
+      },
+      AI: {
+        currencyCode: 'XCD'
+      },
+      AL: {
+        currencyCode: 'ALL'
+      },
+      AM: {
+        currencyCode: 'AMD'
+      },
+      AO: {
+        currencyCode: 'AOA'
+      },
+      AR: {
+        currencyCode: 'ARS'
+      },
+      AT: {
+        currencyCode: 'EUR'
+      },
       AU: {
         currencyCode: 'AUD'
+      },
+      AW: {
+        currencyCode: 'AWG'
+      },
+      AZ: {
+        currencyCode: 'AZN'
+      },
+      BA: {
+        currencyCode: 'BAM'
+      },
+      BB: {
+        currencyCode: 'BBD'
+      },
+      BD: {
+        currencyCode: 'BDT'
+      },
+      BE: {
+        currencyCode: 'EUR'
+      },
+      BF: {
+        currencyCode: 'XOF'
+      },
+      BG: {
+        currencyCode: 'BGN'
+      },
+      BH: {
+        currencyCode: 'BHD'
+      },
+      BJ: {
+        currencyCode: 'XOF'
+      },
+      BM: {
+        currencyCode: 'BMD'
+      },
+      BN: {
+        currencyCode: 'BND'
+      },
+      BO: {
+        currencyCode: 'BOB'
+      },
+      BR: {
+        currencyCode: 'BRL'
+      },
+      BS: {
+        currencyCode: 'BSD'
+      },
+      BT: {
+        currencyCode: 'BTN'
+      },
+      BW: {
+        currencyCode: 'BWP'
+      },
+      BY: {
+        currencyCode: 'BYR'
+      },
+      BZ: {
+        currencyCode: 'BZD'
       },
       CA: {
         currencyCode: 'CAD'
       },
+      CG: {
+        currencyCode: 'CDF'
+      },
+      CH: {
+        currencyCode: 'CHF'
+      },
+      CI: {
+        currencyCode: 'XOF'
+      },
+      CL: {
+        currencyCode: 'CLP'
+      },
+      CM: {
+        currencyCode: 'XAF'
+      },
+      CN: {
+        currencyCode: 'CNY'
+      },
+      CO: {
+        currencyCode: 'COP'
+      },
+      CR: {
+        currencyCode: 'CRC'
+      },
+      CV: {
+        currencyCode: 'CVE'
+      },
+      CY: {
+        currencyCode: 'EUR'
+      },
+      CZ: {
+        currencyCode: 'CZK'
+      },
       DE: {
         currencyCode: 'EUR'
+      },
+      DK: {
+        currencyCode: 'DKK'
+      },
+      DM: {
+        currencyCode: 'XCD'
+      },
+      DO: {
+        currencyCode: 'DOP'
+      },
+      DZ: {
+        currencyCode: 'DZD'
+      },
+      EC: {
+        currencyCode: 'USD'
+      },
+      EE: {
+        currencyCode: 'EUR'
+      },
+      EG: {
+        currencyCode: 'EGP'
       },
       ES: {
         currencyCode: 'EUR'
       },
+      ET: {
+        currencyCode: 'ETB'
+      },
+      FI: {
+        currencyCode: 'EUR'
+      },
+      FJ: {
+        currencyCode: 'FJD'
+      },
+      FM: {
+        currencyCode: 'USD'
+      },
       FR: {
         currencyCode: 'EUR'
+      },
+      GA: {
+        currencyCode: 'XAF'
       },
       GB: {
         currencyCode: 'GBP'
       },
+      GD: {
+        currencyCode: 'XCD'
+      },
+      GE: {
+        currencyCode: 'GEL'
+      },
+      GH: {
+        currencyCode: 'GHS'
+      },
+      GI: {
+        currencyCode: 'GIP'
+      },
+      GM: {
+        currencyCode: 'GMD'
+      },
+      GR: {
+        currencyCode: 'EUR'
+      },
+      GT: {
+        currencyCode: 'GTQ'
+      },
+      GW: {
+        currencyCode: 'XOF'
+      },
+      GY: {
+        currencyCode: 'GYD'
+      },
+      HK: {
+        currencyCode: 'HKD'
+      },
+      HN: {
+        currencyCode: 'HNL'
+      },
+      HR: {
+        currencyCode: 'HRK'
+      },
+      HT: {
+        currencyCode: 'HTG'
+      },
+      HU: {
+        currencyCode: 'HUF'
+      },
+      ID: {
+        currencyCode: 'IDR'
+      },
+      IE: {
+        currencyCode: 'EUR'
+      },
+      IL: {
+        currencyCode: 'ILS'
+      },
+      IN: {
+        currencyCode: 'INR'
+      },
+      IS: {
+        currencyCode: 'ISK'
+      },
+      IT: {
+        currencyCode: 'EUR'
+      },
+      JM: {
+        currencyCode: 'JMD'
+      },
+      JO: {
+        currencyCode: 'JOD'
+      },
       JP: {
         currencyCode: 'JPY'
       },
+      KE: {
+        currencyCode: 'KES'
+      },
+      KG: {
+        currencyCode: 'KGS'
+      },
+      KH: {
+        currencyCode: 'KHR'
+      },
+      KN: {
+        currencyCode: 'XCD'
+      },
+      KR: {
+        currencyCode: 'KRW'
+      },
+      KW: {
+        currencyCode: 'KWD'
+      },
+      KY: {
+        currencyCode: 'KYD'
+      },
+      KZ: {
+        currencyCode: 'KZT'
+      },
+      LA: {
+        currencyCode: 'LAK'
+      },
+      LB: {
+        currencyCode: 'LBP'
+      },
+      LC: {
+        currencyCode: 'XCD'
+      },
+      LI: {
+        currencyCode: 'CHF'
+      },
+      LK: {
+        currencyCode: 'LKR'
+      },
+      LR: {
+        currencyCode: 'LRD'
+      },
+      LT: {
+        currencyCode: 'LTL'
+      },
+      LU: {
+        currencyCode: 'EUR'
+      },
+      LV: {
+        currencyCode: 'EUR'
+      },
+      MA: {
+        currencyCode: 'MAD'
+      },
+      MD: {
+        currencyCode: 'MDL'
+      },
+      MG: {
+        currencyCode: 'MGA'
+      },
+      MK: {
+        currencyCode: 'MKD'
+      },
+      ML: {
+        currencyCode: 'XOF'
+      },
+      MM: {
+        currencyCode: 'MMK'
+      },
+      MN: {
+        currencyCode: 'MNT'
+      },
+      MO: {
+        currencyCode: 'MOP'
+      },
+      MR: {
+        currencyCode: 'MRO'
+      },
+      MS: {
+        currencyCode: 'XCD'
+      },
+      MT: {
+        currencyCode: 'EUR'
+      },
+      MU: {
+        currencyCode: 'MUR'
+      },
+      MW: {
+        currencyCode: 'MWK'
+      },
+      MX: {
+        currencyCode: 'MXN'
+      },
+      MY: {
+        currencyCode: 'MYR'
+      },
+      MZ: {
+        currencyCode: 'MZN'
+      },
+      NA: {
+        currencyCode: 'NAD'
+      },
+      NE: {
+        currencyCode: 'XOF'
+      },
+      NG: {
+        currencyCode: 'NGN'
+      },
+      NI: {
+        currencyCode: 'NIO'
+      },
+      NL: {
+        currencyCode: 'EUR'
+      },
+      NO: {
+        currencyCode: 'NOK'
+      },
+      NP: {
+        currencyCode: 'NPR'
+      },
+      NZ: {
+        currencyCode: 'NZD'
+      },
+      OM: {
+        currencyCode: 'OMR'
+      },
+      PA: {
+        currencyCode: 'PAB'
+      },
+      PE: {
+        currencyCode: 'PEN'
+      },
+      PG: {
+        currencyCode: 'PGK'
+      },
+      PH: {
+        currencyCode: 'PHP'
+      },
+      PK: {
+        currencyCode: 'PKR'
+      },
+      PL: {
+        currencyCode: 'PLN'
+      },
+      PR: {
+        currencyCode: 'USD'
+      },
+      PT: {
+        currencyCode: 'EUR'
+      },
+      PW: {
+        currencyCode: 'USD'
+      },
+      PY: {
+        currencyCode: 'PYG'
+      },
+      QA: {
+        currencyCode: 'QAR'
+      },
+      RO: {
+        currencyCode: 'RON'
+      },
+      RS: {
+        currencyCode: 'RSD'
+      },
+      RU: {
+        currencyCode: 'RUB'
+      },
+      RW: {
+        currencyCode: 'RWF'
+      },
+      SA: {
+        currencyCode: 'SAR'
+      },
+      SB: {
+        currencyCode: 'SBD'
+      },
+      SC: {
+        currencyCode: 'SCR'
+      },
+      SE: {
+        currencyCode: 'SEK'
+      },
+      SG: {
+        currencyCode: 'SGD'
+      },
+      SI: {
+        currencyCode: 'EUR'
+      },
+      SK: {
+        currencyCode: 'EUR'
+      },
+      SL: {
+        currencyCode: 'SLL'
+      },
+      SN: {
+        currencyCode: 'XOF'
+      },
+      SR: {
+        currencyCode: 'SRD'
+      },
+      ST: {
+        currencyCode: 'STD'
+      },
+      SV: {
+        currencyCode: 'SVC'
+      },
+      SZ: {
+        currencyCode: 'SZL'
+      },
+      TC: {
+        currencyCode: 'USD'
+      },
+      TD: {
+        currencyCode: 'XAF'
+      },
+      TG: {
+        currencyCode: 'XOF'
+      },
+      TH: {
+        currencyCode: 'THB'
+      },
+      TJ: {
+        currencyCode: 'TJS'
+      },
+      TM: {
+        currencyCode: 'TMT'
+      },
+      TN: {
+        currencyCode: 'TND'
+      },
+      TR: {
+        currencyCode: 'TRY'
+      },
+      TT: {
+        currencyCode: 'TTD'
+      },
+      TW: {
+        currencyCode: 'TWD'
+      },
+      TZ: {
+        currencyCode: 'TZS'
+      },
+      UA: {
+        currencyCode: 'UAH'
+      },
+      UG: {
+        currencyCode: 'UGX'
+      },
       US: {
+        currencyCode: 'USD'
+      },
+      UY: {
+        currencyCode: 'UYU'
+      },
+      UZ: {
+        currencyCode: 'UZS'
+      },
+      VC: {
+        currencyCode: 'XCD'
+      },
+      VE: {
+        currencyCode: 'VEF'
+      },
+      VG: {
+        currencyCode: 'USD'
+      },
+      VN: {
+        currencyCode: 'VND'
+      },
+      YE: {
+        currencyCode: 'YER'
+      },
+      ZA: {
+        currencyCode: 'ZAR'
+      },
+      ZM: {
+        currencyCode: 'ZMW'
+      },
+      ZW: {
         currencyCode: 'USD'
       }
     };
@@ -4871,30 +5366,553 @@
         minimumIntegerDigits: 1,
         usesGroupingSeparator: true
       },
+      AED: {
+        currencySymbol: 'د.إ',
+        internationalCurrencySymbol: 'د.إ'
+      },
+      ALL: {
+        currencySymbol: 'L',
+        internationalCurrencySymbol: 'L'
+      },
+      AMD: {
+        currencySymbol: 'դր.',
+        internationalCurrencySymbol: 'դր.'
+      },
+      AOA: {
+        currencySymbol: 'Kz',
+        internationalCurrencySymbol: 'Kz'
+      },
+      ARS: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: '$'
+      },
       AUD: {
         currencySymbol: '$',
-        internationalCurrencySymbol: 'AU$'
+        internationalCurrencySymbol: '$'
+      },
+      AWG: {
+        currencySymbol: 'ƒ',
+        internationalCurrencySymbol: 'ƒ'
+      },
+      AZN: {
+        currencySymbol: '₼',
+        internationalCurrencySymbol: '₼'
+      },
+      BAM: {
+        currencySymbol: 'КМ',
+        internationalCurrencySymbol: 'КМ'
+      },
+      BBD: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: '$'
+      },
+      BDT: {
+        currencySymbol: '৳',
+        internationalCurrencySymbol: '৳'
+      },
+      BGN: {
+        currencySymbol: 'лв',
+        internationalCurrencySymbol: 'лв'
+      },
+      BHD: {
+        currencySymbol: 'ب.د',
+        internationalCurrencySymbol: 'ب.د',
+        minimumFractionDigits: 3,
+        maximumFractionDigits: 3
+      },
+      BMD: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: '$'
+      },
+      BND: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: '$'
+      },
+      BOB: {
+        currencySymbol: 'Bs.',
+        internationalCurrencySymbol: 'Bs.'
+      },
+      BRL: {
+        currencySymbol: 'R$',
+        internationalCurrencySymbol: 'R$'
+      },
+      BSD: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: '$'
+      },
+      BTN: {
+        currencySymbol: 'Nu.',
+        internationalCurrencySymbol: 'Nu.'
+      },
+      BWP: {
+        currencySymbol: 'P',
+        internationalCurrencySymbol: 'P'
+      },
+      BYR: {
+        currencySymbol: 'Br',
+        internationalCurrencySymbol: 'Br'
+      },
+      BZD: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: '$'
       },
       CAD: {
         currencySymbol: '$',
-        internationalCurrencySymbol: 'CA$'
+        internationalCurrencySymbol: '$'
       },
-      EUR: {
-        currencySymbol: '€'
+      CDF: {
+        currencySymbol: 'Fr',
+        internationalCurrencySymbol: 'Fr'
       },
-      GBP: {
-        currencySymbol: '£',
-        internationalCurrencySymbol: 'GB£'
+      CHF: {
+        currencySymbol: 'Fr',
+        internationalCurrencySymbol: 'Fr'
       },
-      JPY: {
-        currencySymbol: '¥',
-        internationalCurrencySymbol: 'JP¥',
+      CLP: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: '$',
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
       },
+      CNY: {
+        currencySymbol: '¥',
+        internationalCurrencySymbol: '¥'
+      },
+      COP: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: '$'
+      },
+      CRC: {
+        currencySymbol: '₡',
+        internationalCurrencySymbol: '₡'
+      },
+      CVE: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: '$'
+      },
+      CZK: {
+        currencySymbol: 'Kč',
+        internationalCurrencySymbol: 'Kč'
+      },
+      DKK: {
+        currencySymbol: 'kr',
+        internationalCurrencySymbol: 'kr'
+      },
+      DOP: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: '$'
+      },
+      DZD: {
+        currencySymbol: 'د.ج',
+        internationalCurrencySymbol: 'د.ج'
+      },
+      EGP: {
+        currencySymbol: 'ج.م',
+        internationalCurrencySymbol: 'ج.م'
+      },
+      ETB: {
+        currencySymbol: 'ብር',
+        internationalCurrencySymbol: 'ብር'
+      },
+      EUR: {
+        currencySymbol: '€',
+        internationalCurrencySymbol: '€'
+      },
+      FJD: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: '$'
+      },
+      GBP: {
+        currencySymbol: '£',
+        internationalCurrencySymbol: '£'
+      },
+      GEL: {
+        currencySymbol: 'ლ,',
+        internationalCurrencySymbol: 'ლ,'
+      },
+      GHS: {
+        currencySymbol: '₵',
+        internationalCurrencySymbol: '₵'
+      },
+      GIP: {
+        currencySymbol: '£',
+        internationalCurrencySymbol: '£'
+      },
+      GMD: {
+        currencySymbol: 'D',
+        internationalCurrencySymbol: 'D'
+      },
+      GTQ: {
+        currencySymbol: 'Q',
+        internationalCurrencySymbol: 'Q'
+      },
+      GYD: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: '$'
+      },
+      HKD: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: '$'
+      },
+      HNL: {
+        currencySymbol: 'L',
+        internationalCurrencySymbol: 'L'
+      },
+      HRK: {
+        currencySymbol: 'kn',
+        internationalCurrencySymbol: 'kn'
+      },
+      HTG: {
+        currencySymbol: 'G',
+        internationalCurrencySymbol: 'G'
+      },
+      HUF: {
+        currencySymbol: 'Ft',
+        internationalCurrencySymbol: 'Ft'
+      },
+      IDR: {
+        currencySymbol: 'Rp',
+        internationalCurrencySymbol: 'Rp'
+      },
+      ILS: {
+        currencySymbol: '₪',
+        internationalCurrencySymbol: '₪'
+      },
+      INR: {
+        currencySymbol: '₹',
+        internationalCurrencySymbol: '₹'
+      },
+      ISK: {
+        currencySymbol: 'kr',
+        internationalCurrencySymbol: 'kr'
+      },
+      JMD: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: '$'
+      },
+      JOD: {
+        currencySymbol: 'د.ا',
+        internationalCurrencySymbol: 'د.ا'
+      },
+      JPY: {
+        currencySymbol: '¥',
+        internationalCurrencySymbol: '¥',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      },
+      KES: {
+        currencySymbol: 'KSh',
+        internationalCurrencySymbol: 'KSh'
+      },
+      KGS: {
+        currencySymbol: 'som',
+        internationalCurrencySymbol: 'som'
+      },
+      KHR: {
+        currencySymbol: '៛',
+        internationalCurrencySymbol: '៛'
+      },
+      KRW: {
+        currencySymbol: '₩',
+        internationalCurrencySymbol: '₩',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      },
+      KWD: {
+        currencySymbol: 'د.ك',
+        internationalCurrencySymbol: 'د.ك',
+        minimumFractionDigits: 3,
+        maximumFractionDigits: 3
+      },
+      KYD: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: '$'
+      },
+      KZT: {
+        currencySymbol: '〒',
+        internationalCurrencySymbol: '〒'
+      },
+      LAK: {
+        currencySymbol: '₭',
+        internationalCurrencySymbol: '₭'
+      },
+      LBP: {
+        currencySymbol: 'ل.ل',
+        internationalCurrencySymbol: 'ل.ل'
+      },
+      LKR: {
+        currencySymbol: '₨',
+        internationalCurrencySymbol: '₨'
+      },
+      LRD: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: '$'
+      },
+      LTL: {
+        currencySymbol: 'Lt',
+        internationalCurrencySymbol: 'Lt'
+      },
+      MAD: {
+        currencySymbol: 'د.م.',
+        internationalCurrencySymbol: 'د.م.'
+      },
+      MDL: {
+        currencySymbol: 'L',
+        internationalCurrencySymbol: 'L'
+      },
+      MGA: {
+        currencySymbol: 'Ar',
+        internationalCurrencySymbol: 'Ar',
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1
+      },
+      MKD: {
+        currencySymbol: 'ден',
+        internationalCurrencySymbol: 'ден'
+      },
+      MMK: {
+        currencySymbol: 'K',
+        internationalCurrencySymbol: 'K'
+      },
+      MNT: {
+        currencySymbol: '₮',
+        internationalCurrencySymbol: '₮'
+      },
+      MOP: {
+        currencySymbol: 'P',
+        internationalCurrencySymbol: 'P'
+      },
+      MRO: {
+        currencySymbol: 'UM',
+        internationalCurrencySymbol: 'UM',
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1
+      },
+      MUR: {
+        currencySymbol: '₨',
+        internationalCurrencySymbol: '₨'
+      },
+      MWK: {
+        currencySymbol: 'MK',
+        internationalCurrencySymbol: 'MK'
+      },
+      MXN: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: '$'
+      },
+      MYR: {
+        currencySymbol: 'RM',
+        internationalCurrencySymbol: 'RM'
+      },
+      MZN: {
+        currencySymbol: 'MTn',
+        internationalCurrencySymbol: 'MTn'
+      },
+      NAD: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: '$'
+      },
+      NGN: {
+        currencySymbol: '₦',
+        internationalCurrencySymbol: '₦'
+      },
+      NIO: {
+        currencySymbol: 'C$',
+        internationalCurrencySymbol: 'C$'
+      },
+      NOK: {
+        currencySymbol: 'kr',
+        internationalCurrencySymbol: 'kr'
+      },
+      NPR: {
+        currencySymbol: '₨',
+        internationalCurrencySymbol: '₨'
+      },
+      NZD: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: '$'
+      },
+      OMR: {
+        currencySymbol: 'ر.ع.',
+        internationalCurrencySymbol: 'ر.ع.',
+        minimumFractionDigits: 3,
+        maximumFractionDigits: 3
+      },
+      PAB: {
+        currencySymbol: 'B/.',
+        internationalCurrencySymbol: 'B/.'
+      },
+      PEN: {
+        currencySymbol: 'S/.',
+        internationalCurrencySymbol: 'S/.'
+      },
+      PGK: {
+        currencySymbol: 'K',
+        internationalCurrencySymbol: 'K'
+      },
+      PHP: {
+        currencySymbol: '₱',
+        internationalCurrencySymbol: '₱'
+      },
+      PKR: {
+        currencySymbol: '₨',
+        internationalCurrencySymbol: '₨'
+      },
+      PLN: {
+        currencySymbol: 'zł',
+        internationalCurrencySymbol: 'zł'
+      },
+      PYG: {
+        currencySymbol: '₲',
+        internationalCurrencySymbol: '₲'
+      },
+      QAR: {
+        currencySymbol: 'ر.ق',
+        internationalCurrencySymbol: 'ر.ق'
+      },
+      RON: {
+        currencySymbol: 'Lei',
+        internationalCurrencySymbol: 'Lei'
+      },
+      RSD: {
+        currencySymbol: 'РСД',
+        internationalCurrencySymbol: 'РСД'
+      },
+      RUB: {
+        currencySymbol: '₽',
+        internationalCurrencySymbol: '₽'
+      },
+      RWF: {
+        currencySymbol: 'FRw',
+        internationalCurrencySymbol: 'FRw'
+      },
+      SAR: {
+        currencySymbol: 'ر.س',
+        internationalCurrencySymbol: 'ر.س'
+      },
+      SBD: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: '$'
+      },
+      SCR: {
+        currencySymbol: '₨',
+        internationalCurrencySymbol: '₨'
+      },
+      SEK: {
+        currencySymbol: 'kr',
+        internationalCurrencySymbol: 'kr'
+      },
+      SGD: {
+        currencySymbol: 'S$',
+        internationalCurrencySymbol: 'S$'
+      },
+      SLL: {
+        currencySymbol: 'Le',
+        internationalCurrencySymbol: 'Le'
+      },
+      SRD: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: '$'
+      },
+      STD: {
+        currencySymbol: 'Db',
+        internationalCurrencySymbol: 'Db'
+      },
+      SVC: {
+        currencySymbol: '₡',
+        internationalCurrencySymbol: '₡'
+      },
+      SZL: {
+        currencySymbol: 'L',
+        internationalCurrencySymbol: 'L'
+      },
+      THB: {
+        currencySymbol: '฿',
+        internationalCurrencySymbol: '฿'
+      },
+      TJS: {
+        currencySymbol: 'ЅМ',
+        internationalCurrencySymbol: 'ЅМ'
+      },
+      TMT: {
+        currencySymbol: 'm',
+        internationalCurrencySymbol: 'm'
+      },
+      TND: {
+        currencySymbol: 'د.ت',
+        internationalCurrencySymbol: 'د.ت',
+        minimumFractionDigits: 3,
+        maximumFractionDigits: 3
+      },
+      TRY: {
+        currencySymbol: '₺',
+        internationalCurrencySymbol: '₺'
+      },
+      TTD: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: '$'
+      },
+      TWD: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: '$'
+      },
+      TZS: {
+        currencySymbol: 'Sh',
+        internationalCurrencySymbol: 'Sh'
+      },
+      UAH: {
+        currencySymbol: '₴',
+        internationalCurrencySymbol: '₴'
+      },
+      UGX: {
+        currencySymbol: 'USh',
+        internationalCurrencySymbol: 'USh'
+      },
       USD: {
         currencySymbol: '$',
-        internationalCurrencySymbol: 'US$'
+        internationalCurrencySymbol: '$'
+      },
+      UYU: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: '$'
+      },
+      UZS: {
+        currencySymbol: 'лв',
+        internationalCurrencySymbol: 'лв'
+      },
+      VEF: {
+        currencySymbol: 'Bs F',
+        internationalCurrencySymbol: 'Bs F'
+      },
+      VND: {
+        currencySymbol: '₫',
+        internationalCurrencySymbol: '₫',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      },
+      XAF: {
+        currencySymbol: 'Fr',
+        internationalCurrencySymbol: 'Fr'
+      },
+      XCD: {
+        currencySymbol: '$',
+        internationalCurrencySymbol: '$'
+      },
+      XOF: {
+        currencySymbol: 'Fr',
+        internationalCurrencySymbol: 'Fr'
+      },
+      YER: {
+        currencySymbol: '﷼',
+        internationalCurrencySymbol: '﷼'
+      },
+      ZAR: {
+        currencySymbol: 'R',
+        internationalCurrencySymbol: 'R'
+      },
+      ZMW: {
+        currencySymbol: 'ZMK',
+        internationalCurrencySymbol: 'ZMK'
       }
     };
 
