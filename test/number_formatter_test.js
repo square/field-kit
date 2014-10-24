@@ -669,6 +669,13 @@ describe('FieldKit.NumberFormatter', function() {
             formatter.setCurrencyCode('EUR');
             expect(formatter.format(1234.56)).to.equal('€1,234.56');
             expect(formatter.format(-1234.56)).to.equal('(€1,234.56)');
+
+            // A person in Israel who speaks Hebrew looking at Shekel.
+            formatter.setLocale('he-IL');
+            formatter.setCountryCode('IL');
+            formatter.setCurrencyCode('ILS');
+            expect(formatter.format(1234.56)).to.equal('₪1,234.56');
+            expect(formatter.format(-1234.56)).to.equal('(₪1,234.56)');
           });
 
           it('allows implicitly changing the digit settings', function() {
@@ -687,8 +694,8 @@ describe('FieldKit.NumberFormatter', function() {
             formatter.setLocale('en-US');
             formatter.setCountryCode('DE');
             formatter.setCurrencyCode('USD');
-            expect(formatter.format(1.2)).to.equal('US$1.20');
-            expect(formatter.format(-1.2)).to.equal('(US$1.20)');
+            expect(formatter.format(1.2)).to.equal('$1.20');
+            expect(formatter.format(-1.2)).to.equal('($1.20)');
           });
         });
 
