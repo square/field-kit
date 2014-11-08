@@ -5592,7 +5592,9 @@
       },
       JOD: {
         currencySymbol: 'د.ا',
-        internationalCurrencySymbol: 'د.ا'
+        internationalCurrencySymbol: 'د.ا',
+        minimumFractionDigits: 3,
+        maximumFractionDigits: 3
       },
       JPY: {
         currencySymbol: '¥',
@@ -5663,8 +5665,8 @@
       MGA: {
         currencySymbol: 'Ar',
         internationalCurrencySymbol: 'Ar',
-        minimumFractionDigits: 1,
-        maximumFractionDigits: 1
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
       },
       MKD: {
         currencySymbol: 'ден',
@@ -5685,8 +5687,8 @@
       MRO: {
         currencySymbol: 'UM',
         internationalCurrencySymbol: 'UM',
-        minimumFractionDigits: 1,
-        maximumFractionDigits: 1
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
       },
       MUR: {
         currencySymbol: '₨',
