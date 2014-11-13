@@ -21,7 +21,7 @@
     "test"
   ],
   "dependencies": {
-    "jquery-caret": "https://donovan@stash.corp.squareup.com/scm/js/jquery-caret.git#~0.0.1",
+    "jquery-caret": "https://git.corp.squareup.com/scm/js/jquery-caret.git#~0.0.1",
     "stround": "~0.1.0"
   }
 }
