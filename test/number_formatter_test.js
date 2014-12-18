@@ -694,8 +694,8 @@ describe('FieldKit.NumberFormatter', function() {
             formatter.setLocale('en-US');
             formatter.setCountryCode('DE');
             formatter.setCurrencyCode('USD');
-            expect(formatter.format(1.2)).to.equal('$1.20');
-            expect(formatter.format(-1.2)).to.equal('($1.20)');
+            expect(formatter.format(1.2)).to.equal('US$1.20');
+            expect(formatter.format(-1.2)).to.equal('(US$1.20)');
           });
         });
 
