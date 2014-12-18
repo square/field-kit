@@ -1939,7 +1939,7 @@
           var text = this.text();
           var delegate = this.delegate();
           var formatter = this.formatter();
-          if (!formatter) { return value; }
+          if (!formatter) { return text; }
 
           return formatter.parse(text, function(errorType) {
             if (delegate) {
@@ -5872,7 +5872,7 @@
       },
       USD: {
         currencySymbol: '$',
-        internationalCurrencySymbol: '$'
+        internationalCurrencySymbol: 'US$'
       },
       UYU: {
         currencySymbol: '$',
