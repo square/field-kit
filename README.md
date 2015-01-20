@@ -90,7 +90,7 @@ Prerequisites:
 First, install the development dependencies:
 
 ```
-$ npm --registry http://npm.corp.squareup.com:8000 install
+$ npm install
 ```
 
 Then, try running the tests:
