@@ -5020,6 +5020,9 @@
       GT: {
         currencyCode: 'GTQ'
       },
+      GU: {
+        currencyCode: 'USD'
+      },
       GW: {
         currencyCode: 'XOF'
       },
@@ -5142,6 +5145,9 @@
       },
       MO: {
         currencyCode: 'MOP'
+      },
+      MP: {
+        currencyCode: 'USD'
       },
       MR: {
         currencyCode: 'MRO'
@@ -5333,6 +5339,9 @@
         currencyCode: 'VEF'
       },
       VG: {
+        currencyCode: 'USD'
+      },
+      VI: {
         currencyCode: 'USD'
       },
       VN: {
