@@ -1,5 +1,5 @@
 NPMBIN=$(shell npm bin)
-ESNEXT=$(NPMBIN)/esnext
+BABEL=$(NPMBIN)/babel
 COMPILE_MODULES=$(NPMBIN)/compile-modules
 JSHINT=$(NPMBIN)/jshint
 JSDOC=$(NPMBIN)/jsdoc
@@ -14,22 +14,22 @@ dist: dist/field-kit.js dist/field-kit.min.js docs
 # Create rules dynamically of the form:
 #
 #   build/index.js: lib/index.js
-#           esnext -o $@ $<
+#           babel -o $@ $<
 #
-define esnextbuild
+define babelbuild
 $(patsubst %.js, $(2)/%.js, $(notdir $(1))): $(1)
 	@mkdir -p $(2)
-	$(ESNEXT) -o $$@ $$<
+	$(BABEL) -o $$@ --blacklist es6.modules,useStrict $$<
 endef
 
 # Build lib/*.js
-$(foreach file,$(wildcard lib/*.js),$(eval $(call esnextbuild, $(file), build/lib)))
+$(foreach file,$(wildcard lib/*.js),$(eval $(call babelbuild, $(file), build/lib)))
 
 # Build test/helpers/*.js
-$(foreach file,$(wildcard test/helpers/*.js),$(eval $(call esnextbuild, $(file), build/test/helpers)))
+$(foreach file,$(wildcard test/helpers/*.js),$(eval $(call babelbuild, $(file), build/test/helpers)))
 
 # Build test/*.js
-$(foreach file,$(wildcard test/*.js),$(eval $(call esnextbuild, $(file), build/test)))
+$(foreach file,$(wildcard test/*.js),$(eval $(call babelbuild, $(file), build/test)))
 
 # Collect the targets that may not exist yet for build/lib/*.js.
 LIB_OBJS=$(foreach file,$(wildcard lib/*.js),build/lib/$(notdir $(file)))
