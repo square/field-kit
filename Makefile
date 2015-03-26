@@ -1,6 +1,6 @@
 NPMBIN=$(shell npm bin)
-ESNEXT=$(NPMBIN)/esnext
-COMPILE_MODULES=$(NPMBIN)/compile-modules
+BABEL=$(NPMBIN)/babel
+BABEL_NODE=$(NPMBIN)/babel-node
 JSHINT=$(NPMBIN)/jshint
 JSDOC=$(NPMBIN)/jsdoc
 
@@ -11,39 +11,11 @@ clean: clean-docs
 
 dist: dist/field-kit.js dist/field-kit.min.js docs
 
-# Create rules dynamically of the form:
-#
-#   build/index.js: lib/index.js
-#           esnext -o $@ $<
-#
-define esnextbuild
-$(patsubst %.js, $(2)/%.js, $(notdir $(1))): $(1)
-	@mkdir -p $(2)
-	$(ESNEXT) -o $$@ $$<
-endef
-
-# Build lib/*.js
-$(foreach file,$(wildcard lib/*.js),$(eval $(call esnextbuild, $(file), build/lib)))
-
-# Build test/helpers/*.js
-$(foreach file,$(wildcard test/helpers/*.js),$(eval $(call esnextbuild, $(file), build/test/helpers)))
-
-# Build test/*.js
-$(foreach file,$(wildcard test/*.js),$(eval $(call esnextbuild, $(file), build/test)))
-
-# Collect the targets that may not exist yet for build/lib/*.js.
-LIB_OBJS=$(foreach file,$(wildcard lib/*.js),build/lib/$(notdir $(file)))
-
-# Collect the targets that may not exist yet for build/test/helpers/*.js.
-TEST_HELPERS_OBJS=$(foreach file,$(wildcard test/helpers/*.js),build/test/helpers/$(notdir $(file)))
-
-# Collect the targets that may not exist yet for build/test/*.js.
-TEST_OBJS=$(foreach file,$(wildcard test/*.js),build/test/$(notdir $(file)))
+build:
+	$(BABEL_NODE) script/build.js
 
 # Build the distribution file by using es6-modules to concatenate.
-dist/field-kit.js: $(LIB_OBJS) node_modules/stround/lib/*.js Makefile
-	@mkdir -p dist
-	$(COMPILE_MODULES) convert -I build/lib -I node_modules/stround/lib -f bundle -o $@ index
+dist/field-kit.js: build
 
 dist/%.min.js: dist/%.js
 	cat $< | closure-compiler --language_in ECMASCRIPT5 > $@
@@ -54,15 +26,12 @@ docs: clean-docs
 clean-docs:
 	rm -rf docs
 
-build/test/all.js: $(TEST_HELPERS_OBJS) $(TEST_OBJS) Makefile
-	$(COMPILE_MODULES) convert -I build/test -f bundle -o $@ $(TEST_OBJS)
-
-test-setup: dist/field-kit.js build/test/all.js Makefile
+test-setup: dist/field-kit.js Makefile
 
 lint: lib/*.js test/*.js
 	$(JSHINT) $^
 
-test: lint test-setup
+test: lint test-setup build
 	node_modules/karma/bin/karma start --single-run
 
-.PHONY: test lint test-setup docs
+.PHONY: test lint test-setup docs build
