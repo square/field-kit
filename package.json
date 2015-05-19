@@ -1,6 +1,6 @@
 {
   "name": "field-kit",
-  "version": "0.3.9",
+  "version": "0.3.10",
   "description": "Utilities to effectively manage text entry on the web.",
   "main": "lib/index.js",
   "scripts": {

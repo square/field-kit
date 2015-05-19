@@ -6829,8 +6829,8 @@
         internationalCurrencySymbol: "د.ج"
       },
       EGP: {
-        currencySymbol: "ج.م",
-        internationalCurrencySymbol: "ج.م"
+        currencySymbol: "E£",
+        internationalCurrencySymbol: "E£"
       },
       ETB: {
         currencySymbol: "ብር",
