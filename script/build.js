@@ -4,7 +4,7 @@ import { FileResolver, Container, formatters } from 'es6-module-transpiler';
 
 convert('lib', 'build/lib')
   .then(() => console.log(`[es6→es5] lib → build/lib`))
-  .then(() => bundle('index', ['build/lib', 'build', 'node_modules/stround/lib'], 'dist/field-kit.js'))
+  .then(() => bundle('index', ['build/lib', 'build', 'node_modules/input-sim/lib', 'node_modules/stround/lib'], 'dist/field-kit.js'))
   .then(() => console.log(`[bundle] build/lib → dist/field-kit.js`))
   .catch(error => {
     console.error(error.stack);
@@ -14,7 +14,7 @@ convert('lib', 'build/lib')
 convert('test', 'build/test')
   .then(() => console.log(`[es6→es5] test → build/test`))
   .then(() => findMatching('test', /_test\.js$/))
-  .then(testFiles => bundle(testFiles, ['build/test'], 'build/test/all.js'))
+  .then(testFiles => bundle(testFiles, ['build/test', 'node_modules/input-sim/lib'], 'build/test/all.js'))
   .then(() => console.log(`[bundle] build/test → build/test/all.js`))
   .catch(error => {
     console.error(error.stack);

@@ -1,7 +1,6 @@
 (function() {
     "use strict";
     var $$formatter$$_createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
     var $$formatter$$_classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
     /*! jshint esnext:true, undef:true, unused:true */
@@ -84,11 +83,8 @@
 
     var $$formatter$$default = $$formatter$$Formatter;
     var $$delimited_text_formatter$$_createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
     var $$delimited_text_formatter$$_get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
     var $$delimited_text_formatter$$_inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
     var $$delimited_text_formatter$$_classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
     /**
@@ -376,12 +372,14 @@
     })($$formatter$$default);
 
     var $$delimited_text_formatter$$default = $$delimited_text_formatter$$DelimitedTextFormatter;
+
     /*! jshint esnext:true, undef:true, unused:true */
 
     /**
      * @TODO Make this an enum
      */
     var $$card_utils$$AMEX = "amex";
+
     var $$card_utils$$DISCOVER = "discover";
     var $$card_utils$$JCB = "jcb";
     var $$card_utils$$MASTERCARD = "mastercard";
@@ -434,12 +432,11 @@
         default:
           return false;
       }
-    }var $$default_card_formatter$$_createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+    }
 
+    var $$default_card_formatter$$_createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
     var $$default_card_formatter$$_get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
     var $$default_card_formatter$$_inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
     var $$default_card_formatter$$_classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
     /**
@@ -525,9 +522,7 @@
 
     var $$default_card_formatter$$default = $$default_card_formatter$$DefaultCardFormatter;
     var $$amex_card_formatter$$_createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
     var $$amex_card_formatter$$_inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
     var $$amex_card_formatter$$_classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
     /**
@@ -574,7 +569,6 @@
 
     var $$amex_card_formatter$$default = $$amex_card_formatter$$AmexCardFormatter;
     var $$adaptive_card_formatter$$_createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
     var $$adaptive_card_formatter$$_classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
     /**
@@ -678,6 +672,7 @@
      * @private
      */
     var $$utils$$SURROUNDING_SPACE_PATTERN = /(^\s+|\s+$)/;
+
     function $$utils$$isDigits(string) {
       return $$utils$$DIGITS_PATTERN.test(string);
     }
@@ -735,6 +730,7 @@
     }
 
     var $$utils$$hasOwnProp = Object.prototype.hasOwnProperty;
+
     function $$utils$$forEach(iterable, iterator) {
       if (iterable && typeof iterable.forEach === "function") {
         iterable.forEach(iterator);
@@ -776,6 +772,7 @@
     var $$utils$$getPrototypeOf = Object.getPrototypeOf || function (object) {
       return object.__proto__;
     };
+
     function $$utils$$hasGetter(object, property) {
       // Skip if getOwnPropertyDescriptor throws (IE8)
       try {
@@ -815,8 +812,9 @@
       }
 
       return result;
-    }var $$undo_manager$$_createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+    }
 
+    var $$undo_manager$$_createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
     var $$undo_manager$$_classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
     /**
@@ -1062,42 +1060,47 @@
     })();
 
     var $$undo_manager$$default = $$undo_manager$$UndoManager;
-    var $$keybindings$$_createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-    var $$keybindings$$_classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
-
-    /*! jshint esnext:true, undef:true, unused:true */
-
-    /** @private */
+    var $$caret$$default = Caret;
+    var $$keybindings$$$__Array$prototype$slice = Array.prototype.slice;
+    var $$keybindings$$$__Object$defineProperties = Object.defineProperties;
     var $$keybindings$$A = 65;
+
     /** @private */
     var $$keybindings$$Y = 89;
+
     /** @private */
     var $$keybindings$$Z = 90;
+
     /** @private */
     var $$keybindings$$ZERO = 48;
+
     /** @private */
     var $$keybindings$$NINE = 57;
+
     /** @private */
     var $$keybindings$$LEFT = 37;
+
     /** @private */
     var $$keybindings$$RIGHT = 39;
+
     /** @private */
     var $$keybindings$$UP = 38;
+
     /** @private */
     var $$keybindings$$DOWN = 40;
+
     /** @private */
     var $$keybindings$$BACKSPACE = 8;
+
     /** @private */
     var $$keybindings$$DELETE = 46;
+
     /** @private */
     var $$keybindings$$TAB = 9;
+
     /** @private */
     var $$keybindings$$ENTER = 13;
 
-    /**
-     * @namespace KEYS
-     */
     var $$keybindings$$KEYS = {
       A: $$keybindings$$A,
       Y: $$keybindings$$Y,
@@ -1117,7 +1120,7 @@
        * @param {number} keyCode
        * @returns {boolean}
        */
-      isDigit: function isDigit(keyCode) {
+      isDigit: function(keyCode) {
         return $$keybindings$$ZERO <= keyCode && keyCode <= $$keybindings$$NINE;
       },
 
@@ -1127,67 +1130,67 @@
        * @param {number} keyCode
        * @returns {boolean}
        */
-      isDirectional: function isDirectional(keyCode) {
+      isDirectional: function(keyCode) {
         return keyCode === $$keybindings$$LEFT || keyCode === $$keybindings$$RIGHT || keyCode === $$keybindings$$UP || keyCode === $$keybindings$$DOWN;
       }
     };
 
-    var $$keybindings$$CTRL = 1 << 0;
-    var $$keybindings$$META = 1 << 1;
-    var $$keybindings$$ALT = 1 << 2;
+    var $$keybindings$$CTRL  = 1 << 0;
+    var $$keybindings$$META  = 1 << 1;
+    var $$keybindings$$ALT   = 1 << 2;
     var $$keybindings$$SHIFT = 1 << 3;
-
     var $$keybindings$$cache = {};
+
     function $$keybindings$$keyBindingsForPlatform(platform) {
-      var osx = platform === "OSX";
+      var osx = platform === 'OSX';
       var ctrl = osx ? $$keybindings$$META : $$keybindings$$CTRL;
 
       if (!$$keybindings$$cache[platform]) {
-        $$keybindings$$cache[platform] = $$keybindings$$build(function (bind) {
-          bind($$keybindings$$A, ctrl, "selectAll");
-          bind($$keybindings$$LEFT, null, "moveLeft");
-          bind($$keybindings$$LEFT, $$keybindings$$ALT, "moveWordLeft");
-          bind($$keybindings$$LEFT, $$keybindings$$SHIFT, "moveLeftAndModifySelection");
-          bind($$keybindings$$LEFT, $$keybindings$$ALT | $$keybindings$$SHIFT, "moveWordLeftAndModifySelection");
-          bind($$keybindings$$RIGHT, null, "moveRight");
-          bind($$keybindings$$RIGHT, $$keybindings$$ALT, "moveWordRight");
-          bind($$keybindings$$RIGHT, $$keybindings$$SHIFT, "moveRightAndModifySelection");
-          bind($$keybindings$$RIGHT, $$keybindings$$ALT | $$keybindings$$SHIFT, "moveWordRightAndModifySelection");
-          bind($$keybindings$$UP, null, "moveUp");
-          bind($$keybindings$$UP, $$keybindings$$ALT, "moveToBeginningOfParagraph");
-          bind($$keybindings$$UP, $$keybindings$$SHIFT, "moveUpAndModifySelection");
-          bind($$keybindings$$UP, $$keybindings$$ALT | $$keybindings$$SHIFT, "moveParagraphBackwardAndModifySelection");
-          bind($$keybindings$$DOWN, null, "moveDown");
-          bind($$keybindings$$DOWN, $$keybindings$$ALT, "moveToEndOfParagraph");
-          bind($$keybindings$$DOWN, $$keybindings$$SHIFT, "moveDownAndModifySelection");
-          bind($$keybindings$$DOWN, $$keybindings$$ALT | $$keybindings$$SHIFT, "moveParagraphForwardAndModifySelection");
-          bind($$keybindings$$BACKSPACE, null, "deleteBackward");
-          bind($$keybindings$$BACKSPACE, $$keybindings$$SHIFT, "deleteBackward");
-          bind($$keybindings$$BACKSPACE, $$keybindings$$ALT, "deleteWordBackward");
-          bind($$keybindings$$BACKSPACE, $$keybindings$$ALT | $$keybindings$$SHIFT, "deleteWordBackward");
-          bind($$keybindings$$BACKSPACE, ctrl, "deleteBackwardToBeginningOfLine");
-          bind($$keybindings$$BACKSPACE, ctrl | $$keybindings$$SHIFT, "deleteBackwardToBeginningOfLine");
-          bind($$keybindings$$DELETE, null, "deleteForward");
-          bind($$keybindings$$DELETE, $$keybindings$$ALT, "deleteWordForward");
-          bind($$keybindings$$TAB, null, "insertTab");
-          bind($$keybindings$$TAB, $$keybindings$$SHIFT, "insertBackTab");
-          bind($$keybindings$$ENTER, null, "insertNewline");
-          bind($$keybindings$$Z, ctrl, "undo");
+        $$keybindings$$cache[platform] = $$keybindings$$build(function(bind) {
+          bind($$keybindings$$A         , ctrl       , 'selectAll');
+          bind($$keybindings$$LEFT      , null       , 'moveLeft');
+          bind($$keybindings$$LEFT      , $$keybindings$$ALT        , 'moveWordLeft');
+          bind($$keybindings$$LEFT      , $$keybindings$$SHIFT      , 'moveLeftAndModifySelection');
+          bind($$keybindings$$LEFT      , $$keybindings$$ALT|$$keybindings$$SHIFT  , 'moveWordLeftAndModifySelection');
+          bind($$keybindings$$RIGHT     , null       , 'moveRight');
+          bind($$keybindings$$RIGHT     , $$keybindings$$ALT        , 'moveWordRight');
+          bind($$keybindings$$RIGHT     , $$keybindings$$SHIFT      , 'moveRightAndModifySelection');
+          bind($$keybindings$$RIGHT     , $$keybindings$$ALT|$$keybindings$$SHIFT  , 'moveWordRightAndModifySelection');
+          bind($$keybindings$$UP        , null       , 'moveUp');
+          bind($$keybindings$$UP        , $$keybindings$$ALT        , 'moveToBeginningOfParagraph');
+          bind($$keybindings$$UP        , $$keybindings$$SHIFT      , 'moveUpAndModifySelection');
+          bind($$keybindings$$UP        , $$keybindings$$ALT|$$keybindings$$SHIFT  , 'moveParagraphBackwardAndModifySelection');
+          bind($$keybindings$$DOWN      , null       , 'moveDown');
+          bind($$keybindings$$DOWN      , $$keybindings$$ALT        , 'moveToEndOfParagraph');
+          bind($$keybindings$$DOWN      , $$keybindings$$SHIFT      , 'moveDownAndModifySelection');
+          bind($$keybindings$$DOWN      , $$keybindings$$ALT|$$keybindings$$SHIFT  , 'moveParagraphForwardAndModifySelection');
+          bind($$keybindings$$BACKSPACE , null       , 'deleteBackward');
+          bind($$keybindings$$BACKSPACE , $$keybindings$$SHIFT      , 'deleteBackward');
+          bind($$keybindings$$BACKSPACE , $$keybindings$$ALT        , 'deleteWordBackward');
+          bind($$keybindings$$BACKSPACE , $$keybindings$$ALT|$$keybindings$$SHIFT  , 'deleteWordBackward');
+          bind($$keybindings$$BACKSPACE , ctrl       , 'deleteBackwardToBeginningOfLine');
+          bind($$keybindings$$BACKSPACE , ctrl|$$keybindings$$SHIFT , 'deleteBackwardToBeginningOfLine');
+          bind($$keybindings$$DELETE    , null       , 'deleteForward');
+          bind($$keybindings$$DELETE    , $$keybindings$$ALT        , 'deleteWordForward');
+          bind($$keybindings$$TAB       , null       , 'insertTab');
+          bind($$keybindings$$TAB       , $$keybindings$$SHIFT      , 'insertBackTab');
+          bind($$keybindings$$ENTER     , null       , 'insertNewline');
+          bind($$keybindings$$Z         , ctrl       , 'undo');
 
           if (osx) {
-            bind($$keybindings$$LEFT, $$keybindings$$META, "moveToBeginningOfLine");
-            bind($$keybindings$$LEFT, $$keybindings$$META | $$keybindings$$SHIFT, "moveToBeginningOfLineAndModifySelection");
-            bind($$keybindings$$RIGHT, $$keybindings$$META, "moveToEndOfLine");
-            bind($$keybindings$$RIGHT, $$keybindings$$META | $$keybindings$$SHIFT, "moveToEndOfLineAndModifySelection");
-            bind($$keybindings$$UP, $$keybindings$$META, "moveToBeginningOfDocument");
-            bind($$keybindings$$UP, $$keybindings$$META | $$keybindings$$SHIFT, "moveToBeginningOfDocumentAndModifySelection");
-            bind($$keybindings$$DOWN, $$keybindings$$META, "moveToEndOfDocument");
-            bind($$keybindings$$DOWN, $$keybindings$$META | $$keybindings$$SHIFT, "moveToEndOfDocumentAndModifySelection");
-            bind($$keybindings$$BACKSPACE, $$keybindings$$CTRL, "deleteBackwardByDecomposingPreviousCharacter");
-            bind($$keybindings$$BACKSPACE, $$keybindings$$CTRL | $$keybindings$$SHIFT, "deleteBackwardByDecomposingPreviousCharacter");
-            bind($$keybindings$$Z, $$keybindings$$META | $$keybindings$$SHIFT, "redo");
+            bind($$keybindings$$LEFT      , $$keybindings$$META       , 'moveToBeginningOfLine');
+            bind($$keybindings$$LEFT      , $$keybindings$$META|$$keybindings$$SHIFT , 'moveToBeginningOfLineAndModifySelection');
+            bind($$keybindings$$RIGHT     , $$keybindings$$META       , 'moveToEndOfLine');
+            bind($$keybindings$$RIGHT     , $$keybindings$$META|$$keybindings$$SHIFT , 'moveToEndOfLineAndModifySelection');
+            bind($$keybindings$$UP        , $$keybindings$$META       , 'moveToBeginningOfDocument');
+            bind($$keybindings$$UP        , $$keybindings$$META|$$keybindings$$SHIFT , 'moveToBeginningOfDocumentAndModifySelection');
+            bind($$keybindings$$DOWN      , $$keybindings$$META       , 'moveToEndOfDocument');
+            bind($$keybindings$$DOWN      , $$keybindings$$META|$$keybindings$$SHIFT , 'moveToEndOfDocumentAndModifySelection');
+            bind($$keybindings$$BACKSPACE , $$keybindings$$CTRL       , 'deleteBackwardByDecomposingPreviousCharacter');
+            bind($$keybindings$$BACKSPACE , $$keybindings$$CTRL|$$keybindings$$SHIFT , 'deleteBackwardByDecomposingPreviousCharacter');
+            bind($$keybindings$$Z         , $$keybindings$$META|$$keybindings$$SHIFT , 'redo');
           } else {
-            bind($$keybindings$$Y, $$keybindings$$CTRL, "redo");
+            bind($$keybindings$$Y         , $$keybindings$$CTRL       , 'redo');
           }
         });
       }
@@ -1197,78 +1200,55 @@
 
     function $$keybindings$$build(callback) {
       var result = new $$keybindings$$BindingSet();
-      callback(function () {
-        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-          args[_key] = arguments[_key];
-        }
-
-        return result.bind.apply(result, args);
+      callback(function() {
+        var $__0;
+        var $__arguments = arguments;
+        var args = [].slice.call($__arguments, 0);
+        return ($__0 = result).bind.apply($__0, $$keybindings$$$__Array$prototype$slice.call(args));
       });
       return result;
     }
 
-    /**
-     * @private
-     */
+    var $$keybindings$$BindingSet = function() {
+      "use strict";
 
-    var $$keybindings$$BindingSet = (function () {
       function BindingSet() {
-        $$keybindings$$_classCallCheck(this, BindingSet);
-
         this.bindings = {};
       }
 
-      $$keybindings$$_createClass(BindingSet, {
+      $$keybindings$$$__Object$defineProperties(BindingSet.prototype, {
         bind: {
-
-          /**
-           * @param {number} keyCode
-           * @param {number} modifiers
-           * @param {string} action
-           */
-
-          value: function bind(keyCode, modifiers, action) {
-            if (!this.bindings[keyCode]) {
-              this.bindings[keyCode] = {};
-            }
+          value: function(keyCode, modifiers, action) {
+            if (!this.bindings[keyCode]) { this.bindings[keyCode] = {}; }
             this.bindings[keyCode][modifiers || 0] = action;
-          }
+          },
+
+          enumerable: false,
+          writable: true
         },
+
         actionForEvent: {
-
-          /**
-           * @param {Event} event
-           * @returns {?string}
-           */
-
-          value: function actionForEvent(event) {
+          value: function(event) {
             var bindingsForKeyCode = this.bindings[event.keyCode];
             if (bindingsForKeyCode) {
               var modifiers = 0;
-              if (event.altKey) {
-                modifiers |= $$keybindings$$ALT;
-              }
-              if (event.ctrlKey) {
-                modifiers |= $$keybindings$$CTRL;
-              }
-              if (event.metaKey) {
-                modifiers |= $$keybindings$$META;
-              }
-              if (event.shiftKey) {
-                modifiers |= $$keybindings$$SHIFT;
-              }
+              if (event.altKey) { modifiers |= $$keybindings$$ALT; }
+              if (event.ctrlKey) { modifiers |= $$keybindings$$CTRL; }
+              if (event.metaKey) { modifiers |= $$keybindings$$META; }
+              if (event.shiftKey) { modifiers |= $$keybindings$$SHIFT; }
               return bindingsForKeyCode[modifiers];
             }
-          }
+          },
+
+          enumerable: false,
+          writable: true
         }
       });
 
       return BindingSet;
-    })();
-    var $$caret$$default = Caret;
-    var $$text_field$$_createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+    }();
 
-    var $$text_field$$_classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+    var input$sim$$$__Object$defineProperties = Object.defineProperties;
 
     /**
      * Enum for text direction affinity.
@@ -1277,7 +1257,7 @@
      * @enum {number}
      * @private
      */
-    var $$text_field$$Affinity = {
+    var input$sim$$Affinity = {
       UPSTREAM: 0,
       DOWNSTREAM: 1,
       NONE: null
@@ -1290,7 +1270,7 @@
      * @returns {boolean}
      * @private
      */
-    function $$text_field$$isWordChar(chr) {
+    function input$sim$$isWordChar(chr) {
       return chr && /^\w$/.test(chr);
     }
 
@@ -1303,11 +1283,11 @@
      * @returns {boolean}
      * @private
      */
-    function $$text_field$$hasLeftWordBreakAtIndex(text, index) {
+    function input$sim$$hasLeftWordBreakAtIndex(text, index) {
       if (index === 0) {
         return true;
       } else {
-        return !$$text_field$$isWordChar(text[index - 1]) && $$text_field$$isWordChar(text[index]);
+        return !input$sim$$isWordChar(text[index - 1]) && input$sim$$isWordChar(text[index]);
       }
     }
 
@@ -1320,20 +1300,792 @@
      * @returns {boolean}
      * @private
      */
-    function $$text_field$$hasRightWordBreakAtIndex(text, index) {
-      if (index === text.length) {
+    function input$sim$$hasRightWordBreakAtIndex(text, index) {
+      if (index === text.length - 1) {
         return true;
       } else {
-        return $$text_field$$isWordChar(text[index]) && !$$text_field$$isWordChar(text[index + 1]);
+        return input$sim$$isWordChar(text[index]) && !input$sim$$isWordChar(text[index + 1]);
       }
     }
+
+    var input$sim$$Input = function() {
+      "use strict";
+
+      function Input(value, range) {
+        this._value = '';
+        this._selectedRange = {
+          start: 0,
+          length: 0
+        };
+        this.shouldCancelEvents = true;
+        this.selectionAffinity = input$sim$$Affinity.NONE;
+
+        if(value) {
+          this.setText(value);
+        }
+        if(range) {
+          this.setSelectedRange(range);
+        }
+        this._buildKeybindings();
+      }
+
+      input$sim$$$__Object$defineProperties(Input.prototype, {
+        clearSelection: {
+          value: function() {
+            this.replaceSelection('');
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        deleteBackward: {
+          value: function(event) {
+            this._handleEvent(event);
+            var range = this.selectedRange();
+            if (range.length === 0) {
+              range.start--;
+              range.length++;
+              this.setSelectedRange(range);
+            }
+            this.clearSelection();
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        deleteWordBackward: {
+          value: function(event) {
+            if (this.hasSelection()) {
+              this.deleteBackward(event);
+            } else {
+              this._handleEvent(event);
+              var range = this.selectedRange();
+              var start = this._lastWordBreakBeforeIndex(range.start);
+              range.length += range.start - start;
+              range.start = start;
+              this.setSelectedRange(range);
+              this.clearSelection();
+            }
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        deleteBackwardByDecomposingPreviousCharacter: {
+          value: function(event) {
+            this.deleteBackward(event);
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        deleteBackwardToBeginningOfLine: {
+          value: function(event) {
+            if (this.hasSelection()) {
+              this.deleteBackward(event);
+            } else {
+              this._handleEvent(event);
+              var range = this.selectedRange();
+              range.length = range.start;
+              range.start = 0;
+              this.setSelectedRange(range);
+              this.clearSelection();
+            }
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        deleteForward: {
+          value: function(event) {
+            this._handleEvent(event);
+            var range = this.selectedRange();
+            if (range.length === 0) {
+              range.length++;
+              this.setSelectedRange(range);
+            }
+            this.clearSelection();
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        deleteWordForward: {
+          value: function(event) {
+            if (this.hasSelection()) {
+              return this.deleteForward(event);
+            } else {
+              this._handleEvent(event);
+              var range = this.selectedRange();
+              var end = this._nextWordBreakAfterIndex(range.start + range.length);
+              this.setSelectedRange({
+                start: range.start,
+                length: end - range.start
+              });
+              this.clearSelection();
+            }
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        handleEvent: {
+          value: function(event) {
+            if(typeof event === 'undefined') {
+              throw new Error('cannot handle and event that isn\'t passed');
+            }
+            var action = this._bindings.actionForEvent(event);
+            if(action) this[action](event);
+            return action;
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        hasSelection: {
+          value: function() {
+            return this.selectedRange().length !== 0;
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        insertBackTab: {
+          value: function() {},
+          enumerable: false,
+          writable: true
+        },
+
+        insertNewline: {
+          value: function() {},
+          enumerable: false,
+          writable: true
+        },
+
+        insertTab: {
+          value: function() {},
+          enumerable: false,
+          writable: true
+        },
+
+        insertText: {
+          value: function(text) {
+            var range;
+            if (this.hasSelection()) {
+              this.clearSelection();
+            }
+
+            this.replaceSelection(text);
+            range = this.selectedRange();
+            range.start += range.length;
+            range.length = 0;
+            this.setSelectedRange(range);
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        moveUp: {
+          value: function(event) {
+            this._handleEvent(event);
+            this.setSelectedRange({
+              start: 0,
+              length: 0
+            });
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        moveToBeginningOfParagraph: {
+          value: function(event) {
+            this.moveUp(event);
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        moveUpAndModifySelection: {
+          value: function(event) {
+            this._handleEvent(event);
+            var range = this.selectedRange();
+            switch (this.selectionAffinity) {
+              case input$sim$$Affinity.UPSTREAM:
+              case input$sim$$Affinity.NONE:
+                // 12<34 56|78  =>  <1234 56|78
+                range.length += range.start;
+                range.start = 0;
+                break;
+              case input$sim$$Affinity.DOWNSTREAM:
+                // 12|34 56>78   =>   <12|34 5678
+                range.length = range.start;
+                range.start = 0;
+                break;
+            }
+            this.setSelectedRangeWithAffinity(range, input$sim$$Affinity.UPSTREAM);
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        moveParagraphBackwardAndModifySelection: {
+          value: function(event) {
+            this._handleEvent(event);
+            var range = this.selectedRange();
+            switch (this.selectionAffinity) {
+              case input$sim$$Affinity.UPSTREAM:
+              case input$sim$$Affinity.NONE:
+                // 12<34 56|78  =>  <1234 56|78
+                range.length += range.start;
+                range.start = 0;
+                break;
+              case input$sim$$Affinity.DOWNSTREAM:
+                // 12|34 56>78  =>  12|34 5678
+                range.length = 0;
+                break;
+            }
+            this.setSelectedRangeWithAffinity(range, input$sim$$Affinity.UPSTREAM);
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        moveToBeginningOfDocument: {
+          value: function(event) {
+            // Since we only support a single line this is just an alias.
+            this.moveToBeginningOfLine(event);
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        moveToBeginningOfDocumentAndModifySelection: {
+          value: function(event) {
+            this._handleEvent(event);
+            var range = this.selectedRange();
+            range.length += range.start;
+            range.start = 0;
+            this.setSelectedRangeWithAffinity(range, input$sim$$Affinity.UPSTREAM);
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        moveDown: {
+          value: function(event) {
+            this._handleEvent(event);
+            // 12|34 56|78  =>  1234 5678|
+            var range = {
+              start: this.text().length,
+              length: 0
+            };
+            this.setSelectedRangeWithAffinity(range, input$sim$$Affinity.NONE);
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        moveToEndOfParagraph: {
+          value: function(event) {
+            this.moveDown(event);
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        moveDownAndModifySelection: {
+          value: function(event) {
+            this._handleEvent(event);
+            var range = this.selectedRange();
+            var end = this.text().length;
+            if (this.selectionAffinity === input$sim$$Affinity.UPSTREAM) {
+              range.start += range.length;
+            }
+            range.length = end - range.start;
+            this.setSelectedRangeWithAffinity(range, input$sim$$Affinity.DOWNSTREAM);
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        moveParagraphForwardAndModifySelection: {
+          value: function(event) {
+            this._handleEvent(event);
+            var range = this.selectedRange();
+            switch (this.selectionAffinity) {
+              case input$sim$$Affinity.DOWNSTREAM:
+              case input$sim$$Affinity.NONE:
+                // 12|34 56>78  =>  12|34 5678>
+                range.length = this.text().length - range.start;
+                break;
+              case input$sim$$Affinity.UPSTREAM:
+                // 12<34 56|78  =>  12|34 5678
+                range.start += range.length;
+                range.length = 0;
+                break;
+            }
+            this.setSelectedRangeWithAffinity(range, input$sim$$Affinity.DOWNSTREAM);
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        moveToEndOfDocument: {
+          value: function(event) {
+            // Since we only support a single line this is just an alias.
+            this.moveToEndOfLine(event);
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        moveToEndOfDocumentAndModifySelection: {
+          value: function(event) {
+            this._handleEvent(event);
+            var range = this.selectedRange();
+            range.length = this.text().length - range.start;
+            this.setSelectedRangeWithAffinity(range, input$sim$$Affinity.DOWNSTREAM);
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        moveLeft: {
+          value: function(event) {
+            this._handleEvent(event);
+            var range = this.selectedRange();
+            if (range.length !== 0) {
+              range.length = 0;
+            } else {
+              range.start--;
+            }
+            this.setSelectedRangeWithAffinity(range, input$sim$$Affinity.NONE);
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        moveLeftAndModifySelection: {
+          value: function(event) {
+            this._handleEvent(event);
+            var range = this.selectedRange();
+            switch (this.selectionAffinity) {
+              case input$sim$$Affinity.UPSTREAM:
+              case input$sim$$Affinity.NONE:
+                this.selectionAffinity = input$sim$$Affinity.UPSTREAM;
+                range.start--;
+                range.length++;
+                break;
+              case input$sim$$Affinity.DOWNSTREAM:
+                range.length--;
+                break;
+            }
+            this.setSelectedRange(range);
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        moveWordLeft: {
+          value: function(event) {
+            this._handleEvent(event);
+            var index = this._lastWordBreakBeforeIndex(this.selectedRange().start - 1);
+            this.setSelectedRange({ start: index, length: 0 });
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        moveWordLeftAndModifySelection: {
+          value: function(event) {
+            this._handleEvent(event);
+            var range = this.selectedRange();
+            switch (this.selectionAffinity) {
+              case input$sim$$Affinity.UPSTREAM:
+              case input$sim$$Affinity.NONE:
+                this.selectionAffinity = input$sim$$Affinity.UPSTREAM;
+                var start = this._lastWordBreakBeforeIndex(range.start - 1);
+                range.length += range.start - start;
+                range.start = start;
+                break;
+              case input$sim$$Affinity.DOWNSTREAM:
+                var end = this._lastWordBreakBeforeIndex(range.start + range.length);
+                if (end < range.start) {
+                  end = range.start;
+                }
+                range.length -= range.start + range.length - end;
+                break;
+            }
+            this.setSelectedRange(range);
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        moveToBeginningOfLine: {
+          value: function(event) {
+            this._handleEvent(event);
+            this.setSelectedRange({ start: 0, length: 0 });
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        moveToBeginningOfLineAndModifySelection: {
+          value: function(event) {
+            this._handleEvent(event);
+            var range = this.selectedRange();
+            range.length += range.start;
+            range.start = 0;
+            this.setSelectedRangeWithAffinity(range, input$sim$$Affinity.UPSTREAM);
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        moveRight: {
+          value: function(event) {
+            this._handleEvent(event);
+            var range = this.selectedRange();
+            if (range.length !== 0) {
+              range.start += range.length;
+              range.length = 0;
+            } else {
+              range.start++;
+            }
+            this.setSelectedRangeWithAffinity(range, input$sim$$Affinity.NONE);
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        moveRightAndModifySelection: {
+          value: function(event) {
+            this._handleEvent(event);
+            var range = this.selectedRange();
+            switch (this.selectionAffinity) {
+              case input$sim$$Affinity.UPSTREAM:
+                range.start++;
+                range.length--;
+                break;
+              case input$sim$$Affinity.DOWNSTREAM:
+              case input$sim$$Affinity.NONE:
+                this.selectionAffinity = input$sim$$Affinity.DOWNSTREAM;
+                range.length++;
+                break;
+            }
+            this.setSelectedRange(range);
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        moveWordRight: {
+          value: function(event) {
+            this._handleEvent(event);
+            var range = this.selectedRange();
+            var index = this._nextWordBreakAfterIndex(range.start + range.length);
+            this.setSelectedRange({ start: index, length: 0 });
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        moveWordRightAndModifySelection: {
+          value: function(event) {
+            this._handleEvent(event);
+            var range = this.selectedRange();
+            var start = range.start;
+            var end = range.start + range.length;
+            switch (this.selectionAffinity) {
+              case input$sim$$Affinity.UPSTREAM:
+                start = Math.min(this._nextWordBreakAfterIndex(start), end);
+                break;
+              case input$sim$$Affinity.DOWNSTREAM:
+              case input$sim$$Affinity.NONE:
+                this.selectionAffinity = input$sim$$Affinity.DOWNSTREAM;
+                end = this._nextWordBreakAfterIndex(range.start + range.length);
+                break;
+            }
+            this.setSelectedRange({ start: start, length: end - start });
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        moveToEndOfLine: {
+          value: function(event) {
+            this._handleEvent(event);
+            this.setSelectedRange({ start: this.text().length, length: 0 });
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        moveToEndOfLineAndModifySelection: {
+          value: function(event) {
+            this._handleEvent(event);
+            var range = this.selectedRange();
+            range.length = this.text().length - range.start;
+            this.setSelectedRangeWithAffinity(range, input$sim$$Affinity.DOWNSTREAM);
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        replaceSelection: {
+          value: function(replacement) {
+            var range = this.selectedRange();
+            var end = range.start + range.length;
+            var text = this.text();
+            text = text.substring(0, range.start) + replacement + text.substring(end);
+            range.length = replacement.length;
+            this.setText(text);
+            this.setSelectedRangeWithAffinity(range, input$sim$$Affinity.NONE);
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        rightWordBreakIndexes: {
+          value: function() {
+            var result = [];
+            var text = this.text();
+            for (var i = 0, l = text.length; i < l; i++) {
+              if (input$sim$$hasRightWordBreakAtIndex(text, i)) {
+                result.push(i + 1);
+              }
+            }
+            return result;
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        selectAll: {
+          value: function(event) {
+            this._handleEvent(event);
+            this.setSelectedRangeWithAffinity({
+              start: 0,
+              length: this.text().length
+            }, input$sim$$Affinity.NONE);
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        text: {
+          value: function() {
+            return this._value;
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        setText: {
+          value: function(value) {
+            this._value = '' + value;
+            this.setSelectedRange({
+              start: this._value.length,
+              length: 0
+            });
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        selectedRange: {
+          value: function() {
+            return this._selectedRange;
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        setSelectedRange: {
+          value: function(range) {
+            this.setSelectedRangeWithAffinity(range, this.selectionAffinity);
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        setSelectedRangeWithAffinity: {
+          value: function(range, affinity) {
+            var min = 0;
+            var max = this.text().length;
+            var caret = {
+              start: Math.max(min, Math.min(max, range.start)),
+              end: Math.max(min, Math.min(max, range.start + range.length))
+            };
+            this._selectedRange = {
+              start: caret.start,
+              length: caret.end - caret.start
+            }
+            this.selectionAffinity = range.length === 0 ? input$sim$$Affinity.NONE : affinity;
+            return this._selectedRange;
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        selectionAnchor: {
+          value: function() {
+            var range = this.selectedRange();
+            switch (this.selectionAffinity) {
+              case input$sim$$Affinity.UPSTREAM:
+                return range.start + range.length;
+              case input$sim$$Affinity.DOWNSTREAM:
+                return range.start;
+              default:
+                return input$sim$$Affinity.NONE;
+            }
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        _buildKeybindings: {
+          value: function() {
+            var osx;
+
+            if(typeof navigator !== 'undefined') {
+              osx = /^Mozilla\/[\d\.]+ \(Macintosh/.test(navigator.userAgent);
+            } else if(typeof process !== 'undefined') {
+              osx = /darwin/.test(process.platform);
+            }
+            this._bindings = $$keybindings$$keyBindingsForPlatform(osx ? 'OSX' : 'Default');
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        _handleEvent: {
+          value: function(event) {
+            if(event && this.shouldCancelEvents) {
+              event.preventDefault();
+            }
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        _lastWordBreakBeforeIndex: {
+          value: function(index) {
+            var indexes = this._leftWordBreakIndexes();
+            var result = indexes[0];
+            for (var i = 0, l = indexes.length; i < l; i++) {
+              var wordBreakIndex = indexes[i];
+              if (index > wordBreakIndex) {
+                result = wordBreakIndex;
+              } else {
+                break;
+              }
+            }
+            return result;
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        _leftWordBreakIndexes: {
+          value: function() {
+            var result = [];
+            var text = this.text();
+            for (var i = 0, l = text.length; i < l; i++) {
+              if (input$sim$$hasLeftWordBreakAtIndex(text, i)) {
+                result.push(i);
+              }
+            }
+            return result;
+          },
+
+          enumerable: false,
+          writable: true
+        },
+
+        _nextWordBreakAfterIndex: {
+          value: function(index) {
+            var indexes = this.rightWordBreakIndexes().reverse();
+            var result = indexes[0];
+            for (var i = 0, l = indexes.length; i < l; i++) {
+              var wordBreakIndex = indexes[i];
+              if (index < wordBreakIndex) {
+                result = wordBreakIndex;
+              } else {
+                break;
+              }
+            }
+            return result;
+          },
+
+          enumerable: false,
+          writable: true
+        }
+      });
+
+      return Input;
+    }();
+
+    var $$text_field$$_createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+    var $$text_field$$_get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+    var $$text_field$$_inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+    var $$text_field$$_classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
     /**
      * TextField is the simplest input and the base for more complex
      * types to inherit.
+     *
+     * @extends external:InputSim.Input
      */
 
-    var $$text_field$$TextField = (function () {
+    var $$text_field$$TextField = (function (_Input) {
       /**
        * Sets up the initial properties of the TextField and
        * sets  up the event listeners
@@ -1345,6 +2097,7 @@
       function TextField(element, formatter) {
         $$text_field$$_classCallCheck(this, TextField);
 
+        var caret = $$caret$$default.get(element);
         if (typeof element.get === "function") {
           console.warn("DEPRECATION: FieldKit.TextField instances should no longer be " + "created with a jQuery-wrapped element.");
           element = element.get(0);
@@ -1378,7 +2131,6 @@
         element.addEventListener("paste", this._paste);
         element.addEventListener("focus", this._focus);
         element.addEventListener("blur", this._blur);
-        this._buildKeybindings();
 
         var window = element.ownerDocument.defaultView;
 
@@ -1392,14 +2144,13 @@
          */
         this._needsManualCaret = window.navigator.userAgent.toLowerCase().indexOf("android") > -1;
 
-        /**
-         * Contains one of the Affinity enum to indicate the preferred direction of
-         * selection.
-         *
-         * @private
-         */
-        this.selectionAffinity = $$text_field$$Affinity.NONE;
+        $$text_field$$_get(Object.getPrototypeOf(TextField.prototype), "constructor", this).call(this, element.value, {
+          start: caret.start,
+          length: caret.end - caret.start
+        });
       }
+
+      $$text_field$$_inherits(TextField, _Input);
 
       $$text_field$$_createClass(TextField, {
         textDidChange: {
@@ -1503,27 +2254,11 @@
             }
           }
         },
-        clearSelection: {
+        delegate: {
 
           /**
            * **** Public Methods ****
            */
-
-          /**
-           * Clears all characters in the existing selection.
-           *
-           * @example
-           *     // 12|34567|8
-           *     clearSelection();
-           *     // 12|8
-           *
-           */
-
-          value: function clearSelection() {
-            this.replaceSelection("");
-          }
-        },
-        delegate: {
 
           /**
            * Gets the current delegate for this text field.
@@ -1545,190 +2280,6 @@
 
           value: function setDelegate(delegate) {
             this._delegate = delegate;
-          }
-        },
-        deleteBackward: {
-
-          /**
-           * Deletes backward one character or clears a non-empty selection.
-           *
-           * @example
-           *
-           *     // |What's up, doc?
-           *     deleteBackward(event);
-           *     // |What's up, doc?
-           *
-           *     // What'|s up, doc?
-           *     deleteBackward(event);
-           *     // What|s up, doc?
-           *
-           *     // |What's| up, doc?
-           *     deleteBackward(event);
-           *     // | up, doc?
-           */
-
-          value: function deleteBackward(event) {
-            event.preventDefault();
-            var range = this.selectedRange();
-            if (range.length === 0) {
-              range.start--;
-              range.length++;
-              this.setSelectedRange(range);
-            }
-            this.clearSelection();
-          }
-        },
-        deleteWordBackward: {
-
-          /**
-           * Deletes backward one word or clears a non-empty selection.
-           *
-           * @example
-           *     // |What's up, doc?
-           *     deleteWordBackward(event);
-           *     // |What's up, doc?
-           *
-           *     // What'|s up, doc?
-           *     deleteWordBackward(event);
-           *     // |s up, doc?
-           *
-           *     // |What's| up, doc?
-           *     deleteWordBackward(event);
-           *     // | up, doc?
-           */
-
-          value: function deleteWordBackward(event) {
-            if (this.hasSelection()) {
-              this.deleteBackward(event);
-            } else {
-              event.preventDefault();
-              var range = this.selectedRange();
-              var start = this._lastWordBreakBeforeIndex(range.start);
-              range.length += range.start - start;
-              range.start = start;
-              this.setSelectedRange(range);
-              this.clearSelection();
-            }
-          }
-        },
-        deleteBackwardByDecomposingPreviousCharacter: {
-
-          /**
-           * Deletes backward one character, clears a non-empty selection, or decomposes
-           * an accented character to its simple form.
-           *
-           * @TODO Make this work as described.
-           *
-           * @example
-           *     // |fiancée
-           *     deleteBackwardByDecomposingPreviousCharacter(event);
-           *     // |What's up, doc?
-           *
-           *     // fianc|é|e
-           *     deleteBackwardByDecomposingPreviousCharacter(event);
-           *     // fianc|e
-           *
-           *     // fiancé|e
-           *     deleteBackwardByDecomposingPreviousCharacter(event);
-           *     // fiance|e
-           *
-           */
-
-          value: function deleteBackwardByDecomposingPreviousCharacter(event) {
-            this.deleteBackward(event);
-          }
-        },
-        deleteBackwardToBeginningOfLine: {
-
-          /**
-           * Deletes all characters before the cursor or clears a non-empty selection.
-           *
-           * @example
-           *     // The quick |brown fox.
-           *     deleteBackwardToBeginningOfLine(event);
-           *     // |brown fox.
-           *
-           *     // The |quick |brown fox.
-           *     deleteBackwardToBeginningOfLine(event);
-           *     // The brown fox.
-           *
-           */
-
-          value: function deleteBackwardToBeginningOfLine(event) {
-            if (this.hasSelection()) {
-              this.deleteBackward(event);
-            } else {
-              event.preventDefault();
-              var range = this.selectedRange();
-              range.length = range.start;
-              range.start = 0;
-              this.setSelectedRange(range);
-              this.clearSelection();
-            }
-          }
-        },
-        deleteForward: {
-
-          /**
-           * Deletes forward one character or clears a non-empty selection.
-           *
-           * @example
-           *     // What's up, doc?|
-           *     deleteForward(event);
-           *     // What's up, doc?|
-           *
-           *     // What'|s up, doc?
-           *     deleteForward(event);
-           *     // What'| up, doc?
-           *
-           *     // |What's| up, doc?
-           *     deleteForward(event);
-           *     // | up, doc?
-           *
-           */
-
-          value: function deleteForward(event) {
-            event.preventDefault();
-            var range = this.selectedRange();
-            if (range.length === 0) {
-              range.length++;
-              this.setSelectedRange(range);
-            }
-            this.clearSelection();
-          }
-        },
-        deleteWordForward: {
-
-          /**
-           * Deletes forward one word or clears a non-empty selection.
-           *
-           * @example
-           *     // What's up, doc?|
-           *     deleteWordForward(event);
-           *     // What's up, doc?|
-           *
-           *     // What's |up, doc?
-           *     deleteWordForward(event);
-           *     // What's |, doc?
-           *
-           *     // |What's| up, doc?
-           *     deleteWordForward(event);
-           *     // | up, doc?
-           */
-
-          value: function deleteWordForward(event) {
-            if (this.hasSelection()) {
-              return this.deleteForward(event);
-            } else {
-              event.preventDefault();
-              var range = this.selectedRange();
-              var end = this._nextWordBreakAfterIndex(range.start + range.length);
-              this.setSelectedRange({
-                start: range.start,
-                length: end - range.start
-              });
-              this.clearSelection();
-            }
           }
         },
         destroy: {
@@ -1784,57 +2335,6 @@
             this.setValue(value);
           }
         },
-        hasSelection: {
-
-          /**
-           * Determines whether this field has any selection.
-           *
-           * @returns {boolean} true if there is at least one character selected
-           */
-
-          value: function hasSelection() {
-            return this.selectedRange().length !== 0;
-          }
-        },
-        insertBackTab: {
-
-          /**
-           * Handles the back tab key.
-           *
-           */
-
-          value: function insertBackTab() {}
-        },
-        insertTab: {
-
-          /**
-           * Handles the tab key.
-           *
-           */
-
-          value: function insertTab() {}
-        },
-        insertText: {
-
-          /**
-           * Handles a key event that is trying to insert a character.
-           *
-           * @param {string} text
-           */
-
-          value: function insertText(text) {
-            var range;
-            if (this.hasSelection()) {
-              this.clearSelection();
-            }
-
-            this.replaceSelection(text);
-            range = this.selectedRange();
-            range.start += range.length;
-            range.length = 0;
-            this.setSelectedRange(range);
-          }
-        },
         insertNewline: {
 
           /**
@@ -1859,682 +2359,6 @@
             return "#<TextField text=\"" + this.text() + "\">";
           }
         },
-        moveUp: {
-
-          /**
-           * Moves the cursor up, which because this is a single-line text field, means
-           * moving to the beginning of the value.
-           *
-           * @example
-           *     // Hey guys|
-           *     moveUp(event);
-           *     // |Hey guys
-           *
-           *     // Hey |guys|
-           *     moveUp(event);
-           *     // |Hey guys
-           *
-           * @param {Event} event
-           */
-
-          value: function moveUp(event) {
-            event.preventDefault();
-            this.setSelectedRange({
-              start: 0,
-              length: 0
-            });
-          }
-        },
-        moveToBeginningOfParagraph: {
-
-          /**
-           * Moves the cursor up to the beginning of the current paragraph, which because
-           * this is a single-line text field, means moving to the beginning of the
-           * value.
-           *
-           * @example
-           *     // Hey guys|
-           *     moveToBeginningOfParagraph(event)
-           *     // |Hey guys
-           *
-           *     // Hey |guys|
-           *     moveToBeginningOfParagraph(event)
-           *     // |Hey guys
-           *
-           * @param {Event} event
-           */
-
-          value: function moveToBeginningOfParagraph(event) {
-            this.moveUp(event);
-          }
-        },
-        moveUpAndModifySelection: {
-
-          /**
-           * Moves the cursor up, keeping the current anchor point and extending the
-           * selection to the beginning as moveUp would.
-           *
-           * @example
-           *     // rightward selections are shrunk
-           *     // Hey guys, |where> are you?
-           *     moveUpAndModifySelection(event);
-           *     // <Hey guys, |where are you?
-           *
-           *     // leftward selections are extended
-           *     // Hey guys, <where| are you?
-           *     moveUpAndModifySelection(event);
-           *     // <Hey guys, where| are you?
-           *
-           *     // neutral selections are extended
-           *     // Hey guys, |where| are you?
-           *     moveUpAndModifySelection(event);
-           *     // <Hey guys, where| are you?
-           *
-           * @param {Event} event
-           */
-
-          value: function moveUpAndModifySelection(event) {
-            event.preventDefault();
-            var range = this.selectedRange();
-            switch (this.selectionAffinity) {
-              case $$text_field$$Affinity.UPSTREAM:
-              case $$text_field$$Affinity.NONE:
-                // 12<34 56|78  =>  <1234 56|78
-                range.length += range.start;
-                range.start = 0;
-                break;
-              case $$text_field$$Affinity.DOWNSTREAM:
-                // 12|34 56>78   =>   <12|34 5678
-                range.length = range.start;
-                range.start = 0;
-                break;
-            }
-            this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.UPSTREAM);
-          }
-        },
-        moveParagraphBackwardAndModifySelection: {
-
-          /**
-           * Moves the free end of the selection to the beginning of the paragraph, or
-           * since this is a single-line text field to the beginning of the line.
-           *
-           * @param {Event} event
-           */
-
-          value: function moveParagraphBackwardAndModifySelection(event) {
-            event.preventDefault();
-            var range = this.selectedRange();
-            switch (this.selectionAffinity) {
-              case $$text_field$$Affinity.UPSTREAM:
-              case $$text_field$$Affinity.NONE:
-                // 12<34 56|78  =>  <1234 56|78
-                range.length += range.start;
-                range.start = 0;
-                break;
-              case $$text_field$$Affinity.DOWNSTREAM:
-                // 12|34 56>78  =>  12|34 5678
-                range.length = 0;
-                break;
-            }
-            this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.UPSTREAM);
-          }
-        },
-        moveToBeginningOfDocument: {
-
-          /**
-           * Moves the cursor to the beginning of the document.
-           *
-           * @param {Event} event
-           */
-
-          value: function moveToBeginningOfDocument(event) {
-            // Since we only support a single line this is just an alias.
-            this.moveToBeginningOfLine(event);
-          }
-        },
-        moveToBeginningOfDocumentAndModifySelection: {
-
-          /**
-           * Moves the selection start to the beginning of the document.
-           * @param {Event} event
-           */
-
-          value: function moveToBeginningOfDocumentAndModifySelection(event) {
-            event.preventDefault();
-            var range = this.selectedRange();
-            range.length += range.start;
-            range.start = 0;
-            this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.UPSTREAM);
-          }
-        },
-        moveDown: {
-
-          /**
-           * Moves the cursor down, which because this is a single-line text field, means
-           * moving to the end of the value.
-           *
-           * @example
-           *     // Hey |guys
-           *     moveDown(event)
-           *     // Hey guys|
-           *
-           *     // |Hey| guys
-           *     moveDown(event)
-           *     // Hey guys|
-           *
-           * @param {Event} event
-           */
-
-          value: function moveDown(event) {
-            event.preventDefault();
-            // 12|34 56|78  =>  1234 5678|
-            var range = {
-              start: this.text().length,
-              length: 0
-            };
-            this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.NONE);
-          }
-        },
-        moveToEndOfParagraph: {
-
-          /**
-           * Moves the cursor up to the end of the current paragraph, which because this
-           * is a single-line text field, means moving to the end of the value.
-           *
-           * @example
-           *     // |Hey guys
-           *     moveToEndOfParagraph(event)
-           *     // Hey guys|
-           *
-           *     // Hey |guys|
-           *     moveToEndOfParagraph(event)
-           *     // Hey guys|
-           *
-           * @param {Event} event
-           */
-
-          value: function moveToEndOfParagraph(event) {
-            this.moveDown(event);
-          }
-        },
-        moveDownAndModifySelection: {
-
-          /**
-           * Moves the cursor down, keeping the current anchor point and extending the
-           * selection to the end as moveDown would.
-           *
-           * @example
-           *     // leftward selections are shrunk
-           *     // Hey guys, <where| are you?
-           *     moveDownAndModifySelection(event)
-           *     // Hey guys, |where are you?>
-           *
-           *     // rightward selections are extended
-           *     // Hey guys, |where> are you?
-           *     moveDownAndModifySelection(event)
-           *     // Hey guys, where| are you?>
-           *
-           *     // neutral selections are extended
-           *     // Hey guys, |where| are you?
-           *     moveDownAndModifySelection(event)
-           *     // Hey guys, |where are you?>
-           *
-           * @param {Event} event
-           */
-
-          value: function moveDownAndModifySelection(event) {
-            event.preventDefault();
-            var range = this.selectedRange();
-            var end = this.text().length;
-            if (this.selectionAffinity === $$text_field$$Affinity.UPSTREAM) {
-              range.start += range.length;
-            }
-            range.length = end - range.start;
-            this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.DOWNSTREAM);
-          }
-        },
-        moveParagraphForwardAndModifySelection: {
-
-          /**
-           * Moves the free end of the selection to the end of the paragraph, or since
-           * this is a single-line text field to the end of the line.
-           *
-           * @param {Event} event
-           */
-
-          value: function moveParagraphForwardAndModifySelection(event) {
-            event.preventDefault();
-            var range = this.selectedRange();
-            switch (this.selectionAffinity) {
-              case $$text_field$$Affinity.DOWNSTREAM:
-              case $$text_field$$Affinity.NONE:
-                // 12|34 56>78  =>  12|34 5678>
-                range.length = this.text().length - range.start;
-                break;
-              case $$text_field$$Affinity.UPSTREAM:
-                // 12<34 56|78  =>  12|34 5678
-                range.start += range.length;
-                range.length = 0;
-                break;
-            }
-            this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.DOWNSTREAM);
-          }
-        },
-        moveToEndOfDocument: {
-
-          /**
-           * Moves the cursor to the end of the document.
-           *
-           * @param {Event} event
-           */
-
-          value: function moveToEndOfDocument(event) {
-            // Since we only support a single line this is just an alias.
-            this.moveToEndOfLine(event);
-          }
-        },
-        moveToEndOfDocumentAndModifySelection: {
-
-          /**
-           * Moves the selection end to the end of the document.
-           * @param {Event} event
-           */
-
-          value: function moveToEndOfDocumentAndModifySelection(event) {
-            event.preventDefault();
-            var range = this.selectedRange();
-            range.length = this.text().length - range.start;
-            this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.DOWNSTREAM);
-          }
-        },
-        moveLeft: {
-
-          /**
-           * Moves the cursor to the left, counting selections as a thing to move past.
-           *
-           * @example
-           *     // no selection just moves the cursor left
-           *     // Hey guys|
-           *     moveLeft(event)
-           *     // Hey guy|s
-           *
-           *     // selections are removed
-           *     // Hey |guys|
-           *     moveLeft(event)
-           *     // Hey |guys
-           *
-           * @param {Event} event
-           */
-
-          value: function moveLeft(event) {
-            event.preventDefault();
-            var range = this.selectedRange();
-            if (range.length !== 0) {
-              range.length = 0;
-            } else {
-              range.start--;
-            }
-            this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.NONE);
-          }
-        },
-        moveLeftAndModifySelection: {
-
-          /**
-           * Moves the free end of the selection one to the left.
-           *
-           * @example
-           *     // no selection just selects to the left
-           *     // Hey guys|
-           *     moveLeftAndModifySelection(event)
-           *     // Hey guy<s|
-           *
-           *     // left selections are extended
-           *     // Hey <guys|
-           *     moveLeftAndModifySelection(event)
-           *     // Hey< guys|
-           *
-           *     // right selections are shrunk
-           *     // Hey |guys>
-           *     moveLeftAndModifySelection(event)
-           *     // Hey |guy>s
-           *
-           *     // neutral selections are extended
-           *     // Hey |guys|
-           *     moveLeftAndModifySelection(event)
-           *     //Hey< guys|
-           *
-           * @param {Event} event
-           */
-
-          value: function moveLeftAndModifySelection(event) {
-            event.preventDefault();
-            var range = this.selectedRange();
-            switch (this.selectionAffinity) {
-              case $$text_field$$Affinity.UPSTREAM:
-              case $$text_field$$Affinity.NONE:
-                this.selectionAffinity = $$text_field$$Affinity.UPSTREAM;
-                range.start--;
-                range.length++;
-                break;
-              case $$text_field$$Affinity.DOWNSTREAM:
-                range.length--;
-                break;
-            }
-            this.setSelectedRange(range);
-          }
-        },
-        moveWordLeft: {
-
-          /**
-           * Moves the cursor left until the start of a word is found.
-           *
-           * @example
-           *     // no selection just moves the cursor left
-           *     // Hey guys|
-           *     moveWordLeft(event)
-           *     // Hey |guys
-           *
-           *     // selections are removed
-           *     // Hey |guys|
-           *     moveWordLeft(event)
-           *     // |Hey guys
-           *
-           * @param {Event} event
-           */
-
-          value: function moveWordLeft(event) {
-            event.preventDefault();
-            var index = this._lastWordBreakBeforeIndex(this.selectedRange().start - 1);
-            this.setSelectedRange({ start: index, length: 0 });
-          }
-        },
-        moveWordLeftAndModifySelection: {
-
-          /**
-           * Moves the free end of the current selection to the beginning of the previous
-           * word.
-           *
-           * @example
-           *     // no selection just selects to the left
-           *     // Hey guys|
-           *     moveWordLeftAndModifySelection(event)
-           *     // Hey |guys|
-           *
-           *     // left selections are extended
-           *     // Hey <guys|
-           *     moveWordLeftAndModifySelection(event)
-           *     // <Hey guys|
-           *
-           *     // right selections are shrunk
-           *     // |Hey guys>
-           *     moveWordLeftAndModifySelection(event)
-           *     // |Hey >guys
-           *
-           *     // neutral selections are extended
-           *     // Hey |guys|
-           *     moveWordLeftAndModifySelection(event)
-           *     // <Hey guys|
-           *
-           * @param {Event} event
-           */
-
-          value: function moveWordLeftAndModifySelection(event) {
-            event.preventDefault();
-            var range = this.selectedRange();
-            switch (this.selectionAffinity) {
-              case $$text_field$$Affinity.UPSTREAM:
-              case $$text_field$$Affinity.NONE:
-                this.selectionAffinity = $$text_field$$Affinity.UPSTREAM;
-                var start = this._lastWordBreakBeforeIndex(range.start - 1);
-                range.length += range.start - start;
-                range.start = start;
-                break;
-              case $$text_field$$Affinity.DOWNSTREAM:
-                var end = this._lastWordBreakBeforeIndex(range.start + range.length);
-                if (end < range.start) {
-                  end = range.start;
-                }
-                range.length -= range.start + range.length - end;
-                break;
-            }
-            this.setSelectedRange(range);
-          }
-        },
-        moveToBeginningOfLine: {
-
-          /**
-           * Moves the cursor to the beginning of the current line.
-           *
-           * @example
-           *     // Hey guys, where| are ya?
-           *     moveToBeginningOfLine(event)
-           *     // |Hey guys, where are ya?
-           *
-           * @param {Event} event
-           */
-
-          value: function moveToBeginningOfLine(event) {
-            event.preventDefault();
-            this.setSelectedRange({ start: 0, length: 0 });
-          }
-        },
-        moveToBeginningOfLineAndModifySelection: {
-
-          /**
-           * Select from the free end of the selection to the beginning of line.
-           *
-           * @example
-           *     // Hey guys, where| are ya?
-           *     moveToBeginningOfLineAndModifySelection(event)
-           *     // <Hey guys, where| are ya?
-           *
-           *     // Hey guys, where| are> ya?
-           *     moveToBeginningOfLineAndModifySelection(event)
-           *     // <Hey guys, where are| ya?
-           *
-           * @param {Event} event
-           */
-
-          value: function moveToBeginningOfLineAndModifySelection(event) {
-            event.preventDefault();
-            var range = this.selectedRange();
-            range.length += range.start;
-            range.start = 0;
-            this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.UPSTREAM);
-          }
-        },
-        moveRight: {
-
-          /**
-           * Moves the cursor to the right, counting selections as a thing to move past.
-           *
-           * @example
-           *     // no selection just moves the cursor right
-           *     // Hey guy|s
-           *     moveRight(event)
-           *     // Hey guys|
-           *
-           *     // selections are removed
-           *     // Hey |guys|
-           *     moveRight(event)
-           *     // Hey guys|
-           *
-           * @param {Event} event
-           */
-
-          value: function moveRight(event) {
-            event.preventDefault();
-            var range = this.selectedRange();
-            if (range.length !== 0) {
-              range.start += range.length;
-              range.length = 0;
-            } else {
-              range.start++;
-            }
-            this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.NONE);
-          }
-        },
-        moveRightAndModifySelection: {
-
-          /**
-           * Moves the free end of the selection one to the right.
-           *
-           * @example
-           *     // no selection just selects to the right
-           *     // Hey |guys
-           *     moveRightAndModifySelection(event)
-           *     // Hey |g>uys
-           *
-           *     // right selections are extended
-           *     // Hey |gu>ys
-           *     moveRightAndModifySelection(event)
-           *     // Hey |guy>s
-           *
-           *     // left selections are shrunk
-           *     // <Hey |guys
-           *     moveRightAndModifySelection(event)
-           *     // H<ey |guys
-           *
-           *     // neutral selections are extended
-           *     // |Hey| guys
-           *     moveRightAndModifySelection(event)
-           *     // |Hey >guys
-           *
-           * @param {Event} event
-           */
-
-          value: function moveRightAndModifySelection(event) {
-            event.preventDefault();
-            var range = this.selectedRange();
-            switch (this.selectionAffinity) {
-              case $$text_field$$Affinity.UPSTREAM:
-                range.start++;
-                range.length--;
-                break;
-              case $$text_field$$Affinity.DOWNSTREAM:
-              case $$text_field$$Affinity.NONE:
-                this.selectionAffinity = $$text_field$$Affinity.DOWNSTREAM;
-                range.length++;
-                break;
-            }
-            this.setSelectedRange(range);
-          }
-        },
-        moveWordRight: {
-
-          /**
-           * Moves the cursor right until the end of a word is found.
-           *
-           * @example
-           *     // no selection just moves the cursor right
-           *     // Hey| guys
-           *     moveWordRight(event)
-           *     // Hey guys|
-           *
-           *     // selections are removed
-           *     // |Hey| guys
-           *     moveWordRight(event)
-           *     // Hey guys|
-           *
-           * @param {Event} event
-           */
-
-          value: function moveWordRight(event) {
-            event.preventDefault();
-            var range = this.selectedRange();
-            var index = this._nextWordBreakAfterIndex(range.start + range.length);
-            this.setSelectedRange({ start: index, length: 0 });
-          }
-        },
-        moveWordRightAndModifySelection: {
-
-          /**
-           * Moves the free end of the current selection to the next end of word.
-           *
-           * @example
-           *     // no selection just selects to the right
-           *     // Hey |guys
-           *     moveWordRightAndModifySelection(event)
-           *     // Hey |guys|
-           *
-           *     // right selections are extended
-           *     // Hey |g>uys
-           *     moveWordRightAndModifySelection(event)
-           *     // Hey |guys>
-           *
-           *     // left selections are shrunk
-           *     // He<y |guys
-           *     moveWordRightAndModifySelection(event)
-           *     // Hey< |guys
-           *
-           *     // neutral selections are extended
-           *     // He|y |guys
-           *     moveWordRightAndModifySelection(event)
-           *     // He|y guys>
-           *
-           * @param {Event} event
-           */
-
-          value: function moveWordRightAndModifySelection(event) {
-            event.preventDefault();
-            var range = this.selectedRange();
-            var start = range.start;
-            var end = range.start + range.length;
-            switch (this.selectionAffinity) {
-              case $$text_field$$Affinity.UPSTREAM:
-                start = Math.min(this._nextWordBreakAfterIndex(start), end);
-                break;
-              case $$text_field$$Affinity.DOWNSTREAM:
-              case $$text_field$$Affinity.NONE:
-                this.selectionAffinity = $$text_field$$Affinity.DOWNSTREAM;
-                end = this._nextWordBreakAfterIndex(range.start + range.length);
-                break;
-            }
-            this.setSelectedRange({ start: start, length: end - start });
-          }
-        },
-        moveToEndOfLine: {
-
-          /**
-           * Moves the cursor to the end of the current line.
-           *
-           * @example
-           *     // Hey guys, where| are ya?
-           *     moveToEndOfLine(event)
-           *     // |Hey guys, where are ya?
-           *
-           * @param {Event} event
-           */
-
-          value: function moveToEndOfLine(event) {
-            event.preventDefault();
-            this.setSelectedRange({ start: this.text().length, length: 0 });
-          }
-        },
-        moveToEndOfLineAndModifySelection: {
-
-          /**
-           * Moves the free end of the selection to the end of the current line.
-           *
-           * @example
-           *     // Hey guys, where| are ya?
-           *     moveToEndOfLineAndModifySelection(event)
-           *     // Hey guys, where| are ya?>
-           *
-           *     // Hey guys, <where| are ya?
-           *     moveToEndOfLineAndModifySelection(event)
-           *     // Hey guys, |where are ya?>
-           *
-           * @param {Event} event
-           */
-
-          value: function moveToEndOfLineAndModifySelection(event) {
-            event.preventDefault();
-            var range = this.selectedRange();
-            range.length = this.text().length - range.start;
-            this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.DOWNSTREAM);
-          }
-        },
         readSelectionFromPasteboard: {
 
           /**
@@ -2551,53 +2375,6 @@
             range.start += range.length;
             range.length = 0;
             this.setSelectedRange(range);
-          }
-        },
-        replaceSelection: {
-
-          /**
-           * Replaces the characters within the selection with given text.
-           *
-           * @example
-           *     // 12|34567|8
-           *     replaceSelection('00')
-           *     // 12|00|8
-           *
-           * @param {string} replacement
-           */
-
-          value: function replaceSelection(replacement) {
-            var range = this.selectedRange();
-            var end = range.start + range.length;
-            var text = this.text();
-            text = text.substring(0, range.start) + replacement + text.substring(end);
-            range.length = replacement.length;
-            this.setText(text);
-            this.setSelectedRangeWithAffinity(range, $$text_field$$Affinity.NONE);
-          }
-        },
-        rightWordBreakIndexes: {
-
-          /**
-           * Find ends of 'words' for navigational purposes.
-           *
-           * @example
-           *     // given value of '123456789' and text of '123-45-6789'
-           *     rightWordBreakIndexes()
-           *     //=> [3, 5, 9]
-           *
-           * @returns {number[]}
-           */
-
-          value: function rightWordBreakIndexes() {
-            var result = [];
-            var text = this.text();
-            for (var i = 0, l = text.length; i <= l; i++) {
-              if ($$text_field$$hasRightWordBreakAtIndex(text, i)) {
-                result.push(i + 1);
-              }
-            }
-            return result;
           }
         },
         rollbackInvalidChanges: {
@@ -2649,53 +2426,6 @@
             return result;
           }
         },
-        selectAll: {
-
-          /**
-           * Expands the selection to contain all the characters in the content.
-           *
-           * @example
-           *     // 123|45678
-           *     selectAll(event)
-           *     // |12345678|
-           *
-           * @param {Event} event
-           */
-
-          value: function selectAll(event) {
-            event.preventDefault();
-            this.setSelectedRangeWithAffinity({
-              start: 0,
-              length: this.text().length
-            }, $$text_field$$Affinity.NONE);
-          }
-        },
-        text: {
-
-          /**
-           * Gets the formatted text value. This is the same as the value of the
-           * underlying input element.
-           *
-           * @returns {string}
-           */
-
-          value: function text() {
-            return this.element.value;
-          }
-        },
-        setText: {
-
-          /**
-           * Sets the formatted text value. This generally should not be used. Instead,
-           * use the value setter.
-           *
-           * @param {string} text
-           */
-
-          value: function setText(text) {
-            this.element.value = text;
-          }
-        },
         value: {
 
           /**
@@ -2739,11 +2469,44 @@
             this.setText("" + value);
           }
         },
+        text: {
+
+          /**
+           * **** InputSim Overrides ****
+           */
+
+          /**
+           * Gets the formatted text value. This is the same as the value of the
+           * underlying input element.
+           *
+           * @augments external:InputSim.Input#text
+           * @returns {string}
+           */
+
+          value: function text() {
+            return this.element.value;
+          }
+        },
+        setText: {
+
+          /**
+           * Sets the formatted text value. This generally should not be used. Instead,
+           * use the value setter.
+           *
+           * @augments external:InputSim.Input#setText
+           * @param {string} text
+           */
+
+          value: function setText(text) {
+            this.element.value = text;
+          }
+        },
         selectedRange: {
 
           /**
            * Gets the range of the current selection.
            *
+           * @augments external:InputSim.Input#selectedRange
            * @returns {Object} {start: number, length: number}
            */
 
@@ -2756,57 +2519,25 @@
             };
           }
         },
-        setSelectedRange: {
-
-          /**
-           * Sets the range of the current selection without changing the affinity.
-           * @param {Object} range ({start: 0, length: 0})
-           */
-
-          value: function setSelectedRange(range) {
-            this.setSelectedRangeWithAffinity(range, this.selectionAffinity);
-          }
-        },
         setSelectedRangeWithAffinity: {
 
           /**
            * Sets the range of the current selection and the selection affinity.
            *
-           * @param {Object} range {start: number, length: number}
+           * @augments external:InputSim.Input#setSelectedRangeWithAffinity
+           * @param {{start: number, length: number}} range
            * @param {Affinity} affinity
            */
 
           value: function setSelectedRangeWithAffinity(range, affinity) {
-            var min = 0;
-            var max = this.text().length;
+            var newRange = $$text_field$$_get(Object.getPrototypeOf(TextField.prototype), "setSelectedRangeWithAffinity", this).call(this, range, affinity);
             var caret = {
-              start: Math.max(min, Math.min(max, range.start)),
-              end: Math.max(min, Math.min(max, range.start + range.length))
+              start: newRange.start,
+              end: newRange.start + newRange.length
             };
             this._manualCaret = caret;
             $$caret$$default.set(this.element, caret.start, caret.end);
-            this.selectionAffinity = range.length === 0 ? $$text_field$$Affinity.NONE : affinity;
-          }
-        },
-        selectionAnchor: {
-
-          /**
-           * Gets the position of the current selection's anchor point, i.e. the point
-           * that the selection extends from, if any.
-           *
-           * @returns {number}
-           */
-
-          value: function selectionAnchor() {
-            var range = this.selectedRange();
-            switch (this.selectionAffinity) {
-              case $$text_field$$Affinity.UPSTREAM:
-                return range.start + range.length;
-              case $$text_field$$Affinity.DOWNSTREAM:
-                return range.start;
-              default:
-                return $$text_field$$Affinity.NONE;
-            }
+            this.selectionAffinity = range.length === 0 ? null : affinity;
           }
         },
         allowsUndo: {
@@ -3095,6 +2826,7 @@
           /**
            * Builds the key bindings for platform
            *
+           * @augments external:InputSim.Input#_buildKeybindings
            * @private
            */
 
@@ -3115,10 +2847,12 @@
            */
 
           value: function _click() {
-            if (this._needsManualCaret) {
-              this._manualCaret = $$caret$$default.get(this.element);
-            }
-            this.selectionAffinity = $$text_field$$Affinity.NONE;
+            this._manualCaret = $$caret$$default.get(this.element);
+            this._selectedRange = {
+              start: this._manualCaret.start,
+              length: this._manualCaret.end - this._manualCaret.start
+            };
+            this.selectionAffinity = null;
           }
         },
         _fireEvent: {
@@ -3249,79 +2983,6 @@
             });
           }
         },
-        _lastWordBreakBeforeIndex: {
-
-          /**
-           * Finds the start of the 'word' before index.
-           *
-           * @param {number} index position at which to start looking
-           * @returns {number} index in value less than or equal to the given index
-           * @private
-           */
-
-          value: function _lastWordBreakBeforeIndex(index) {
-            var indexes = this._leftWordBreakIndexes();
-            var result = indexes[0];
-            for (var i = 0, l = indexes.length; i < l; i++) {
-              var wordBreakIndex = indexes[i];
-              if (index > wordBreakIndex) {
-                result = wordBreakIndex;
-              } else {
-                break;
-              }
-            }
-            return result;
-          }
-        },
-        _leftWordBreakIndexes: {
-
-          /**
-           * Find starts of 'words' for navigational purposes.
-           *
-           * @example
-           *     // given value of '123456789' and text of '123-45-6789'
-           *     leftWordBreakIndexes()
-           *     // => [0, 3, 5]
-           *
-           * @returns {number[]} indexes in value of word starts.
-           * @private
-           */
-
-          value: function _leftWordBreakIndexes() {
-            var result = [];
-            var text = this.text();
-            for (var i = 0, l = text.length; i < l; i++) {
-              if ($$text_field$$hasLeftWordBreakAtIndex(text, i)) {
-                result.push(i);
-              }
-            }
-            return result;
-          }
-        },
-        _nextWordBreakAfterIndex: {
-
-          /**
-           * Finds the end of the 'word' after index.
-           *
-           * @param {number} index position in value at which to start looking.
-           * @returns {number}
-           * @private
-           */
-
-          value: function _nextWordBreakAfterIndex(index) {
-            var indexes = this.rightWordBreakIndexes().reverse();
-            var result = indexes[0];
-            for (var i = 0, l = indexes.length; i < l; i++) {
-              var wordBreakIndex = indexes[i];
-              if (index < wordBreakIndex) {
-                result = wordBreakIndex;
-              } else {
-                break;
-              }
-            }
-            return result;
-          }
-        },
         _paste: {
 
           /**
@@ -3368,7 +3029,7 @@
       });
 
       return TextField;
-    })();
+    })(input$sim$$Input);
 
     /**
      * Helps calculate the changes after an event on a FieldKit.TextField.
@@ -3493,11 +3154,8 @@
 
     var $$text_field$$default = $$text_field$$TextField;
     var $$card_text_field$$_createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
     var $$card_text_field$$_get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
     var $$card_text_field$$_inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
     var $$card_text_field$$_classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
     /**
@@ -3735,11 +3393,8 @@
 
     var $$card_text_field$$default = $$card_text_field$$CardTextField;
     var $$expiry_date_formatter$$_createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
     var $$expiry_date_formatter$$_get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
     var $$expiry_date_formatter$$_inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
     var $$expiry_date_formatter$$_classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
     /**
@@ -3909,11 +3564,8 @@
 
     var $$expiry_date_formatter$$default = $$expiry_date_formatter$$ExpiryDateFormatter;
     var $$expiry_date_field$$_createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
     var $$expiry_date_field$$_get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
     var $$expiry_date_field$$_inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
     var $$expiry_date_field$$_classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
     /**
@@ -3958,9 +3610,7 @@
 
     var $$expiry_date_field$$default = $$expiry_date_field$$ExpiryDateField;
     var $$number_formatter_settings_formatter$$_createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
     var $$number_formatter_settings_formatter$$_inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
     var $$number_formatter_settings_formatter$$_classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
     var $$number_formatter_settings_formatter$$NumberFormatterSettings = function NumberFormatterSettings() {
@@ -4169,6 +3819,7 @@
     })($$formatter$$default);
 
     var $$number_formatter_settings_formatter$$default = $$number_formatter_settings_formatter$$NumberFormatterSettingsFormatter;
+
     var stround$$modes = {
       CEILING: 0,
       FLOOR: 1,
@@ -4178,7 +3829,6 @@
       HALF_DOWN: 5,
       HALF_UP: 6
     };
-
 
     /**
      * @const
@@ -4406,19 +4056,17 @@
 
       return stround$$format(stround$$shiftParts([negative, intPart, ''], -precision));
     }
+
     var $$number_formatter$$_createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
     var $$number_formatter$$_get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
     var $$number_formatter$$_inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
     var $$number_formatter$$_classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
     // Style
     var $$number_formatter$$NONE = 0;
+
     var $$number_formatter$$CURRENCY = 1;
     var $$number_formatter$$PERCENT = 2;
-
     var $$number_formatter$$DEFAULT_LOCALE = "en-US";
     var $$number_formatter$$DEFAULT_COUNTRY = "US";
 
@@ -4476,6 +4124,7 @@
     function $$number_formatter$$replacePlusSign(string, plusSign) {
       return string.replace(/\+/g, plusSign);
     }
+
     /**
      * @param {string} string
      * @param {string} minusSign
@@ -5983,46 +5632,67 @@
 
     /** @private */
     $$number_formatter$$NumberFormatter.prototype._allowsFloats = null;
+
     /** @private */
     $$number_formatter$$NumberFormatter.prototype._alwaysShowsDecimalSeparator = null;
+
     /** @private */
     $$number_formatter$$NumberFormatter.prototype._countryCode = null;
+
     /** @private */
     $$number_formatter$$NumberFormatter.prototype._currencyCode = null;
+
     /** @private */
     $$number_formatter$$NumberFormatter.prototype._exponent = null;
+
     /** @private */
     $$number_formatter$$NumberFormatter.prototype._groupingSeparator = null;
+
     /** @private */
     $$number_formatter$$NumberFormatter.prototype._groupingSize = null;
+
     /** @private */
     $$number_formatter$$NumberFormatter.prototype._lenient = false;
+
     /** @private */
     $$number_formatter$$NumberFormatter.prototype._locale = null;
+
     /** @private */
     $$number_formatter$$NumberFormatter.prototype._internationalCurrencySymbol = null;
+
     /** @private */
     $$number_formatter$$NumberFormatter.prototype._maximumFractionDigits = null;
+
     /** @private */
     $$number_formatter$$NumberFormatter.prototype._minimumFractionDigits = null;
+
     /** @private */
     $$number_formatter$$NumberFormatter.prototype._maximumIntegerDigits = null;
+
     /** @private */
     $$number_formatter$$NumberFormatter.prototype._minimumIntegerDigits = null;
+
     /** @private */
     $$number_formatter$$NumberFormatter.prototype._maximum = null;
+
     /** @private */
     $$number_formatter$$NumberFormatter.prototype._minimum = null;
+
     /** @private */
     $$number_formatter$$NumberFormatter.prototype._notANumberSymbol = null;
+
     /** @private */
     $$number_formatter$$NumberFormatter.prototype._nullSymbol = null;
+
     /** @private */
     $$number_formatter$$NumberFormatter.prototype._numberStyle = null;
+
     /** @private */
     $$number_formatter$$NumberFormatter.prototype._roundingMode = null;
+
     /** @private */
     $$number_formatter$$NumberFormatter.prototype._usesGroupingSeparator = null;
+
     /** @private */
     $$number_formatter$$NumberFormatter.prototype._zeroSymbol = null;
 
@@ -6031,8 +5701,8 @@
      */
 
     $$number_formatter$$NumberFormatter.prototype.stringFromNumber = $$number_formatter$$NumberFormatter.prototype.format;
-    $$number_formatter$$NumberFormatter.prototype.numberFromString = $$number_formatter$$NumberFormatter.prototype.parse;
 
+    $$number_formatter$$NumberFormatter.prototype.numberFromString = $$number_formatter$$NumberFormatter.prototype.parse;
     $$number_formatter$$NumberFormatter.Rounding = stround$$modes;
 
     /**
@@ -7242,11 +6912,8 @@
 
     var $$number_formatter$$default = $$number_formatter$$NumberFormatter;
     var $$phone_formatter$$_createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
     var $$phone_formatter$$_get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
     var $$phone_formatter$$_inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
     var $$phone_formatter$$_classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
     /**
@@ -7516,11 +7183,8 @@
 
     var $$phone_formatter$$default = $$phone_formatter$$PhoneFormatter;
     var $$social_security_number_formatter$$_createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
     var $$social_security_number_formatter$$_get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
     var $$social_security_number_formatter$$_inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
     var $$social_security_number_formatter$$_classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
     /**
@@ -7623,5 +7287,3 @@
       this.FieldKit = index$$FieldKit;
     }
 }).call(this);
-
-//# sourceMappingURL=field-kit.js.map
