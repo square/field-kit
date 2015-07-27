@@ -31,73 +31,24 @@
 
 import Formatter from './formatter';
 import UndoManager from './undo_manager';
-import { KEYS, keyBindingsForPlatform } from './keybindings';
 import { bind } from './utils';
 import Caret from './caret';
 
 /**
- * Enum for text direction affinity.
+ * Simulates input behavior.
  *
- * @const
- * @enum {number}
- * @private
+ * @external InputSim
+ * @see https://github.com/iamJoeTaylor/input-sim
  */
-var Affinity = {
-  UPSTREAM: 0,
-  DOWNSTREAM: 1,
-  NONE: null
-};
-
-/**
- * Tests is string passed in is a single word.
- *
- * @param {string} chr
- * @returns {boolean}
- * @private
- */
-function isWordChar(chr) {
-  return chr &amp;&amp; /^\w$/.test(chr);
-}
-
-/**
- * Checks if char to the left of {index} in {string}
- * is a break (non-char).
- *
- * @param {string} text
- * @param {number} index
- * @returns {boolean}
- * @private
- */
-function hasLeftWordBreakAtIndex(text, index) {
-  if (index === 0) {
-    return true;
-  } else {
-    return !isWordChar(text[index - 1]) &amp;&amp; isWordChar(text[index]);
-  }
-}
-
-/**
- * Checks if char to the right of {index} in {string}
- * is a break (non-char).
- *
- * @param {string} text
- * @param {number} index
- * @returns {boolean}
- * @private
- */
-function hasRightWordBreakAtIndex(text, index) {
-  if (index === text.length) {
-    return true;
-  } else {
-    return isWordChar(text[index]) &amp;&amp; !isWordChar(text[index + 1]);
-  }
-}
+import {Input, KEYS, keyBindingsForPlatform} from 'input-sim';
 
 /**
  * TextField is the simplest input and the base for more complex
  * types to inherit.
+ *
+ * @extends external:InputSim.Input
  */
-class TextField {
+class TextField extends Input {
   /**
    * Sets up the initial properties of the TextField and
    * sets  up the event listeners
@@ -106,6 +57,7 @@ class TextField {
    * @param {Formatter} formatter
    */
   constructor(element, formatter) {
+    var caret = Caret.get(element);
     if (typeof element.get === 'function') {
       console.warn(
         'DEPRECATION: FieldKit.TextField instances should no longer be ' +
@@ -142,7 +94,6 @@ class TextField {
     element.addEventListener('paste', this._paste);
     element.addEventListener('focus', this._focus);
     element.addEventListener('blur', this._blur);
-    this._buildKeybindings();
 
     var window = element.ownerDocument.defaultView;
 
@@ -156,13 +107,10 @@ class TextField {
      */
     this._needsManualCaret = window.navigator.userAgent.toLowerCase().indexOf('android') > -1;
 
-    /**
-     * Contains one of the Affinity enum to indicate the preferred direction of
-     * selection.
-     *
-     * @private
-     */
-    this.selectionAffinity = Affinity.NONE;
+    super(element.value, {
+      start: caret.start,
+      length: caret.end - caret.start
+    });
   }
 
 
@@ -256,19 +204,6 @@ class TextField {
    */
 
   /**
-   * Clears all characters in the existing selection.
-   *
-   * @example
-   *     // 12|34567|8
-   *     clearSelection();
-   *     // 12|8
-   *
-   */
-  clearSelection() {
-    this.replaceSelection('');
-  }
-
-  /**
    * Gets the current delegate for this text field.
    *
    * @returns {TextFieldDelegate}
@@ -284,172 +219,6 @@ class TextField {
    */
   setDelegate(delegate) {
     this._delegate = delegate;
-  }
-
-  /**
-   * Deletes backward one character or clears a non-empty selection.
-   *
-   * @example
-   *
-   *     // |What's up, doc?
-   *     deleteBackward(event);
-   *     // |What's up, doc?
-   *
-   *     // What'|s up, doc?
-   *     deleteBackward(event);
-   *     // What|s up, doc?
-   *
-   *     // |What's| up, doc?
-   *     deleteBackward(event);
-   *     // | up, doc?
-   */
-  deleteBackward(event) {
-    event.preventDefault();
-    var range = this.selectedRange();
-    if (range.length === 0) {
-      range.start--;
-      range.length++;
-      this.setSelectedRange(range);
-    }
-    this.clearSelection();
-  }
-
-  /**
-   * Deletes backward one word or clears a non-empty selection.
-   *
-   * @example
-   *     // |What's up, doc?
-   *     deleteWordBackward(event);
-   *     // |What's up, doc?
-   *
-   *     // What'|s up, doc?
-   *     deleteWordBackward(event);
-   *     // |s up, doc?
-   *
-   *     // |What's| up, doc?
-   *     deleteWordBackward(event);
-   *     // | up, doc?
-   */
-  deleteWordBackward(event) {
-    if (this.hasSelection()) {
-      this.deleteBackward(event);
-    } else {
-      event.preventDefault();
-      var range = this.selectedRange();
-      var start = this._lastWordBreakBeforeIndex(range.start);
-      range.length += range.start - start;
-      range.start = start;
-      this.setSelectedRange(range);
-      this.clearSelection();
-    }
-  }
-
-  /**
-   * Deletes backward one character, clears a non-empty selection, or decomposes
-   * an accented character to its simple form.
-   *
-   * @TODO Make this work as described.
-   *
-   * @example
-   *     // |fiancée
-   *     deleteBackwardByDecomposingPreviousCharacter(event);
-   *     // |What's up, doc?
-   *
-   *     // fianc|é|e
-   *     deleteBackwardByDecomposingPreviousCharacter(event);
-   *     // fianc|e
-   *
-   *     // fiancé|e
-   *     deleteBackwardByDecomposingPreviousCharacter(event);
-   *     // fiance|e
-   *
-   */
-  deleteBackwardByDecomposingPreviousCharacter(event) {
-    this.deleteBackward(event);
-  }
-
-  /**
-   * Deletes all characters before the cursor or clears a non-empty selection.
-   *
-   * @example
-   *     // The quick |brown fox.
-   *     deleteBackwardToBeginningOfLine(event);
-   *     // |brown fox.
-   *
-   *     // The |quick |brown fox.
-   *     deleteBackwardToBeginningOfLine(event);
-   *     // The brown fox.
-   *
-   */
-  deleteBackwardToBeginningOfLine(event) {
-    if (this.hasSelection()) {
-      this.deleteBackward(event);
-    } else {
-      event.preventDefault();
-      var range = this.selectedRange();
-      range.length = range.start;
-      range.start = 0;
-      this.setSelectedRange(range);
-      this.clearSelection();
-    }
-  }
-
-  /**
-   * Deletes forward one character or clears a non-empty selection.
-   *
-   * @example
-   *     // What's up, doc?|
-   *     deleteForward(event);
-   *     // What's up, doc?|
-   *
-   *     // What'|s up, doc?
-   *     deleteForward(event);
-   *     // What'| up, doc?
-   *
-   *     // |What's| up, doc?
-   *     deleteForward(event);
-   *     // | up, doc?
-   *
-   */
-  deleteForward(event) {
-    event.preventDefault();
-    var range = this.selectedRange();
-    if (range.length === 0) {
-      range.length++;
-      this.setSelectedRange(range);
-    }
-    this.clearSelection();
-  }
-
-  /**
-   * Deletes forward one word or clears a non-empty selection.
-   *
-   * @example
-   *     // What's up, doc?|
-   *     deleteWordForward(event);
-   *     // What's up, doc?|
-   *
-   *     // What's |up, doc?
-   *     deleteWordForward(event);
-   *     // What's |, doc?
-   *
-   *     // |What's| up, doc?
-   *     deleteWordForward(event);
-   *     // | up, doc?
-   */
-  deleteWordForward(event) {
-    if (this.hasSelection()) {
-      return this.deleteForward(event);
-    } else {
-      event.preventDefault();
-      var range = this.selectedRange();
-      var end = this._nextWordBreakAfterIndex(range.start + range.length);
-      this.setSelectedRange({
-        start: range.start,
-        length: end - range.start
-      });
-      this.clearSelection();
-    }
   }
 
   /**
@@ -497,45 +266,6 @@ class TextField {
   }
 
   /**
-   * Determines whether this field has any selection.
-   *
-   * @returns {boolean} true if there is at least one character selected
-   */
-  hasSelection() {
-    return this.selectedRange().length !== 0;
-  }
-
-  /**
-   * Handles the back tab key.
-   *
-   */
-  insertBackTab() {}
-
-  /**
-   * Handles the tab key.
-   *
-   */
-  insertTab() {}
-
-  /**
-   * Handles a key event that is trying to insert a character.
-   *
-   * @param {string} text
-   */
-  insertText(text) {
-    var range;
-    if (this.hasSelection()) {
-      this.clearSelection();
-    }
-
-    this.replaceSelection(text);
-    range = this.selectedRange();
-    range.start += range.length;
-    range.length = 0;
-    this.setSelectedRange(range);
-  }
-
-  /**
    * Handles a key event could be trying to end editing.
    *
    */
@@ -554,610 +284,6 @@ class TextField {
   }
 
   /**
-   * Moves the cursor up, which because this is a single-line text field, means
-   * moving to the beginning of the value.
-   *
-   * @example
-   *     // Hey guys|
-   *     moveUp(event);
-   *     // |Hey guys
-   *
-   *     // Hey |guys|
-   *     moveUp(event);
-   *     // |Hey guys
-   *
-   * @param {Event} event
-   */
-  moveUp(event) {
-    event.preventDefault();
-    this.setSelectedRange({
-      start: 0,
-      length: 0
-    });
-  }
-
-  /**
-   * Moves the cursor up to the beginning of the current paragraph, which because
-   * this is a single-line text field, means moving to the beginning of the
-   * value.
-   *
-   * @example
-   *     // Hey guys|
-   *     moveToBeginningOfParagraph(event)
-   *     // |Hey guys
-   *
-   *     // Hey |guys|
-   *     moveToBeginningOfParagraph(event)
-   *     // |Hey guys
-   *
-   * @param {Event} event
-   */
-  moveToBeginningOfParagraph(event) {
-    this.moveUp(event);
-  }
-
-  /**
-   * Moves the cursor up, keeping the current anchor point and extending the
-   * selection to the beginning as moveUp would.
-   *
-   * @example
-   *     // rightward selections are shrunk
-   *     // Hey guys, |where> are you?
-   *     moveUpAndModifySelection(event);
-   *     // &lt;Hey guys, |where are you?
-   *
-   *     // leftward selections are extended
-   *     // Hey guys, &lt;where| are you?
-   *     moveUpAndModifySelection(event);
-   *     // &lt;Hey guys, where| are you?
-   *
-   *     // neutral selections are extended
-   *     // Hey guys, |where| are you?
-   *     moveUpAndModifySelection(event);
-   *     // &lt;Hey guys, where| are you?
-   *
-   * @param {Event} event
-   */
-  moveUpAndModifySelection(event) {
-    event.preventDefault();
-    var range = this.selectedRange();
-    switch (this.selectionAffinity) {
-      case Affinity.UPSTREAM:
-      case Affinity.NONE:
-        // 12&lt;34 56|78  =>  &lt;1234 56|78
-        range.length += range.start;
-        range.start = 0;
-        break;
-      case Affinity.DOWNSTREAM:
-        // 12|34 56>78   =>   &lt;12|34 5678
-        range.length = range.start;
-        range.start = 0;
-        break;
-    }
-    this.setSelectedRangeWithAffinity(range, Affinity.UPSTREAM);
-  }
-
-  /**
-   * Moves the free end of the selection to the beginning of the paragraph, or
-   * since this is a single-line text field to the beginning of the line.
-   *
-   * @param {Event} event
-   */
-  moveParagraphBackwardAndModifySelection(event) {
-    event.preventDefault();
-    var range = this.selectedRange();
-    switch (this.selectionAffinity) {
-      case Affinity.UPSTREAM:
-      case Affinity.NONE:
-        // 12&lt;34 56|78  =>  &lt;1234 56|78
-        range.length += range.start;
-        range.start = 0;
-        break;
-      case Affinity.DOWNSTREAM:
-        // 12|34 56>78  =>  12|34 5678
-        range.length = 0;
-        break;
-    }
-    this.setSelectedRangeWithAffinity(range, Affinity.UPSTREAM);
-  }
-
-  /**
-   * Moves the cursor to the beginning of the document.
-   *
-   * @param {Event} event
-   */
-  moveToBeginningOfDocument(event) {
-    // Since we only support a single line this is just an alias.
-    this.moveToBeginningOfLine(event);
-  }
-
-  /**
-   * Moves the selection start to the beginning of the document.
-   * @param {Event} event
-   */
-  moveToBeginningOfDocumentAndModifySelection(event) {
-    event.preventDefault();
-    var range = this.selectedRange();
-    range.length += range.start;
-    range.start = 0;
-    this.setSelectedRangeWithAffinity(range, Affinity.UPSTREAM);
-  }
-
-  /**
-   * Moves the cursor down, which because this is a single-line text field, means
-   * moving to the end of the value.
-   *
-   * @example
-   *     // Hey |guys
-   *     moveDown(event)
-   *     // Hey guys|
-   *
-   *     // |Hey| guys
-   *     moveDown(event)
-   *     // Hey guys|
-   *
-   * @param {Event} event
-   */
-  moveDown(event) {
-    event.preventDefault();
-    // 12|34 56|78  =>  1234 5678|
-    var range = {
-      start: this.text().length,
-      length: 0
-    };
-    this.setSelectedRangeWithAffinity(range, Affinity.NONE);
-  }
-
-  /**
-   * Moves the cursor up to the end of the current paragraph, which because this
-   * is a single-line text field, means moving to the end of the value.
-   *
-   * @example
-   *     // |Hey guys
-   *     moveToEndOfParagraph(event)
-   *     // Hey guys|
-   *
-   *     // Hey |guys|
-   *     moveToEndOfParagraph(event)
-   *     // Hey guys|
-   *
-   * @param {Event} event
-   */
-  moveToEndOfParagraph(event) {
-    this.moveDown(event);
-  }
-
-  /**
-   * Moves the cursor down, keeping the current anchor point and extending the
-   * selection to the end as moveDown would.
-   *
-   * @example
-   *     // leftward selections are shrunk
-   *     // Hey guys, &lt;where| are you?
-   *     moveDownAndModifySelection(event)
-   *     // Hey guys, |where are you?>
-   *
-   *     // rightward selections are extended
-   *     // Hey guys, |where> are you?
-   *     moveDownAndModifySelection(event)
-   *     // Hey guys, where| are you?>
-   *
-   *     // neutral selections are extended
-   *     // Hey guys, |where| are you?
-   *     moveDownAndModifySelection(event)
-   *     // Hey guys, |where are you?>
-   *
-   * @param {Event} event
-   */
-  moveDownAndModifySelection(event) {
-    event.preventDefault();
-    var range = this.selectedRange();
-    var end = this.text().length;
-    if (this.selectionAffinity === Affinity.UPSTREAM) {
-      range.start += range.length;
-    }
-    range.length = end - range.start;
-    this.setSelectedRangeWithAffinity(range, Affinity.DOWNSTREAM);
-  }
-
-  /**
-   * Moves the free end of the selection to the end of the paragraph, or since
-   * this is a single-line text field to the end of the line.
-   *
-   * @param {Event} event
-   */
-  moveParagraphForwardAndModifySelection(event) {
-    event.preventDefault();
-    var range = this.selectedRange();
-    switch (this.selectionAffinity) {
-      case Affinity.DOWNSTREAM:
-      case Affinity.NONE:
-        // 12|34 56>78  =>  12|34 5678>
-        range.length = this.text().length - range.start;
-        break;
-      case Affinity.UPSTREAM:
-        // 12&lt;34 56|78  =>  12|34 5678
-        range.start += range.length;
-        range.length = 0;
-        break;
-    }
-    this.setSelectedRangeWithAffinity(range, Affinity.DOWNSTREAM);
-  }
-
-  /**
-   * Moves the cursor to the end of the document.
-   *
-   * @param {Event} event
-   */
-  moveToEndOfDocument(event) {
-    // Since we only support a single line this is just an alias.
-    this.moveToEndOfLine(event);
-  }
-
-  /**
-   * Moves the selection end to the end of the document.
-   * @param {Event} event
-   */
-  moveToEndOfDocumentAndModifySelection(event) {
-    event.preventDefault();
-    var range = this.selectedRange();
-    range.length = this.text().length - range.start;
-    this.setSelectedRangeWithAffinity(range, Affinity.DOWNSTREAM);
-  }
-
-  /**
-   * Moves the cursor to the left, counting selections as a thing to move past.
-   *
-   * @example
-   *     // no selection just moves the cursor left
-   *     // Hey guys|
-   *     moveLeft(event)
-   *     // Hey guy|s
-   *
-   *     // selections are removed
-   *     // Hey |guys|
-   *     moveLeft(event)
-   *     // Hey |guys
-   *
-   * @param {Event} event
-   */
-  moveLeft(event) {
-    event.preventDefault();
-    var range = this.selectedRange();
-    if (range.length !== 0) {
-      range.length = 0;
-    } else {
-      range.start--;
-    }
-    this.setSelectedRangeWithAffinity(range, Affinity.NONE);
-  }
-
-  /**
-   * Moves the free end of the selection one to the left.
-   *
-   * @example
-   *     // no selection just selects to the left
-   *     // Hey guys|
-   *     moveLeftAndModifySelection(event)
-   *     // Hey guy&lt;s|
-   *
-   *     // left selections are extended
-   *     // Hey &lt;guys|
-   *     moveLeftAndModifySelection(event)
-   *     // Hey&lt; guys|
-   *
-   *     // right selections are shrunk
-   *     // Hey |guys>
-   *     moveLeftAndModifySelection(event)
-   *     // Hey |guy>s
-   *
-   *     // neutral selections are extended
-   *     // Hey |guys|
-   *     moveLeftAndModifySelection(event)
-   *     //Hey&lt; guys|
-   *
-   * @param {Event} event
-   */
-  moveLeftAndModifySelection(event) {
-    event.preventDefault();
-    var range = this.selectedRange();
-    switch (this.selectionAffinity) {
-      case Affinity.UPSTREAM:
-      case Affinity.NONE:
-        this.selectionAffinity = Affinity.UPSTREAM;
-        range.start--;
-        range.length++;
-        break;
-      case Affinity.DOWNSTREAM:
-        range.length--;
-        break;
-    }
-    this.setSelectedRange(range);
-  }
-
-  /**
-   * Moves the cursor left until the start of a word is found.
-   *
-   * @example
-   *     // no selection just moves the cursor left
-   *     // Hey guys|
-   *     moveWordLeft(event)
-   *     // Hey |guys
-   *
-   *     // selections are removed
-   *     // Hey |guys|
-   *     moveWordLeft(event)
-   *     // |Hey guys
-   *
-   * @param {Event} event
-   */
-  moveWordLeft(event) {
-    event.preventDefault();
-    var index = this._lastWordBreakBeforeIndex(this.selectedRange().start - 1);
-    this.setSelectedRange({ start: index, length: 0 });
-  }
-
-  /**
-   * Moves the free end of the current selection to the beginning of the previous
-   * word.
-   *
-   * @example
-   *     // no selection just selects to the left
-   *     // Hey guys|
-   *     moveWordLeftAndModifySelection(event)
-   *     // Hey |guys|
-   *
-   *     // left selections are extended
-   *     // Hey &lt;guys|
-   *     moveWordLeftAndModifySelection(event)
-   *     // &lt;Hey guys|
-   *
-   *     // right selections are shrunk
-   *     // |Hey guys>
-   *     moveWordLeftAndModifySelection(event)
-   *     // |Hey >guys
-   *
-   *     // neutral selections are extended
-   *     // Hey |guys|
-   *     moveWordLeftAndModifySelection(event)
-   *     // &lt;Hey guys|
-   *
-   * @param {Event} event
-   */
-  moveWordLeftAndModifySelection(event) {
-    event.preventDefault();
-    var range = this.selectedRange();
-    switch (this.selectionAffinity) {
-      case Affinity.UPSTREAM:
-      case Affinity.NONE:
-        this.selectionAffinity = Affinity.UPSTREAM;
-        var start = this._lastWordBreakBeforeIndex(range.start - 1);
-        range.length += range.start - start;
-        range.start = start;
-        break;
-      case Affinity.DOWNSTREAM:
-        var end = this._lastWordBreakBeforeIndex(range.start + range.length);
-        if (end &lt; range.start) {
-          end = range.start;
-        }
-        range.length -= range.start + range.length - end;
-        break;
-    }
-    this.setSelectedRange(range);
-  }
-
-  /**
-   * Moves the cursor to the beginning of the current line.
-   *
-   * @example
-   *     // Hey guys, where| are ya?
-   *     moveToBeginningOfLine(event)
-   *     // |Hey guys, where are ya?
-   *
-   * @param {Event} event
-   */
-  moveToBeginningOfLine(event) {
-    event.preventDefault();
-    this.setSelectedRange({ start: 0, length: 0 });
-  }
-
-  /**
-   * Select from the free end of the selection to the beginning of line.
-   *
-   * @example
-   *     // Hey guys, where| are ya?
-   *     moveToBeginningOfLineAndModifySelection(event)
-   *     // &lt;Hey guys, where| are ya?
-   *
-   *     // Hey guys, where| are> ya?
-   *     moveToBeginningOfLineAndModifySelection(event)
-   *     // &lt;Hey guys, where are| ya?
-   *
-   * @param {Event} event
-   */
-  moveToBeginningOfLineAndModifySelection(event) {
-    event.preventDefault();
-    var range = this.selectedRange();
-    range.length += range.start;
-    range.start = 0;
-    this.setSelectedRangeWithAffinity(range, Affinity.UPSTREAM);
-  }
-
-  /**
-   * Moves the cursor to the right, counting selections as a thing to move past.
-   *
-   * @example
-   *     // no selection just moves the cursor right
-   *     // Hey guy|s
-   *     moveRight(event)
-   *     // Hey guys|
-   *
-   *     // selections are removed
-   *     // Hey |guys|
-   *     moveRight(event)
-   *     // Hey guys|
-   *
-   * @param {Event} event
-   */
-  moveRight(event) {
-    event.preventDefault();
-    var range = this.selectedRange();
-    if (range.length !== 0) {
-      range.start += range.length;
-      range.length = 0;
-    } else {
-      range.start++;
-    }
-    this.setSelectedRangeWithAffinity(range, Affinity.NONE);
-  }
-
-  /**
-   * Moves the free end of the selection one to the right.
-   *
-   * @example
-   *     // no selection just selects to the right
-   *     // Hey |guys
-   *     moveRightAndModifySelection(event)
-   *     // Hey |g>uys
-   *
-   *     // right selections are extended
-   *     // Hey |gu>ys
-   *     moveRightAndModifySelection(event)
-   *     // Hey |guy>s
-   *
-   *     // left selections are shrunk
-   *     // &lt;Hey |guys
-   *     moveRightAndModifySelection(event)
-   *     // H&lt;ey |guys
-   *
-   *     // neutral selections are extended
-   *     // |Hey| guys
-   *     moveRightAndModifySelection(event)
-   *     // |Hey >guys
-   *
-   * @param {Event} event
-   */
-  moveRightAndModifySelection(event) {
-    event.preventDefault();
-    var range = this.selectedRange();
-    switch (this.selectionAffinity) {
-      case Affinity.UPSTREAM:
-        range.start++;
-        range.length--;
-        break;
-      case Affinity.DOWNSTREAM:
-      case Affinity.NONE:
-        this.selectionAffinity = Affinity.DOWNSTREAM;
-        range.length++;
-        break;
-    }
-    this.setSelectedRange(range);
-  }
-
-  /**
-   * Moves the cursor right until the end of a word is found.
-   *
-   * @example
-   *     // no selection just moves the cursor right
-   *     // Hey| guys
-   *     moveWordRight(event)
-   *     // Hey guys|
-   *
-   *     // selections are removed
-   *     // |Hey| guys
-   *     moveWordRight(event)
-   *     // Hey guys|
-   *
-   * @param {Event} event
-   */
-  moveWordRight(event) {
-    event.preventDefault();
-    var range = this.selectedRange();
-    var index = this._nextWordBreakAfterIndex(range.start + range.length);
-    this.setSelectedRange({ start: index, length: 0 });
-  }
-
-  /**
-   * Moves the free end of the current selection to the next end of word.
-   *
-   * @example
-   *     // no selection just selects to the right
-   *     // Hey |guys
-   *     moveWordRightAndModifySelection(event)
-   *     // Hey |guys|
-   *
-   *     // right selections are extended
-   *     // Hey |g>uys
-   *     moveWordRightAndModifySelection(event)
-   *     // Hey |guys>
-   *
-   *     // left selections are shrunk
-   *     // He&lt;y |guys
-   *     moveWordRightAndModifySelection(event)
-   *     // Hey&lt; |guys
-   *
-   *     // neutral selections are extended
-   *     // He|y |guys
-   *     moveWordRightAndModifySelection(event)
-   *     // He|y guys>
-   *
-   * @param {Event} event
-   */
-  moveWordRightAndModifySelection(event) {
-    event.preventDefault();
-    var range = this.selectedRange();
-    var start = range.start;
-    var end = range.start + range.length;
-    switch (this.selectionAffinity) {
-      case Affinity.UPSTREAM:
-        start = Math.min(this._nextWordBreakAfterIndex(start), end);
-        break;
-      case Affinity.DOWNSTREAM:
-      case Affinity.NONE:
-        this.selectionAffinity = Affinity.DOWNSTREAM;
-        end = this._nextWordBreakAfterIndex(range.start + range.length);
-        break;
-    }
-    this.setSelectedRange({ start: start, length: end - start });
-  }
-
-  /**
-   * Moves the cursor to the end of the current line.
-   *
-   * @example
-   *     // Hey guys, where| are ya?
-   *     moveToEndOfLine(event)
-   *     // |Hey guys, where are ya?
-   *
-   * @param {Event} event
-   */
-  moveToEndOfLine(event) {
-    event.preventDefault();
-    this.setSelectedRange({ start: this.text().length, length: 0 });
-  }
-
-  /**
-   * Moves the free end of the selection to the end of the current line.
-   *
-   * @example
-   *     // Hey guys, where| are ya?
-   *     moveToEndOfLineAndModifySelection(event)
-   *     // Hey guys, where| are ya?>
-   *
-   *     // Hey guys, &lt;where| are ya?
-   *     moveToEndOfLineAndModifySelection(event)
-   *     // Hey guys, |where are ya?>
-   *
-   * @param {Event} event
-   */
-  moveToEndOfLineAndModifySelection(event) {
-    event.preventDefault();
-    var range = this.selectedRange();
-    range.length = this.text().length - range.start;
-    this.setSelectedRangeWithAffinity(range, Affinity.DOWNSTREAM);
-  }
-
-  /**
    * Replaces the current selection with text from the given pasteboard.
    *
    * @param {DataTransfer} pasteboard
@@ -1170,47 +296,6 @@ class TextField {
     range.start += range.length;
     range.length = 0;
     this.setSelectedRange(range);
-  }
-
-  /**
-   * Replaces the characters within the selection with given text.
-   *
-   * @example
-   *     // 12|34567|8
-   *     replaceSelection('00')
-   *     // 12|00|8
-   *
-   * @param {string} replacement
-   */
-  replaceSelection(replacement) {
-    var range = this.selectedRange();
-    var end = range.start + range.length;
-    var text = this.text();
-    text = text.substring(0, range.start) + replacement + text.substring(end);
-    range.length = replacement.length;
-    this.setText(text);
-    this.setSelectedRangeWithAffinity(range, Affinity.NONE);
-  }
-
-  /**
-   * Find ends of 'words' for navigational purposes.
-   *
-   * @example
-   *     // given value of '123456789' and text of '123-45-6789'
-   *     rightWordBreakIndexes()
-   *     //=> [3, 5, 9]
-   *
-   * @returns {number[]}
-   */
-  rightWordBreakIndexes() {
-    var result = [];
-    var text = this.text();
-    for (var i = 0, l = text.length; i &lt;= l; i++) {
-      if (hasRightWordBreakAtIndex(text, i)) {
-        result.push(i + 1);
-      }
-    }
-    return result;
   }
 
   /**
@@ -1258,44 +343,6 @@ class TextField {
   }
 
   /**
-   * Expands the selection to contain all the characters in the content.
-   *
-   * @example
-   *     // 123|45678
-   *     selectAll(event)
-   *     // |12345678|
-   *
-   * @param {Event} event
-   */
-  selectAll(event) {
-    event.preventDefault();
-    this.setSelectedRangeWithAffinity({
-      start: 0,
-      length: this.text().length
-    }, Affinity.NONE);
-  }
-
-  /**
-   * Gets the formatted text value. This is the same as the value of the
-   * underlying input element.
-   *
-   * @returns {string}
-   */
-  text() {
-    return this.element.value;
-  }
-
-  /**
-   * Sets the formatted text value. This generally should not be used. Instead,
-   * use the value setter.
-   *
-   * @param {string} text
-   */
-  setText(text) {
-    this.element.value = text;
-  }
-
-  /**
    * Gets the object value. This is the value that should be considered the
    * 'real' value of the field.
    *
@@ -1328,9 +375,37 @@ class TextField {
     this.setText('' + value);
   }
 
+
+  /**
+   * **** InputSim Overrides ****
+   */
+
+  /**
+   * Gets the formatted text value. This is the same as the value of the
+   * underlying input element.
+   *
+   * @augments external:InputSim.Input#text
+   * @returns {string}
+   */
+  text() {
+    return this.element.value;
+  }
+
+  /**
+   * Sets the formatted text value. This generally should not be used. Instead,
+   * use the value setter.
+   *
+   * @augments external:InputSim.Input#setText
+   * @param {string} text
+   */
+  setText(text) {
+    this.element.value = text;
+  }
+
   /**
    * Gets the range of the current selection.
    *
+   * @augments external:InputSim.Input#selectedRange
    * @returns {Object} {start: number, length: number}
    */
   selectedRange() {
@@ -1345,47 +420,21 @@ class TextField {
   }
 
   /**
-   * Sets the range of the current selection without changing the affinity.
-   * @param {Object} range ({start: 0, length: 0})
-   */
-  setSelectedRange(range) {
-    this.setSelectedRangeWithAffinity(range, this.selectionAffinity);
-  }
-
-  /**
    * Sets the range of the current selection and the selection affinity.
    *
-   * @param {Object} range {start: number, length: number}
+   * @augments external:InputSim.Input#setSelectedRangeWithAffinity
+   * @param {{start: number, length: number}} range
    * @param {Affinity} affinity
    */
   setSelectedRangeWithAffinity(range, affinity) {
-    var min = 0;
-    var max = this.text().length;
+    var newRange = super.setSelectedRangeWithAffinity(range, affinity);
     var caret = {
-      start: Math.max(min, Math.min(max, range.start)),
-      end: Math.max(min, Math.min(max, range.start + range.length))
+      start: newRange.start,
+      end: newRange.start + newRange.length
     };
     this._manualCaret = caret;
     Caret.set(this.element, caret.start, caret.end);
-    this.selectionAffinity = range.length === 0 ? Affinity.NONE : affinity;
-  }
-
-  /**
-   * Gets the position of the current selection's anchor point, i.e. the point
-   * that the selection extends from, if any.
-   *
-   * @returns {number}
-   */
-  selectionAnchor() {
-    var range = this.selectedRange();
-    switch (this.selectionAffinity) {
-      case Affinity.UPSTREAM:
-        return range.start + range.length;
-      case Affinity.DOWNSTREAM:
-        return range.start;
-      default:
-        return Affinity.NONE;
-    }
+    this.selectionAffinity = range.length === 0 ? null : affinity;
   }
 
 
@@ -1617,6 +666,7 @@ class TextField {
   /**
    * Builds the key bindings for platform
    *
+   * @augments external:InputSim.Input#_buildKeybindings
    * @private
    */
   _buildKeybindings() {
@@ -1633,10 +683,12 @@ class TextField {
    * @private
    */
   _click() {
-    if (this._needsManualCaret) {
-      this._manualCaret = Caret.get(this.element);
-    }
-    this.selectionAffinity = Affinity.NONE;
+    this._manualCaret = Caret.get(this.element);
+    this._selectedRange = {
+      start: this._manualCaret.start,
+      length: this._manualCaret.end - this._manualCaret.start
+    };
+    this.selectionAffinity = null;
   }
 
   /**
@@ -1646,8 +698,10 @@ class TextField {
    * @private
    */
   _fireEvent(eventType) {
-    if (typeof CustomEvent === 'function') {
-      this.element.dispatchEvent(new CustomEvent(eventType, {}));
+    var document = this.element.ownerDocument;
+    var window = document.defaultView;
+    if (typeof window.CustomEvent === 'function') {
+      this.element.dispatchEvent(new window.CustomEvent(eventType, {}));
     } else {
       var event = document.createEvent('Event');
       event.initEvent(eventType, false, false);
@@ -1740,69 +794,6 @@ class TextField {
     });
   }
 
-  /**
-   * Finds the start of the 'word' before index.
-   *
-   * @param {number} index position at which to start looking
-   * @returns {number} index in value less than or equal to the given index
-   * @private
-   */
-  _lastWordBreakBeforeIndex(index) {
-    var indexes = this._leftWordBreakIndexes();
-    var result = indexes[0];
-    for (var i = 0, l = indexes.length; i &lt; l; i++) {
-      var wordBreakIndex = indexes[i];
-      if (index > wordBreakIndex) {
-        result = wordBreakIndex;
-      } else {
-        break;
-      }
-    }
-    return result;
-  }
-
-  /**
-   * Find starts of 'words' for navigational purposes.
-   *
-   * @example
-   *     // given value of '123456789' and text of '123-45-6789'
-   *     leftWordBreakIndexes()
-   *     // => [0, 3, 5]
-   *
-   * @returns {number[]} indexes in value of word starts.
-   * @private
-   */
-  _leftWordBreakIndexes() {
-    var result = [];
-    var text = this.text();
-    for (var i = 0, l = text.length; i &lt; l; i++) {
-      if (hasLeftWordBreakAtIndex(text, i)) {
-        result.push(i);
-      }
-    }
-    return result;
-  }
-
-  /**
-   * Finds the end of the 'word' after index.
-   *
-   * @param {number} index position in value at which to start looking.
-   * @returns {number}
-   * @private
-   */
-  _nextWordBreakAfterIndex(index) {
-    var indexes = this.rightWordBreakIndexes().reverse();
-    var result = indexes[0];
-    for (var i = 0, l = indexes.length; i &lt; l; i++) {
-      var wordBreakIndex = indexes[i];
-      if (index &lt; wordBreakIndex) {
-        result = wordBreakIndex;
-      } else {
-        break;
-      }
-    }
-    return result;
-  }
 
   /**
    * Handles paste events.
@@ -1959,13 +950,13 @@ export default TextField;
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="AdaptiveCardFormatter.html">AdaptiveCardFormatter</a></li><li><a href="AmexCardFormatter.html">AmexCardFormatter</a></li><li><a href="CardTextField.html">CardTextField</a></li><li><a href="DefaultCardFormatter.html">DefaultCardFormatter</a></li><li><a href="DelimitedTextFormatter.html">DelimitedTextFormatter</a></li><li><a href="ExpiryDateField.html">ExpiryDateField</a></li><li><a href="ExpiryDateFormatter.html">ExpiryDateFormatter</a></li><li><a href="Formatter.html">Formatter</a></li><li><a href="NumberFormatter.html">NumberFormatter</a></li><li><a href="PhoneFormatter.html">PhoneFormatter</a></li><li><a href="SocialSecurityNumberFormatter.html">SocialSecurityNumberFormatter</a></li><li><a href="TextField.html">TextField</a></li><li><a href="UndoManager.html">UndoManager</a></li></ul><h3>Namespaces</h3><ul><li><a href="CurrencyDefaults.html">CurrencyDefaults</a></li><li><a href="FieldKit.html">FieldKit</a></li><li><a href="KEYS.html">KEYS</a></li><li><a href="LocaleDefaults.html">LocaleDefaults</a></li><li><a href="RegionDefaults.html">RegionDefaults</a></li><li><a href="StyleDefaults.html">StyleDefaults</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Externals</h3><ul><li><a href="external-InputSim.html">InputSim</a></li></ul><h3>Classes</h3><ul><li><a href="AdaptiveCardFormatter.html">AdaptiveCardFormatter</a></li><li><a href="AmexCardFormatter.html">AmexCardFormatter</a></li><li><a href="CardTextField.html">CardTextField</a></li><li><a href="DefaultCardFormatter.html">DefaultCardFormatter</a></li><li><a href="DelimitedTextFormatter.html">DelimitedTextFormatter</a></li><li><a href="ExpiryDateField.html">ExpiryDateField</a></li><li><a href="ExpiryDateFormatter.html">ExpiryDateFormatter</a></li><li><a href="Formatter.html">Formatter</a></li><li><a href="NumberFormatter.html">NumberFormatter</a></li><li><a href="PhoneFormatter.html">PhoneFormatter</a></li><li><a href="SocialSecurityNumberFormatter.html">SocialSecurityNumberFormatter</a></li><li><a href="TextField.html">TextField</a></li><li><a href="UndoManager.html">UndoManager</a></li></ul><h3>Namespaces</h3><ul><li><a href="CurrencyDefaults.html">CurrencyDefaults</a></li><li><a href="FieldKit.html">FieldKit</a></li><li><a href="KEYS.html">KEYS</a></li><li><a href="LocaleDefaults.html">LocaleDefaults</a></li><li><a href="RegionDefaults.html">RegionDefaults</a></li><li><a href="StyleDefaults.html">StyleDefaults</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a> on Wed Dec 17 2014 19:59:08 GMT-0500 (EST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a> on Fri Jul 17 2015 15:36:07 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>
