@@ -10,15 +10,15 @@ module.exports = function(config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['qunit'],
+    frameworks: ['mocha', 'chai'],
 
 
     // list of files / patterns to load in the browser
     files: [
-      'node_modules/qunit-bdd/lib/qunit-bdd.js',
       'node_modules/sinon/pkg/sinon.js',
       'node_modules/jquery-caret/jquery.caret.js',
       'node_modules/string-selection/dist/string-selection.js',
+      'node_modules/keysim/dist/keysim.js',
       'dist/field-kit.js',
       'build/test/all.js'
     ],
@@ -28,7 +28,6 @@ module.exports = function(config) {
     exclude: [
 
     ],
-
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
@@ -62,7 +61,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['PhantomJS'],
+    browsers: ['Chrome'],
 
 
     // Continuous Integration mode
