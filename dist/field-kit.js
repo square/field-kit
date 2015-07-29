@@ -2335,6 +2335,36 @@
             this.setValue(value);
           }
         },
+        hasChangesAndIsValid: {
+
+          /**
+           * Builds a change instance and formats the change to see if it's valid
+           *
+           * @param   { object} current
+           * @param   { object} proposed
+           * @returns { false|object} false if change doesn't have changes or change isn't valid. Change object if it is.
+           */
+
+          value: function hasChangesAndIsValid(current, proposed) {
+            var _this = this;
+
+            var change = new $$text_field$$TextFieldStateChange(this);
+            var error = function (errorType) {
+              var delegate = _this.delegate();
+              if (delegate) {
+                if (typeof delegate.textFieldDidFailToValidateChange === "function") {
+                  delegate.textFieldDidFailToValidateChange(_this, change, errorType);
+                }
+              }
+            };
+            change.current = { text: current.text, selectedRange: current.selectedRange };
+            change.proposed = { text: proposed.text, selectedRange: proposed.selectedRange };
+            if (change.hasChanges() && this.formatter().isChangeValid(change, error)) {
+              return change;
+            }
+            return false;
+          }
+        },
         insertNewline: {
 
           /**
@@ -2375,6 +2405,27 @@
             range.start += range.length;
             range.length = 0;
             this.setSelectedRange(range);
+          }
+        },
+        replaceStringSelection: {
+
+          /**
+           * Replaces the characters within the selection with given text.
+           *
+           * @example
+           *     // 12|34567|8
+           *     replaceStringSelection('00')
+           *     // 12|00|8
+           *
+           * @param   {string} replacement
+           * @param   {string} text
+           * @param   {object} {start: number, length: number}
+           * @returns {string}
+           */
+
+          value: function replaceStringSelection(replacement, text, range) {
+            var end = range.start + range.length;
+            return text.substring(0, range.start) + replacement + text.substring(end);
           }
         },
         rollbackInvalidChanges: {
@@ -2686,7 +2737,7 @@
         },
         disabledPlaceholder: {
 
-          /*
+          /**
            * **** Placeholder support ****
            */
 
@@ -2953,14 +3004,30 @@
             var _this = this;
 
             var keyCode = event.keyCode;
-            if (!event.metaKey && !event.ctrlKey && keyCode !== $$keybindings$$KEYS.ENTER && keyCode !== $$keybindings$$KEYS.TAB && keyCode !== $$keybindings$$KEYS.BACKSPACE) {
-              event.preventDefault();
-              if (event.charCode !== 0) {
-                var charCode = event.charCode || event.keyCode;
+            if (!event.metaKey && !event.ctrlKey && keyCode !== $$keybindings$$KEYS.ENTER && keyCode !== $$keybindings$$KEYS.TAB && keyCode !== $$keybindings$$KEYS.BACKSPACE && event.charCode !== 0) {
+
+              var newText = String.fromCharCode(event.charCode || event.keyCode);
+              var current = {
+                text: this.text(),
+                selectedRange: this.selectedRange()
+              };
+              var proposed = {
+                text: this.replaceStringSelection(newText, current.text, current.selectedRange),
+                selectedRange: { start: current.selectedRange.start + 1, length: 0 }
+              };
+              var change = this.hasChangesAndIsValid(current, proposed);
+              // HACK(JoeTaylor) Use Browser native input when the formatter
+              // would not make a difference
+              if (change && change.proposed.text === proposed.text && change.proposed.selectedRange.start === proposed.selectedRange.start && change.proposed.selectedRange.length === proposed.selectedRange.length && event instanceof KeyboardEvent) {
+                this.undoManager().proxyFor(this)._applyChangeFromUndoManager(change);
+              } else {
+                event.preventDefault();
                 this.rollbackInvalidChanges(function () {
-                  return _this.insertText(String.fromCharCode(charCode));
+                  return _this.insertText(newText);
                 });
               }
+            } else if (!event.metaKey && !event.ctrlKey && keyCode !== $$keybindings$$KEYS.ENTER && keyCode !== $$keybindings$$KEYS.TAB && keyCode !== $$keybindings$$KEYS.BACKSPACE && event.charCode === 0) {
+              event.preventDefault();
             }
           }
         },

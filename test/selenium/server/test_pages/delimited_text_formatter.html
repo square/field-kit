@@ -1,0 +1,41 @@
+<html>
+  <head>
+    <script src="/jquery-caret/jquery.caret.js"></script>
+    <script src="/field-kit.js"></script>
+  </head>
+
+  <body>
+    <input id="leading-input" />
+    <input id="consecutive-input" />
+    <input id="lazy-input" />
+    <script>
+      function LeadingDelimiterFormatter() {
+        FieldKit.DelimitedTextFormatter.apply(this, arguments);
+      }
+      LeadingDelimiterFormatter.prototype = Object.create(FieldKit.DelimitedTextFormatter.prototype);
+      LeadingDelimiterFormatter.prototype.hasDelimiterAtIndex = function(index) {
+        return index % 4 === 0; // 0, 4, 8, 12, …
+      };
+
+      function ConsecutiveDelimiterFormatter() {
+        FieldKit.DelimitedTextFormatter.apply(this, arguments);
+      }
+      ConsecutiveDelimiterFormatter.prototype = Object.create(FieldKit.DelimitedTextFormatter.prototype);
+      ConsecutiveDelimiterFormatter.prototype.hasDelimiterAtIndex = function(index) {
+        return index === 0 || index === 2 || index === 3 || index === 6 || index === 7;
+      };
+
+      function LazyDelimiterFormatter() {
+        FieldKit.DelimitedTextFormatter.apply(this, arguments);
+      }
+      LazyDelimiterFormatter.prototype = Object.create(FieldKit.DelimitedTextFormatter.prototype);
+      LazyDelimiterFormatter.prototype.hasDelimiterAtIndex = function(index) {
+        return index === 2 || index === 3;
+      };
+
+      window.leadingField = new FieldKit.TextField(document.getElementById('leading-input'), new LeadingDelimiterFormatter('-'));
+      window.consecutiveField = new FieldKit.TextField(document.getElementById('consecutive-input'), new ConsecutiveDelimiterFormatter('-'));
+      window.lazyField = new FieldKit.TextField(document.getElementById('lazy-input'), new LazyDelimiterFormatter('-', true));
+    </script>
+  </body>
+</html>
