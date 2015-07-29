@@ -2340,9 +2340,9 @@
           /**
            * Builds a change instance and formats the change to see if it's valid
            *
-           * @param   { object} current
-           * @param   { object} proposed
-           * @returns { false|object} false if change doesn't have changes or change isn't valid. Change object if it is.
+           * @param   {object} current
+           * @param   {object} proposed
+           * @returns {?object} false if change doesn't have changes or change isn't valid. Change object if it is.
            */
 
           value: function hasChangesAndIsValid(current, proposed) {
@@ -2737,7 +2737,7 @@
         },
         disabledPlaceholder: {
 
-          /**
+          /*
            * **** Placeholder support ****
            */
 
