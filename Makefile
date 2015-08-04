@@ -28,10 +28,10 @@ clean-docs:
 
 test-setup: dist/field-kit.js Makefile
 
-lint: lib/*.js test/*.js
+lint: lib/*.js test/unit/*.js
 	$(JSHINT) $^
 
 test: lint test-setup build
-	node_modules/karma/bin/karma start --single-run
+	$(NPMBIN)/karma start --single-run && $(NPMBIN)/mocha --harmony -t 600000 test/selenium/index.js
 
 .PHONY: test lint test-setup docs build
