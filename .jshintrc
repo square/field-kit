@@ -10,5 +10,6 @@
   "indent": 2,
   "noarg": true,
   "quotmark": "single",
-  "trailing": true
+  "trailing": true,
+  "expr": true
 }
