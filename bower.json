@@ -1,8 +1,11 @@
 {
   "name": "field-kit",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "authors": [
-    "Brian Donovan <donovan@squareup.com>"
+    "Brian Donovan <donovan@squareup.com>",
+    "Joe Taylor <joetaylor@squareup.com>",
+    "Alex Gorbatchev <agorbatchev@squareup.com>",
+    "Matt Wright <mattwright@squareup.com>"
   ],
   "description": "Utilities to effectively manage text entry on the web.",
   "main": "field-kit.js",
