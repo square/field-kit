@@ -25,6 +25,23 @@ describe('FieldKit.TextField', function() {
       expect(field).to.be.selected('hey|');
     });
 
+    it('keeps `autocapitalize` `on` on the input', function() {
+      var formatter = new PassthroughFormatter();
+      var field = buildField({
+        autocapitalize: true,
+        formatter: formatter
+      });
+      expect(field.element.getAttribute('autocapitalize')).to.equal('on');
+    });
+
+    it('turns `autocapitalize` `off` for the input', function() {
+      var formatter = new PassthroughFormatter();
+      var field = buildField({
+        formatter: formatter
+      });
+      expect(field.element.getAttribute('autocapitalize')).to.equal('off');
+    });
+
     it('throws if there is already a TextField attached to the input', function() {
       var $input = buildInput();
       new FieldKit.TextField($input);

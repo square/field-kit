@@ -2137,6 +2137,10 @@
         element.addEventListener("focus", this._focus);
         element.addEventListener("blur", this._blur);
 
+        if (!element.getAttribute("autocapitalize")) {
+          element.setAttribute("autocapitalize", "off");
+        }
+
         var window = element.ownerDocument.defaultView;
 
         /**
