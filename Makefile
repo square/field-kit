@@ -13,6 +13,7 @@ dist: dist/field-kit.js dist/field-kit.min.js docs
 
 build:
 	$(BABEL_NODE) script/build.js
+	cp dist/field-kit.js public/field-kit.js
 
 # Build the distribution file by using es6-modules to concatenate.
 dist/field-kit.js: build

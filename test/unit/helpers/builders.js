@@ -18,7 +18,7 @@ export function buildField(textFieldClass, options) {
     }
   }
 
-  var input = options.input || buildInput();
+  var input = options.input || buildInput(options);
   if (options.userAgent) {
     navigator.__defineGetter__('userAgent', function(){
       return options.userAgent;
@@ -40,14 +40,20 @@ export function buildField(textFieldClass, options) {
   return field;
 }
 
-export function buildInput() {
+export function buildInput(options) {
   var currentInputs = document.getElementsByTagName('input');
+  if (!options) {
+    options = {};
+  }
 
   for(var i = 0; i < currentInputs.length; i++) {
     currentInputs[i].parentNode.removeChild(currentInputs[i]);
   }
   var input = document.createElement('input');
   input.type = 'text';
+
+  if (options.autocapitalize) input.setAttribute('autocapitalize', 'on');
+
   document.body.appendChild(input);
   return document.getElementsByTagName('input')[0];
 }

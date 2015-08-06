@@ -729,6 +729,11 @@
       };
     }
 
+    function $$utils$$replaceStringSelection(replacement, text, range) {
+      var end = range.start + range.length;
+      return text.substring(0, range.start) + replacement + text.substring(end);
+    }
+
     var $$utils$$hasOwnProp = Object.prototype.hasOwnProperty;
 
     function $$utils$$forEach(iterable, iterator) {
@@ -2132,6 +2137,10 @@
         element.addEventListener("focus", this._focus);
         element.addEventListener("blur", this._blur);
 
+        if (!element.getAttribute("autocapitalize")) {
+          element.setAttribute("autocapitalize", "off");
+        }
+
         var window = element.ownerDocument.defaultView;
 
         /**
@@ -2340,9 +2349,9 @@
           /**
            * Builds a change instance and formats the change to see if it's valid
            *
-           * @param   { object} current
-           * @param   { object} proposed
-           * @returns { false|object} false if change doesn't have changes or change isn't valid. Change object if it is.
+           * @param   {object} current
+           * @param   {object} proposed
+           * @returns {?object} false if change doesn't have changes or change isn't valid. Change object if it is.
            */
 
           value: function hasChangesAndIsValid(current, proposed) {
@@ -2362,7 +2371,7 @@
             if (change.hasChanges() && this.formatter().isChangeValid(change, error)) {
               return change;
             }
-            return false;
+            return null;
           }
         },
         insertNewline: {
@@ -2405,27 +2414,6 @@
             range.start += range.length;
             range.length = 0;
             this.setSelectedRange(range);
-          }
-        },
-        replaceStringSelection: {
-
-          /**
-           * Replaces the characters within the selection with given text.
-           *
-           * @example
-           *     // 12|34567|8
-           *     replaceStringSelection('00')
-           *     // 12|00|8
-           *
-           * @param   {string} replacement
-           * @param   {string} text
-           * @param   {object} {start: number, length: number}
-           * @returns {string}
-           */
-
-          value: function replaceStringSelection(replacement, text, range) {
-            var end = range.start + range.length;
-            return text.substring(0, range.start) + replacement + text.substring(end);
           }
         },
         rollbackInvalidChanges: {
@@ -2737,7 +2725,7 @@
         },
         disabledPlaceholder: {
 
-          /**
+          /*
            * **** Placeholder support ****
            */
 
@@ -3012,12 +3000,12 @@
                 selectedRange: this.selectedRange()
               };
               var proposed = {
-                text: this.replaceStringSelection(newText, current.text, current.selectedRange),
+                text: $$utils$$replaceStringSelection(newText, current.text, current.selectedRange),
                 selectedRange: { start: current.selectedRange.start + 1, length: 0 }
               };
               var change = this.hasChangesAndIsValid(current, proposed);
-              // HACK(JoeTaylor) Use Browser native input when the formatter
-              // would not make a difference
+              // HACK(JoeTaylor) Use Browser's native input when using the formatter
+              // would not make a difference https://code.google.com/p/chromium/issues/detail?id=32865
               if (change && change.proposed.text === proposed.text && change.proposed.selectedRange.start === proposed.selectedRange.start && change.proposed.selectedRange.length === proposed.selectedRange.length && event instanceof KeyboardEvent) {
                 this.undoManager().proxyFor(this)._applyChangeFromUndoManager(change);
               } else {
