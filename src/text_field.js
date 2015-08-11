@@ -4,7 +4,7 @@
 import Formatter from './formatter';
 import UndoManager from './undo_manager';
 import { bind } from './utils';
-import Caret from './caret';
+import Caret from 'jquery-caret';
 import { replaceStringSelection } from './utils';
 
 /**

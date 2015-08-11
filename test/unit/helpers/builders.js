@@ -1,7 +1,8 @@
 /* jshint esnext:true, unused:true, undef:true */
-/* global FieldKit, document */
+/* global document */
 
 import PassthroughFormatter from './passthrough_formatter';
+import FieldKit from '../../../src';
 
 export function buildField(textFieldClass, options) {
   if (!textFieldClass) {

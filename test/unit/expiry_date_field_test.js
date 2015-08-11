@@ -1,8 +1,9 @@
 /* jshint esnext:true, unused:true, undef:true */
-/* global FieldKit, describe, beforeEach, it */
+/* global describe, beforeEach, it */
 
 import { expectThatLeaving } from './helpers/expectations';
 import { buildField } from './helpers/builders';
+import FieldKit from '../../src';
 
 testsWithAllKeyboards('FieldKit.ExpiryDateField', function() {
   var field;

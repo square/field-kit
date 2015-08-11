@@ -1,9 +1,10 @@
 /* jshint esnext:true, unused:true, undef:true */
-/* global FieldKit, describe, beforeEach, it */
+/* global describe, beforeEach, it */
 /* global expectThatTyping, buildField */
 
 import { expectThatTyping } from './helpers/expectations';
 import { buildField } from './helpers/builders';
+import FieldKit from '../../src';
 
 testsWithAllKeyboards('FieldKit.SocialSecurityNumberFormatter', function() {
   var field;

@@ -1,5 +1,8 @@
 /* jshint esnext:true, unused:true, undef:true */
-/* global FieldKit, describe, beforeEach, it, expect */
+/* global describe, beforeEach, it, expect */
+
+import FieldKit from '../../src';
+import {expect} from 'chai';
 
 testsWithAllKeyboards('FieldKit.NumberFormatterSettingsFormatter', function() {
   var formatter;

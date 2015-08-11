@@ -1,9 +1,10 @@
 /* jshint esnext:true, unused:true, undef:true */
-/* global FieldKit, describe, beforeEach, it, expect */
+/* global describe, beforeEach, it, expect */
 /* global expectThatTyping, buildField */
 
 import { buildField } from './helpers/builders';
 import { expectThatTyping } from './helpers/expectations';
+import FieldKit from '../../src';
 
 testsWithAllKeyboards('FieldKit.AdaptiveCardFormatter', function() {
   var field = null;

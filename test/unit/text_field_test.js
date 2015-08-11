@@ -1,11 +1,14 @@
 /* jshint esnext:true, unused:true, undef:true */
-/* global FieldKit, describe, beforeEach, it, expect, sinon, context, Keysim */
+/* global describe, beforeEach, it, context */
 /* global expectThatTyping, expectThatPasting, FakeEvent, buildField, buildInput, PassthroughFormatter */
 
 import { expectThatTyping, expectThatPasting } from './helpers/expectations';
 import { buildField, buildInput } from './helpers/builders';
 import FakeEvent from './helpers/fake_event';
 import PassthroughFormatter from './helpers/passthrough_formatter';
+import Keysim from 'keysim';
+import FieldKit from '../../src';
+import sinon from 'sinon';
 
 testsWithAllKeyboards('FieldKit.TextField', function() {
   var keyboard = Keysim.Keyboard.US_ENGLISH;

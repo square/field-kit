@@ -1,8 +1,12 @@
 /* jshint esnext:true, unused:true, undef:true */
-/* global FieldKit, describe, beforeEach, it, expect, sinon, Keysim */
+/* global describe, beforeEach, it */
 
 import { expectThatTyping } from './helpers/expectations';
 import { buildField } from './helpers/builders';
+import Keysim from 'keysim';
+import FieldKit from '../../src';
+import {expect} from 'chai';
+import sinon from 'sinon';
 
 testsWithAllKeyboards('FieldKit.DefaultCardFormatter', function() {
   var field;

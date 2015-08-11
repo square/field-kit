@@ -1,8 +1,9 @@
 /* jshint esnext:true, unused:true, undef:true */
-/* global FieldKit, describe, beforeEach, it */
+/* global describe, beforeEach, it */
 
 import { buildField } from './helpers/builders';
 import { expectThatTyping } from './helpers/expectations';
+import FieldKit from '../../src';
 
 testsWithAllKeyboards('FieldKit.AmexCardFormatter', function() {
   var field = null;

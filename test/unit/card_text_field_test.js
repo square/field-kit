@@ -1,8 +1,10 @@
 /* jshint esnext:true, unused:true, undef:true */
-/* global FieldKit, describe, beforeEach, it, expect, Keysim */
+/* global describe, beforeEach, it, expect */
 
 import { buildField } from './helpers/builders';
 import { expectThatTyping } from './helpers/expectations';
+import Keysim from 'keysim';
+import FieldKit from '../../src';
 
 testsWithAllKeyboards('FieldKit.CardTextField', function() {
   var textField;
