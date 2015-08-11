@@ -4,9 +4,9 @@
   "description": "Utilities to effectively manage text entry on the web.",
   "main": "lib/index.js",
   "scripts": {
-    "test": "make test",
-    "prepublish": "npm test",
-    "build": "gulp build"
+    "test": "karma start --single-run && mocha --harmony -t 600000 test/selenium/index.js",
+    "build": "gulp build",
+    "prepublish.bak": "npm test"
   },
   "author": "Square, Inc.",
   "license": "Apache 2.0",
@@ -21,7 +21,8 @@
     ]
   },
   "devDependencies": {
-    "babel": "^4.7.16",
+    "babel": "^5.8.21",
+    "babel-core": "^5.8.21",
     "babelify": "^6.1.3",
     "browserify": "^11.0.1",
     "browserify-shim": "^3.8.10",
@@ -39,9 +40,12 @@
     "jsdoc": "git://github.com/eventualbuddha/jsdoc.git#add-support-for-es6-classes",
     "jshint": "^2.5.1",
     "karma": "^0.13.3",
+    "karma-browserify": "^4.3.0",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^0.2.0",
+    "karma-eslint": "^2.0.1",
     "karma-mocha": "^0.2.0",
+    "karma-mocha-reporter": "^1.1.1",
     "keysim": "^1.3.0",
     "mocha": "^2.2.5",
     "multer": "^1.0.1",
