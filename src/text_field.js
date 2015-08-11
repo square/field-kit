@@ -4,7 +4,7 @@
 import Formatter from './formatter';
 import UndoManager from './undo_manager';
 import { bind } from './utils';
-import Caret from 'jquery-caret';
+import {Caret} from 'jquery-caret';
 import { replaceStringSelection } from './utils';
 
 /**
@@ -30,7 +30,9 @@ class TextField extends Input {
    * @param {Formatter} formatter
    */
   constructor(element, formatter) {
-    var caret = Caret.get(element);
+    super();
+
+    const caret = Caret.get(element);
     if (typeof element.get === 'function') {
       console.warn(
         'DEPRECATION: FieldKit.TextField instances should no longer be ' +
@@ -85,7 +87,7 @@ class TextField extends Input {
      */
     this._needsManualCaret = window.navigator.userAgent.toLowerCase().indexOf('android') > -1;
 
-    super(element.value, {
+    this.init(element.value, {
       start: caret.start,
       length: caret.end - caret.start
     });

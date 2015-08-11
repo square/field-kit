@@ -1,5 +1,4 @@
 /* jshint esnext:true, unused:true, undef:true */
-/* global expect */
 
 import './setup';
 import Keysim from 'keysim';
@@ -7,7 +6,8 @@ import FakeEvent from './fake_event';
 import Selection from './selection';
 import TextField from '../../../src/text_field';
 import { buildField } from './builders';
-import Caret from 'jquery-caret';
+import {Caret} from 'jquery-caret';
+import {expect} from 'chai';
 
 class FieldExpectationBase {
   into(field) {

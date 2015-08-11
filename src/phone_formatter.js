@@ -54,6 +54,8 @@ class PhoneFormatter extends DelimitedTextFormatter {
    * @param {Array} args
    */
   constructor(...args) {
+    super();
+
     if (args.length !== 0) {
       throw new Error('were you trying to set a delimiter ('+args[0]+')?');
     }

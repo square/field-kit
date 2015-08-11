@@ -13,7 +13,9 @@ class DelimitedTextFormatter extends Formatter {
    * @param {boolean=} isLazy
    * @throws {Error} delimiter must have just one character
    */
-  constructor(delimiter=this.delimiter, isLazy=false) {
+  constructor(delimiter, isLazy=false) {
+    super();
+
     if (delimiter === null || delimiter === undefined || delimiter.length !== 1) {
       throw new Error('delimiter must have just one character');
     }

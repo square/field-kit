@@ -1,9 +1,10 @@
 /* jshint esnext:true, unused:true, undef:true */
-/* global describe, beforeEach, it, context, expect */
+/* global describe, beforeEach, it, context */
 
 import { expectThatTyping, expectThatPasting } from './helpers/expectations';
 import { buildField } from './helpers/builders';
 import FieldKit from '../../src';
+import {expect} from 'chai';
 
 function LeadingDelimiterFormatter() {
   FieldKit.DelimitedTextFormatter.apply(this, arguments);

@@ -9,6 +9,7 @@ import PassthroughFormatter from './helpers/passthrough_formatter';
 import Keysim from 'keysim';
 import FieldKit from '../../src';
 import sinon from 'sinon';
+import {expect} from 'chai';
 
 testsWithAllKeyboards('FieldKit.TextField', function() {
   var keyboard = Keysim.Keyboard.US_ENGLISH;
