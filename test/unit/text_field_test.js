@@ -14,7 +14,7 @@ import {expect} from 'chai';
 testsWithAllKeyboards('FieldKit.TextField', function() {
   var keyboard = Keysim.Keyboard.US_ENGLISH;
 
-  describe('constructor', function() {
+  describe('class constructor', function() {
     it('allows setting the formatter', function() {
       var formatter = new PassthroughFormatter();
       var field = buildField({ formatter: formatter });
