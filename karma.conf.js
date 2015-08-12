@@ -1,4 +1,6 @@
 module.exports = function(config) {
+  var babelify = require('babelify');
+
   config.set({
     basePath   : '',
     frameworks : ['browserify', 'mocha', 'chai'],
@@ -21,7 +23,8 @@ module.exports = function(config) {
     },
 
     browserify: {
-      debug: true
+      debug: true,
+      transform: [babelify]
     }
   });
 };

@@ -15,11 +15,6 @@
     "stround": "0.2.2",
     "string-selection": "^1.0.0"
   },
-  "browserify": {
-    "transform": [
-      "babelify"
-    ]
-  },
   "devDependencies": {
     "babel": "^5.8.21",
     "babel-core": "^5.8.21",
