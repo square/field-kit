@@ -34,7 +34,17 @@ class FieldExpectationBase {
     this.applyDescription();
     this.proxyDelegate();
     this.perform();
+
+    if (this.beforeAssert) {
+      this.beforeAssert();
+    }
+
     this.assert();
+    return this;
+  }
+
+  before(fn) {
+    this.beforeAssert = fn;
     return this;
   }
 
@@ -147,18 +157,20 @@ class ExpectThatTyping extends FieldExpectationBase {
       'ctrl'
     ];
 
-    this.keys.forEach((command) => {
-      command.split('+').forEach((key) => {
-        if(KEYS.indexOf(key) >= 0) {
-          modifier = true;
+    this.keys.forEach((key) => {
+      key.split(',').forEach((command) => {
+        command.split('+').forEach((key) => {
+          if(KEYS.indexOf(key) >= 0) {
+            modifier = true;
+          }
+        });
+
+        if(modifier) {
+          keyboard.dispatchEventsForAction(command, this.field.element);
+        } else {
+          keyboard.dispatchEventsForInput(command, this.field.element);
         }
       });
-
-      if(modifier) {
-        keyboard.dispatchEventsForAction(command, this.field.element);
-      } else {
-        keyboard.dispatchEventsForInput(command, this.field.element);
-      }
     });
   }
 }

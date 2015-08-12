@@ -497,12 +497,12 @@ describe('FieldKit.TextField', function() {
       });
 
       it('is fired when making a successful input', function() {
-        keyboard.dispatchEventsForInput('a', field.element);
+        expectThatTyping('a').into(field).willChange('|').to('a|');
         expect(inputSpy.called).to.equal(true);
       });
 
       it('is not fired when making an empty input', function() {
-        keyboard.dispatchEventsForAction('left', field.element);
+        expectThatTyping('left').into(field).willChange('|').to('|');
         expect(inputSpy.called).to.equal(false);
       });
     });
@@ -524,49 +524,53 @@ describe('FieldKit.TextField', function() {
 
       it('is not fired when leaving the field after making an empty input', function() {
         field.element.focus();
-        keyboard.dispatchEventsForAction('left', field.element);
-        field.element.blur();
+        expectThatTyping('left').into(field).before(() => field.element.blur()).willChange('|').to('|');
         expect(changeSpy.called).to.equal(false);
       });
 
       it('is fired when leaving the field after making a change', function() {
         field.element.focus();
-        keyboard.dispatchEventsForInput('a', field.element);
-        expect(changeSpy.called).to.equal(false);
-        field.element.blur();
+        expectThatTyping('a').into(field).before(() => {
+          expect(changeSpy.called).to.equal(false);
+          field.element.blur();
+        }).willChange('|').to('a|');
         expect(changeSpy.called).to.equal(true);
       });
 
       it('is fired when leaving the field after pressing backspace', function() {
         field.element.focus();
-        keyboard.dispatchEventsForInput('a', field.element);
-        keyboard.dispatchEventsForInput('b', field.element);
-        field.element.blur();
+        expectThatTyping('ab').into(field).before(() => {
+          field.element.blur();
+          field.element.focus();
+        }).willChange('|').to('ab|');
 
         field.element.focus();
-        keyboard.dispatchEventsForAction('backspace', field.element);
-        field.element.blur();
+        expectThatTyping('backspace').into(field).before(() => {
+          field.element.blur();
+        }).willChange('ab|').to('a|');
 
         expect(changeSpy.callCount).to.equal(2);
       });
 
       it('is not fired when leaving the field that has the same value as before it was focused', function() {
         field.element.focus();
-        keyboard.dispatchEventsForInput('a', field.element);
-        keyboard.dispatchEventsForAction('backspace', field.element);
-        field.element.blur();
+        expectThatTyping('a,backspace').into(field).before(() => {
+          field.element.blur();
+        }).willChange('|').to('|');
         expect(changeSpy.called).to.equal(false);
       });
 
       it('status resets properly when leaving a field', function() {
         field.element.focus();
-        keyboard.dispatchEventsForInput('a', field.element);
-        field.element.blur();
+        expectThatTyping('a').into(field).before(() => {
+          field.element.blur();
+        }).willChange('|').to('a|');
         expect(changeSpy.called).to.equal(true);
 
         field.element.focus();
-        keyboard.dispatchEventsForAction('left', field.element);
-        field.element.blur();
+        expectThatTyping('left').into(field).before(() => {
+          field.element.blur();
+        }).willChange('a|').to('|a');
 
         expect(changeSpy.callCount).to.equal(1);
       });
