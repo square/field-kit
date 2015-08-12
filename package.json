@@ -12,8 +12,7 @@
   "license": "Apache 2.0",
   "dependencies": {
     "input-sim": "^3.0.0",
-    "stround": "0.2.2",
-    "string-selection": "^1.0.0"
+    "stround": "0.2.2"
   },
   "devDependencies": {
     "babel": "^5.8.21",
@@ -51,6 +50,7 @@
     "selenium-webdriver": "^2.46.1",
     "serve-index": "^1.7.1",
     "sinon": "^1.9.0",
+    "string-selection": "^1.0.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
   }
