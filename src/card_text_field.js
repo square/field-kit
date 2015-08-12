@@ -1,5 +1,3 @@
-/*! jshint esnext:true, undef:true, unused:true */
-
 import TextField from './text_field';
 import AdaptiveCardFormatter from './adaptive_card_formatter';
 import { determineCardType } from './card_utils';

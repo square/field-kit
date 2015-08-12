@@ -1,5 +1,3 @@
-/*! jshint esnext:true, undef:true, unused:true */
-
 import TextField from './text_field';
 import ExpiryDateFormatter from './expiry_date_formatter';
 

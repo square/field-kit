@@ -1,5 +1,3 @@
-/*! jshint esnext:true, undef:true, unused:true */
-
 /**
  * Base class providing basic formatting, parsing, and change validation to be
  * customized in subclasses.

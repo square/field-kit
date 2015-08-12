@@ -1,5 +1,3 @@
-/*! jshint esnext:true, undef:true, unused:true */
-
 /**
  * @const
  * @private
@@ -91,8 +89,7 @@ export function bind(fn, context) {
 }
 
 if (!Function.prototype.bind) {
-  /* jshint freeze:false */
-  Function.prototype.bind = function(context, ...prependedArgs) {
+    Function.prototype.bind = function(context, ...prependedArgs) {
     var self = this;
     return function(...args) {
       return self.apply(context, prependedArgs.concat(args));
@@ -160,10 +157,7 @@ var getOwnPropertyNames = (function() {
   return getOwnPropertyNames;
 })();
 
-/* jshint proto:true */
 var getPrototypeOf = Object.getPrototypeOf || (object => object.__proto__);
-/* jshint proto:false */
-
 /**
  * @param {Object} object
  * @param {string} property

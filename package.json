@@ -32,7 +32,6 @@
     "gulp-uglify": "^1.2.0",
     "gulp-util": "^3.0.6",
     "jsdoc": "git://github.com/eventualbuddha/jsdoc.git#add-support-for-es6-classes",
-    "jshint": "^2.5.1",
     "karma": "^0.13.3",
     "karma-browserify": "^4.3.0",
     "karma-chai": "^0.1.0",

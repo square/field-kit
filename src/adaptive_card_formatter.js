@@ -1,5 +1,3 @@
-/*! jshint esnext:true, undef:true, unused:true */
-
 import AmexCardFormatter from './amex_card_formatter';
 import DefaultCardFormatter from './default_card_formatter';
 import { determineCardType, AMEX } from './card_utils';

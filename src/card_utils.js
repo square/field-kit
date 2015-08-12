@@ -1,5 +1,3 @@
-/*! jshint esnext:true, undef:true, unused:true */
-
 /**
  * @TODO Make this an enum
  */

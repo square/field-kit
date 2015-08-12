@@ -1,5 +1,3 @@
-/* jshint esnext:true, unused:true, undef:true */
-
 import './setup';
 import Keysim from 'keysim';
 import FakeEvent from './fake_event';

@@ -1,4 +1,3 @@
-/* jshint esnext:true, unused:true, undef:true */
 /* global document */
 
 import PassthroughFormatter from './passthrough_formatter';

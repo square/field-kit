@@ -1,5 +1,3 @@
-/*! jshint esnext:true, undef:true, unused:true */
-
 import DelimitedTextFormatter from './delimited_text_formatter';
 import { validCardLength, luhnCheck } from './card_utils';
 

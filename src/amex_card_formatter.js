@@ -1,5 +1,3 @@
-/*! jshint esnext:true, undef:true, unused:true */
-
 import DefaultCardFormatter from './default_card_formatter';
 
 /**

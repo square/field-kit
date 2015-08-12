@@ -1,4 +1,3 @@
-/* jshint browser:true, esnext:true, undef:true, unused:true */
 /* global console, KeyboardEvent */
 
 import Formatter from './formatter';

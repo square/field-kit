@@ -1,4 +1,3 @@
-/* jshint esnext:true, unused:true, undef:true */
 /* global describe, context, beforeEach, it */
 
 import FieldKit from '../../src';

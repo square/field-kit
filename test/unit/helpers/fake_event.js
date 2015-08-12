@@ -1,5 +1,3 @@
-/* jshint esnext:true, unused:true, undef:true */
-
 var KEYS = {
   A:         65,
   Z:         90,

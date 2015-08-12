@@ -1,5 +1,3 @@
-/*! jshint esnext:true, undef:true, unused:true */
-
 import chai from 'chai';
 import Selection from 'string-selection'
 

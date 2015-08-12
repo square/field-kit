@@ -1,4 +1,3 @@
-/* jshint esnext:true, unused:true, undef:true */
 /* global describe, beforeEach, it */
 
 import { expectThatLeaving } from './helpers/expectations';
