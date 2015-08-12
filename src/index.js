@@ -1,6 +1,4 @@
 /*! jshint esnext:true, undef:true, unused:true */
-/* global define, module, window */
-
 import AdaptiveCardFormatter from './adaptive_card_formatter';
 import AmexCardFormatter from './amex_card_formatter';
 import CardTextField from './card_text_field';

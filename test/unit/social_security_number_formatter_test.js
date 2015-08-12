@@ -1,6 +1,3 @@
-/* global describe, beforeEach, it */
-/* global expectThatTyping, buildField */
-
 import { expectThatTyping } from './helpers/expectations';
 import { buildField } from './helpers/builders';
 import FieldKit from '../../src';

@@ -1,5 +1,3 @@
-/* global describe, beforeEach, it */
-
 import { expectThatLeaving } from './helpers/expectations';
 import { buildField } from './helpers/builders';
 import FieldKit from '../../src';

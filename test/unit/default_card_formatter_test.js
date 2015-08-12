@@ -1,5 +1,3 @@
-/* global describe, beforeEach, it */
-
 import { expectThatTyping } from './helpers/expectations';
 import { buildField } from './helpers/builders';
 import Keysim from 'keysim';

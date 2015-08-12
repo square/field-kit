@@ -1,6 +1,3 @@
-/* global describe, beforeEach, it, context */
-/* global expectThatTyping, expectThatPasting, FakeEvent, buildField, buildInput, PassthroughFormatter */
-
 import { expectThatTyping, expectThatPasting } from './helpers/expectations';
 import { buildField, buildInput } from './helpers/builders';
 import FakeEvent from './helpers/fake_event';

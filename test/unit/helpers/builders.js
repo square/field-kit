@@ -1,5 +1,3 @@
-/* global document */
-
 import PassthroughFormatter from './passthrough_formatter';
 import FieldKit from '../../../src';
 

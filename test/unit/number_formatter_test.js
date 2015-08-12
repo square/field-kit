@@ -1,5 +1,3 @@
-/* global describe, context, beforeEach, it */
-
 import FieldKit from '../../src';
 import {expect} from 'chai';
 import sinon from 'sinon';

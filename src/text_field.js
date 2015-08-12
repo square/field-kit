@@ -1,5 +1,3 @@
-/* global console, KeyboardEvent */
-
 import Formatter from './formatter';
 import UndoManager from './undo_manager';
 import { bind } from './utils';
