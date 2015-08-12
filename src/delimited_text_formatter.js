@@ -14,6 +14,10 @@ class DelimitedTextFormatter extends Formatter {
   constructor(delimiter, isLazy=false) {
     super();
 
+    if (arguments.length === 0) {
+      return;
+    }
+
     if (delimiter === null || delimiter === undefined || delimiter.length !== 1) {
       throw new Error('delimiter must have just one character');
     }

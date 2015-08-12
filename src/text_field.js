@@ -1,7 +1,7 @@
 import Formatter from './formatter';
 import UndoManager from './undo_manager';
 import { bind } from './utils';
-import {Caret} from 'jquery-caret';
+import Caret from './caret';
 import { replaceStringSelection } from './utils';
 
 /**
@@ -84,7 +84,9 @@ class TextField extends Input {
      */
     this._needsManualCaret = window.navigator.userAgent.toLowerCase().indexOf('android') > -1;
 
-    this.init(element.value, {
+    this.setText(element.value);
+
+    this.setSelectedRange({
       start: caret.start,
       length: caret.end - caret.start
     });
@@ -662,20 +664,6 @@ class TextField extends Input {
     }
 
     this._textDidChange();
-  }
-
-  /**
-   * Builds the key bindings for platform
-   *
-   * @augments external:InputSim.Input#_buildKeybindings
-   * @private
-   */
-  _buildKeybindings() {
-    var doc = this.element.ownerDocument;
-    var win = doc.defaultView || doc.parentWindow;
-    var userAgent = win.navigator.userAgent;
-    var osx = /^Mozilla\/[\d\.]+ \(Macintosh/.test(userAgent);
-    this._bindings = keyBindingsForPlatform(osx ? 'OSX' : 'Default');
   }
 
   /**

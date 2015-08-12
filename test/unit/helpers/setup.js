@@ -1,4 +1,4 @@
-import Keysim from './keysim';
+import Keysim from 'keysim';
 const Keyboard = Keysim.Keyboard;
 const Keystroke = Keysim.Keystroke;
 const KeyEvents = Keysim.KeyEvents;

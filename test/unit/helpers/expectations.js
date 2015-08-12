@@ -4,7 +4,7 @@ import FakeEvent from './fake_event';
 import Selection from './selection';
 import TextField from '../../../src/text_field';
 import { buildField } from './builders';
-import {Caret} from 'jquery-caret';
+import Caret from '../../../src/caret';
 import {expect} from 'chai';
 
 class FieldExpectationBase {

@@ -17,20 +17,20 @@ function dist(minified) {
     .pipe(source(minified ? 'field-kit.min.js' : 'field-kit.js'))
     .pipe(buffer())
     .pipe(sourcemaps.init({loadMaps: true}))
-      .pipe(ifElse(minified, uglify()))
+      .pipe(ifElse(minified, uglify))
       .on('error', gutil.log)
     .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('./dist'));
 }
 
-gulp.task('clean-lib', done => rimraf('./lib', done));
-gulp.task('clean-dist', done => rimraf('./dist', done));
+gulp.task('clean:lib', done => rimraf('./lib', done));
+gulp.task('clean:dist', done => rimraf('./dist', done));
 
-gulp.task('dist-not-minified', ['clean-dist'], () => dist(false));
-gulp.task('dist-minified', ['clean-dist'], () => dist(true));
-gulp.task('dist', ['dist-not-minified', 'dist-minified']);
+gulp.task('dist:not-minified', ['clean:dist'], () => dist(false));
+gulp.task('dist:minified', ['clean:dist'], () => dist(true));
+gulp.task('dist', ['dist:not-minified', 'dist:minified']);
 
-gulp.task('lib', ['clean-lib'], function () {
+gulp.task('lib', ['clean:lib'], function () {
   return gulp.src('src/**/*.js')
     .pipe(babel())
     .pipe(gulp.dest('lib'));
