@@ -4,7 +4,7 @@
 import { expectThatTyping } from './helpers/expectations';
 import { buildField } from './helpers/builders';
 
-describe('FieldKit.DefaultCardFormatter', function() {
+describe.testsWithAllKeyboards('FieldKit.DefaultCardFormatter', function() {
   var field;
   var keyboard = Keysim.Keyboard.US_ENGLISH;
 

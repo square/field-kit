@@ -1,7 +1,7 @@
 /* jshint esnext:true, unused:true, undef:true */
 /* global FieldKit, describe, beforeEach, it, expect */
 
-describe('FieldKit.NumberFormatterSettingsFormatter', function() {
+describe.testsWithAllKeyboards('FieldKit.NumberFormatterSettingsFormatter', function() {
   var formatter;
 
   beforeEach(function() {

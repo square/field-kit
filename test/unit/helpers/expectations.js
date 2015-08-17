@@ -1,6 +1,7 @@
 /* jshint esnext:true, unused:true, undef:true */
 /* global expect */
 
+import './setup';
 import Keysim from './keysim';
 import FakeEvent from './fake_event';
 import Selection from './selection';
@@ -74,7 +75,9 @@ class FieldExpectationBase {
     var caret = description.caret;
     var affinity = description.affinity;
     var value = description.value;
-    this.field.element.value = value;
+
+    this.field.setText(value);
+
     Caret.set(this.field.element, caret.start, caret.end);
     this.field.selectionAffinity = affinity;
   }
@@ -137,7 +140,7 @@ class ExpectThatTyping extends FieldExpectationBase {
 
   typeKeys() {
     var modifier = false;
-    var keyboard = Keysim.Keyboard.US_ENGLISH;
+    var keyboard = window.keyboard;
     var KEYS = [
       'zero',
       'nine',

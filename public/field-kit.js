@@ -1058,11 +1058,6 @@
 
             return proxy;
           }
-        },
-        getLastChange: {
-          value: function getLastChange() {
-            return this._undos[this._undos.length - 1] && this._undos[this._undos.length - 1].args[0] || null;
-          }
         }
       });
 
@@ -2122,6 +2117,7 @@
         this._unfocusedPlaceholder = null;
         this._isDirty = false;
         this._valueOnFocus = "";
+        this._currentValue = "";
         this._blur = $$utils$$bind(this._blur, this);
         this._focus = $$utils$$bind(this._focus, this);
         this._click = $$utils$$bind(this._click, this);
@@ -2434,7 +2430,7 @@
             var result = null;
             var errorType = null;
             var change = $$text_field$$TextFieldStateChange.build(this, function () {
-              result = callback();
+              return result = callback();
             });
             var error = function error(type) {
               errorType = type;
@@ -2543,6 +2539,7 @@
 
           value: function setText(text) {
             this.element.value = text;
+            this._currentValue = text;
           }
         },
         selectedRange: {
@@ -3012,7 +3009,12 @@
                       if (!changeTriggeredFormatting && event instanceof KeyboardEvent) {
                         // HACK(JoeTaylor) Use Browser's native input when using the formatter
                         // would not make a difference https://code.google.com/p/chromium/issues/detail?id=32865
+                        if (!_this._isDirty) {
+                          _this._valueOnFocus = change.current.text || "";
+                          _this._isDirty = true;
+                        }
                         _this.undoManager().proxyFor(_this)._applyChangeFromUndoManager(change);
+                        _this._textDidChange();
                       } else {
                         event.preventDefault();
                         _this.rollbackInvalidChanges(function () {
@@ -3054,8 +3056,7 @@
               (function () {
                 // Text has already been changed at this point, so we check the previous text
                 // to determine whether we need to undo the change.
-                var lastChange = _this.undoManager().getLastChange();
-                var previousText = lastChange ? lastChange.proposed.text : "";
+                var previousText = _this._currentValue || "";
                 _this._processChange({
                   currentText: previousText,
                   proposedText: _this.text(),
@@ -3065,7 +3066,12 @@
                       _this.setSelectedRange(change.proposed.selectedRange);
                       _this.setText(newText);
                     }
+                    if (!_this._isDirty) {
+                      _this._valueOnFocus = change.current.text || "";
+                      _this._isDirty = true;
+                    }
                     _this.undoManager().proxyFor(_this)._applyChangeFromUndoManager(change);
+                    _this._textDidChange();
                   },
                   onFail: function () {
                     // Need to rollback the letter input in the Keyup event because it is not valid,

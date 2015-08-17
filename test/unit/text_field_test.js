@@ -7,7 +7,7 @@ import { buildField, buildInput } from './helpers/builders';
 import FakeEvent from './helpers/fake_event';
 import PassthroughFormatter from './helpers/passthrough_formatter';
 
-describe('FieldKit.TextField', function() {
+describe.testsWithAllKeyboards('FieldKit.TextField', function() {
   var keyboard = Keysim.Keyboard.US_ENGLISH;
 
   describe('constructor', function() {
@@ -63,20 +63,21 @@ describe('FieldKit.TextField', function() {
   describe('typing a backspace', function() {
     describe('with a non-empty selection', function() {
       it('clears the selection', function() {
-        expectThatTyping('backspace').willChange('12|34|5').to('12|5');
-        expectThatTyping('backspace').willChange('12<34|5').to('12|5');
-        expectThatTyping('backspace').willChange('12|34>5').to('12|5');
 
-        expectThatTyping('shift+backspace').willChange('12|34|5').to('12|5');
-        expectThatTyping('shift+backspace').willChange('12<34|5').to('12|5');
-        expectThatTyping('shift+backspace').willChange('12|34>5').to('12|5');
+        expectThatTyping('backspace').willChange('12|341|5').to('12|5');
+        expectThatTyping('backspace').willChange('12|341>5').to('12|5');
+        expectThatTyping('backspace').willChange('12<341|5').to('12|5');
 
-        expectThatTyping('alt+backspace').willChange('12|3 4|5').to('12|5');
-        expectThatTyping('alt+backspace').willChange('12<3 4|5').to('12|5');
-        expectThatTyping('alt+backspace').willChange('12|3 4>5').to('12|5');
+        expectThatTyping('shift+backspace').willChange('12|342|5').to('12|5');
+        expectThatTyping('shift+backspace').willChange('12<342|5').to('12|5');
+        expectThatTyping('shift+backspace').willChange('12|342>5').to('12|5');
+
+        expectThatTyping('alt+backspace').willChange('12|3 43|5').to('12|5');
+        expectThatTyping('alt+backspace').willChange('12<3 43|5').to('12|5');
+        expectThatTyping('alt+backspace').willChange('12|3 43>5').to('12|5');
         expectThatTyping('alt+backspace').willChange('+|').to('|');
 
-        expectThatTyping('meta+backspace').willChange('12|3 4>5').to('12|5');
+        expectThatTyping('meta+backspace').willChange('12|3 44>5').to('12|5');
       });
     });
 
@@ -270,7 +271,7 @@ describe('FieldKit.TextField', function() {
       var ctrl = ctrlAndPlatform[0];
       var platform = ctrlAndPlatform[1];
 
-      describe('with the '+ctrl+' key', function() {
+      describe('with the '+ctrl+' key on '+platform, function() {
         it('works without an existing selection', function() {
           expectThatTyping(ctrl+'+a')['on'+platform]().willChange('123|4567').to('|1234567|');
         });
@@ -337,7 +338,10 @@ describe('FieldKit.TextField', function() {
     expectThatPasting('eat').willChange('Want something to |drink>?').to('Want something to eat|?');
   });
 
-  describe('undo and redo', function() {
+  // Mobile doesn't have undo and redo with keyboard
+  // Currently it works on Android but the caret is in the incorrect place
+  // Because of Android Bug
+  describe.testsWithDesktopKeyboards('undo and redo', function() {
     it('undoes the last change', function() {
       expectThatTyping('a', 'meta+z').onOSX().willNotChange('1|');
     });

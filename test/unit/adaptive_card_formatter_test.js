@@ -5,7 +5,7 @@
 import { buildField } from './helpers/builders';
 import { expectThatTyping } from './helpers/expectations';
 
-describe('FieldKit.AdaptiveCardFormatter', function() {
+describe.testsWithAllKeyboards('FieldKit.AdaptiveCardFormatter', function() {
   var field = null;
   var formatter = null;
 
