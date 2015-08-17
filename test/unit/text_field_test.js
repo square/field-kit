@@ -7,7 +7,7 @@ import { buildField, buildInput } from './helpers/builders';
 import FakeEvent from './helpers/fake_event';
 import PassthroughFormatter from './helpers/passthrough_formatter';
 
-describe.testsWithAllKeyboards('FieldKit.TextField', function() {
+testsWithAllKeyboards('FieldKit.TextField', function() {
   var keyboard = Keysim.Keyboard.US_ENGLISH;
 
   describe('constructor', function() {
@@ -341,7 +341,7 @@ describe.testsWithAllKeyboards('FieldKit.TextField', function() {
   // Mobile doesn't have undo and redo with keyboard
   // Currently it works on Android but the caret is in the incorrect place
   // Because of Android Bug
-  describe.testsWithDesktopKeyboards('undo and redo', function() {
+  testsWithDesktopKeyboards('undo and redo', function() {
     it('undoes the last change', function() {
       expectThatTyping('a', 'meta+z').onOSX().willNotChange('1|');
     });

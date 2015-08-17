@@ -29,7 +29,7 @@ Shoe.prototype.setUndoManager = function(undoManager) {
 // This is here so our test can omit getters in the prototype.
 Object.defineProperty(Shoe.prototype, 'getterOnPrototype', { get: function(){ return 42; } });
 
-describe.testsWithAllKeyboards('FieldKit.UndoManager', function() {
+testsWithAllKeyboards('FieldKit.UndoManager', function() {
   var undoManager;
   var shoe;
 

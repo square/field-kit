@@ -4,7 +4,7 @@
 import { expectThatLeaving } from './helpers/expectations';
 import { buildField } from './helpers/builders';
 
-describe.testsWithAllKeyboards('FieldKit.ExpiryDateField', function() {
+testsWithAllKeyboards('FieldKit.ExpiryDateField', function() {
   var field;
 
   beforeEach(function() {

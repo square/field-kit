@@ -4,7 +4,7 @@
 import { expectThatTyping } from './helpers/expectations';
 import { buildField } from './helpers/builders';
 
-describe.testsWithAllKeyboards('FieldKit.ExpiryDateFormatter', function() {
+testsWithAllKeyboards('FieldKit.ExpiryDateFormatter', function() {
   var field;
   var formatter;
 

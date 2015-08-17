@@ -2,7 +2,7 @@ import Keysim from './keysim';
 const Keyboard = Keysim.Keyboard;
 const Keystroke = Keysim.Keystroke;
 
-const defaultKeyboard = Keyboard.US_ENGLISH;
+const DEFAULT_KEYBOARD = Keyboard.US_ENGLISH;
 
 const keyboardWrapper = (type, keyboardFilter=false) => (title, fn) => {
   [
@@ -27,29 +27,19 @@ const keyboardWrapper = (type, keyboardFilter=false) => (title, fn) => {
 
       fn.call(this);
 
-      afterEach(() => window.keyboard = defaultKeyboard);
+      afterEach(() => window.keyboard = DEFAULT_KEYBOARD);
     });
   });
 };
 
-Object.defineProperty(describe, 'testsWithAllKeyboards', {
-  value: keyboardWrapper(describe),
-  writable: true,
-  enumerable: true,
-  configurable: true
-});
-Object.defineProperty(describe, 'testsWithDesktopKeyboards', {
-  value: keyboardWrapper(describe, 'desktop'),
-  writable: true,
-  enumerable: true,
-  configurable: true
-});
+window.testsWithAllKeyboards = keyboardWrapper(describe);
+window.testsWithDesktopKeyboards = keyboardWrapper(describe, 'desktop');
 
-const defaultUA = navigator.userAgent;
+const DEFAULT_UA = navigator.userAgent;
 
 beforeEach(() => {
   navigator.__defineGetter__('userAgent', function(){
-    return defaultUA;
+    return DEFAULT_UA;
   });
 });
 

@@ -4,7 +4,7 @@
 import { buildField } from './helpers/builders';
 import { expectThatTyping } from './helpers/expectations';
 
-describe.testsWithAllKeyboards('FieldKit.CardTextField', function() {
+testsWithAllKeyboards('FieldKit.CardTextField', function() {
   var textField;
   var visa = '4111 1111 1111 1111';
 
