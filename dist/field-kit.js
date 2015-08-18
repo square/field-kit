@@ -3021,6 +3021,7 @@
                           return _this.insertText(newText);
                         });
                       }
+                      _this._currentValue = change.proposed.text;
                     },
                     onFail: function () {
                       event.preventDefault();
@@ -3072,6 +3073,7 @@
                     }
                     _this.undoManager().proxyFor(_this)._applyChangeFromUndoManager(change);
                     _this._textDidChange();
+                    _this._currentValue = change.proposed.text;
                   },
                   onFail: function () {
                     // Need to rollback the letter input in the Keyup event because it is not valid,
