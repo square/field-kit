@@ -1,6 +1,7 @@
 import Keysim from './keysim';
 const Keyboard = Keysim.Keyboard;
 const Keystroke = Keysim.Keystroke;
+const KeyEvents = Keysim.KeyEvents;
 
 const DEFAULT_KEYBOARD = Keyboard.US_ENGLISH;
 
@@ -199,10 +200,8 @@ const originalDispatch = ANDROID_CHROME.dispatchEventsForKeystroke;
 ANDROID_CHROME.dispatchEventsForKeystroke = (keystroke, target, mods=true) => {
   if (!keystroke.modifiers && !mods) {
     const transitionModifiers = false;
-    const keyDownMask = Keyboard.getKeyEventMask({ keyDown: true });
-    const keyUpMask = Keyboard.getKeyEventMask({ keyUp: true });
     // Dispatch keyDown Events
-    originalDispatch.call(ANDROID_CHROME, new Keystroke(0, 229), target, transitionModifiers, keyDownMask);
+    originalDispatch.call(ANDROID_CHROME, new Keystroke(0, 229), target, transitionModifiers, KeyEvents.DOWN);
 
     const field = target['field-kit-text-field'];
     const currentSelectedRange = field.selectedRange();
@@ -217,7 +216,7 @@ ANDROID_CHROME.dispatchEventsForKeystroke = (keystroke, target, mods=true) => {
 
     // Dispatch keyUp
     // This is where we do most of the processing for this type of Android Keyboard
-    return originalDispatch.call(ANDROID_CHROME, new Keystroke(0, 229), target, transitionModifiers, keyUpMask);
+    return originalDispatch.call(ANDROID_CHROME, new Keystroke(0, 229), target, transitionModifiers, KeyEvents.UP);
   } else {
     if (keystroke.keyCode === 97) {
       keystroke.keyCode = 65;
