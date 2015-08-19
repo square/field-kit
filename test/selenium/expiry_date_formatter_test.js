@@ -156,7 +156,7 @@ test.describe('FieldKit.ExpiryDateFormatter', function() {
       });
   });
 
-  test.it('TODO FIX THIS!: selecting all and typing a non number', function() {
+  test.it('selecting all and typing a non number', function() {
     helpers.setInput('12/11|', input);
     return helpers.runJSMethod('element.setSelectionRange(0, 9999);')
       .then(function() {
