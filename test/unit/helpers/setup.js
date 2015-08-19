@@ -18,7 +18,7 @@ const keyboardWrapper = (type, keyboardFilter=false) => (title, fn) => {
       tag: ['mobile']
     }
   ]
-  .filter((keyboard) => {
+  .filter(keyboard => {
     return !keyboardFilter ||
       keyboard.tag.indexOf(keyboardFilter) >= 0;
   })
@@ -44,15 +44,12 @@ beforeEach(() => {
   });
 });
 
-const CTRL  = 1 << 0;
-const META  = 1 << 1;
-const ALT   = 1 << 2;
 const SHIFT = 1 << 3;
 
 const ANDROID_CHROME_CHARCODE_KEYCODE_MAP = {
   32:  new Keystroke(0,     32),  // <space>
   33:  new Keystroke(SHIFT, 33),  // !
-  34:  new Keystroke(SHIFT, 34), // "
+  34:  new Keystroke(SHIFT, 34),  // "
   35:  new Keystroke(SHIFT, 35),  // #
   36:  new Keystroke(SHIFT, 36),  // $
   37:  new Keystroke(SHIFT, 37),  // %
@@ -186,9 +183,13 @@ function replaceStringSelection(replacement, text, range) {
 }
 
 /**
- * Gets a keyboard instance configured as a U.S. English keyboard would be.
+ * NOTE: Some Androids keyboards will always return 229
+ * This keyboard also only produces the keyDown and
+ * keyUp event. FieldKit uses what the browser enters in keyDown
+ * to process with the formatter. So this keyboard needs to also
+ * insert the character into the field.
  *
- * @return {Keyboard}
+ * https://code.google.com/p/chromium/issues/detail?id=118639
  */
 const ANDROID_CHROME = new Keyboard(
   ANDROID_CHROME_CHARCODE_KEYCODE_MAP,
@@ -197,11 +198,11 @@ const ANDROID_CHROME = new Keyboard(
 
 const originalDispatch = ANDROID_CHROME.dispatchEventsForKeystroke;
 
-ANDROID_CHROME.dispatchEventsForKeystroke = (keystroke, target, mods=true) => {
+ANDROID_CHROME.dispatchEventsForKeystroke = function(keystroke, target, mods=true) {
   if (!keystroke.modifiers && !mods) {
     const transitionModifiers = false;
     // Dispatch keyDown Events
-    originalDispatch.call(ANDROID_CHROME, new Keystroke(0, 229), target, transitionModifiers, KeyEvents.DOWN);
+    originalDispatch.call(this, new Keystroke(0, 229), target, transitionModifiers, KeyEvents.DOWN);
 
     const field = target['field-kit-text-field'];
     const currentSelectedRange = field.selectedRange();
@@ -216,13 +217,13 @@ ANDROID_CHROME.dispatchEventsForKeystroke = (keystroke, target, mods=true) => {
 
     // Dispatch keyUp
     // This is where we do most of the processing for this type of Android Keyboard
-    return originalDispatch.call(ANDROID_CHROME, new Keystroke(0, 229), target, transitionModifiers, KeyEvents.UP);
+    return originalDispatch.call(this, new Keystroke(0, 229), target, transitionModifiers, KeyEvents.UP);
   } else {
     if (keystroke.keyCode === 97) {
       keystroke.keyCode = 65;
     } else if (keystroke.keyCode === 122) {
       keystroke.keyCode = 90;
     }
-    originalDispatch.call(ANDROID_CHROME, keystroke, target, mods);
+    originalDispatch.call(this, keystroke, target, mods);
   }
 };
