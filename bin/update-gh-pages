@@ -87,7 +87,7 @@ pages.git('checkout', PAGES_BRANCH).success? || die("Failed to checkout '#{PAGES
 pages.git('pull', '--rebase').success? || die("Failed to update '#{PAGES_BRANCH}' repo!")
 
 step 'Package field-kit.js…'
-run 'npm', 'run-script', 'package'
+run 'npm', 'run-script', 'build'
 
 # copy files over
 (Dir["#{root.path}/field-kit.*"] + Dir["#{root.path}/public/*"]).each do |file|
