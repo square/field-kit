@@ -2117,6 +2117,7 @@
         this._unfocusedPlaceholder = null;
         this._isDirty = false;
         this._valueOnFocus = "";
+        this._currentValue = "";
         this._blur = $$utils$$bind(this._blur, this);
         this._focus = $$utils$$bind(this._focus, this);
         this._click = $$utils$$bind(this._click, this);
@@ -2429,7 +2430,7 @@
             var result = null;
             var errorType = null;
             var change = $$text_field$$TextFieldStateChange.build(this, function () {
-              result = callback();
+              return result = callback();
             });
             var error = function error(type) {
               errorType = type;
@@ -2538,6 +2539,7 @@
 
           value: function setText(text) {
             this.element.value = text;
+            this._currentValue = text;
           }
         },
         selectedRange: {
@@ -2982,7 +2984,10 @@
         _keyPress: {
 
           /**
-           * Handles inserting characters based on the typed key.
+           * Handles inserting characters based on the typed key for normal keyboards.
+           *
+           * NOTE: Does not fire on some versions of Android, in which case we handle
+           * changes in _keyUp instead.
            *
            * @param {Event} event
            * @private
@@ -2992,37 +2997,51 @@
             var _this = this;
 
             var keyCode = event.keyCode;
-            if (!event.metaKey && !event.ctrlKey && keyCode !== $$keybindings$$KEYS.ENTER && keyCode !== $$keybindings$$KEYS.TAB && keyCode !== $$keybindings$$KEYS.BACKSPACE && event.charCode !== 0) {
+            if (!event.metaKey && !event.ctrlKey && keyCode !== $$keybindings$$KEYS.ENTER && keyCode !== $$keybindings$$KEYS.TAB && keyCode !== $$keybindings$$KEYS.BACKSPACE) {
+              if (event.charCode !== 0) {
+                (function () {
+                  var newText = String.fromCharCode(event.charCode || event.keyCode);
 
-              var newText = String.fromCharCode(event.charCode || event.keyCode);
-              var current = {
-                text: this.text(),
-                selectedRange: this.selectedRange()
-              };
-              var proposed = {
-                text: $$utils$$replaceStringSelection(newText, current.text, current.selectedRange),
-                selectedRange: { start: current.selectedRange.start + 1, length: 0 }
-              };
-              var change = this.hasChangesAndIsValid(current, proposed);
-              // HACK(JoeTaylor) Use Browser's native input when using the formatter
-              // would not make a difference https://code.google.com/p/chromium/issues/detail?id=32865
-              if (change && change.proposed.text === proposed.text && change.proposed.selectedRange.start === proposed.selectedRange.start && change.proposed.selectedRange.length === proposed.selectedRange.length && event instanceof KeyboardEvent) {
-                this.undoManager().proxyFor(this)._applyChangeFromUndoManager(change);
+                  _this._processChange({
+                    currentText: _this.text(),
+                    proposedText: $$utils$$replaceStringSelection(newText, _this.text(), _this.selectedRange()),
+                    onSuccess: function (change, changeTriggeredFormatting) {
+                      if (!changeTriggeredFormatting && event instanceof KeyboardEvent) {
+                        // HACK(JoeTaylor) Use Browser's native input when using the formatter
+                        // would not make a difference https://code.google.com/p/chromium/issues/detail?id=32865
+                        if (!_this._isDirty) {
+                          _this._valueOnFocus = change.current.text || "";
+                          _this._isDirty = true;
+                        }
+                        _this.undoManager().proxyFor(_this)._applyChangeFromUndoManager(change);
+                        _this._textDidChange();
+                      } else {
+                        event.preventDefault();
+                        _this.rollbackInvalidChanges(function () {
+                          return _this.insertText(newText);
+                        });
+                      }
+                      _this._currentValue = change.proposed.text;
+                    },
+                    onFail: function () {
+                      event.preventDefault();
+                      _this.rollbackInvalidChanges(function () {
+                        return _this.insertText(newText);
+                      });
+                    }
+                  });
+                })();
               } else {
                 event.preventDefault();
-                this.rollbackInvalidChanges(function () {
-                  return _this.insertText(newText);
-                });
               }
-            } else if (!event.metaKey && !event.ctrlKey && keyCode !== $$keybindings$$KEYS.ENTER && keyCode !== $$keybindings$$KEYS.TAB && keyCode !== $$keybindings$$KEYS.BACKSPACE && event.charCode === 0) {
-              event.preventDefault();
             }
           }
         },
         _keyUp: {
 
           /**
-           * Handles keyup events.
+           * Handles keyup events. On Some Android we need to do all input processing
+           * here because no other information comes in.
            *
            * @param {Event} event
            * @private
@@ -3031,11 +3050,84 @@
           value: function _keyUp(event) {
             var _this = this;
 
-            this.rollbackInvalidChanges(function () {
-              if (event.keyCode === $$keybindings$$KEYS.TAB) {
-                _this.selectAll(event);
-              }
-            });
+            var keyCode = event.keyCode;
+            // NOTE: Certain Androids on Chrome always return 229
+            // https://code.google.com/p/chromium/issues/detail?id=118639
+            if (keyCode === 229) {
+              (function () {
+                // Text has already been changed at this point, so we check the previous text
+                // to determine whether we need to undo the change.
+                var previousText = _this._currentValue || "";
+                _this._processChange({
+                  currentText: previousText,
+                  proposedText: _this.text(),
+                  onSuccess: function (change, changeTriggeredFormatting) {
+                    if (changeTriggeredFormatting) {
+                      var newText = change.proposed.text;
+                      _this.setSelectedRange(change.proposed.selectedRange);
+                      _this.setText(newText);
+                    }
+                    if (!_this._isDirty) {
+                      _this._valueOnFocus = change.current.text || "";
+                      _this._isDirty = true;
+                    }
+                    _this.undoManager().proxyFor(_this)._applyChangeFromUndoManager(change);
+                    _this._textDidChange();
+                    _this._currentValue = change.proposed.text;
+                  },
+                  onFail: function () {
+                    // Need to rollback the letter input in the Keyup event because it is not valid,
+                    // so we set text to the previous state (as collected from the UndoManager).
+                    _this.setText(previousText);
+                  }
+                });
+              })();
+            } else {
+              this.rollbackInvalidChanges(function () {
+                if (event.keyCode === $$keybindings$$KEYS.TAB) {
+                  _this.selectAll(event);
+                }
+              });
+            }
+          }
+        },
+        _processChange: {
+
+          /**
+           * Checks if a change is valid and calls `onSuccess` if so,
+           * and `onFail` if not.
+           *
+           * @param {object} options
+           * @param {string} options.currentText
+           * @param {string} options.proposedText
+           * @param {function} options.onSuccess
+           * @param {function=} options.onFail
+           * @private
+           */
+
+          value: function _processChange(_ref) {
+            var currentText = _ref.currentText;
+            var proposedText = _ref.proposedText;
+            var onSuccess = _ref.onSuccess;
+            var _ref$onFail = _ref.onFail;
+            var onFail = _ref$onFail === undefined ? function () {} : _ref$onFail;
+
+            var current = {
+              text: currentText,
+              selectedRange: this.selectedRange()
+            };
+            var proposed = {
+              text: proposedText,
+              selectedRange: { start: current.selectedRange.start + 1, length: 0 }
+            };
+            var change = this.hasChangesAndIsValid(current, proposed);
+            var changeTriggeredFormatting = change && (change.proposed.text !== proposed.text || change.proposed.selectedRange.start !== proposed.selectedRange.start || change.proposed.selectedRange.length !== proposed.selectedRange.length);
+
+            if (change) {
+              onSuccess(change, changeTriggeredFormatting);
+            } else {
+              onFail();
+            }
           }
         },
         _paste: {

@@ -4,7 +4,7 @@
 import { buildField } from './helpers/builders';
 import { expectThatTyping } from './helpers/expectations';
 
-describe('FieldKit.AmexCardFormatter', function() {
+testsWithAllKeyboards('FieldKit.AmexCardFormatter', function() {
   var field = null;
 
   beforeEach(function() {

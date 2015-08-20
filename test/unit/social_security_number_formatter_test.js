@@ -5,7 +5,7 @@
 import { expectThatTyping } from './helpers/expectations';
 import { buildField } from './helpers/builders';
 
-describe('FieldKit.SocialSecurityNumberFormatter', function() {
+testsWithAllKeyboards('FieldKit.SocialSecurityNumberFormatter', function() {
   var field;
 
   beforeEach(function() {

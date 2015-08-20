@@ -4,7 +4,7 @@
 import { expectThatTyping, expectThatPasting } from './helpers/expectations';
 import { buildField } from './helpers/builders';
 
-describe('FieldKit.PhoneFormatter', function() {
+testsWithAllKeyboards('FieldKit.PhoneFormatter', function() {
   var keyboard = Keysim.Keyboard.US_ENGLISH;
   var field;
   var formatter;

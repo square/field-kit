@@ -28,7 +28,7 @@ LazyDelimiterFormatter.prototype.hasDelimiterAtIndex = function(index) {
   return index === 2 || index === 3;
 };
 
-describe('LeadingDelimiterFormatter', function() {
+testsWithAllKeyboards('LeadingDelimiterFormatter', function() {
   var field;
 
   beforeEach(function() {

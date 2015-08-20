@@ -4,10 +4,9 @@
 import { buildField } from './helpers/builders';
 import { expectThatTyping } from './helpers/expectations';
 
-describe('FieldKit.CardTextField', function() {
+testsWithAllKeyboards('FieldKit.CardTextField', function() {
   var textField;
   var visa = '4111 1111 1111 1111';
-  var keyboard = Keysim.Keyboard.US_ENGLISH;
 
   beforeEach(function() {
     textField = buildField(FieldKit.CardTextField);
@@ -47,9 +46,11 @@ describe('FieldKit.CardTextField', function() {
 
       it('does not change the displayed card number on end editing', function() {
         textField.textFieldDidBeginEditing();
-        keyboard.dispatchEventsForInput(visa, textField.element);
-        textField.textFieldDidEndEditing();
-        expect(textField.element.value).to.equal(visa);
+        expectThatTyping(visa)
+          .into(textField)
+          .before(() => textField.textFieldDidEndEditing())
+          .willChange('|')
+          .to(`${visa}|`);
       });
     });
 
@@ -60,29 +61,36 @@ describe('FieldKit.CardTextField', function() {
 
       it('does not change the displayed card number while typing', function() {
         textField.textFieldDidBeginEditing();
-        keyboard.dispatchEventsForInput(visa, textField.element);
-        expect(textField.element.value).to.equal(visa);
+        expectThatTyping(visa)
+          .into(textField)
+          .willChange('|')
+          .to(`${visa}|`);
       });
 
       it('masks the displayed card number on end editing', function() {
         textField.textFieldDidBeginEditing();
-        keyboard.dispatchEventsForInput(visa, textField.element);
-        textField.textFieldDidEndEditing();
-        expect(textField.element.value).to.equal('•••• •••• •••• 1111');
+        expectThatTyping(visa)
+          .into(textField)
+          .before(() => textField.textFieldDidEndEditing.call(textField))
+          .willChange('|')
+          .to('•••• •••• •••• 1111|');
       });
 
       it('does change the selected range on end editing', function() {
         textField.textFieldDidBeginEditing();
-        keyboard.dispatchEventsForInput(visa, textField.element);
-        expectThatTyping('enter').into(textField).willChange('|'+visa+'>').to('•••• •••• •••• 1111|');
+        expectThatTyping('enter').into(textField).willChange(`|${visa}>`).to('•••• •••• •••• 1111|');
       });
 
       it('restores the original value on beginning editing', function() {
         textField.textFieldDidBeginEditing();
-        keyboard.dispatchEventsForInput(visa, textField.element);
-        textField.textFieldDidEndEditing();
-        textField.textFieldDidBeginEditing();
-        expect(textField.element.value).to.equal(visa);
+        expectThatTyping(visa)
+          .into(textField)
+          .before(() => {
+            textField.textFieldDidEndEditing();
+            textField.textFieldDidBeginEditing();
+          })
+          .willChange('|')
+          .to(`${visa}|`);
       });
 
       it('masks when a value is set before editing', function() {

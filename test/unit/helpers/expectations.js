@@ -1,6 +1,7 @@
 /* jshint esnext:true, unused:true, undef:true */
 /* global expect */
 
+import './setup';
 import Keysim from './keysim';
 import FakeEvent from './fake_event';
 import Selection from './selection';
@@ -34,7 +35,17 @@ class FieldExpectationBase {
     this.applyDescription();
     this.proxyDelegate();
     this.perform();
+
+    if (this.beforeAssert) {
+      this.beforeAssert();
+    }
+
     this.assert();
+    return this;
+  }
+
+  before(fn) {
+    this.beforeAssert = fn;
     return this;
   }
 
@@ -64,7 +75,9 @@ class FieldExpectationBase {
     var caret = description.caret;
     var affinity = description.affinity;
     var value = description.value;
-    this.field.element.value = value;
+
+    this.field.setText(value);
+
     Caret.set(this.field.element, caret.start, caret.end);
     this.field.selectionAffinity = affinity;
   }
@@ -127,7 +140,7 @@ class ExpectThatTyping extends FieldExpectationBase {
 
   typeKeys() {
     var modifier = false;
-    var keyboard = Keysim.Keyboard.US_ENGLISH;
+    var keyboard = window.keyboard;
     var KEYS = [
       'zero',
       'nine',
@@ -147,18 +160,20 @@ class ExpectThatTyping extends FieldExpectationBase {
       'ctrl'
     ];
 
-    this.keys.forEach((command) => {
-      command.split('+').forEach((key) => {
-        if(KEYS.indexOf(key) >= 0) {
-          modifier = true;
+    this.keys.forEach((key) => {
+      key.split(',').forEach((command) => {
+        command.split('+').forEach((key) => {
+          if(KEYS.indexOf(key) >= 0) {
+            modifier = true;
+          }
+        });
+
+        if(modifier) {
+          keyboard.dispatchEventsForAction(command, this.field.element);
+        } else {
+          keyboard.dispatchEventsForInput(command, this.field.element);
         }
       });
-
-      if(modifier) {
-        keyboard.dispatchEventsForAction(command, this.field.element);
-      } else {
-        keyboard.dispatchEventsForInput(command, this.field.element);
-      }
     });
   }
 }

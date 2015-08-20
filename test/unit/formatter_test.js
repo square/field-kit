@@ -26,7 +26,6 @@ describe('FieldKit.Formatter', function() {
     it('prevents input that would make the text longer than the maximum', function() {
       expectThatTyping('d').into(field).willNotChange('abc|');
       expectThatTyping('b').into(field).willNotChange('a|cd');
-      expectThatTyping('b').into(field).willNotChange('a|cd');
     });
 
     it('allows pasted characters up until the maximum', function() {
