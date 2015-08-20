@@ -1,0 +1,41 @@
+{
+  "name": "field-kit",
+  "version": "1.1.0",
+  "description": "Utilities to effectively manage text entry on the web.",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "make test",
+    "build": "make dist",
+    "prepublish": "npm test"
+  },
+  "author": "Square, Inc.",
+  "license": "Apache 2.0",
+  "dependencies": {
+    "input-sim": "^3.0.0",
+    "stround": "0.2.2"
+  },
+  "devDependencies": {
+    "babel": "^4.7.16",
+    "chai": "^3.2.0",
+    "chokidar": "^0.8.2",
+    "chromedriver": "^2.16.0",
+    "es6-module-transpiler": "^0.5.1",
+    "express": "^4.13.1",
+    "jsdoc": "git://github.com/eventualbuddha/jsdoc.git#add-support-for-es6-classes",
+    "jshint": "^2.5.1",
+    "karma": "^0.13.3",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^0.2.0",
+    "karma-mocha": "^0.2.0",
+    "keysim": "^1.3.0",
+    "mocha": "^2.2.5",
+    "multer": "^1.0.1",
+    "node-static": "^0.7.7",
+    "promise": "^7.0.3",
+    "sander": "^0.2.2",
+    "selenium-webdriver": "^2.46.1",
+    "serve-index": "^1.7.1",
+    "sinon": "^1.9.0",
+    "string-selection": "^1.0.0"
+  }
+}
