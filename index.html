@@ -1,422 +1,292 @@
+---
+title: FieldKit
+---
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
 
-  <title>FieldKit Demo</title>
+  <title>{{ page.title }}</title>
 
-  <link rel="stylesheet" media="screen" href="bootstrap.min.css" />
-  <link rel="stylesheet" media="screen" href="google-code-prettify/prettify.css" />
-  <style type="text/css" media="screen">
-    input[type=text], input[type=password], input[type=tel] {
-      width: 230px;
-      height: 30px;
-      font-size: 20px;
-    }
-
-    #expiry {
-      width: 150px;
-      position: relative;
-      top: 23px;
-    }
-
-    #card-number {
-      width: 200px;
-      position: relative;
-      top: 23px;
-    }
-
-    #card-type {
-      position: relative;
-      top: 20px;
-    }
-
-    #ssn {
-      width: 120px;
-      position: relative;
-      top: 12px;
-    }
-
-    #phone {
-      width: 150px;
-    }
-
-    #b-to-a {
-      width: 200px;
-      position: relative;
-      top: 12px;
-    }
-
-    .docs-example .tryout {
-      background: none;
-      border: none;
-    }
-
-    #form-test input[type=text] {
-      display: inline;
-      margin-right: 20px;
-    }
-
-  /* Base class */
-  .docs-example {
-    position: relative;
-    margin: 15px 0;
-    padding: 39px 19px 14px;
-    *padding-top: 19px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    -webkit-border-radius: 4px;
-       -moz-border-radius: 4px;
-            border-radius: 4px;
-  }
-
-  /* Echo out a label for the example */
-  .docs-example:after {
-    content: "Example";
-    position: absolute;
-    top: -1px;
-    left: -1px;
-    padding: 3px 7px;
-    font-size: 12px;
-    font-weight: bold;
-    background-color: #f5f5f5;
-    border: 1px solid #ddd;
-    color: #9da0a4;
-    -webkit-border-radius: 4px 0 4px 0;
-       -moz-border-radius: 4px 0 4px 0;
-            border-radius: 4px 0 4px 0;
-  }
-
-  /* Remove spacing between an example and it's code */
-  .docs-example + .prettyprint {
-    margin-top: -20px;
-    padding-top: 5px;
-  }
-
-  /* Base class */
-  .docs-example-code {
-    position: relative;
-    margin: 15px 0;
-    border: 1px solid #ddd;
-    -webkit-border-radius: 4px;
-       -moz-border-radius: 4px;
-            border-radius: 4px;
-  }
-
-  /* Echo out a label for the example */
-  .docs-example-code:after {
-    position: absolute;
-    top: -1px;
-    right: -1px;
-    padding: 3px 7px;
-    font-size: 12px;
-    font-weight: bold;
-    color: #9da0a4;
-    -webkit-border-radius: 4px 0 4px 0;
-       -moz-border-radius: 4px 0 4px 0;
-            border-radius: 4px 0 4px 0;
-  }
-
-  .docs-example-code-js:after {
-    content: "JS";
-  }
-
-  .docs-example-code-coffee:after {
-    content: "Coffee";
-  }
-
-  .docs-example-code-html:after {
-    content: "HTML";
-  }
-
-  .docs-example-code + .docs-example-code {
-    border-top-style: dotted;
-    margin-top: -24px;
-    padding-top: 5px;
-  }
-
-  .docs-example-code + .docs-example-code:after {
-  }
-  </style>
+  <link rel="stylesheet" media="screen" href="https://d1g145x70srn7h.cloudfront.net/fonts/sqmarket/sq-market.css" />
+  <link rel="stylesheet" media="screen" href="css/index.css" />
 </head>
 
-<body onload="prettyPrint()">
-  <div class="container">
-    <div class="row">
-      <div class="page-header">
-        <h1>FieldKit Demo</h1>
-      </div>
-    </div>
+<body>
+  <nav class="links">
+    <a href="https://github.com/square/fieldkit">
+      <img src="images/icon-github.png" alt="FieldKit on GitHub" />
+    </a>
+    <a href="http://square.github.io/">
+      <img src="images/icon-square.png" alt="Square Open Source Portal" />
+    </a>
+  </nav>
+  <h1>{{ page.title }}</h1>
 
-    <div class="row">
-      <div class="offset2 span8">
-        <h3>TextField</h3>
-      </div>
-    </div>
+  <section>
+    <p>FieldKit lets you take control of your text fields.</p>
+  </section>
 
-    <div class="row field-kit-example">
-      <div class="offset2 span8">
-        <p>
-          <code>TextField</code> is the base class that wraps an
-          <code>&lt;input type=&quot;text&quot;&gt;</code> with helpers that
-          give you advanced control over the field.
-        </p>
+  <h2>Demos</h2>
 
-        <div class="docs-example">
-          <div class="row">
-            <div class="html span3"></div>
-          </div>
-        </div>
+  <section>
+    <h3>TextField</h3>
 
-        <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="text-field-example" /&gt;</code></pre>
-        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField(document.getElementById('text-field-example'));
+    <p>
+      <code>TextField</code> is the base class that wraps an <code>&lt;input type=&quot;text&quot;&gt;</code> with helpers that give you advanced control over the field.
+    </p>
+
+    <div class="demo">
+{% highlight html %}
+<input type="text" id="text-field-example" />
+{% endhighlight %}
+
+{% highlight javascript %}
+var input = document.getElementById('text-field-example');
+var field = new FieldKit.TextField(input);
 field.setFocusedPlaceholder('John Smith');
-field.setUnfocusedPlaceholder('First Name');</code></pre>
-      </div>
+field.setUnfocusedPlaceholder('First Name');
+{% endhighlight %}
     </div>
+  </section>
 
+  <section>
+    <h3>NumberFormatter</h3>
 
-    <div class="row">
-      <div class="offset2 span8">
-        <h3>NumberFormatter</h3>
-      </div>
-    </div>
+    <p>
+      The <code>NumberFormatter</code> provides formatting for all kinds of numbers, percentages, currencies, etc.
+    </p>
 
-    <div class="row field-kit-example">
-      <div class="offset2 span8">
-        <p>
-          The <code>NumberFormatter</code> provides formatting for all kinds of
-          numbers, percentages, currencies, etc.
-        </p>
+    <div class="demo">
+{% highlight html %}
+<input type="text" id="number">
+{% endhighlight %}
 
-        <div class="docs-example">
-          <div class="row">
-            <div class="html span3"></div>
-
-            <div class="span4">
-              <pre class="tryout"></pre>
-            </div>
-          </div>
-        </div>
-
-        <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="number"&gt;</code></pre>
-        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField(document.getElementById('number'));
+{% highlight javascript %}
+var field = new FieldKit.TextField(document.getElementById('number'));
 field.setFormatter(new FieldKit.NumberFormatter()
-  .setNumberStyle(Math.random() &gt; 0.5 ?
+  .setNumberStyle(Math.random() < 0.5 ?
     FieldKit.NumberFormatter.Style.PERCENT :
     FieldKit.NumberFormatter.Style.CURRENCY));
-field.setValue((Math.random() &gt; 0.5 ? 1 : -1) * Math.random()*10);</code></pre>
-      </div>
+field.setValue((Math.random() < 0.5 ? 1 : -1) * Math.random()*10);
+{% endhighlight %}
     </div>
+  </section>
 
+  <section>
+    <h3>ExpiryDateField / ExpiryDateFormatter</h3>
 
-    <div class="row">
-      <div class="offset2 span8">
-        <h3>ExpiryDateField / ExpiryDateFormatter</h3>
-      </div>
+    <p>
+      The <code>ExpiryDateField</code> wraps <code>ExpiryDateFormatter</code> for credit card expiry
+      dates, preventing the input of nonsense months or non-date characters. It also adds the preceding zero and the slash between the month and year automatically, but treats them as if they are not
+      there. In order to do this predictably it forces the cursor to remain at the end of the field and prevents any kind of selection.
+    </p>
+
+    <div class="demo">
+      <table>
+        <tbody>
+          <tr>
+            <td>“4”</td>
+            <td>“04/”</td>
+          </tr>
+          <tr>
+            <td>“1212”</td>
+            <td>“12/12”</td>
+          </tr>
+          <tr>
+            <td>“12/” + backspace</td>
+            <td>“1”</td>
+          </tr>
+        </tbody>
+      </table>
+
+{% highlight html %}
+<input type="text" id="expiry" placeholder="mm/yy">
+{% endhighlight %}
+
+{% highlight javascript %}
+new FieldKit.ExpiryDateField(document.getElementById('expiry'));
+{% endhighlight %}
     </div>
+  </section>
 
-    <div class="row field-kit-example">
-      <div class="offset2 span8">
-        <p>
-          The <code>ExpiryDateField</code> wraps
-          <code>ExpiryDateFormatter</code> for credit card expiry
-          dates, preventing the input of nonsense months or non-date
-          characters.  It also adds the preceding zero and the slash between
-          the month and year automatically, but treats them as if they are not
-          there. In order to do this predictably it forces the cursor to remain
-          at the end of the field and prevents any kind of selection.
-        </p>
+  <section>
+    <h3>CardTextField / AdaptiveCardFormatter</h3>
 
-        <div class="docs-example">
-          <div class="row">
-            <div class="html span3"></div>
+    <p>
+      The <code>CardTextField</code> and <code>AdaptiveCardFormatter</code> provide formatting for credit card PANs, preventing the input of non-digit characters and automatically breaking into digit groups according to the rules for the entered card type.
+    </p>
 
-            <div class="span4">
-              <pre class="tryout">&ldquo;4&rdquo; &rarr; &ldquo;04/&rdquo;
-&ldquo;1212&rdquo; &rarr; &ldquo;12/12&rdquo;
-&ldquo;12/&rdquo; + backspace &rarr; &ldquo;1&rdquo;</pre>
-            </div>
-          </div>
-        </div>
+    <div class="demo">
+      <table>
+        <tbody>
+          <tr>
+            <td>“411111111”</td>
+            <td>“4111 1111 1 (Visa)”</td>
+          </tr>
+          <tr>
+            <td>“3725123456”</td>
+            <td>“3725 123456 (Amex)”</td>
+          </tr>
+          <tr>
+            <td>“4111” + backspace</td>
+            <td>“411”</td>
+          </tr>
+        </tbody>
+      </table>
 
-        <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="expiry" placeholder="mm/yy"&gt;</code></pre>
-        <pre class="prettyprint docs-example-code docs-example-code-js"><code>new FieldKit.ExpiryDateField(document.getElementById('expiry'));</code></pre>
-      </div>
-    </div>
+{% highlight html %}
+<input type="text" id="card-number" placeholder="1234 5678 9012 3456">
+<div id="card-type">Card type: <span id="card-type-span">Unknown</span></div>
+{% endhighlight %}
 
-
-    <div class="row">
-      <div class="offset2 span8">
-        <h3>CardTextField / AdaptiveCardFormatter</h3>
-      </div>
-    </div>
-
-    <div class="row field-kit-example">
-      <div class="offset2 span8">
-        <p>
-          The <code>CardTextField</code> and <code>AdaptiveCardFormatter</code>
-          provide formatting for credit card PANs, preventing the input of
-          non-digit characters and automatically breaking into digit groups
-          according to the rules for the entered card type.
-        </p>
-
-        <div class="docs-example">
-          <div class="row">
-            <div class="html span3"></div>
-
-            <div class="span4">
-              <pre class="tryout">&ldquo;411111111&rdquo; &rarr; &ldquo;4111 1111 1&rdquo;  # visa
-&ldquo;3725123456&rdquo; &rarr; &ldquo;3725 123456&rdquo; # amex
-&ldquo;4111 &rdquo; + backspace &rarr; &ldquo;411&rdquo;</pre>
-            </div>
-          </div>
-        </div>
-
-        <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="card-number" placeholder="1234 5678 9012 3456"&gt;
-&lt;div id="card-type"&gt;Card type: &lt;span id="card-type-span"&gt;unknown&lt;/span&gt;&lt;/div&gt;</code></pre>
-        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.CardTextField(document.getElementById('card-number'));
+{% highlight javascript %}
+var field = new FieldKit.CardTextField(document.getElementById('card-number'));
 field.setCardMaskStrategy(FieldKit.CardTextField.CardMaskStrategy.DoneEditing);
 field.setDelegate({
   textDidChange: function() {
-    document.getElementById('card-type-span').innerHTML = (field.cardType() || 'unknown');
+    var cardTypeString = field.cardType() || 'unknown';
+    document.getElementById('card-type-span').innerHTML = cardTypeString;
   }
-});</code></pre>
-      </div>
+});
+{% endhighlight %}
     </div>
+  </section>
 
+  <section>
+    <h3>SocialSecurityNumberFormatter</h3>
 
-    <div class="row">
-      <div class="offset2 span8">
-        <h3>SocialSecurityNumberFormatter</h3>
-      </div>
+    <p>
+      The <code>SocialSecurityNumberFormatter</code> provides formatting for US Social Security numbers, preventing the input of non-digit characters and automatically breaking into digit groups like <code>NNN-NN-NNNN</code>.
+    </p>
+
+    <div class="demo">
+      <table>
+        <tbody>
+          <tr>
+            <td>“1234”</td>
+            <td>“123-4”</td>
+          </tr>
+          <tr>
+            <td>“123-45-” + backspace</td>
+            <td>“123-4”</td>
+          </tr>
+        </tbody>
+      </table>
+
+{% highlight html %}
+<input type="text" id="ssn" placeholder="123-45-6789">
+{% endhighlight %}
+
+{% highlight javascript %}
+ssnFormatter = new FieldKit.SocialSecurityNumberFormatter();
+new FieldKit.TextField(document.getElementById('ssn'), ssnFormatter);
+{% endhighlight %}
     </div>
+  </section>
 
-    <div class="row field-kit-example">
-      <div class="offset2 span8">
-        <p>
-          The <code>SocialSecurityNumberFormatter</code> provides formatting for
-          US Social Security numbers, preventing the input of non-digit characters
-          and automatically breaking into digit groups like
-          <code>NNN-NN-NNNN</code>.
-        </p>
+  <section>
+    <h3>PhoneFormatter</h3>
 
-        <div class="docs-example">
-          <div class="row">
-            <div class="html span3"></div>
+    <p>
+      The <code>PhoneFormatter</code> provides formatting for phone numbers, preventing the input of non-digit characters and automatically formatting like <code>(NNN) NNN-NNNN</code>.
+    </p>
 
-            <div class="span4">
-              <pre class="tryout">&ldquo;1234&rdquo; &rarr; &ldquo;123-4&rdquo;
-&ldquo;123-45-&rdquo; + backspace &rarr; &ldquo;123-4&rdquo;</pre>
-            </div>
-          </div>
-        </div>
+    <div class="demo">
+      <table>
+        <tbody>
+          <tr>
+            <td>“4155”</td>
+            <td>“(415) 5”</td>
+          </tr>
+        </tbody>
+      </table>
 
-        <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="ssn" placeholder="123-45-6789"&gt;</code></pre>
-        <pre class="prettyprint docs-example-code docs-example-code-js"><code>new FieldKit.TextField(document.getElementById('ssn'), new FieldKit.SocialSecurityNumberFormatter());</code></pre>
-      </div>
+{% highlight html %}
+<input type="tel" id="phone" placeholder="(415) 555-1212">
+{% endhighlight %}
+
+{% highlight javascript %}
+new FieldKit.TextField(document.getElementById('phone'), new FieldKit.PhoneFormatter());
+{% endhighlight %}
     </div>
+  </section>
 
-    <div class="row">
-      <div class="offset2 span8">
-        <h3>PhoneFormatter</h3>
-      </div>
-    </div>
+  <section>
+    <h3>Writing a custom formatter</h3>
 
-    <div class="row field-kit-example">
-      <div class="offset2 span8">
-        <p>
-          The <code>PhoneFormatter</code> provides formatting for
-          phone numbers, preventing the input of non-digit characters
-          and automatically formatting like
-          <code>(NNN) NNN-NNNN</code>.
-        </p>
+    <p>
+      Formatters are objects that implement the <code>Formatter</code> interface:
+    </p>
 
-        <div class="docs-example">
-          <div class="row">
-            <div class="html span3"></div>
-
-            <div class="span4">
-              <pre class="tryout">&ldquo;4155&rdquo; &rarr; &ldquo;(415) 5&rdquo;</pre>
-            </div>
-          </div>
-        </div>
-
-        <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="tel" id="phone" placeholder="(415) 555-1212"&gt;</code></pre>
-        <pre class="prettyprint docs-example-code docs-example-code-js"><code>new FieldKit.TextField(document.getElementById('phone'), new FieldKit.PhoneFormatter());</code></pre>
-      </div>
-    </div>
-
-
-    <div class="row">
-      <div class="offset2 span8">
-        <h3>Writing a custom formatter</h3>
-      </div>
-    </div>
-
-    <div class="row field-kit-example">
-      <div class="offset2 span8">
-        <p>
-          Formatters are objects that implement the <code>Formatter</code> interface:
-        </p>
-
-        <pre class="prettyprint"><code>interface Formatter
+{% highlight javascript %}
+interface Formatter
 {
-  string format(any objectValue);
-  any parse(string stringValue);
+string format(any objectValue);
+any parse(string stringValue);
 
-  [Optional] boolean isChangeValid(Change change);
+[Optional] boolean isChangeValid(Change change);
 }
 
 interface Change
 {
-  attribute TextField field;
-  attribute TextState current;
-  attribute TextState proposed;
-  attribute TextChange inserted;
-  attribute TextChange deleted;
+attribute TextField field;
+attribute TextState current;
+attribute TextState proposed;
+attribute TextChange inserted;
+attribute TextChange deleted;
 }
 
 interface TextState
 {
-  attribute string text;
-  attribute Range selectedRange;
+attribute string text;
+attribute Range selectedRange;
 }
 
 interface TextChange
 {
-  attribute string text;
-  attribute unsigned long start;
-  attribute unsigned long end;
+attribute string text;
+attribute unsigned long start;
+attribute unsigned long end;
 }
 
 interface Range
 {
-  attribute unsigned long start;
-  attribute unsigned long length;
+attribute unsigned long start;
+attribute unsigned long length;
 }
-</code></pre>
+{% endhighlight %}
+    </div>
+  </section>
 
-        <h4>Character Replacement</h4>
+  <section>
+    <h3>Character Replacement</h3>
 
-        <p>
-          This example replaces any &lsquo;b&rsquo; it finds with &lsquo;a&rsquo;.
-          It does this using all three of the methods on <code>Formatter</code>.
-        </p>
+    <p>
+      This example replaces any ‘b’ it finds with ‘a’. It does this using all three of the methods on <code>Formatter</code>.
+    </p>
 
-        <div class="docs-example">
-          <div class="row">
-            <div class="html span3"></div>
+    <div class="demo">
+      <table>
+        <tbody>
+          <tr>
+            <td>“Hot tub”</td>
+            <td>“Hot tua”</td>
+          </tr>
+          <tr>
+            <td>“But why?”</td>
+            <td>“Aut why?”</td>
+          </tr>
+        </tbody>
+      </table>
 
-            <div class="span4">
-              <pre class="tryout">&ldquo;Hot tub&rdquo; &rarr; &ldquo;Hot tua&rdquo;
-&ldquo;But why?&rdquo; &rarr; &ldquo;Aut why?&rdquo;</pre>
-            </div>
-          </div>
-        </div>
+{% highlight html %}
+<input type="text" id="b-to-a" placeholder="changes 'b' to 'a'">
+{% endhighlight %}
 
-        <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="b-to-a" placeholder="changes 'b' to 'a'"&gt;</code></pre>
-        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField(document.getElementById('b-to-a'));
+{% highlight javascript %}
+var field = new FieldKit.TextField(document.getElementById('b-to-a'));
 field.setFormatter({
   format: function(value){ return value.replace(/b/g, 'a').replace(/B/g, 'A'); },
   parse: function(value){ return value; },
@@ -425,32 +295,25 @@ field.setFormatter({
     change.proposed.text = this.format(this.parse(change.proposed.text));
     return true;
   }
-});</code></pre>
-      </div>
+});
+{% endhighlight %}
     </div>
+  </section>
 
-    <div class="row field-kit-example">
-      <div class="offset2 span8">
-        <h4>Controlling the Selection</h4>
+  <section>
+    <h3>Controlling the Selection</h3>
 
-        <p>
-          Formatters not only have control over the editable text but also the
-          selection, if they so choose. Formatters can exercise this control by
-          implementing the <code>#isChangeValid(change)</code> method and
-          changing the proposed selection. The example below does not impose
-          any restrictions on what can be typed or how to display the value,
-          but disables all selection. Because of browser limitations you can
-          still select text using the mouse and by tabbing into this field.
-        </p>
+    <p>
+      Formatters not only have control over the editable text but also the selection, if they so choose. Formatters can exercise this control by implementing the <code>#isChangeValid(change)</code> method and changing the proposed selection. The example below does not impose any restrictions on what can be typed or how to display the value, but disables all selection. Because of browser limitations you can still select text using the mouse and by tabbing into this field.
+    </p>
 
-        <div class="docs-example">
-          <div class="row">
-            <div class="html span3"></div>
-          </div>
-        </div>
+    <div class="demo">
+{% highlight html %}
+<input type="text" id="no-selection" placeholder="no selection">
+{% endhighlight %}
 
-        <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;input type="text" id="no-selection" placeholder="no selection"&gt;</code></pre>
-        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var field = new FieldKit.TextField(document.getElementById('no-selection'));
+{% highlight javascript %}
+var field = new FieldKit.TextField(document.getElementById('no-selection'));
 field.setFormatter({
   format: function(value){ return value; },
   parse: function(value){ return value; },
@@ -471,32 +334,30 @@ field.setFormatter({
 
     return true;
   }
-});</code></pre>
-      </div>
+});
+{% endhighlight %}
     </div>
+  </section>
 
-    <div class="row field-kit-example">
-      <div class="offset2 span8">
-        <h4>Form Interaction</h4>
+  <section>
+    <h3>Form Interaction</h3>
 
-        <p>
-          FieldKit text fields should behave essentially as expected with
-          regard to forms. Tabbing from one field to the next should work.
-          Pressing ENTER should submit the form. Etc.
-        </p>
+    <p>
+      FieldKit text fields should behave essentially as expected with regard to forms. Tabbing from one field to the next should work. Pressing ENTER should submit the form. Etc.
+    </p>
 
-        <div class="docs-example">
-          <div class="row">
-            <div class="html span7"></div>
-          </div>
-        </div>
+    <div class="demo">
+{% highlight html %}
+<form id="form-test">
+  <input type="text" class="form-test" placeholder="first name">
+  <input type="text" class="form-test" placeholder="last name">
+  <input type="submit">
+</form>
+{% endhighlight %}
 
-        <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;form id="form-test"&gt;
-  &lt;input type="text" class="form-test" placeholder="first name"&gt;
-  &lt;input type="text" class="form-test" placeholder="last name"&gt;
-  &lt;input type="submit" class="btn btn-primary"&gt;
-&lt;/form&gt;</code></pre>
-        <pre class="prettyprint docs-example-code docs-example-code-js"><code>var fields = Array.prototype.filter.call(document.getElementsByClassName('form-test'), function(el) {
+{% highlight javascript %}
+var inputs = document.getElementsByClassName('form-test')
+var fields = Array.prototype.filter.call(inputs, function(el) {
   return new FieldKit.TextField(el);
 });
 var form = document.getElementById('form-test'),
@@ -507,27 +368,33 @@ var form = document.getElementById('form-test'),
     };
 
 if (form.addEventListener) {
-  form.addEventListener('submit', popup, false);  //Modern browsers
+  form.addEventListener('submit', popup, false);  // Modern browsers
 } else if (form.attachEvent) {
-  form.attachEvent('onsubmit', popup);            //Old IE
+  form.attachEvent('onsubmit', popup);            // Old IE
 }
-      </div>
+{% endhighlight %}
     </div>
+  </section>
 
+  <a href="https://github.com/square/fieldkit"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
 
-    <div class="row">
-      <div class="span4">
-      </div>
-    </div>
-  </div>
-
-
-  <script src="jquery.caret.js" type="text/javascript" charset="utf-8"></script>
-  <script src="field-kit.js" type="text/javascript" charset="utf-8"></script>
+  <script src="javascript/field-kit.js" type="text/javascript" charset="utf-8"></script>
 
   <!-- Demo JS -->
-  <script src="jquery.js" type="text/javascript" charset="utf-8"></script>
-  <script src="index.js" type="text/javascript" charset="utf-8"></script>
-  <script src="google-code-prettify/prettify.js" type="text/javascript" charset="utf-8"></script>
+  <!-- This code grabs the example HTML and JavaScript and use it to build the actual demo! -->
+  <script type="text/javascript" charset="utf-8">
+    (function() {
+      var htmlCodeBlocks = document.querySelectorAll('code.language-html');
+
+      for (var i = 0; i < htmlCodeBlocks.length; ++i) {
+        var htmlCode = htmlCodeBlocks[i];
+        container = htmlCode.parentNode.parentNode.parentNode; // gets containing .demo div
+        container.insertAdjacentHTML('afterbegin', '<div class="input-container">' + htmlCode.innerText + '</div>');
+        var jsCode = container.querySelector('code.language-javascript').innerText;
+        var fn = new Function(jsCode);
+        fn.call(this);
+      };
+    })();
+  </script>
 </body>
 </html>
