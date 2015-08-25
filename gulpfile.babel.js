@@ -13,7 +13,7 @@ import sourcemaps from 'gulp-sourcemaps';
 import uglify from 'gulp-uglify';
 
 function dist(minified) {
-  return browserify({entries: 'src/index.js'})
+  return browserify({entries: 'src/dist.js'})
     .transform(babelify)
     .bundle()
     .pipe(source(minified ? 'field-kit.min.js' : 'field-kit.js'))
