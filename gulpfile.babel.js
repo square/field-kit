@@ -45,3 +45,4 @@ gulp.task('lib', ['clean:lib'], function () {
 });
 
 gulp.task('build', ['lib', 'dist']);
+gulp.task('default', ['build']);
