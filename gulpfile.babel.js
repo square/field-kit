@@ -2,9 +2,11 @@ import babel from 'gulp-babel';
 import babelify from 'babelify';
 import browserify from 'browserify';
 import buffer from 'vinyl-buffer';
+import ghPages from 'gulp-gh-pages';
 import gulp from 'gulp';
-import ifElse from 'gulp-if-else';
 import gutil from 'gulp-util';
+import ifElse from 'gulp-if-else';
+import print from 'gulp-print';
 import rimraf from 'rimraf';
 import source from 'vinyl-source-stream';
 import sourcemaps from 'gulp-sourcemaps';
@@ -29,6 +31,12 @@ gulp.task('clean:dist', done => rimraf('./dist', done));
 gulp.task('dist:not-minified', ['clean:dist'], () => dist(false));
 gulp.task('dist:minified', ['clean:dist'], () => dist(true));
 gulp.task('dist', ['dist:not-minified', 'dist:minified']);
+
+gulp.task('gh-pages', function () {
+  return gulp.src(['**/*', '!node_modules/**'])
+    .pipe(print())
+    .pipe(ghPages());
+});
 
 gulp.task('lib', ['clean:lib'], function () {
   return gulp.src('src/**/*.js')
