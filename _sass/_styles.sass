@@ -1,0 +1,116 @@
+$padding-large       : 20px
+$padding-small       : 10px
+$border-radius       : 5px
+$input-bottom-margin : 35px // visual match with top margin
+$font-size-small     : 12px
+
+$color-base          : rgb(61,69,77)
+$color-medium        : rgb(133,137,140)
+$color-light         : rgb(194,199,204)
+$color-ultra-light   : rgb(242,244,245)
+
+body
+  font-family: "Square Market", Helvetica, Arial, sans-serif
+  color: $color-base
+  max-width: 660px
+  margin: 0 auto
+  padding: $padding-large
+  line-height: 1.6
+
+.links
+  position: absolute
+  top: 0
+  left: 0
+  background-color: $color-base
+  padding: $padding-large
+  border-bottom-right-radius: $border-radius
+  line-height: 1
+  a
+    text-decoration: none
+    &:first-child img
+      margin-right: 10px
+  img
+    width: 30px
+
+h1
+  font-weight: 100
+  font-size: 80px
+
+h2,
+h3
+  font-weight: 500
+
+section
+  margin-bottom: 70px
+
+td:first-child
+  text-align: right
+  &::after
+    content: " →"
+
+.demo
+  margin: 1.6em 0
+
+.input-container
+  float: left
+  margin-bottom: $input-bottom-margin
+  &:before
+    content: "Example"
+    display: block
+    font-size: $font-size-small
+    margin-bottom: 4px
+
+input
+  font-family: "Square Market", Helvetica, Arial, sans-serif
+  padding: 8px
+  font-size: 20px
+  outline: none
+  border: solid 1px $color-light
+  &[type="submit"]
+    color: white
+    background-color: $color-base
+    border-color: $color-base
+
+#card-type
+  text-align: center
+  font-size: small
+  margin-top: 6px
+
+table
+  float: left
+  font-size: smaller
+  margin-left: $padding-large
+  margin-bottom: $input-bottom-margin
+  color: $color-medium
+  border-collapse: collapse
+
+.highlight
+  clear: both
+  position: relative
+  background-color: $color-ultra-light
+  padding: $padding-large $padding-small $padding-small
+  &:nth-last-child(2)
+    border-top-left-radius: $border-radius
+    border-top-right-radius: $border-radius
+  &:last-child
+    margin-top: 4px
+    border-bottom-left-radius: $border-radius
+    border-bottom-right-radius: $border-radius
+
+code::before
+  position: absolute
+  right: $padding-small
+  top: $padding-small
+  font-size: $font-size-small
+  color: rgb(133,137,140)
+
+code.language-html::before
+  content: "HTML"
+
+code.language-javascript::before
+  content: "JavaScript"
+
+pre,
+code
+  white-space: pre-wrap
+  word-wrap: break-word
