@@ -6,7 +6,6 @@
   "scripts": {
     "test": "karma start --single-run && mocha --harmony -t 600000 test/selenium/index.js",
     "build": "gulp build",
-    "docs": "rm -fr docs && jsdoc -r src -d docs",
     "prepublish": "npm build"
   },
   "author": "Square, Inc.",
@@ -34,7 +33,6 @@
     "gulp-sourcemaps": "^1.5.2",
     "gulp-uglify": "^1.2.0",
     "gulp-util": "^3.0.6",
-    "jsdoc": "git://github.com/eventualbuddha/jsdoc.git#add-support-for-es6-classes",
     "karma": "^0.13.3",
     "karma-browserify": "^4.3.0",
     "karma-chai": "^0.1.0",
