@@ -35,6 +35,25 @@ export function buildField(textFieldClass, options) {
     }
   }
 
+  // This is necessary because of a Chrome "feature" where it won't do any focusing
+  // or blurring if the browser window not in focus itself. Otherwise running Karma
+  // testing in the background is impossible.
+  if (field) {
+    let hasFocus = false;
+
+    field.hasFocus = () => hasFocus;
+
+    field.element.focus = function () {
+      hasFocus = true;
+      field.element.dispatchEvent(new UIEvent('focus'));
+    }
+
+    field.element.blur = function () {
+      hasFocus = false;
+      field.element.dispatchEvent(new UIEvent('blur'));
+    }
+  }
+
   return field;
 }
 
