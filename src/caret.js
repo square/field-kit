@@ -1,6 +1,3 @@
-/*! jshint esnext:true, undef:true, unused:true */
-/* global document */
-
 let getCaret, setCaret;
 
 if (!document) {

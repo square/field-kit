@@ -1,5 +1,3 @@
-/** jshint esnext:true, undef:true, unused:true */
-
 import Formatter from './formatter';
 import NumberFormatterSettingsFormatter from './number_formatter_settings_formatter';
 import { isDigits, startsWith, endsWith, trim, forEach } from './utils';

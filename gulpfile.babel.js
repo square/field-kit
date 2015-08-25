@@ -39,7 +39,7 @@ gulp.task('gh-pages', function () {
 });
 
 gulp.task('lib', ['clean:lib'], function () {
-  return gulp.src('src/**/*.js')
+  return gulp.src(['src/**/*.js', '!src/dist.js'])
     .pipe(babel())
     .pipe(gulp.dest('lib'));
 });
