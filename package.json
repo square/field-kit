@@ -5,8 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "karma start --single-run && mocha --harmony -t 600000 test/selenium/index.js",
-    "build": "gulp build",
-    "prepublish": "npm build"
+    "prepublish": "gulp build"
   },
   "author": "Square, Inc.",
   "license": "Apache 2.0",
