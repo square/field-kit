@@ -6,7 +6,8 @@
   "scripts": {
     "test": "karma start --single-run && mocha --harmony -t 600000 test/selenium/index.js",
     "build": "gulp build",
-    "prepublish.bak": "npm test"
+    "docs": "rm -fr docs && jsdoc -r src -d docs",
+    "prepublish": "npm build"
   },
   "author": "Square, Inc.",
   "license": "Apache 2.0",
