@@ -1,3 +1,5 @@
+**This project is still under development and should not be used for anything in production yet. We are not seeking external contributors at this time**
+
 # FieldKit
 
 FieldKit lets you take control of your text fields.
