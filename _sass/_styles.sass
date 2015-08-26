@@ -9,6 +9,13 @@ $color-medium        : rgb(133,137,140)
 $color-light         : rgb(194,199,204)
 $color-ultra-light   : rgb(242,244,245)
 
+=mobile
+  @media screen and (max-width: 580px)
+    @content
+
+*
+  box-sizing: border-box
+
 body
   font-family: "Square Market", Helvetica, Arial, sans-serif
   color: $color-base
@@ -54,6 +61,12 @@ td:first-child
 .input-container
   float: left
   margin-bottom: $input-bottom-margin
+  +mobile
+    float: none
+    width: 100%
+    max-width: 360px
+    margin-left: auto
+    margin-right: auto
   &:before
     content: "Example"
     display: block
@@ -66,6 +79,10 @@ input
   font-size: 20px
   outline: none
   border: solid 1px $color-light
+  + input // stacked inputs
+    margin-top: $padding-small
+  +mobile
+    width: 100%
   &[type="submit"]
     color: white
     background-color: $color-base
@@ -83,6 +100,10 @@ table
   margin-bottom: $input-bottom-margin
   color: $color-medium
   border-collapse: collapse
+  +mobile
+    float: none
+    margin-left: auto
+    margin-right: auto
 
 .highlight
   clear: both
@@ -114,3 +135,10 @@ pre,
 code
   white-space: pre-wrap
   word-wrap: break-word
+
+#fork-me
+  position: absolute
+  top: 0
+  right: 0
+  +mobile
+    display: none
