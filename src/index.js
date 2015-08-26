@@ -18,7 +18,7 @@ import UndoManager from './undo_manager';
  * @namespace FieldKit
  * @readonly
  */
-var FieldKit = {
+module.exports = {
   AdaptiveCardFormatter: AdaptiveCardFormatter,
   AmexCardFormatter: AmexCardFormatter,
   CardTextField: CardTextField,
@@ -43,13 +43,3 @@ var FieldKit = {
   TextField: TextField,
   UndoManager: UndoManager
 };
-
-if (typeof define === 'function' && define.amd) {
-  define(function() { return FieldKit; });
-} else if (typeof module !== 'undefined' && module.exports) {
-  module.exports = FieldKit;
-} else if (typeof window !== 'undefined') {
-  window.FieldKit = FieldKit;
-} else {
-  this.FieldKit = FieldKit;
-}
