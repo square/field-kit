@@ -1,8 +1,8 @@
-/* jshint esnext:true, unused:true, undef:true */
-/* global FieldKit, describe, beforeEach, it, expect, sinon, afterEach */
-
 import { expectThatTyping } from './helpers/expectations';
 import { buildField } from './helpers/builders';
+import FieldKit from '../../src';
+import {expect} from 'chai';
+import sinon from 'sinon';
 
 testsWithAllKeyboards('FieldKit.ExpiryDateFormatter', function() {
   var field;

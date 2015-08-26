@@ -1,5 +1,3 @@
-/* jshint esnext:true, unused:true, undef:true */
-
 class PassthroughFormatter {
   format(value) {
     return value;

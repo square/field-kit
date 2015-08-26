@@ -1,5 +1,5 @@
-/* jshint esnext:true, unused:true, undef:true */
-/* global FieldKit, describe, beforeEach, it, expect */
+import FieldKit from '../../src';
+import {expect} from 'chai';
 
 function Shoe() {
   // This is here so our test can omit getters on the object.

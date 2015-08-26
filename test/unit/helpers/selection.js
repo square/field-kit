@@ -1,5 +1,5 @@
-/*! jshint esnext:true, undef:true, unused:true */
-/* global Selection */
+import chai from 'chai';
+import Selection from 'string-selection'
 
 chai.use(function (_chai, utils) {
   utils.addMethod(chai.Assertion.prototype, 'selected', function (description) {

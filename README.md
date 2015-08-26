@@ -4,13 +4,19 @@
 
 FieldKit lets you take control of your text fields.
 
+## Installation
+
+```
+npm install fieldkit
+```
+
 ## Usage
 
-You can use npm or simply copy field-kit.js into your project. Once in
-your project you use FieldKit by wrapping an input with a
-`FieldKit.TextField` instance:
+Use `FieldKit` to wrap an input with a `FieldKit.TextField` instance, for example:
 
 ```js
+var FieldKit = require('fieldkit');
+
 var field = new FieldKit.TextField(document.getElementById('ssn'));
 field.setValue('123-45-6789');
 ```
@@ -22,7 +28,8 @@ field.setValue('123-45-6789');
 See examples of built-in formatters and fields at [the demo page][demo-page].
 
 ### Documentation
-Please see our [documentation][docs] for a more in depth overview.
+
+Please see our [wiki](https://github.com/square/fieldkit/wiki) for a more in depth overview.
 
 ### What are Formatters?
 
@@ -41,11 +48,14 @@ FieldKit comes bundled with a few useful formatters, such as
 only enter valid numbers:
 
 ```js
-var field = new FieldKit.TextField(document.getElementById('quantity'),
-              new FieldKit.NumberFormatter()
-                .setMinimum(0)
-                .setMaximum(10))
-              .setValue(quantity);
+var numberFormatter = new FieldKit.NumberFormatter()
+    .setMinimum(0)
+    .setMaximum(10);
+
+var element = document.getElementById('quantity');
+
+var field = new FieldKit.TextField(element, numberFormatter)
+    .setValue(quantity);
 ```
 
 `NumberFormatter` can format integers, decimals (safely using
@@ -64,8 +74,8 @@ FieldKit will disable `autocapitalization` unless you specifically turn it on
 with an attribute on the `input`. We recommend that you use a formatter to handle
 capitalizations for your fields instead of using `autocapitalization`.
 
-**Caution on iOS this causes a bug that will cause the text to be all Caps unless
-the user manually uncaps the text**
+**NOTE:** `autocapitalization` causes a bug on iOS that will result in the text to
+be all Caps unless the user manually uncaps it.
 
 ## Testing with FieldKit
 
@@ -96,44 +106,20 @@ We’re glad you’re interested in FieldKit, and we’d love to see where you t
 
 Please review [CONTRIBUTING.md][contributing]
 
-
 ### Setup
 
-Prerequisites:
-
-* closure-compiler (`$ brew install closure-compiler`)
-
-First, install the development dependencies:
-
-```
-$ npm install
-```
-
-Then, try running the tests:
-
-```
-$ npm test
-```
-
-### Development
-
-As you make changes you may find it useful to have everything automatically
-compiled and ready to test interactively in the browser. You can do that using
-`script/develop`:
-
-```
-$ ./script/develop
-```
-
-That will run the tests in PhantomJS whenever files are changed. You can run
-the tests in other browsers by opening http://localhost:9876/.
+1. Fork on GitHub.
+2. `git clone ...`
+3. `npm install`
+4. `npm test`
+5. Run `karma start` for on the fly testing
 
 ### Pull Requests
 
 Contributions via pull requests are very welcome! Follow the steps in
-Developing above, then add your feature or bugfix with tests to cover it, push
-to a branch, and open a pull request. Don't worry about rebuilding
-dist/field-kit.js. If you need to for some reason, run `npm run build`.
+the Setup section above, then add your feature or bugfix with tests to cover it, push
+to a branch, and open a pull request.
+
 [demo-page]: http://square.github.io/fieldkit
 [docs]: https://github.com/square/fieldkit/tree/master/docs
 [nsformatter]: https://developer.apple.com/library/mac/documentation/cocoa/reference/foundation/classes/NSFormatter_Class/Reference/Reference.html

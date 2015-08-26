@@ -1,8 +1,7 @@
-/* jshint esnext:true, unused:true, undef:true */
-/* global FieldKit, describe, beforeEach, it, context, expect */
-
 import { expectThatTyping, expectThatPasting } from './helpers/expectations';
 import { buildField } from './helpers/builders';
+import FieldKit from '../../src';
+import {expect} from 'chai';
 
 function LeadingDelimiterFormatter() {
   FieldKit.DelimitedTextFormatter.apply(this, arguments);

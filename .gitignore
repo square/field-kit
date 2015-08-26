@@ -1,5 +1,2 @@
-.test-build
-tmp
-bower_components
-build
+dist
 node_modules

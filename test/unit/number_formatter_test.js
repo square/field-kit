@@ -1,5 +1,6 @@
-/* jshint esnext:true, unused:true, undef:true */
-/* global FieldKit, describe, context, beforeEach, it, expect, sinon */
+import FieldKit from '../../src';
+import {expect} from 'chai';
+import sinon from 'sinon';
 
 testsWithAllKeyboards('FieldKit.NumberFormatter', function() {
   var formatter = null;
