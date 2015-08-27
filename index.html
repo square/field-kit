@@ -32,22 +32,44 @@ title: FieldKit
   <h2>Demos</h2>
 
   <section>
-    <h3>TextField</h3>
+    <h3>Credit Card Fields</h3>
 
     <p>
-      <code>TextField</code> is the base class that wraps an <code>&lt;input type=&quot;text&quot;&gt;</code> with helpers that give you advanced control over the field.
+      The <code>CardTextField</code> and <code>AdaptiveCardFormatter</code> provide formatting for credit card PANs, preventing the input of non-digit characters and automatically breaking into digit groups according to the rules for the entered card type.
     </p>
 
     <div class="demo">
+      <table>
+        <tbody>
+        <tr>
+          <td>“411111111”</td>
+          <td>“4111 1111 1 (Visa)”</td>
+        </tr>
+        <tr>
+          <td>“3725123456”</td>
+          <td>“3725 123456 (Amex)”</td>
+        </tr>
+        <tr>
+          <td>“4111” + backspace</td>
+          <td>“411”</td>
+        </tr>
+        </tbody>
+      </table>
+
 {% highlight html %}
-<input type="text" id="text-field-example" />
+<input type="text" id="card-number" placeholder="1234 5678 9012 3456">
+<div id="card-type">Card type: <span id="card-type-span">Unknown</span></div>
 {% endhighlight %}
 
 {% highlight javascript %}
-var input = document.getElementById('text-field-example');
-var field = new FieldKit.TextField(input);
-field.setFocusedPlaceholder('John Smith');
-field.setUnfocusedPlaceholder('First Name');
+var field = new FieldKit.CardTextField(document.getElementById('card-number'));
+field.setCardMaskStrategy(FieldKit.CardTextField.CardMaskStrategy.DoneEditing);
+field.setDelegate({
+textDidChange: function() {
+var cardTypeString = field.cardType() || 'unknown';
+document.getElementById('card-type-span').innerHTML = cardTypeString;
+}
+});
 {% endhighlight %}
     </div>
   </section>
@@ -108,49 +130,6 @@ field.setValue((Math.random() < 0.5 ? 1 : -1) * Math.random()*10);
 
 {% highlight javascript %}
 new FieldKit.ExpiryDateField(document.getElementById('expiry'));
-{% endhighlight %}
-    </div>
-  </section>
-
-  <section>
-    <h3>CardTextField / AdaptiveCardFormatter</h3>
-
-    <p>
-      The <code>CardTextField</code> and <code>AdaptiveCardFormatter</code> provide formatting for credit card PANs, preventing the input of non-digit characters and automatically breaking into digit groups according to the rules for the entered card type.
-    </p>
-
-    <div class="demo">
-      <table>
-        <tbody>
-          <tr>
-            <td>“411111111”</td>
-            <td>“4111 1111 1 (Visa)”</td>
-          </tr>
-          <tr>
-            <td>“3725123456”</td>
-            <td>“3725 123456 (Amex)”</td>
-          </tr>
-          <tr>
-            <td>“4111” + backspace</td>
-            <td>“411”</td>
-          </tr>
-        </tbody>
-      </table>
-
-{% highlight html %}
-<input type="text" id="card-number" placeholder="1234 5678 9012 3456">
-<div id="card-type">Card type: <span id="card-type-span">Unknown</span></div>
-{% endhighlight %}
-
-{% highlight javascript %}
-var field = new FieldKit.CardTextField(document.getElementById('card-number'));
-field.setCardMaskStrategy(FieldKit.CardTextField.CardMaskStrategy.DoneEditing);
-field.setDelegate({
-  textDidChange: function() {
-    var cardTypeString = field.cardType() || 'unknown';
-    document.getElementById('card-type-span').innerHTML = cardTypeString;
-  }
-});
 {% endhighlight %}
     </div>
   </section>
