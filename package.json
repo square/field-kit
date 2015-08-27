@@ -9,6 +9,7 @@
   },
   "author": "Square, Inc.",
   "license": "Apache 2.0",
+  "repository": "square/fieldkit",
   "dependencies": {
     "input-sim": "^3.0.0",
     "stround": "0.2.2"
