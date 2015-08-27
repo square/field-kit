@@ -8,7 +8,7 @@
     "prepublish": "gulp build"
   },
   "author": "Square, Inc.",
-  "license": "Apache 2.0",
+  "license": "Apache-2.0",
   "repository": "square/fieldkit",
   "dependencies": {
     "input-sim": "^3.0.0",
