@@ -6,7 +6,7 @@ module.exports = function(config) {
     frameworks : ['browserify', 'mocha', 'chai'],
     reporters  : ['mocha'],
     port       : process.env.KARMA_PORT || 2000,
-    browsers   : ['Chrome'],
+    browsers   : process.env.CONTINUOUS_INTEGRATION ? ['Firefox'] : ['Chrome'],
 
     files: [
       'src/index.js',
