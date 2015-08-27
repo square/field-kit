@@ -391,12 +391,12 @@ if (form.addEventListener) {
 
       for (var i = 0; i < htmlCodeBlocks.length; ++i) {
         var htmlCode = htmlCodeBlocks[i];
-        container = htmlCode.parentNode.parentNode.parentNode; // gets containing .demo div
-        container.insertAdjacentHTML('afterbegin', '<div class="input-container">' + htmlCode.innerText + '</div>');
-        var jsCode = container.querySelector('code.language-javascript').innerText;
+        var container = htmlCode.parentNode.parentNode.parentNode; // gets containing .demo div
+        container.insertAdjacentHTML('afterbegin', '<div class="input-container">' + htmlCode.textContent + '</div>');
+        var jsCode = container.querySelector('code.language-javascript').textContent;
         var fn = new Function(jsCode);
         fn.call(this);
-      };
+      }
     })();
   </script>
 </body>
