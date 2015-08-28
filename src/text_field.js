@@ -10,7 +10,7 @@ import { replaceStringSelection } from './utils';
  * @external InputSim
  * @see https://github.com/iamJoeTaylor/input-sim
  */
-import {Input, KEYS, keyBindingsForPlatform} from 'input-sim';
+import {Input, KEYS} from 'input-sim';
 
 /**
  * TextField is the simplest input and the base for more complex
