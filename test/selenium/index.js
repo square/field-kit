@@ -5,15 +5,21 @@ global.driver = null;
 function setUpDriverFor(test) {
   test.before(function() {
     var webdriver = require('selenium-webdriver');
-    var chrome = require('selenium-webdriver/chrome');
-    var path = require('chromedriver').path;
+    var builder = new webdriver.Builder();
 
-    var service = new chrome.ServiceBuilder(path).build();
-    chrome.setDefaultService(service);
+    if (process.env.CONTINUOUS_INTEGRATION) {
+      builder.forBrowser('firefox');
+    } else {
+      var chrome = require('selenium-webdriver/chrome');
+      var path = require('chromedriver').path;
 
-    driver = new webdriver.Builder()
-      .withCapabilities(webdriver.Capabilities.chrome())
-      .build();
+      var service = new chrome.ServiceBuilder(path).build();
+      chrome.setDefaultService(service);
+
+      builder.withCapabilities(webdriver.Capabilities.chrome())
+    }
+
+    driver = builder.build();
 
     server.start();
   });
