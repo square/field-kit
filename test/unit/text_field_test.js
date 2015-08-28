@@ -19,8 +19,7 @@ testsWithAllKeyboards('FieldKit.TextField', function() {
 
     it('does not attempt to reformat existing text', function() {
       var formatter = { format: function(text) { return text + '!'; } };
-      var $input = buildInput();
-      $input.value = 'hey';
+      var $input = buildInput({ value: 'hey' });
       var field = new FieldKit.TextField($input, formatter);
       expect(field).to.be.selected('hey|');
     });

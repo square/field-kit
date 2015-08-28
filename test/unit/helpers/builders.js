@@ -1,5 +1,6 @@
 import PassthroughFormatter from './passthrough_formatter';
 import FieldKit from '../../../src';
+import { setCaret } from '../../../src/caret';
 
 export function buildField(textFieldClass, options) {
   if (!textFieldClass) {
@@ -68,6 +69,15 @@ export function buildInput(options) {
   }
   var input = document.createElement('input');
   input.type = 'text';
+
+  var value = options.value;
+  if (value) {
+    input.value = value;
+    // Many tests assume that when creating a new input and setting the value
+    // that the caret will be placed after the text. This is not the case in
+    // Firefox, so we set it that way here to normalize the behavior.
+    setCaret(input, value.length, value.length);
+  }
 
   if (options.autocapitalize) input.setAttribute('autocapitalize', 'on');
 
