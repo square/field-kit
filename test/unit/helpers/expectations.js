@@ -166,7 +166,7 @@ class ExpectThatTyping extends FieldExpectationBase {
           }
         });
 
-        if(modifier) {
+        if (modifier) {
           keyboard.dispatchEventsForAction(command, this.field.element);
         } else {
           keyboard.dispatchEventsForInput(command, this.field.element);

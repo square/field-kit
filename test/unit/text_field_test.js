@@ -1,5 +1,7 @@
 import { expectThatTyping, expectThatPasting } from './helpers/expectations';
 import { buildField, buildInput } from './helpers/builders';
+import { getCaret } from '../../src/caret';
+import Selection from './helpers/selection';
 import FakeEvent from './helpers/fake_event';
 import PassthroughFormatter from './helpers/passthrough_formatter';
 import Keysim from 'keysim';
@@ -73,7 +75,7 @@ testsWithAllKeyboards('FieldKit.TextField', function() {
         expectThatTyping('alt+backspace').willChange('12|3 43>5').to('12|5');
         expectThatTyping('alt+backspace').willChange('+|').to('|');
 
-        expectThatTyping('meta+backspace').willChange('12|3 44>5').to('12|5');
+        expectThatTyping('meta+backspace').onOSX().willChange('12|3 44>5').to('12|5');
       });
     });
 
@@ -88,7 +90,7 @@ testsWithAllKeyboards('FieldKit.TextField', function() {
         expectThatTyping('alt+backspace').willChange('12 3|4').to('12 |4');
         expectThatTyping('alt+backspace').willChange('12 |34').to('|34');
 
-        expectThatTyping('meta+backspace').willChange('12 34 |56').to('|56');
+        expectThatTyping('meta+backspace').onOSX().willChange('12 34 |56').to('|56');
       });
     });
   });
@@ -197,9 +199,9 @@ testsWithAllKeyboards('FieldKit.TextField', function() {
       expectThatTyping('shift+alt+up', 'shift+alt+up').willChange('4111 11|11').to('<4111 11|11');
       expectThatTyping('shift+alt+up').willChange('4111 |11>11').to('4111 |1111');
 
-      expectThatTyping('meta+up').willChange('41|11').to('|4111');
-      expectThatTyping('shift+meta+up').willChange('41|1>1').to('<411|1');
-      expectThatTyping('shift+meta+up').willChange('41|11').to('<41|11');
+      expectThatTyping('meta+up').onOSX().willChange('41|11').to('|4111');
+      expectThatTyping('shift+meta+up').onOSX().willChange('41|1>1').to('<411|1');
+      expectThatTyping('shift+meta+up').onOSX().willChange('41|11').to('<41|11');
     });
   });
 
@@ -225,9 +227,9 @@ testsWithAllKeyboards('FieldKit.TextField', function() {
       expectThatTyping('shift+alt+down').willChange('<41|11 1111').to('41|11 1111');
       expectThatTyping('shift+alt+down', 'shift+alt+down').willChange('4111| 1111').to('4111| 1111>');
 
-      expectThatTyping('meta+down').willChange('41|11').to('4111|');
-      expectThatTyping('shift+meta+down').willChange('4<1|11').to('4|111>');
-      expectThatTyping('shift+meta+down').willChange('41|11').to('41|11>');
+      expectThatTyping('meta+down').onOSX().willChange('41|11').to('4111|');
+      expectThatTyping('shift+meta+down').onOSX().willChange('4<1|11').to('4|111>');
+      expectThatTyping('shift+meta+down').onOSX().willChange('41|11').to('41|11>');
     });
   });
 
@@ -325,7 +327,7 @@ testsWithAllKeyboards('FieldKit.TextField', function() {
     expectThatTyping('shift+up').into(field).willChange('234|').to('|234');
     expectThatTyping('shift+right').into(field).willChange('2|34').to('23|4');
     expectThatTyping('shift+down').into(field).willChange('2|34').to('234|');
-    expectThatTyping('meta+a').into(field).willNotChange('|1234');
+    expectThatTyping('meta+a').onOSX().into(field).willNotChange('|1234');
     expectThatTyping('alt+shift+right').into(field).willChange('|12 34').to('12| 34');
   });
 
@@ -369,7 +371,7 @@ testsWithAllKeyboards('FieldKit.TextField', function() {
       });
 
       it('does not count the rejected change as something to undo', function() {
-        expectThatTyping('0', 'a', '1', 'meta+z', 'meta+z').withFormatter(formatter).willNotChange('|');
+        expectThatTyping('0', 'a', '1', 'meta+z', 'meta+z').onOSX().withFormatter(formatter).willNotChange('|');
       });
     });
   });
@@ -616,15 +618,15 @@ testsWithAllKeyboards('FieldKit.TextField', function() {
     it('calls the delegate method for text change when a change is undone by the user', function() {
       keyboard.dispatchEventsForInput('a', field.element);
       field.delegate().textDidChange.reset();
-      keyboard.dispatchEventsForAction('meta+z', field.element);
+      keyboard.dispatchEventsForAction('ctrl+z', field.element);
       expect(field.delegate().textDidChange.firstCall.args).to.eql([field]);
     });
 
     it('calls the delegate method for text change when a change is redone by the user', function() {
       keyboard.dispatchEventsForInput('a', field.element);
-      keyboard.dispatchEventsForAction('meta+z', field.element);
+      keyboard.dispatchEventsForAction('ctrl+z', field.element);
       field.delegate().textDidChange.reset();
-      keyboard.dispatchEventsForAction('meta+shift+z', field.element);
+      keyboard.dispatchEventsForAction('ctrl+y', field.element);
       expect(field.delegate().textDidChange.firstCall.args).to.eql([field]);
     });
 
@@ -637,7 +639,7 @@ testsWithAllKeyboards('FieldKit.TextField', function() {
 
     it('calls the delegate method for text change when a change is redone manually', function() {
       keyboard.dispatchEventsForInput('a', field.element);
-      keyboard.dispatchEventsForAction('meta+z', field.element);
+      keyboard.dispatchEventsForAction('ctrl+z', field.element);
       field.delegate().textDidChange.reset();
       field.undoManager().redo();
       expect(field.delegate().textDidChange.firstCall.args).to.eql([field]);
