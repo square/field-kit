@@ -1,7 +1,7 @@
 import Formatter from './formatter';
 import UndoManager from './undo_manager';
 import { bind } from './utils';
-import Caret from './caret';
+import { getCaret, setCaret } from './caret';
 import { replaceStringSelection } from './utils';
 
 /**
@@ -29,7 +29,7 @@ class TextField extends Input {
   constructor(element, formatter) {
     super();
 
-    const caret = Caret.get(element);
+    const caret = getCaret(element);
     if (typeof element.get === 'function') {
       console.warn(
         'DEPRECATION: FieldKit.TextField instances should no longer be ' +
@@ -414,7 +414,7 @@ class TextField extends Input {
   selectedRange() {
     var caret = this._needsManualCaret ?
         this._manualCaret :
-        Caret.get(this.element);
+        getCaret(this.element);
 
     return {
       start: caret.start,
@@ -436,7 +436,7 @@ class TextField extends Input {
       end: newRange.start + newRange.length
     };
     this._manualCaret = caret;
-    Caret.set(this.element, caret.start, caret.end);
+    setCaret(this.element, caret.start, caret.end);
     this.selectionAffinity = range.length === 0 ? null : affinity;
   }
 
@@ -672,7 +672,7 @@ class TextField extends Input {
    * @private
    */
   _click() {
-    this._manualCaret = Caret.get(this.element);
+    this._manualCaret = getCaret(this.element);
     this._selectedRange = {
       start: this._manualCaret.start,
       length: this._manualCaret.end - this._manualCaret.start

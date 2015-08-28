@@ -4,7 +4,7 @@ import FakeEvent from './fake_event';
 import Selection from './selection';
 import TextField from '../../../src/text_field';
 import { buildField } from './builders';
-import Caret from '../../../src/caret';
+import { getCaret, setCaret } from '../../../src/caret';
 import {expect} from 'chai';
 
 class FieldExpectationBase {
@@ -76,7 +76,7 @@ class FieldExpectationBase {
 
     this.field.setText(value);
 
-    Caret.set(this.field.element, caret.start, caret.end);
+    setCaret(this.field.element, caret.start, caret.end);
     this.field.selectionAffinity = affinity;
   }
 
@@ -102,7 +102,7 @@ class FieldExpectationBase {
   assert() {
     var actual =
       Selection.printDescription({
-        caret: Caret.get(this.field.element),
+        caret: getCaret(this.field.element),
         affinity: this.field.selectionAffinity,
         value: this.field.element.value
       });

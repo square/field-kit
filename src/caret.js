@@ -1,4 +1,5 @@
-let getCaret, setCaret;
+let getCaret;
+let setCaret;
 
 if (!document) {
   throw new Error('Caret does not have access to document');
@@ -39,4 +40,4 @@ if (!document) {
   throw new Error('Caret unknown input selection capabilities');
 }
 
-export default { get: getCaret, set: setCaret };
+export { getCaret, setCaret };
