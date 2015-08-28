@@ -44,15 +44,15 @@ export function buildField(textFieldClass, options) {
 
     field.hasFocus = () => hasFocus;
 
-    field.element.focus = function () {
+    field.element.focus = function() {
       hasFocus = true;
       field.element.dispatchEvent(new UIEvent('focus'));
-    }
+    };
 
-    field.element.blur = function () {
+    field.element.blur = function() {
       hasFocus = false;
       field.element.dispatchEvent(new UIEvent('blur'));
-    }
+    };
   }
 
   return field;
@@ -64,7 +64,7 @@ export function buildInput(options) {
     options = {};
   }
 
-  for(var i = 0; i < currentInputs.length; i++) {
+  for (var i = 0; i < currentInputs.length; i++) {
     currentInputs[i].parentNode.removeChild(currentInputs[i]);
   }
   var input = document.createElement('input');
@@ -79,7 +79,9 @@ export function buildInput(options) {
     setCaret(input, value.length, value.length);
   }
 
-  if (options.autocapitalize) input.setAttribute('autocapitalize', 'on');
+  if (options.autocapitalize) {
+    input.setAttribute('autocapitalize', 'on');
+  }
 
   document.body.appendChild(input);
   return document.getElementsByTagName('input')[0];

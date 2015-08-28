@@ -13,12 +13,12 @@ testsWithAllKeyboards('FieldKit.TextField', function() {
   describe('class constructor', function() {
     it('allows setting the formatter', function() {
       var formatter = new PassthroughFormatter();
-      var field = buildField({ formatter: formatter });
+      var field = buildField({ formatter });
       expect(field.formatter()).to.equal(formatter);
     });
 
     it('does not attempt to reformat existing text', function() {
-      var formatter = { format: function(text) { return text + '!'; } };
+      var formatter = { format: text => `${text}!` };
       var $input = buildInput({ value: 'hey' });
       var field = new FieldKit.TextField($input, formatter);
       expect(field).to.be.selected('hey|');
@@ -28,16 +28,14 @@ testsWithAllKeyboards('FieldKit.TextField', function() {
       var formatter = new PassthroughFormatter();
       var field = buildField({
         autocapitalize: true,
-        formatter: formatter
+        formatter
       });
       expect(field.element.getAttribute('autocapitalize')).to.equal('on');
     });
 
     it('turns `autocapitalize` `off` for the input', function() {
       var formatter = new PassthroughFormatter();
-      var field = buildField({
-        formatter: formatter
-      });
+      var field = buildField({ formatter });
       expect(field.element.getAttribute('autocapitalize')).to.equal('off');
     });
 
@@ -62,7 +60,6 @@ testsWithAllKeyboards('FieldKit.TextField', function() {
   describe('typing a backspace', function() {
     describe('with a non-empty selection', function() {
       it('clears the selection', function() {
-
         expectThatTyping('backspace').willChange('12|341|5').to('12|5');
         expectThatTyping('backspace').willChange('12|341>5').to('12|5');
         expectThatTyping('backspace').willChange('12<341|5').to('12|5');
@@ -292,7 +289,7 @@ testsWithAllKeyboards('FieldKit.TextField', function() {
 
   it('allows the formatter to prevent changes', function() {
     var field = buildField();
-    field.formatter().isChangeValid = function(change, error) { error('NO WAY'); return false; };
+    field.formatter().isChangeValid = (change, error) => { error('NO WAY'); return false; };
     expectThatTyping('backspace').into(field).willNotChange('3725 |').withError('NO WAY');
     expectThatTyping('a').into(field).willNotChange('3725 |').withError('NO WAY');
   });
@@ -300,7 +297,7 @@ testsWithAllKeyboards('FieldKit.TextField', function() {
   it('allows the formatter to alter selection range changes', function() {
     var field = buildField();
     // disallow empty selection at the start of text
-    field.formatter().isChangeValid = function(change) {
+    field.formatter().isChangeValid = (change) => {
       var range = change.proposed.selectedRange;
       if (range.start === 0 && range.length === 0) {
         range.start = 1;
@@ -311,7 +308,7 @@ testsWithAllKeyboards('FieldKit.TextField', function() {
     expectThatTyping('up').into(field).willChange(' 234|').to(' |234');
 
     // disallow selection
-    field.formatter().isChangeValid = function(change) {
+    field.formatter().isChangeValid = (change) => {
       var range = change.proposed.selectedRange;
       if (range.length !== 0) {
         if (change.field.selectionAnchor() === range.start) {
@@ -368,7 +365,7 @@ testsWithAllKeyboards('FieldKit.TextField', function() {
 
       beforeEach(function() {
         formatter = new PassthroughFormatter();
-        formatter.isChangeValid = function(change) { return change.inserted.text !== 'a'; };
+        formatter.isChangeValid = change => change.inserted.text !== 'a';
       });
 
       it('does not count the rejected change as something to undo', function() {
@@ -429,7 +426,7 @@ testsWithAllKeyboards('FieldKit.TextField', function() {
 
     beforeEach(function() {
       field = buildField();
-      sinon.stub(field, 'hasFocus', function(){ return hasFocus; });
+      sinon.stub(field, 'hasFocus', () => hasFocus);
     });
 
     it('is not set by default', function() {
@@ -461,7 +458,7 @@ testsWithAllKeyboards('FieldKit.TextField', function() {
 
     beforeEach(function() {
       field = buildField();
-      sinon.stub(field, 'hasFocus', function(){ return hasFocus; });
+      sinon.stub(field, 'hasFocus', () => hasFocus);
     });
 
     it('is not set by default', function() {
