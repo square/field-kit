@@ -1,5 +1,5 @@
 {
-  "name": "fieldkit",
+  "name": "field-kit",
   "version": "2.0.0",
   "description": "Utilities to effectively manage text entry on the web.",
   "main": "lib/index.js",
@@ -9,7 +9,7 @@
   },
   "author": "Square, Inc.",
   "license": "Apache-2.0",
-  "repository": "square/fieldkit",
+  "repository": "square/field-kit",
   "dependencies": {
     "input-sim": "^3.0.0",
     "stround": "0.2.2"

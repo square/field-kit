@@ -14,6 +14,6 @@ We’re glad you’re interested in FieldKit, and we’d love to see where you t
 
 Please review [CONTRIBUTING.md][contributing]
 
-[demo-page]: http://square.github.io/fieldkit
-[docs]: https://github.com/square/fieldkit/wiki
-[contributing]: https://github.com/square/fieldkit/blob/master/CONTRIBUTING.md
+[demo-page]: http://square.github.io/field-kit
+[docs]: https://github.com/square/field-kit/wiki
+[contributing]: https://github.com/square/field-kit/blob/master/CONTRIBUTING.md
