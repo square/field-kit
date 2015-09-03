@@ -1,127 +1,19 @@
 **This project is still under development and should not be used for anything in production yet. We are not seeking external contributors at this time**
 
 # FieldKit
-
 FieldKit lets you take control of your text fields.
 
-## Installation
-
-```
-npm install fieldkit
-```
-
-## Usage
-
-Use `FieldKit` to wrap an input with a `FieldKit.TextField` instance, for example:
-
-```js
-var FieldKit = require('fieldkit');
-
-var field = new FieldKit.TextField(document.getElementById('ssn'));
-field.setValue('123-45-6789');
-```
-
-## Formatting
-
-### Demo
-
+## Demo
 See examples of built-in formatters and fields at [the demo page][demo-page].
 
-### Documentation
-
-Please see our [wiki](https://github.com/square/fieldkit/wiki) for a more in depth overview.
-
-### What are Formatters?
-
-Formatters provide two main methods: `parse()` and `format()`. `parse()` takes
-a string and returns the value represented by that string, e.g. a `Date` object
-if the formatter provided date and time formatting. `format()` takes an object
-of the same type `parse()` returns and turns it into a string representation
-suitable for display to or editing by an end user.
-
-Formatters may also assist with as-you-type editing by implementing the
-`isChangeValid()` method which can by used to prevent or alter changes to a
-text field that would make the value invalid.
-
-FieldKit comes bundled with a few useful formatters, such as
-`FieldKit.NumberFormatter`, which implements `isChangeValid()` to help users to
-only enter valid numbers:
-
-```js
-var numberFormatter = new FieldKit.NumberFormatter()
-    .setMinimum(0)
-    .setMaximum(10);
-
-var element = document.getElementById('quantity');
-
-var field = new FieldKit.TextField(element, numberFormatter)
-    .setValue(quantity);
-```
-
-`NumberFormatter` can format integers, decimals (safely using
-[stround][stround]), percentages, and currency amounts. Use `#setNumberStyle()`
-to choose which style to use.
-
-`FieldKit.Formatter` and its subclasses are modeled after Cocoa's
-[`NSFormatter`][nsformatter] class and its subclasses. They share many of the
-same API methods and relationships with other objects, so any guides and
-documentation for use Cocoa formatting may be useful in understanding how
-FieldKit works.
-
-### Note
-
-FieldKit will disable `autocapitalization` unless you specifically turn it on
-with an attribute on the `input`. We recommend that you use a formatter to handle
-capitalizations for your fields instead of using `autocapitalization`.
-
-**NOTE:** `autocapitalization` causes a bug on iOS that will result in the text to
-be all Caps unless the user manually uncaps it.
-
-## Testing with FieldKit
-
-In your application's acceptance tests you'll want to ensure that your FieldKit
-fields interact with your application properly. To do this you'll need to
-simulate user interaction more precisely than you may be used to in the past.
-For example, you can't simply use jQuery to set the value of an input and
-trigger its "change" event. You'll want to trigger the same set of events that
-a user would trigger when editing the field. Here's an example of entering an
-"a" into a field and then backspacing it immediately:
-
-* `focusin`
-* `focus`
-* `keydown keyCode=65`
-* `keypress keyCode=97`
-* `keyup keyCode=65`
-* `keydown keyCode=8`
-* `keyup keyCode=8`
-* `blur`
-* `focusout`
-
-You can trigger these events however you like, but it makes sense to have
-helpers for entering text that do the right thing and then use them everywhere.
+## Documentation
+Please see our [documentation][docs] for a more in depth overview.
 
 ## Contributing
-
 We’re glad you’re interested in FieldKit, and we’d love to see where you take it.
 
 Please review [CONTRIBUTING.md][contributing]
 
-### Setup
-
-1. Fork on GitHub.
-2. `git clone ...`
-3. `npm install`
-4. `npm test`
-5. Run `karma start` for on the fly testing
-
-### Pull Requests
-
-Contributions via pull requests are very welcome! Follow the steps in
-the Setup section above, then add your feature or bugfix with tests to cover it, push
-to a branch, and open a pull request.
-
 [demo-page]: http://square.github.io/fieldkit
-[docs]: https://github.com/square/fieldkit/tree/master/docs
-[nsformatter]: https://developer.apple.com/library/mac/documentation/cocoa/reference/foundation/classes/NSFormatter_Class/Reference/Reference.html
-[stround]: https://github.com/square/stround
+[docs]: https://github.com/square/fieldkit/wiki
 [contributing]: https://github.com/square/fieldkit/blob/master/CONTRIBUTING.md
