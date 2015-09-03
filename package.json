@@ -4,7 +4,7 @@
   "description": "Utilities to effectively manage text entry on the web.",
   "main": "lib/index.js",
   "scripts": {
-    "test": "karma start --single-run && mocha --harmony -t 600000 test/selenium/index.js",
+    "test": "gulp build && karma start --single-run && mocha --harmony -t 600000 test/selenium/index.js",
     "prepublish": "gulp build"
   },
   "author": "Square, Inc.",

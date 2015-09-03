@@ -618,15 +618,15 @@ testsWithAllKeyboards('FieldKit.TextField', function() {
     it('calls the delegate method for text change when a change is undone by the user', function() {
       keyboard.dispatchEventsForInput('a', field.element);
       field.delegate().textDidChange.reset();
-      keyboard.dispatchEventsForAction('ctrl+z', field.element);
+      keyboard.dispatchEventsForAction('meta+z', field.element);
       expect(field.delegate().textDidChange.firstCall.args).to.eql([field]);
     });
 
     it('calls the delegate method for text change when a change is redone by the user', function() {
       keyboard.dispatchEventsForInput('a', field.element);
-      keyboard.dispatchEventsForAction('ctrl+z', field.element);
+      keyboard.dispatchEventsForAction('meta+z', field.element);
       field.delegate().textDidChange.reset();
-      keyboard.dispatchEventsForAction('ctrl+y', field.element);
+      keyboard.dispatchEventsForAction('meta+shift+z', field.element);
       expect(field.delegate().textDidChange.firstCall.args).to.eql([field]);
     });
 
@@ -639,7 +639,7 @@ testsWithAllKeyboards('FieldKit.TextField', function() {
 
     it('calls the delegate method for text change when a change is redone manually', function() {
       keyboard.dispatchEventsForInput('a', field.element);
-      keyboard.dispatchEventsForAction('ctrl+z', field.element);
+      keyboard.dispatchEventsForAction('meta+z', field.element);
       field.delegate().textDidChange.reset();
       field.undoManager().redo();
       expect(field.delegate().textDidChange.firstCall.args).to.eql([field]);

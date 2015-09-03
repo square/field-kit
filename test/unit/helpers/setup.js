@@ -1,4 +1,7 @@
 import Keysim from 'keysim';
+
+const DEFAULT_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36";
+
 const Keyboard = Keysim.Keyboard;
 const Keystroke = Keysim.Keystroke;
 const KeyEvents = Keysim.KeyEvents;
@@ -36,7 +39,6 @@ const keyboardWrapper = (type, keyboardFilter=false) => (title, fn) => {
 window.testsWithAllKeyboards = keyboardWrapper(describe);
 window.testsWithDesktopKeyboards = keyboardWrapper(describe, 'desktop');
 
-const DEFAULT_UA = navigator.userAgent;
 
 beforeEach(() => {
   navigator.__defineGetter__('userAgent', function(){
