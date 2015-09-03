@@ -65,10 +65,10 @@ title: FieldKit
 var field = new FieldKit.CardTextField(document.getElementById('card-number'));
 field.setCardMaskStrategy(FieldKit.CardTextField.CardMaskStrategy.DoneEditing);
 field.setDelegate({
-textDidChange: function() {
-var cardTypeString = field.cardType() || 'unknown';
-document.getElementById('card-type-span').innerHTML = cardTypeString;
-}
+  textDidChange: function() {
+    var cardTypeString = field.cardType() || 'unknown';
+    document.getElementById('card-type-span').innerHTML = cardTypeString;
+  }
 });
 {% endhighlight %}
     </div>
@@ -92,7 +92,7 @@ field.setFormatter(new FieldKit.NumberFormatter()
   .setNumberStyle(Math.random() < 0.5 ?
     FieldKit.NumberFormatter.Style.PERCENT :
     FieldKit.NumberFormatter.Style.CURRENCY));
-field.setValue((Math.random() < 0.5 ? 1 : -1) * Math.random()*10);
+field.setValue((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
 {% endhighlight %}
     </div>
   </section>
@@ -160,7 +160,7 @@ new FieldKit.ExpiryDateField(document.getElementById('expiry'));
 {% endhighlight %}
 
 {% highlight javascript %}
-ssnFormatter = new FieldKit.SocialSecurityNumberFormatter();
+var ssnFormatter = new FieldKit.SocialSecurityNumberFormatter();
 new FieldKit.TextField(document.getElementById('ssn'), ssnFormatter);
 {% endhighlight %}
     </div>
