@@ -9,4 +9,4 @@ Want to add support for a new formatter or fix a bug in an obscure version of An
 FieldKit is available under the [Apache License][license].
 
 [cla]: https://spreadsheets.google.com/spreadsheet/viewform?formkey=dDViT2xzUHAwRkI3X3k5Z0lQM091OGc6MQ&ndplr=1
-[license]: https://github.com/square/fieldkit/blob/master/LICENSE
+[license]: https://github.com/square/field-kit/blob/master/LICENSE
