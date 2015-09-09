@@ -1,5 +1,3 @@
-**This project is still under development and should not be used for anything in production yet. We are not seeking external contributors at this time**
-
 # FieldKit
 
 <p align="center">
@@ -22,6 +20,8 @@
 </p>
 
 FieldKit lets you take control of your text fields.
+
+FieldKit provides real-time, text field formatting as users type. It simplifies input formatting and creates a more polished experience for users, while outputting standardized data
 
 ## Demo
 See examples of built-in formatters and fields at [the demo page][demo-page].
