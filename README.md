@@ -2,7 +2,7 @@
 
 <p align="center">
   <a href="https://travis-ci.org/square/field-kit">
-    <img src="https://travis-ci.org/square/fieldkit.svg?branch=master"
+    <img src="https://travis-ci.org/square/field-kit.svg?branch=master"
          alt="build status">
   </a>
   <a href="https://npmjs.org/package/field-kit">
