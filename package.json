@@ -16,8 +16,8 @@
     "src/"
   ],
   "dependencies": {
-    "input-sim": "^3.0.0",
-    "stround": "0.2.2"
+    "input-sim": "^3.0.1",
+    "stround": "0.3.1"
   },
   "devDependencies": {
     "babel": "^5.8.21",
