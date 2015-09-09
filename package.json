@@ -2,7 +2,8 @@
   "name": "field-kit",
   "version": "2.0.0",
   "description": "Utilities to effectively manage text entry on the web.",
-  "main": "lib/index.js",
+  "main": "dist/field-kit.js",
+  "jsnext:main": "src/index.js",
   "scripts": {
     "test": "gulp build && karma start --single-run && mocha --harmony -t 600000 test/selenium/index.js",
     "prepublish": "gulp build"
@@ -10,6 +11,10 @@
   "author": "Square, Inc.",
   "license": "Apache-2.0",
   "repository": "square/field-kit",
+  "files": [
+    "dist/",
+    "src/"
+  ],
   "dependencies": {
     "input-sim": "^3.0.0",
     "stround": "0.2.2"
