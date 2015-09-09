@@ -21,7 +21,7 @@
 
 FieldKit lets you take control of your text fields.
 
-FieldKit provides real-time, text field formatting as users type. It simplifies input formatting and creates a more polished experience for users, while outputting standardized data
+FieldKit provides real-time, text field formatting as users type. It simplifies input formatting and creates a more polished experience for users, while outputting standardized data.
 
 ## Demo
 See examples of built-in formatters and fields at [the demo page][demo-page].
