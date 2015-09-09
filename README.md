@@ -13,10 +13,6 @@
     <img src="https://img.shields.io/npm/l/field-kit.svg"
          alt="license">
   </a>
-  <a href="https://david-dm.org/square/field-kit">
-    <img src="https://david-dm.org/square/field-kit.svg"
-         alt="dependency status">
-  </a>
 </p>
 
 FieldKit lets you take control of your text fields.
