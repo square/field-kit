@@ -18,7 +18,7 @@ import UndoManager from './undo_manager';
  * @namespace FieldKit
  * @readonly
  */
-module.exports = {
+export default {
   AdaptiveCardFormatter: AdaptiveCardFormatter,
   AmexCardFormatter: AmexCardFormatter,
   CardTextField: CardTextField,
