@@ -4,6 +4,7 @@ import CardTextField from './card_text_field';
 import { AMEX, DISCOVER, VISA, MASTERCARD, determineCardType, luhnCheck, validCardLength } from './card_utils';
 import DefaultCardFormatter from './default_card_formatter';
 import DelimitedTextFormatter from './delimited_text_formatter';
+import EmployerIdentificationNumberFormatter from './employer_identification_number_formatter';
 import ExpiryDateField from './expiry_date_field';
 import ExpiryDateFormatter from './expiry_date_formatter';
 import Formatter from './formatter';
@@ -33,6 +34,7 @@ module.exports = {
   },
   DefaultCardFormatter: DefaultCardFormatter,
   DelimitedTextFormatter: DelimitedTextFormatter,
+  EmployerIdentificationNumberFormatter: EmployerIdentificationNumberFormatter,
   ExpiryDateField: ExpiryDateField,
   ExpiryDateFormatter: ExpiryDateFormatter,
   Formatter: Formatter,
