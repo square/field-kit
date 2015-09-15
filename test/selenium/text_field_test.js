@@ -54,5 +54,26 @@ test.describe('FieldKit.TextField', function() {
         expect(placeholder).to.equal('Doc');
       });
   });
+
+  test.describe('textDidChange', function() {
+    beforeEach(function() {
+      return helpers.runJSMethod(
+        "setDelegate({" +
+          "textDidChange: function(field) {" +
+            "window.currentValue = field.value();" +
+          "}" +
+        "});"
+      );
+    });
+
+    test.it('should have current value', function() {
+      helpers.setInput('B', input);
+
+      return driver.executeScript('return window.currentValue')
+        .then(function(currentValue) {
+          expect(currentValue).to.equal('B');
+        });
+    });
+  });
 });
 

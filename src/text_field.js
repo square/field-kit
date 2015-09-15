@@ -48,6 +48,8 @@ class TextField extends Input {
     this._isDirty = false;
     this._valueOnFocus = '';
     this._currentValue = '';
+    // Make sure textDidChange fires while the value is correct
+    this._needsKeyUpTextDidChangeTrigger = false;
     this._blur = bind(this._blur, this);
     this._focus = bind(this._focus, this);
     this._click = bind(this._click, this);
@@ -780,7 +782,7 @@ class TextField extends Input {
                 this._isDirty = true;
               }
               this.undoManager().proxyFor(this)._applyChangeFromUndoManager(change);
-              this._textDidChange();
+              this._needsKeyUpTextDidChangeTrigger = true;
             } else {
               event.preventDefault();
               this.rollbackInvalidChanges(() => this.insertText(newText));
@@ -806,6 +808,10 @@ class TextField extends Input {
    * @private
    */
   _keyUp(event) {
+    if (this._needsKeyUpTextDidChangeTrigger) {
+      this._textDidChange();
+      this._needsKeyUpTextDidChangeTrigger = false;
+    }
     const keyCode = event.keyCode;
     // NOTE: Certain Androids on Chrome always return 229
     // https://code.google.com/p/chromium/issues/detail?id=118639
