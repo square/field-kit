@@ -1,6 +1,8 @@
 import PassthroughFormatter from './passthrough_formatter';
 import FieldKit from '../../../src';
-import { setCaret } from '../../../src/caret';
+import installCaret from '../../../src/caret';
+
+const { setCaret } = installCaret();
 
 export function buildField(textFieldClass, options) {
   if (!textFieldClass) {

@@ -1,6 +1,5 @@
 import { expectThatTyping, expectThatPasting } from './helpers/expectations';
 import { buildField, buildInput } from './helpers/builders';
-import { getCaret } from '../../src/caret';
 import Selection from './helpers/selection';
 import FakeEvent from './helpers/fake_event';
 import PassthroughFormatter from './helpers/passthrough_formatter';
