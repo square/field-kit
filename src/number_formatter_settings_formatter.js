@@ -44,25 +44,25 @@ function chars(character, length) {
  * @const
  * @private
  */
-var DIGIT = '#';
+const DIGIT = '#';
 
 /**
  * @const
  * @private
  */
-var PADDING = '0';
+const PADDING = '0';
 
 /**
  * @const
  * @private
  */
-var DECIMAL_SEPARATOR = '.';
+const DECIMAL_SEPARATOR = '.';
 
 /**
  * @const
  * @private
  */
-var GROUPING_SEPARATOR = ',';
+const GROUPING_SEPARATOR = ',';
 
 class NumberFormatterSettingsFormatter extends Formatter {
   /**
@@ -70,9 +70,9 @@ class NumberFormatterSettingsFormatter extends Formatter {
    * @returns {string}
    */
   format(settings) {
-    var result = '';
+    let result = '';
 
-    var minimumIntegerDigits = settings.minimumIntegerDigits;
+    const minimumIntegerDigits = settings.minimumIntegerDigits;
     if (minimumIntegerDigits !== 0) {
       result += chars(PADDING, minimumIntegerDigits);
     }
@@ -89,15 +89,15 @@ class NumberFormatterSettingsFormatter extends Formatter {
         result.slice(-settings.groupingSize);
     }
 
-    var minimumFractionDigits = settings.minimumFractionDigits;
-    var maximumFractionDigits = settings.maximumFractionDigits;
-    var hasFractionalPart = settings.alwaysShowsDecimalSeparator ||
+    const minimumFractionDigits = settings.minimumFractionDigits;
+    const maximumFractionDigits = settings.maximumFractionDigits;
+    const hasFractionalPart = settings.alwaysShowsDecimalSeparator ||
       minimumFractionDigits > 0 ||
       maximumFractionDigits > 0;
 
     if (hasFractionalPart) {
       result += DECIMAL_SEPARATOR;
-      for (var i = 0, length = maximumFractionDigits; i < length; i++) {
+      for (let i = 0, length = maximumFractionDigits; i < length; i++) {
         result += (i < minimumFractionDigits) ? PADDING : DIGIT;
       }
     }
@@ -110,16 +110,16 @@ class NumberFormatterSettingsFormatter extends Formatter {
    * @returns {?NumberFormatterSettings}
    */
   parse(string) {
-    var result = new NumberFormatterSettings();
+    const result = new NumberFormatterSettings();
 
-    var hasPassedPrefix = false;
-    var hasStartedSuffix = false;
-    var decimalSeparatorIndex = null;
-    var groupingSeparatorIndex = null;
-    var lastIntegerDigitIndex = null;
+    let hasPassedPrefix = false;
+    let hasStartedSuffix = false;
+    let decimalSeparatorIndex = null;
+    let groupingSeparatorIndex = null;
+    let lastIntegerDigitIndex = null;
 
     for (var i = 0, length = string.length; i < length; i++) {
-      var c = string[i];
+      const c = string[i];
 
       switch (c) {
         case DIGIT:

@@ -14,9 +14,9 @@ import { zpad2 } from './utils';
  * @private
  */
 function interpretTwoDigitYear(year) {
-  var thisYear = new Date().getFullYear();
-  var thisCentury = thisYear - (thisYear % 100);
-  var centuries = [thisCentury, thisCentury - 100, thisCentury + 100].sort(function(a, b) {
+  const thisYear = new Date().getFullYear();
+  const thisCentury = thisYear - (thisYear % 100);
+  const centuries = [thisCentury, thisCentury - 100, thisCentury + 100].sort(function(a, b) {
     return Math.abs(thisYear - (year + a)) - Math.abs(thisYear - (year + b));
   });
   return year + centuries[0];
@@ -48,8 +48,7 @@ class ExpiryDateFormatter extends DelimitedTextFormatter {
   format(value) {
     if (!value) { return ''; }
 
-    var month = value.month;
-    var year = value.year;
+    let {month, year} = value;
     year = year % 100;
 
     return super.format(zpad2(month) + zpad2(year));
@@ -63,9 +62,9 @@ class ExpiryDateFormatter extends DelimitedTextFormatter {
    * @returns {?Object} { month: month, year: year }
    */
   parse(text, error) {
-    var monthAndYear = text.split(this.delimiter);
-    var month = monthAndYear[0];
-    var year = monthAndYear[1];
+    const monthAndYear = text.split(this.delimiter);
+    let month = monthAndYear[0];
+    let year = monthAndYear[1];
     if (month && month.match(/^(0?[1-9]|1\d)$/) && year && year.match(/^\d\d?$/)) {
       month = Number(month);
       year = interpretTwoDigitYear(Number(year));
@@ -89,8 +88,8 @@ class ExpiryDateFormatter extends DelimitedTextFormatter {
   isChangeValid(change, error) {
     if (!error) { error = function(){}; }
 
-    var isBackspace = change.proposed.text.length < change.current.text.length;
-    var newText = change.proposed.text;
+    const isBackspace = change.proposed.text.length < change.current.text.length;
+    let newText = change.proposed.text;
 
     if (isBackspace) {
       if (change.deleted.text === this.delimiter) {
@@ -131,7 +130,7 @@ class ExpiryDateFormatter extends DelimitedTextFormatter {
         newText += this.delimiter;
       }
 
-      var match = newText.match(/^(\d\d)(.)(\d\d?).*$/);
+      const match = newText.match(/^(\d\d)(.)(\d\d?).*$/);
       if (match && match[2] === this.delimiter) {
         newText = match[1] + this.delimiter + match[3];
       }

@@ -2,13 +2,13 @@
  * @const
  * @private
  */
-var DIGITS_PATTERN = /^\d*$/;
+const DIGITS_PATTERN = /^\d*$/;
 
 /**
  * @const
  * @private
  */
-var SURROUNDING_SPACE_PATTERN = /(^\s+|\s+$)/;
+const SURROUNDING_SPACE_PATTERN = /(^\s+|\s+$)/;
 
 /**
  * @param {string} string
@@ -40,7 +40,7 @@ export function endsWith(suffix, string) {
  * @param {string} string
  * @returns {string}
  */
-export var trim = (typeof ''.trim === 'function') ?
+export const trim = (typeof ''.trim === 'function') ?
   function(string) { return string.trim(); } :
   function(string) { return string.replace(SURROUNDING_SPACE_PATTERN, ''); };
 
@@ -56,7 +56,7 @@ export var trim = (typeof ''.trim === 'function') ?
  * @returns {string}
  */
 export function zpad(length, n) {
-  var result = ''+n;
+  let result = ''+n;
   while (result.length < length) {
     result = '0'+result;
   }
@@ -90,7 +90,7 @@ export function bind(fn, context) {
 
 if (!Function.prototype.bind) {
     Function.prototype.bind = function(context, ...prependedArgs) {
-    var self = this;
+    const self = this;
     return function(...args) {
       return self.apply(context, prependedArgs.concat(args));
     };
@@ -111,11 +111,11 @@ if (!Function.prototype.bind) {
  * @returns {string}
  */
 export function replaceStringSelection(replacement, text, range) {
-  var end = range.start + range.length;
+  const end = range.start + range.length;
   return text.substring(0, range.start) + replacement + text.substring(end);
 }
 
-var hasOwnProp = Object.prototype.hasOwnProperty;
+const hasOwnProp = Object.prototype.hasOwnProperty;
 /**
  * @param {*} iterable
  * @param {Function} iterator
@@ -124,11 +124,11 @@ export function forEach(iterable, iterator) {
   if (iterable && typeof iterable.forEach === 'function') {
     iterable.forEach(iterator);
   } else if ({}.toString.call(iterable) === '[object Array]') {
-    for (var i = 0, l = iterable.length; i < l; i++) {
+    for (let i = 0, l = iterable.length; i < l; i++) {
       iterator.call(null, iterable[i], i, iterable);
     }
   } else {
-    for (var key in iterable) {
+    for (let key in iterable) {
       if (hasOwnProp.call(iterable, key)) {
         iterator.call(null, iterable[key], key, iterable);
       }
@@ -136,16 +136,16 @@ export function forEach(iterable, iterator) {
   }
 }
 
-var getOwnPropertyNames = (function() {
-  var getOwnPropertyNames = Object.getOwnPropertyNames;
+const getOwnPropertyNames = (function() {
+  let getOwnPropertyNames = Object.getOwnPropertyNames;
 
   try {
     Object.getOwnPropertyNames({}, 'sq');
   } catch (e) {
     // IE 8
     getOwnPropertyNames = function(object) {
-      var result = [];
-      for (var key in object) {
+      const result = [];
+      for (let key in object) {
         if (hasOwnProp.call(object, key)) {
           result.push(key);
         }
@@ -157,7 +157,7 @@ var getOwnPropertyNames = (function() {
   return getOwnPropertyNames;
 })();
 
-var getPrototypeOf = Object.getPrototypeOf || (object => object.__proto__);
+const getPrototypeOf = Object.getPrototypeOf || (object => object.__proto__);
 /**
  * @param {Object} object
  * @param {string} property
@@ -171,7 +171,7 @@ export function hasGetter(object, property) {
     return false;
   }
 
-  var descriptor;
+  let descriptor;
 
   if (object && object.constructor && object.constructor.prototype) {
     descriptor = Object.getOwnPropertyDescriptor(object.constructor.prototype, property);
@@ -197,9 +197,9 @@ export function getAllPropertyNames(object) {
     return [];
   }
 
-  var result = getOwnPropertyNames(object);
+  const result = getOwnPropertyNames(object);
 
-  var prototype = object.constructor && object.constructor.prototype;
+  let prototype = object.constructor && object.constructor.prototype;
   while (prototype) {
     result.push(...getOwnPropertyNames(prototype));
     prototype = getPrototypeOf(prototype);

@@ -119,10 +119,10 @@ class UndoManager {
     if (!this.canUndo()) {
       throw new Error('there are no registered undos');
     }
-    var data = this._undos.pop();
-    var target = data.target;
-    var selector = data.selector;
-    var args = data.args;
+    const data = this._undos.pop();
+    const target = data.target;
+    const selector = data.selector;
+    const args = data.args;
     this._isUndoing = true;
     target[selector].apply(target, args);
     this._isUndoing = false;
@@ -137,10 +137,10 @@ class UndoManager {
     if (!this.canRedo()) {
       throw new Error('there are no registered redos');
     }
-    var data = this._redos.pop();
-    var target = data.target;
-    var selector = data.selector;
-    var args = data.args;
+    const data = this._redos.pop();
+    const target = data.target;
+    const selector = data.selector;
+    const args = data.args;
     this._isRedoing = true;
     target[selector].apply(target, args);
     this._isRedoing = false;
@@ -160,8 +160,8 @@ class UndoManager {
    * @returns {Object}
    */
   proxyFor(target) {
-    var proxy = {};
-    var self = this;
+    const proxy = {};
+    const self = this;
 
     function proxyMethod(selector) {
       return function(...args) {
