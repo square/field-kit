@@ -20,7 +20,7 @@ class ExpiryDateField extends TextField {
    * @private
    */
   textFieldDidEndEditing() {
-    var value = this.value();
+    const value = this.value();
     if (value) {
       this.setText(this.formatter().format(value));
     }

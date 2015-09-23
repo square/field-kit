@@ -74,7 +74,7 @@ class TextField extends Input {
       element.setAttribute('autocapitalize', 'off');
     }
 
-    var window = element.ownerDocument.defaultView;
+    const window = element.ownerDocument.defaultView;
 
     /**
      * Fixes caret bug (Android) that caused the input
@@ -134,7 +134,7 @@ class TextField extends Input {
    * @private
    */
   _textDidChange() {
-    var delegate = this._delegate;
+    const delegate = this._delegate;
     this.textDidChange();
     if (delegate && typeof delegate.textDidChange === 'function') {
       delegate.textDidChange(this);
@@ -150,7 +150,7 @@ class TextField extends Input {
    * @private
    */
   _textFieldDidEndEditing() {
-    var delegate = this._delegate;
+    const delegate = this._delegate;
     this.textFieldDidEndEditing();
     if (delegate && typeof delegate.textFieldDidEndEditing === 'function') {
       delegate.textFieldDidEndEditing(this);
@@ -172,7 +172,7 @@ class TextField extends Input {
    * @private
    */
   _textFieldDidBeginEditing() {
-    var delegate = this._delegate;
+    const delegate = this._delegate;
     this.textFieldDidBeginEditing();
     if (delegate && typeof delegate.textFieldDidBeginEditing === 'function') {
       delegate.textFieldDidBeginEditing(this);
@@ -206,7 +206,7 @@ class TextField extends Input {
    * Tears down FieldKit
    */
   destroy() {
-    var element = this.element;
+    const element = this.element;
     element.removeEventListener('keydown', this._keyDown);
     element.removeEventListener('keypress', this._keyPress);
     element.removeEventListener('keyup', this._keyUp);
@@ -226,7 +226,7 @@ class TextField extends Input {
   formatter() {
     if (!this._formatter) {
       this._formatter = new Formatter();
-      var maximumLengthString = this.element.getAttribute('maxlength');
+      const maximumLengthString = this.element.getAttribute('maxlength');
       if (maximumLengthString !== undefined && maximumLengthString !== null) {
         this._formatter.maximumLength = parseInt(maximumLengthString, 10);
       }
@@ -241,7 +241,7 @@ class TextField extends Input {
    * @param {Formatter} formatter
    */
   setFormatter(formatter) {
-    var value = this.value();
+    const value = this.value();
     this._formatter = formatter;
     this.setValue(value);
   }
@@ -254,9 +254,9 @@ class TextField extends Input {
    * @returns {?object} false if change doesn't have changes or change isn't valid. Change object if it is.
    */
   hasChangesAndIsValid(current, proposed) {
-    var change = new TextFieldStateChange(this);
-    var error = errorType => {
-      var delegate = this.delegate();
+    const change = new TextFieldStateChange(this);
+    const error = errorType => {
+      const delegate = this.delegate();
       if (delegate) {
         if (typeof delegate.textFieldDidFailToValidateChange === 'function') {
           delegate.textFieldDidFailToValidateChange(this, change, errorType);
@@ -295,7 +295,7 @@ class TextField extends Input {
    * @param {DataTransfer} pasteboard
    */
   readSelectionFromPasteboard(pasteboard) {
-    var range, text;
+    let range, text;
     text = pasteboard.getData('Text');
     this.replaceSelection(text);
     range = this.selectedRange();
@@ -311,12 +311,12 @@ class TextField extends Input {
    * @returns {Object} whatever object `callback` returns
    */
   rollbackInvalidChanges(callback) {
-    var result = null;
-    var errorType = null;
-    var change = TextFieldStateChange.build(this, () => result = callback());
-    var error = function(type) { errorType = type; };
+    let result = null;
+    let errorType = null;
+    const change = TextFieldStateChange.build(this, () => result = callback());
+    const error = function(type) { errorType = type; };
     if (change.hasChanges()) {
-      var formatter = this.formatter();
+      const formatter = this.formatter();
       if (formatter && typeof formatter.isChangeValid === 'function') {
         if (!this._isDirty) {
           this._valueOnFocus = change.current.text || '';
@@ -327,7 +327,7 @@ class TextField extends Input {
           this.setText(change.proposed.text);
           this.setSelectedRange(change.proposed.selectedRange);
         } else {
-          var delegate = this.delegate();
+          const delegate = this.delegate();
           if (delegate) {
             if (typeof delegate.textFieldDidFailToValidateChange === 'function') {
               delegate.textFieldDidFailToValidateChange(this, change, errorType);
@@ -353,9 +353,9 @@ class TextField extends Input {
    * @returns {Object}
    */
   value() {
-    var text = this.text();
-    var delegate = this.delegate();
-    var formatter = this.formatter();
+    const text = this.text();
+    const delegate = this.delegate();
+    const formatter = this.formatter();
     if (!formatter) { return text; }
 
     return formatter.parse(text, (errorType) => {
@@ -414,7 +414,7 @@ class TextField extends Input {
    * @returns {Object} {start: number, length: number}
    */
   selectedRange() {
-    var caret = this._needsManualCaret ?
+    const caret = this._needsManualCaret ?
         this._manualCaret :
         getCaret(this.element);
 
@@ -432,8 +432,8 @@ class TextField extends Input {
    * @param {Affinity} affinity
    */
   setSelectedRangeWithAffinity(range, affinity) {
-    var newRange = super.setSelectedRangeWithAffinity(range, affinity);
-    var caret = {
+    const newRange = super.setSelectedRangeWithAffinity(range, affinity);
+    const caret = {
       start: newRange.start,
       end: newRange.start + newRange.length
     };
@@ -689,12 +689,12 @@ class TextField extends Input {
    * @private
    */
   _fireEvent(eventType) {
-    var document = this.element.ownerDocument;
-    var window = document.defaultView;
+    const document = this.element.ownerDocument;
+    const window = document.defaultView;
     if (typeof window.CustomEvent === 'function') {
       this.element.dispatchEvent(new window.CustomEvent(eventType, {}));
     } else {
-      var event = document.createEvent('Event');
+      const event = document.createEvent('Event');
       event.initEvent(eventType, false, false);
       this.element.dispatchEvent(event);
     }
@@ -736,7 +736,7 @@ class TextField extends Input {
       this._didEndEditingButKeptFocus = false;
     }
 
-    var action = this._bindings.actionForEvent(event);
+    const action = this._bindings.actionForEvent(event);
     if (action) {
       switch (action) {
         case 'undo':
@@ -761,7 +761,7 @@ class TextField extends Input {
    * @private
    */
   _keyPress(event) {
-    var keyCode = event.keyCode;
+    const keyCode = event.keyCode;
     if (!event.metaKey && !event.ctrlKey &&
       keyCode !== KEYS.ENTER &&
       keyCode !== KEYS.TAB &&
@@ -904,17 +904,17 @@ class TextField extends Input {
    */
   _syncPlaceholder() {
     if (!this._enabled) {
-      var disabledPlaceholder = this._disabledPlaceholder;
+      const disabledPlaceholder = this._disabledPlaceholder;
       if (disabledPlaceholder !== undefined && disabledPlaceholder !== null) {
         this.setPlaceholder(disabledPlaceholder);
       }
     } else if (this.hasFocus()) {
-      var focusedPlaceholder = this._focusedPlaceholder;
+      const focusedPlaceholder = this._focusedPlaceholder;
       if (focusedPlaceholder !== undefined && focusedPlaceholder !== null) {
         this.setPlaceholder(focusedPlaceholder);
       }
     } else {
-      var unfocusedPlaceholder = this._unfocusedPlaceholder;
+      const unfocusedPlaceholder = this._unfocusedPlaceholder;
       if (unfocusedPlaceholder !== undefined && unfocusedPlaceholder !== null) {
         this.setPlaceholder(unfocusedPlaceholder);
       }
@@ -954,12 +954,12 @@ class TextFieldStateChange {
    */
   recomputeDiff() {
     if (this.proposed.text !== this.current.text) {
-      var ctext = this.current.text;
-      var ptext = this.proposed.text;
-      var sharedPrefixLength = 0;
-      var sharedSuffixLength = 0;
-      var minTextLength = Math.min(ctext.length, ptext.length);
-      var i;
+      const ctext = this.current.text;
+      const ptext = this.proposed.text;
+      let sharedPrefixLength = 0;
+      let sharedSuffixLength = 0;
+      let minTextLength = Math.min(ctext.length, ptext.length);
+      let i;
 
       for (i = 0; i < minTextLength; i++) {
         if (ptext[i] === ctext[i]) {
@@ -977,11 +977,11 @@ class TextFieldStateChange {
         }
       }
 
-      var inserted = {
+      const inserted = {
         start: sharedPrefixLength,
         end: ptext.length - sharedSuffixLength
       };
-      var deleted = {
+      const deleted = {
         start: sharedPrefixLength,
         end: ctext.length - sharedSuffixLength
       };
@@ -1016,7 +1016,7 @@ class TextFieldStateChange {
  * @returns {Object} change object with current and proposed properties
  */
 TextFieldStateChange.build = function(field, callback) {
-  var change = new this(field);
+  const change = new this(field);
   change.current = {
     text: field.text(),
     selectedRange: field.selectedRange()

@@ -72,11 +72,11 @@ class DelimitedTextFormatter extends Formatter {
   _textFromValue(value) {
     if (!value) { return ''; }
 
-    var result = '';
-    var delimiter;
-    var maximumLength = this.maximumLength;
+    let result = '';
+    let delimiter;
+    let maximumLength = this.maximumLength;
 
-    for (var i = 0, l = value.length; i < l; i++) {
+    for (let i = 0, l = value.length; i < l; i++) {
       while ((delimiter = this.delimiterAt(result.length))) {
         result += delimiter;
       }
@@ -114,8 +114,8 @@ class DelimitedTextFormatter extends Formatter {
    */
   _valueFromText(text) {
     if (!text) { return ''; }
-    var result = '';
-    for (var i = 0, l = text.length; i < l; i++) {
+    let result = '';
+    for (let i = 0, l = text.length; i < l; i++) {
       if (!this.isDelimiter(text[i])) {
         result += text[i];
       }
@@ -136,22 +136,22 @@ class DelimitedTextFormatter extends Formatter {
       return false;
     }
 
-    var newText = change.proposed.text;
-    var range = change.proposed.selectedRange;
-    var hasSelection = range.length !== 0;
+    let newText = change.proposed.text;
+    let range = change.proposed.selectedRange;
+    const hasSelection = range.length !== 0;
 
-    var startMovedLeft = range.start < change.current.selectedRange.start;
-    var startMovedRight = range.start > change.current.selectedRange.start;
-    var endMovedLeft = (range.start + range.length) < (change.current.selectedRange.start + change.current.selectedRange.length);
-    var endMovedRight = (range.start + range.length) > (change.current.selectedRange.start + change.current.selectedRange.length);
+    const startMovedLeft = range.start < change.current.selectedRange.start;
+    const startMovedRight = range.start > change.current.selectedRange.start;
+    const endMovedLeft = (range.start + range.length) < (change.current.selectedRange.start + change.current.selectedRange.length);
+    const endMovedRight = (range.start + range.length) > (change.current.selectedRange.start + change.current.selectedRange.length);
 
-    var startMovedOverADelimiter = startMovedLeft && this.hasDelimiterAtIndex(range.start) ||
+    const startMovedOverADelimiter = startMovedLeft && this.hasDelimiterAtIndex(range.start) ||
                                     startMovedRight && this.hasDelimiterAtIndex(range.start - 1);
-    var endMovedOverADelimiter = endMovedLeft && this.hasDelimiterAtIndex(range.start + range.length) ||
+    const endMovedOverADelimiter = endMovedLeft && this.hasDelimiterAtIndex(range.start + range.length) ||
                                   endMovedRight && this.hasDelimiterAtIndex(range.start + range.length - 1);
 
     if (this.isDelimiter(change.deleted.text)) {
-      var newCursorPosition = change.deleted.start - 1;
+      let newCursorPosition = change.deleted.start - 1;
       // delete any immediately preceding delimiters
       while (this.isDelimiter(newText.charAt(newCursorPosition))) {
         newText = newText.substring(0, newCursorPosition) + newText.substring(newCursorPosition + 1);
@@ -175,7 +175,7 @@ class DelimitedTextFormatter extends Formatter {
 
     if (startMovedRight) {
       // move right over any delimiters found on the way, including any leading delimiters
-      for (var i = change.current.selectedRange.start; i < range.start + range.length; i++) {
+      for (let i = change.current.selectedRange.start; i < range.start + range.length; i++) {
         if (this.delimiterAt(i)) {
           range.start++;
           if(range.length > 0) {
@@ -233,9 +233,9 @@ class DelimitedTextFormatter extends Formatter {
       range.length = 0;
     }
 
-    var result = true;
+    let result = true;
 
-    var value = this._valueFromText(newText, function(...args) {
+    const value = this._valueFromText(newText, function(...args) {
       result = false;
       error(...args);
     });

@@ -1,11 +1,11 @@
 /**
  * @TODO Make this an enum
  */
-export var AMEX        = 'amex';
-export var DISCOVER    = 'discover';
-export var JCB         = 'jcb';
-export var MASTERCARD  = 'mastercard';
-export var VISA        = 'visa';
+export const AMEX        = 'amex';
+export const DISCOVER    = 'discover';
+export const JCB         = 'jcb';
+export const MASTERCARD  = 'mastercard';
+export const VISA        = 'visa';
 
 /**
  * Pass in a credit card number and it'll return the
@@ -20,9 +20,9 @@ export function determineCardType(pan) {
   }
 
   pan = pan.toString();
-  var firsttwo = parseInt(pan.slice(0, 2), 10);
-  var iin = parseInt(pan.slice(0, 6), 10);
-  var halfiin = parseInt(pan.slice(0, 3), 10);
+  const firsttwo = parseInt(pan.slice(0, 2), 10);
+  const iin = parseInt(pan.slice(0, 6), 10);
+  const halfiin = parseInt(pan.slice(0, 3), 10);
 
   if (pan[0] === '4') {
     return VISA;
@@ -45,10 +45,10 @@ export function determineCardType(pan) {
  * @returns {boolean}
  */
 export function luhnCheck(pan) {
-  var sum = 0;
-  var flip = true;
-  for (var i = pan.length - 1; i >= 0; i--) {
-    var digit = parseInt(pan.charAt(i), 10);
+  let sum = 0;
+  let flip = true;
+  for (let i = pan.length - 1; i >= 0; i--) {
+    const digit = parseInt(pan.charAt(i), 10);
     sum += (flip = !flip) ? Math.floor((digit * 2) / 10) + Math.floor(digit * 2 % 10) : digit;
   }
 

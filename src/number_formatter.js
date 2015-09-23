@@ -4,12 +4,12 @@ import { isDigits, startsWith, endsWith, trim, forEach } from './utils';
 import { modes, shiftParts, round } from 'stround';
 
 // Style
-var NONE = 0;
-var CURRENCY = 1;
-var PERCENT = 2;
+const NONE = 0;
+const CURRENCY = 1;
+const PERCENT = 2;
 
-var DEFAULT_LOCALE = 'en-US';
-var DEFAULT_COUNTRY = 'US';
+const DEFAULT_LOCALE = 'en-US';
+const DEFAULT_COUNTRY = 'US';
 
 /**
  * @param {string} locale
@@ -17,11 +17,11 @@ var DEFAULT_COUNTRY = 'US';
  * @private
  */
 function splitLocaleComponents(locale) {
-  var match = locale.match(/^([a-z][a-z])(?:[-_]([a-z][a-z]))?$/i);
+  const match = locale.match(/^([a-z][a-z])(?:[-_]([a-z][a-z]))?$/i);
   if (match) {
-    var lang = match[1] && match[1].toLowerCase();
-    var country = match[2] && match[2].toLowerCase();
-    return { lang: lang, country: country };
+    const lang = match[1] && match[1].toLowerCase();
+    const country = match[2] && match[2].toLowerCase();
+    return { lang, country };
   }
 }
 
@@ -33,7 +33,7 @@ function splitLocaleComponents(locale) {
  */
 function get(object, key, ...args) {
   if (object) {
-    var value = object[key];
+    const value = object[key];
     if (typeof value === 'function') {
       return value(...args);
     } else {
@@ -248,7 +248,7 @@ class NumberFormatter extends Formatter {
    * @private
    */
   _shouldShowNativeCurrencySymbol() {
-    var regionDefaultCurrencyCode = this._regionDefaults().currencyCode;
+    let regionDefaultCurrencyCode = this._regionDefaults().currencyCode;
     if (typeof regionDefaultCurrencyCode === 'function') {
       regionDefaultCurrencyCode = regionDefaultCurrencyCode();
     }
@@ -418,8 +418,8 @@ class NumberFormatter extends Formatter {
    * @returns {number}
    */
   maximumFractionDigits() {
-    var result = this._get('maximumFractionDigits');
-    var minimumFractionDigits = this._minimumFractionDigits;
+    let result = this._get('maximumFractionDigits');
+    const minimumFractionDigits = this._minimumFractionDigits;
     if (result !== null && result !== undefined &&
         minimumFractionDigits !== null && minimumFractionDigits !== undefined &&
         minimumFractionDigits > result) {
@@ -441,8 +441,8 @@ class NumberFormatter extends Formatter {
    * @returns {number}
    */
   minimumFractionDigits() {
-    var result = this._get('minimumFractionDigits');
-    var maximumFractionDigits = this._maximumFractionDigits;
+    let result = this._get('minimumFractionDigits');
+    const maximumFractionDigits = this._maximumFractionDigits;
     if (result !== null && result !== undefined &&
         maximumFractionDigits !== null && maximumFractionDigits !== undefined &&
         maximumFractionDigits < result) {
@@ -464,8 +464,8 @@ class NumberFormatter extends Formatter {
    * @returns {number}
    */
   maximumIntegerDigits() {
-    var result = this._get('maximumIntegerDigits');
-    var minimumIntegerDigits = this._minimumIntegerDigits;
+    let result = this._get('maximumIntegerDigits');
+    const minimumIntegerDigits = this._minimumIntegerDigits;
     if (result !== null && result !== undefined &&
         minimumIntegerDigits !== null && minimumIntegerDigits !== undefined &&
         minimumIntegerDigits > result) {
@@ -487,8 +487,8 @@ class NumberFormatter extends Formatter {
    * @returns {number}
    */
   minimumIntegerDigits() {
-    var result = this._get('minimumIntegerDigits');
-    var maximumIntegerDigits = this._maximumIntegerDigits;
+    let result = this._get('minimumIntegerDigits');
+    const maximumIntegerDigits = this._maximumIntegerDigits;
     if (result !== null && result !== undefined &&
         maximumIntegerDigits !== null && maximumIntegerDigits !== undefined &&
         maximumIntegerDigits < result) {
@@ -555,7 +555,7 @@ class NumberFormatter extends Formatter {
    * @param negativeFormat
    */
   setNegativeFormat(negativeFormat) {
-    var settings = this.numberFormatFormatter().parse(negativeFormat);
+    const settings = this.numberFormatFormatter().parse(negativeFormat);
     this.setNegativePrefix(settings.prefix);
     this.setNegativeSuffix(settings.suffix);
     this.setGroupingSize(settings.groupingSize);
@@ -788,7 +788,7 @@ class NumberFormatter extends Formatter {
    * @param positiveFormat
    */
   setPositiveFormat(positiveFormat) {
-    var settings = this.numberFormatFormatter().parse(positiveFormat);
+    const settings = this.numberFormatFormatter().parse(positiveFormat);
     this.setPositivePrefix(settings.prefix);
     this.setPositiveSuffix(settings.suffix);
     this.setGroupingSize(settings.groupingSize);
@@ -912,13 +912,13 @@ class NumberFormatter extends Formatter {
    * @private
    */
   _get(attr) {
-    var value = this['_' + attr];
+    let value = this['_' + attr];
     if (value !== null && value !== undefined) {
       return value;
     }
-    var styleDefaults = this._styleDefaults;
-    var localeDefaults = this._localeDefaults();
-    var regionDefaults = this._regionDefaults();
+    const styleDefaults = this._styleDefaults;
+    const localeDefaults = this._localeDefaults();
+    const regionDefaults = this._regionDefaults();
     value = get(styleDefaults, attr, this, localeDefaults);
     if (value !== null && value !== undefined) {
       return value;
@@ -976,40 +976,40 @@ class NumberFormatter extends Formatter {
       return '';
     }
 
-    var zeroSymbol = this.zeroSymbol();
+    const zeroSymbol = this.zeroSymbol();
     if (zeroSymbol !== undefined && zeroSymbol !== null && number === 0) {
       return zeroSymbol;
     }
 
-    var nullSymbol = this.nullSymbol();
+    const nullSymbol = this.nullSymbol();
     if (nullSymbol !== undefined && nullSymbol !== null && number === null) {
       return nullSymbol;
     }
 
-    var notANumberSymbol = this.notANumberSymbol();
+    const notANumberSymbol = this.notANumberSymbol();
     if (notANumberSymbol !== undefined && notANumberSymbol !== null && isNaN(number)) {
       return notANumberSymbol;
     }
 
-    var positiveInfinitySymbol = this.positiveInfinitySymbol();
+    const positiveInfinitySymbol = this.positiveInfinitySymbol();
     if (positiveInfinitySymbol !== undefined && positiveInfinitySymbol !== null && number === Infinity) {
       return positiveInfinitySymbol;
     }
 
-    var negativeInfinitySymbol = this.negativeInfinitySymbol();
+    const negativeInfinitySymbol = this.negativeInfinitySymbol();
     if (negativeInfinitySymbol !== undefined && negativeInfinitySymbol !== null && number === -Infinity) {
       return negativeInfinitySymbol;
     }
 
-    var negative = number < 0;
+    let negative = number < 0;
 
-    var parts = (''+Math.abs(number)).split('.');
-    var integerPart = parts[0];
-    var fractionPart = parts[1] || '';
+    let parts = (''+Math.abs(number)).split('.');
+    let integerPart = parts[0];
+    let fractionPart = parts[1] || '';
 
-    var exponent = this.exponent();
+    const exponent = this.exponent();
     if (exponent !== undefined && exponent !== null) {
-      var shifted = shiftParts([negative, integerPart, fractionPart], exponent);
+      const shifted = shiftParts([negative, integerPart, fractionPart], exponent);
       negative = shifted[0];
       integerPart = shifted[1];
       fractionPart = shifted[2];
@@ -1019,10 +1019,10 @@ class NumberFormatter extends Formatter {
     }
 
     // round fraction part to the maximum length
-    var maximumFractionDigits = this.maximumFractionDigits();
+    const maximumFractionDigits = this.maximumFractionDigits();
     if (fractionPart.length > maximumFractionDigits) {
-      var unrounded = `${integerPart}.${fractionPart}`;
-      var rounded = this._round(negative ? `-${unrounded}` : unrounded);
+      const unrounded = `${integerPart}.${fractionPart}`;
+      let rounded = this._round(negative ? `-${unrounded}` : unrounded);
       if (rounded[0] === '-') {
         rounded = rounded.slice(1);
       }
@@ -1032,13 +1032,13 @@ class NumberFormatter extends Formatter {
     }
 
     // right-pad fraction zeros up to the minimum length
-    var minimumFractionDigits = this.minimumFractionDigits();
+    const minimumFractionDigits = this.minimumFractionDigits();
     while (fractionPart.length < minimumFractionDigits) {
       fractionPart += '0';
     }
 
     // left-pad integer zeros up to the minimum length
-    var minimumIntegerDigits = this.minimumIntegerDigits();
+    const minimumIntegerDigits = this.minimumIntegerDigits();
     while (integerPart.length < minimumIntegerDigits) {
       integerPart = '0' + integerPart;
     }
@@ -1049,7 +1049,7 @@ class NumberFormatter extends Formatter {
     }
 
     // left-truncate any integer digits over the maximum length
-    var maximumIntegerDigits = this.maximumIntegerDigits();
+    const maximumIntegerDigits = this.maximumIntegerDigits();
     if (maximumIntegerDigits !== undefined && maximumIntegerDigits !== null && integerPart.length > maximumIntegerDigits) {
       integerPart = integerPart.slice(-maximumIntegerDigits);
     }
@@ -1060,10 +1060,10 @@ class NumberFormatter extends Formatter {
     }
 
     if (this.usesGroupingSeparator()) {
-      var integerPartWithGroupingSeparators = '';
-      var copiedCharacterCount = 0;
+      let integerPartWithGroupingSeparators = '';
+      let copiedCharacterCount = 0;
 
-      for (var i = integerPart.length - 1; i >= 0; i--) {
+      for (let i = integerPart.length - 1; i >= 0; i--) {
         if (copiedCharacterCount > 0 && copiedCharacterCount % this.groupingSize() === 0) {
           integerPartWithGroupingSeparators = this.groupingSeparator() + integerPartWithGroupingSeparators;
         }
@@ -1073,7 +1073,7 @@ class NumberFormatter extends Formatter {
       integerPart = integerPartWithGroupingSeparators;
     }
 
-    var result = integerPart + fractionPart;
+    let result = integerPart + fractionPart;
 
     // surround with the appropriate prefix and suffix
     if (negative) {
@@ -1111,11 +1111,11 @@ class NumberFormatter extends Formatter {
    * @returns {?number}
    */
   parse(string, error) {
-    var result;
-    var positivePrefix = this.positivePrefix();
-    var negativePrefix = this.negativePrefix();
-    var positiveSuffix = this.positiveSuffix();
-    var negativeSuffix = this.negativeSuffix();
+    let result;
+    let positivePrefix = this.positivePrefix();
+    let negativePrefix = this.negativePrefix();
+    let positiveSuffix = this.positiveSuffix();
+    let negativeSuffix = this.negativeSuffix();
 
     if (this.isLenient()) {
       string = string.replace(/\s/g, '');
@@ -1125,12 +1125,12 @@ class NumberFormatter extends Formatter {
       negativeSuffix = trim(negativeSuffix);
     }
 
-    var zeroSymbol;
-    var nullSymbol;
-    var notANumberSymbol;
-    var positiveInfinitySymbol;
-    var negativeInfinitySymbol;
-    var innerString;
+    let zeroSymbol;
+    let nullSymbol;
+    let notANumberSymbol;
+    let positiveInfinitySymbol;
+    let negativeInfinitySymbol;
+    let innerString;
 
     if ((zeroSymbol = this.zeroSymbol()) !== undefined && zeroSymbol !== null && string === zeroSymbol) {
       result = 0;
@@ -1143,8 +1143,8 @@ class NumberFormatter extends Formatter {
     } else if ((negativeInfinitySymbol = this.negativeInfinitySymbol()) !== undefined && negativeInfinitySymbol !== null && string === negativeInfinitySymbol) {
       result = -Infinity;
     } else {
-      var hasNegativePrefix = startsWith(negativePrefix, string);
-      var hasNegativeSuffix = endsWith(negativeSuffix, string);
+      const hasNegativePrefix = startsWith(negativePrefix, string);
+      const hasNegativeSuffix = endsWith(negativeSuffix, string);
       if (hasNegativePrefix && (this.isLenient() || hasNegativeSuffix)) {
         innerString = string.slice(negativePrefix.length);
         if (hasNegativeSuffix) {
@@ -1155,8 +1155,8 @@ class NumberFormatter extends Formatter {
           result *= -1;
         }
       } else {
-        var hasPositivePrefix = startsWith(positivePrefix, string);
-        var hasPositiveSuffix = endsWith(positiveSuffix, string);
+        const hasPositivePrefix = startsWith(positivePrefix, string);
+        const hasPositiveSuffix = endsWith(positiveSuffix, string);
         if (this.isLenient() || (hasPositivePrefix && hasPositiveSuffix)) {
           innerString = string;
           if (hasPositivePrefix) {
@@ -1176,7 +1176,7 @@ class NumberFormatter extends Formatter {
     }
 
     if (result !== undefined && result !== null) {
-      var minimum = this.minimum();
+      const minimum = this.minimum();
       if (minimum !== undefined && minimum !== null && result < minimum) {
         if (typeof error === 'function') {
           error('number-formatter.out-of-bounds.below-minimum');
@@ -1184,7 +1184,7 @@ class NumberFormatter extends Formatter {
         return null;
       }
 
-      var maximum = this.maximum();
+      const maximum = this.maximum();
       if (maximum !== undefined && maximum !== null && result > maximum) {
         if (typeof error === 'function') {
           error('number-formatter.out-of-bounds.above-maximum');
@@ -1203,7 +1203,7 @@ class NumberFormatter extends Formatter {
    * @private
    */
   _parseAbsoluteValue(string, error) {
-    var number;
+    let number;
     if (string.length === 0) {
       if (typeof error === 'function') {
         error('number-formatter.invalid-format');
@@ -1211,7 +1211,7 @@ class NumberFormatter extends Formatter {
       return null;
     }
 
-    var parts = string.split(this.decimalSeparator());
+    const parts = string.split(this.decimalSeparator());
     if (parts.length > 2) {
       if (typeof error === 'function') {
         error('number-formatter.invalid-format');
@@ -1219,12 +1219,12 @@ class NumberFormatter extends Formatter {
       return null;
     }
 
-    var integerPart = parts[0];
-    var fractionPart = parts[1] || '';
+    let integerPart = parts[0];
+    let fractionPart = parts[1] || '';
 
     if (this.usesGroupingSeparator()) {
-      var groupingSize = this.groupingSize();
-      var groupParts = integerPart.split(this.groupingSeparator());
+      const groupingSize = this.groupingSize();
+      const groupParts = integerPart.split(this.groupingSeparator());
 
       if (!this.isLenient()) {
         if (groupParts.length > 1) {
@@ -1237,8 +1237,8 @@ class NumberFormatter extends Formatter {
           }
 
           // disallow 1,00
-          var groupPartsTail = groupParts.slice(1);
-          for (var i = 0, l = groupPartsTail.length; i < l; i++) {
+          const groupPartsTail = groupParts.slice(1);
+          for (let i = 0, l = groupPartsTail.length; i < l; i++) {
             if (groupPartsTail[i].length !== groupingSize) {
               if (typeof error === 'function') {
                 error('number-formatter.invalid-format.grouping-size');
@@ -1260,9 +1260,9 @@ class NumberFormatter extends Formatter {
       return null;
     }
 
-    var exponent = this.exponent();
+    const exponent = this.exponent();
     if (exponent !== undefined && exponent !== null) {
-      var shifted = shiftParts([false, integerPart, fractionPart], -exponent);
+      const shifted = shiftParts([false, integerPart, fractionPart], -exponent);
       integerPart = shifted[1];
       fractionPart = shifted[2];
     }
@@ -1286,7 +1286,7 @@ class NumberFormatter extends Formatter {
    * @private
    */
   _currencyDefaults() {
-    var result = {};
+    const result = {};
 
     forEach(CurrencyDefaults['default'], function(value, key) {
       result[key] = value;
@@ -1306,7 +1306,7 @@ class NumberFormatter extends Formatter {
    * @private
    */
   _regionDefaults() {
-    var result = {};
+    const result = {};
 
     forEach(RegionDefaults.default, function(value, key) {
       result[key] = value;
@@ -1326,12 +1326,12 @@ class NumberFormatter extends Formatter {
    * @private
    */
   _localeDefaults() {
-    var locale      = this.locale();
-    var countryCode = this.countryCode();
-    var lang = splitLocaleComponents(locale).lang;
-    var result = {};
+    const locale = this.locale();
+    const countryCode = this.countryCode();
+    const lang = splitLocaleComponents(locale).lang;
+    const result = {};
 
-    var defaultFallbacks = [
+    const defaultFallbacks = [
       RegionDefaults.default,
       LocaleDefaults.default,
       RegionDefaults[countryCode],  // CA
@@ -1420,7 +1420,7 @@ NumberFormatter.Style = {
 /**
  * @namespace StyleDefaults
  */
-var StyleDefaults = {
+const StyleDefaults = {
   NONE: {
     usesGroupingSeparator: false,
     minimumFractionDigits: 0,
@@ -1463,7 +1463,7 @@ var StyleDefaults = {
  *
  * @namespace LocaleDefaults
  */
-var LocaleDefaults = {
+const LocaleDefaults = {
   'default': {
     allowsFloats: true,
     alwaysShowsDecimalSeparator: false,
@@ -1509,7 +1509,7 @@ var LocaleDefaults = {
 /**
  * @namespace RegionDefaults
  */
-var RegionDefaults = {
+const RegionDefaults = {
   AE: {
     currencyCode: 'AED'
   },
@@ -2043,7 +2043,7 @@ var RegionDefaults = {
 /**
  * @namespace CurrencyDefaults
  */
-var CurrencyDefaults = {
+const CurrencyDefaults = {
   'default': {
     currencySymbol: formatter => formatter.currencyCode(),
     internationalCurrencySymbol: formatter => formatter.currencyCode(),

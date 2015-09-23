@@ -9,7 +9,7 @@ import { determineCardType } from './card_utils';
  * @enum {number}
  * @private
  */
-var CardMaskStrategy = {
+const CardMaskStrategy = {
   None: 'None',
   DoneEditing: 'DoneEditing'
 };
@@ -82,9 +82,9 @@ class CardTextField extends TextField {
    * @returns {string} Returns a masked card string.
    */
   cardMask() {
-    var text   = this.text();
-    var toMask = text.slice(0, -4);
-    var last4  = text.slice(-4);
+    const text   = this.text();
+    const last4  = text.slice(-4);
+    let toMask = text.slice(0, -4);
 
     return toMask.replace(/\d/g, '•') + last4;
   }

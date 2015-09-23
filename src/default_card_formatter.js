@@ -27,7 +27,7 @@ class DefaultCardFormatter extends DelimitedTextFormatter {
    * @returns {string} returns value with delimiters removed
    */
   parse(text, error) {
-    var value = this._valueFromText(text);
+    const value = this._valueFromText(text);
     if (typeof error === 'function') {
       if (!validCardLength(value)) {
         error('card-formatter.number-too-short');

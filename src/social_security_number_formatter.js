@@ -4,7 +4,7 @@ import DelimitedTextFormatter from './delimited_text_formatter';
  * @const
  * @private
  */
-var DIGITS_PATTERN = /^\d*$/;
+const DIGITS_PATTERN = /^\d*$/;
 
 /**
  * @extends DelimitedTextFormatter

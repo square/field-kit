@@ -4,7 +4,7 @@ import DelimitedTextFormatter from './delimited_text_formatter';
  * @const
  * @private
  */
-var NANPPhoneDelimiters = {
+const NANPPhoneDelimiters = {
   0: '(',
   4: ')',
   5: ' ',
@@ -15,7 +15,7 @@ var NANPPhoneDelimiters = {
  * @const
  * @private
  */
-var NANPPhoneDelimitersWithOne = {
+const NANPPhoneDelimitersWithOne = {
   1:  ' ',
   2:  '(',
   6:  ')',
@@ -27,7 +27,7 @@ var NANPPhoneDelimitersWithOne = {
  * @const
  * @private
  */
-var NANPPhoneDelimitersWithPlus = {
+const NANPPhoneDelimitersWithPlus = {
   2:  ' ',
   3:  '(',
   7:  ')',
@@ -41,7 +41,7 @@ var NANPPhoneDelimitersWithPlus = {
  * @const
  * @private
  */
-var DELIMITER_PATTERN = /[-\(\) ]/g;
+const DELIMITER_PATTERN = /[-\(\) ]/g;
 
 /**
  * @extends DelimitedTextFormatter
@@ -64,8 +64,8 @@ class PhoneFormatter extends DelimitedTextFormatter {
    * @returns {boolean}
    */
   isDelimiter(chr) {
-    var map = this.delimiterMap;
-    for (var index in map) {
+    const map = this.delimiterMap;
+    for (let index in map) {
       if (map.hasOwnProperty(index)) {
         if (map[index] === chr) {
           return true;
@@ -88,7 +88,7 @@ class PhoneFormatter extends DelimitedTextFormatter {
    * @returns {boolean}
    */
   hasDelimiterAtIndex(index) {
-    var delimiter = this.delimiterAt(index);
+    const delimiter = this.delimiterAt(index);
     return delimiter !== undefined && delimiter !== null;
   }
 
@@ -101,7 +101,7 @@ class PhoneFormatter extends DelimitedTextFormatter {
    */
   parse(text, error) {
     if (!error) { error = function(){}; }
-    var digits = this.digitsWithoutCountryCode(text);
+    const digits = this.digitsWithoutCountryCode(text);
     // Source: http://en.wikipedia.org/wiki/North_American_Numbering_Plan
     //
     // Area Code
@@ -149,12 +149,12 @@ class PhoneFormatter extends DelimitedTextFormatter {
 
     if (change.inserted.text.length > 1) {
       // handle pastes
-      var text = change.current.text;
-      var selectedRange = change.current.selectedRange;
-      var toInsert = change.inserted.text;
+      const text = change.current.text;
+      const selectedRange = change.current.selectedRange;
+      const toInsert = change.inserted.text;
 
       // Replace the selection with the new text, remove non-digits, then format.
-      var formatted = this.format((
+      const formatted = this.format((
         text.slice(0, selectedRange.start) +
         toInsert +
         text.slice(selectedRange.start+selectedRange.length)
@@ -207,8 +207,8 @@ class PhoneFormatter extends DelimitedTextFormatter {
    * @private
    */
   digitsWithoutCountryCode(text) {
-    var digits = (text || '').replace(/[^\d]/g, '');
-    var extraDigits = digits.length - 10;
+    let digits = (text || '').replace(/[^\d]/g, '');
+    const extraDigits = digits.length - 10;
     if (extraDigits > 0) {
       digits = digits.substr(extraDigits);
     }
