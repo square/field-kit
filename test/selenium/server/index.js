@@ -22,5 +22,12 @@ exports.pathFor = function(page) {
 };
 
 exports.goTo = function(page) {
-  driver.get(exports.pathFor(page));
+  return driver.get(exports.pathFor(page))
+    .then(function() {
+        if(global.ua) return driver.executeScript('return window.navigator.__defineGetter__("userAgent", ' +
+        'function() { return "' + global.ua + '"; });');
+    })
+    .then(function() {
+      return driver.executeScript('window.installFieldKit();');
+    });
 };

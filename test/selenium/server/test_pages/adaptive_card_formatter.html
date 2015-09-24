@@ -7,7 +7,9 @@
   <body>
     <input id="field" />
     <script>
-      window.testField = new FieldKit.TextField(document.getElementById('field'), new FieldKit.AdaptiveCardFormatter());
+      window.installFieldKit = function() {
+        window.testField = new FieldKit.TextField(document.getElementById('field'), new FieldKit.AdaptiveCardFormatter());
+      };
     </script>
   </body>
 </html>
