@@ -1,8 +1,0 @@
-.test-build
-tmp
-bower_components
-build
-node_modules
-.sass-cache
-# ignore generated Jekyll files
-_site
