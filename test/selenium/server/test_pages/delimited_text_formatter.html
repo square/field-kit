@@ -33,9 +33,11 @@
         return index === 2 || index === 3;
       };
 
-      window.leadingField = new FieldKit.TextField(document.getElementById('leading-input'), new LeadingDelimiterFormatter('-'));
-      window.consecutiveField = new FieldKit.TextField(document.getElementById('consecutive-input'), new ConsecutiveDelimiterFormatter('-'));
-      window.lazyField = new FieldKit.TextField(document.getElementById('lazy-input'), new LazyDelimiterFormatter('-', true));
+window.installFieldKit = function() {
+        window.leadingField = new FieldKit.TextField(document.getElementById('leading-input'), new LeadingDelimiterFormatter('-'));
+        window.consecutiveField = new FieldKit.TextField(document.getElementById('consecutive-input'), new ConsecutiveDelimiterFormatter('-'));
+        window.lazyField = new FieldKit.TextField(document.getElementById('lazy-input'), new LazyDelimiterFormatter('-', true));
+};
     </script>
   </body>
 </html>
