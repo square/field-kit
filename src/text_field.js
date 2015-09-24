@@ -782,6 +782,10 @@ class TextField extends Input {
                 this._isDirty = true;
               }
               this.undoManager().proxyFor(this)._applyChangeFromUndoManager(change);
+              this._manualCaret = {
+                start: change.proposed.selectedRange.start,
+                end: change.proposed.selectedRange.start + change.proposed.selectedRange.length
+              };
               this._needsKeyUpTextDidChangeTrigger = true;
             } else {
               event.preventDefault();
