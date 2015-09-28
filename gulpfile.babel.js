@@ -4,6 +4,7 @@ import browserify from 'browserify';
 import buffer from 'vinyl-buffer';
 import ghPages from 'gulp-gh-pages';
 import gulp from 'gulp';
+import derequire from 'gulp-derequire';
 import gutil from 'gulp-util';
 import ifElse from 'gulp-if-else';
 import print from 'gulp-print';
@@ -13,10 +14,11 @@ import sourcemaps from 'gulp-sourcemaps';
 import uglify from 'gulp-uglify';
 
 function dist(minified) {
-  return browserify({entries: 'src/dist.js'})
+  return browserify({entries: 'src/index.js', standalone: 'FieldKit'})
     .transform(babelify)
     .bundle()
     .pipe(source(minified ? 'field-kit.min.js' : 'field-kit.js'))
+    .pipe(derequire())
     .pipe(buffer())
     .pipe(sourcemaps.init({loadMaps: true}))
       .pipe(ifElse(minified, uglify))
@@ -39,7 +41,7 @@ gulp.task('gh-pages', function () {
 });
 
 gulp.task('lib', ['clean:lib'], function () {
-  return gulp.src(['src/**/*.js', '!src/dist.js'])
+  return gulp.src(['src/**/*.js', '!src/index.js'])
     .pipe(babel())
     .pipe(gulp.dest('lib'));
 });

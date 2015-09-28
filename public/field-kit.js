@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.FieldKit = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -91,7 +91,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],2:[function(require,module,exports){
+},{}],2:[function(_dereq_,module,exports){
 (function (process){
 (function (global, factory) {
   if (typeof define === 'function' && define.amd) {
@@ -1585,8 +1585,8 @@ process.umask = function() { return 0; };
 });
 
 
-}).call(this,require('_process'))
-},{"_process":1}],3:[function(require,module,exports){
+}).call(this,_dereq_('_process'))
+},{"_process":1}],3:[function(_dereq_,module,exports){
 (function (global, factory) {
   if (typeof define === 'function' && define.amd) {
     define('stround', ['exports'], factory);
@@ -1921,7 +1921,7 @@ process.umask = function() { return 0; };
   }
 });
 
-},{}],4:[function(require,module,exports){
+},{}],4:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1934,15 +1934,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _amex_card_formatter = require('./amex_card_formatter');
+var _amex_card_formatter = _dereq_('./amex_card_formatter');
 
 var _amex_card_formatter2 = _interopRequireDefault(_amex_card_formatter);
 
-var _default_card_formatter = require('./default_card_formatter');
+var _default_card_formatter = _dereq_('./default_card_formatter');
 
 var _default_card_formatter2 = _interopRequireDefault(_default_card_formatter);
 
-var _card_utils = require('./card_utils');
+var _card_utils = _dereq_('./card_utils');
 
 /**
  * AdaptiveCardFormatter will decide if it needs to use
@@ -2027,7 +2027,7 @@ var AdaptiveCardFormatter = (function () {
 exports['default'] = AdaptiveCardFormatter;
 module.exports = exports['default'];
 
-},{"./amex_card_formatter":5,"./card_utils":7,"./default_card_formatter":9}],5:[function(require,module,exports){
+},{"./amex_card_formatter":5,"./card_utils":7,"./default_card_formatter":9}],5:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2044,7 +2044,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _default_card_formatter = require('./default_card_formatter');
+var _default_card_formatter = _dereq_('./default_card_formatter');
 
 var _default_card_formatter2 = _interopRequireDefault(_default_card_formatter);
 
@@ -2089,7 +2089,7 @@ var AmexCardFormatter = (function (_DefaultCardFormatter) {
 exports['default'] = AmexCardFormatter;
 module.exports = exports['default'];
 
-},{"./default_card_formatter":9}],6:[function(require,module,exports){
+},{"./default_card_formatter":9}],6:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2106,15 +2106,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _text_field = require('./text_field');
+var _text_field = _dereq_('./text_field');
 
 var _text_field2 = _interopRequireDefault(_text_field);
 
-var _adaptive_card_formatter = require('./adaptive_card_formatter');
+var _adaptive_card_formatter = _dereq_('./adaptive_card_formatter');
 
 var _adaptive_card_formatter2 = _interopRequireDefault(_adaptive_card_formatter);
 
-var _card_utils = require('./card_utils');
+var _card_utils = _dereq_('./card_utils');
 
 /**
  * Enum for card mask strategies.
@@ -2212,8 +2212,8 @@ var CardTextField = (function (_TextField) {
     key: 'cardMask',
     value: function cardMask() {
       var text = this.text();
-      var toMask = text.slice(0, -4);
       var last4 = text.slice(-4);
+      var toMask = text.slice(0, -4);
 
       return toMask.replace(/\d/g, '•') + last4;
     }
@@ -2338,7 +2338,7 @@ var CardTextField = (function (_TextField) {
 exports['default'] = CardTextField;
 module.exports = exports['default'];
 
-},{"./adaptive_card_formatter":4,"./card_utils":7,"./text_field":20}],7:[function(require,module,exports){
+},{"./adaptive_card_formatter":4,"./card_utils":7,"./text_field":20}],7:[function(_dereq_,module,exports){
 /**
  * @TODO Make this an enum
  */
@@ -2435,7 +2435,7 @@ function validCardLength(pan) {
   }
 }
 
-},{}],8:[function(require,module,exports){
+},{}],8:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2486,7 +2486,7 @@ if (!document) {
 exports.getCaret = getCaret;
 exports.setCaret = setCaret;
 
-},{}],9:[function(require,module,exports){
+},{}],9:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2503,11 +2503,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _delimited_text_formatter = require('./delimited_text_formatter');
+var _delimited_text_formatter = _dereq_('./delimited_text_formatter');
 
 var _delimited_text_formatter2 = _interopRequireDefault(_delimited_text_formatter);
 
-var _card_utils = require('./card_utils');
+var _card_utils = _dereq_('./card_utils');
 
 /**
  * A generic credit card formatter.
@@ -2588,7 +2588,7 @@ var DefaultCardFormatter = (function (_DelimitedTextFormatter) {
 exports['default'] = DefaultCardFormatter;
 module.exports = exports['default'];
 
-},{"./card_utils":7,"./delimited_text_formatter":10}],10:[function(require,module,exports){
+},{"./card_utils":7,"./delimited_text_formatter":10}],10:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2605,7 +2605,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _formatter = require('./formatter');
+var _formatter = _dereq_('./formatter');
 
 var _formatter2 = _interopRequireDefault(_formatter);
 
@@ -2701,7 +2701,7 @@ var DelimitedTextFormatter = (function (_Formatter) {
       }
 
       var result = '';
-      var delimiter;
+      var delimiter = undefined;
       var maximumLength = this.maximumLength;
 
       for (var i = 0, l = value.length; i < l; i++) {
@@ -2889,26 +2889,7 @@ var DelimitedTextFormatter = (function (_Formatter) {
 exports['default'] = DelimitedTextFormatter;
 module.exports = exports['default'];
 
-},{"./formatter":14}],11:[function(require,module,exports){
-'use strict';
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var _ = require('./');
-
-var _2 = _interopRequireDefault(_);
-
-if (typeof define === 'function' && define.amd) {
-  define(function () {
-    return _2['default'];
-  });
-} else if (typeof window !== 'undefined') {
-  window.FieldKit = _2['default'];
-}
-
-module.exports = _2['default'];
-
-},{"./":15}],12:[function(require,module,exports){
+},{"./formatter":14}],11:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2925,11 +2906,88 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _text_field = require('./text_field');
+var _delimited_text_formatter = _dereq_('./delimited_text_formatter');
+
+var _delimited_text_formatter2 = _interopRequireDefault(_delimited_text_formatter);
+
+/**
+ * @const
+ * @private
+ */
+var DIGITS_PATTERN = /^\d*$/;
+
+/**
+ * @extends DelimitedTextFormatter
+ */
+
+var EmployerIdentificationNumberFormatter = (function (_DelimitedTextFormatter) {
+  _inherits(EmployerIdentificationNumberFormatter, _DelimitedTextFormatter);
+
+  function EmployerIdentificationNumberFormatter() {
+    _classCallCheck(this, EmployerIdentificationNumberFormatter);
+
+    _get(Object.getPrototypeOf(EmployerIdentificationNumberFormatter.prototype), 'constructor', this).call(this, '-');
+    this.maximumLength = 9 + 1;
+  }
+
+  /**
+   * @param {number} index
+   * @returns {boolean}
+   */
+
+  _createClass(EmployerIdentificationNumberFormatter, [{
+    key: 'hasDelimiterAtIndex',
+    value: function hasDelimiterAtIndex(index) {
+      return index === 2;
+    }
+
+    /**
+     * Determines whether the given change should be allowed and, if so, whether
+     * it should be altered.
+     *
+     * @param {TextFieldStateChange} change
+     * @param {function(string)} error
+     * @returns {boolean}
+     */
+  }, {
+    key: 'isChangeValid',
+    value: function isChangeValid(change, error) {
+      if (DIGITS_PATTERN.test(change.inserted.text)) {
+        return _get(Object.getPrototypeOf(EmployerIdentificationNumberFormatter.prototype), 'isChangeValid', this).call(this, change, error);
+      } else {
+        return false;
+      }
+    }
+  }]);
+
+  return EmployerIdentificationNumberFormatter;
+})(_delimited_text_formatter2['default']);
+
+exports['default'] = EmployerIdentificationNumberFormatter;
+module.exports = exports['default'];
+
+},{"./delimited_text_formatter":10}],12:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _text_field = _dereq_('./text_field');
 
 var _text_field2 = _interopRequireDefault(_text_field);
 
-var _expiry_date_formatter = require('./expiry_date_formatter');
+var _expiry_date_formatter = _dereq_('./expiry_date_formatter');
 
 var _expiry_date_formatter2 = _interopRequireDefault(_expiry_date_formatter);
 
@@ -2974,7 +3032,7 @@ var ExpiryDateField = (function (_TextField) {
 exports['default'] = ExpiryDateField;
 module.exports = exports['default'];
 
-},{"./expiry_date_formatter":13,"./text_field":20}],13:[function(require,module,exports){
+},{"./expiry_date_formatter":13,"./text_field":20}],13:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2991,11 +3049,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _delimited_text_formatter = require('./delimited_text_formatter');
+var _delimited_text_formatter = _dereq_('./delimited_text_formatter');
 
 var _delimited_text_formatter2 = _interopRequireDefault(_delimited_text_formatter);
 
-var _utils = require('./utils');
+var _utils = _dereq_('./utils');
 
 /**
  * Give this function a 2 digit year it'll return with 4.
@@ -3058,6 +3116,7 @@ var ExpiryDateFormatter = (function (_DelimitedTextFormatter) {
 
       var month = value.month;
       var year = value.year;
+
       year = year % 100;
 
       return _get(Object.getPrototypeOf(ExpiryDateFormatter.prototype), 'format', this).call(this, (0, _utils.zpad2)(month) + (0, _utils.zpad2)(year));
@@ -3164,7 +3223,7 @@ var ExpiryDateFormatter = (function (_DelimitedTextFormatter) {
 exports['default'] = ExpiryDateFormatter;
 module.exports = exports['default'];
 
-},{"./delimited_text_formatter":10,"./utils":22}],14:[function(require,module,exports){
+},{"./delimited_text_formatter":10,"./utils":22}],14:[function(_dereq_,module,exports){
 /**
  * Base class providing basic formatting, parsing, and change validation to be
  * customized in subclasses.
@@ -3250,66 +3309,70 @@ var Formatter = (function () {
 exports['default'] = Formatter;
 module.exports = exports['default'];
 
-},{}],15:[function(require,module,exports){
+},{}],15:[function(_dereq_,module,exports){
 'use strict';
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _adaptive_card_formatter = require('./adaptive_card_formatter');
+var _adaptive_card_formatter = _dereq_('./adaptive_card_formatter');
 
 var _adaptive_card_formatter2 = _interopRequireDefault(_adaptive_card_formatter);
 
-var _amex_card_formatter = require('./amex_card_formatter');
+var _amex_card_formatter = _dereq_('./amex_card_formatter');
 
 var _amex_card_formatter2 = _interopRequireDefault(_amex_card_formatter);
 
-var _card_text_field = require('./card_text_field');
+var _card_text_field = _dereq_('./card_text_field');
 
 var _card_text_field2 = _interopRequireDefault(_card_text_field);
 
-var _card_utils = require('./card_utils');
+var _card_utils = _dereq_('./card_utils');
 
-var _default_card_formatter = require('./default_card_formatter');
+var _default_card_formatter = _dereq_('./default_card_formatter');
 
 var _default_card_formatter2 = _interopRequireDefault(_default_card_formatter);
 
-var _delimited_text_formatter = require('./delimited_text_formatter');
+var _delimited_text_formatter = _dereq_('./delimited_text_formatter');
 
 var _delimited_text_formatter2 = _interopRequireDefault(_delimited_text_formatter);
 
-var _expiry_date_field = require('./expiry_date_field');
+var _employer_identification_number_formatter = _dereq_('./employer_identification_number_formatter');
+
+var _employer_identification_number_formatter2 = _interopRequireDefault(_employer_identification_number_formatter);
+
+var _expiry_date_field = _dereq_('./expiry_date_field');
 
 var _expiry_date_field2 = _interopRequireDefault(_expiry_date_field);
 
-var _expiry_date_formatter = require('./expiry_date_formatter');
+var _expiry_date_formatter = _dereq_('./expiry_date_formatter');
 
 var _expiry_date_formatter2 = _interopRequireDefault(_expiry_date_formatter);
 
-var _formatter = require('./formatter');
+var _formatter = _dereq_('./formatter');
 
 var _formatter2 = _interopRequireDefault(_formatter);
 
-var _number_formatter = require('./number_formatter');
+var _number_formatter = _dereq_('./number_formatter');
 
 var _number_formatter2 = _interopRequireDefault(_number_formatter);
 
-var _number_formatter_settings_formatter = require('./number_formatter_settings_formatter');
+var _number_formatter_settings_formatter = _dereq_('./number_formatter_settings_formatter');
 
 var _number_formatter_settings_formatter2 = _interopRequireDefault(_number_formatter_settings_formatter);
 
-var _phone_formatter = require('./phone_formatter');
+var _phone_formatter = _dereq_('./phone_formatter');
 
 var _phone_formatter2 = _interopRequireDefault(_phone_formatter);
 
-var _social_security_number_formatter = require('./social_security_number_formatter');
+var _social_security_number_formatter = _dereq_('./social_security_number_formatter');
 
 var _social_security_number_formatter2 = _interopRequireDefault(_social_security_number_formatter);
 
-var _text_field = require('./text_field');
+var _text_field = _dereq_('./text_field');
 
 var _text_field2 = _interopRequireDefault(_text_field);
 
-var _undo_manager = require('./undo_manager');
+var _undo_manager = _dereq_('./undo_manager');
 
 var _undo_manager2 = _interopRequireDefault(_undo_manager);
 
@@ -3332,6 +3395,7 @@ module.exports = {
   },
   DefaultCardFormatter: _default_card_formatter2['default'],
   DelimitedTextFormatter: _delimited_text_formatter2['default'],
+  EmployerIdentificationNumberFormatter: _employer_identification_number_formatter2['default'],
   ExpiryDateField: _expiry_date_field2['default'],
   ExpiryDateFormatter: _expiry_date_formatter2['default'],
   Formatter: _formatter2['default'],
@@ -3343,7 +3407,7 @@ module.exports = {
   UndoManager: _undo_manager2['default']
 };
 
-},{"./adaptive_card_formatter":4,"./amex_card_formatter":5,"./card_text_field":6,"./card_utils":7,"./default_card_formatter":9,"./delimited_text_formatter":10,"./expiry_date_field":12,"./expiry_date_formatter":13,"./formatter":14,"./number_formatter":16,"./number_formatter_settings_formatter":17,"./phone_formatter":18,"./social_security_number_formatter":19,"./text_field":20,"./undo_manager":21}],16:[function(require,module,exports){
+},{"./adaptive_card_formatter":4,"./amex_card_formatter":5,"./card_text_field":6,"./card_utils":7,"./default_card_formatter":9,"./delimited_text_formatter":10,"./employer_identification_number_formatter":11,"./expiry_date_field":12,"./expiry_date_formatter":13,"./formatter":14,"./number_formatter":16,"./number_formatter_settings_formatter":17,"./phone_formatter":18,"./social_security_number_formatter":19,"./text_field":20,"./undo_manager":21}],16:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3360,17 +3424,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _formatter = require('./formatter');
+var _formatter = _dereq_('./formatter');
 
 var _formatter2 = _interopRequireDefault(_formatter);
 
-var _number_formatter_settings_formatter = require('./number_formatter_settings_formatter');
+var _number_formatter_settings_formatter = _dereq_('./number_formatter_settings_formatter');
 
 var _number_formatter_settings_formatter2 = _interopRequireDefault(_number_formatter_settings_formatter);
 
-var _utils = require('./utils');
+var _utils = _dereq_('./utils');
 
-var _stround = require('stround');
+var _stround = _dereq_('stround');
 
 // Style
 var NONE = 0;
@@ -4615,7 +4679,7 @@ var NumberFormatter = (function (_Formatter) {
   }, {
     key: 'parse',
     value: function parse(string, error) {
-      var result;
+      var result = undefined;
       var positivePrefix = this.positivePrefix();
       var negativePrefix = this.negativePrefix();
       var positiveSuffix = this.positiveSuffix();
@@ -4629,12 +4693,12 @@ var NumberFormatter = (function (_Formatter) {
         negativeSuffix = (0, _utils.trim)(negativeSuffix);
       }
 
-      var zeroSymbol;
-      var nullSymbol;
-      var notANumberSymbol;
-      var positiveInfinitySymbol;
-      var negativeInfinitySymbol;
-      var innerString;
+      var zeroSymbol = undefined;
+      var nullSymbol = undefined;
+      var notANumberSymbol = undefined;
+      var positiveInfinitySymbol = undefined;
+      var negativeInfinitySymbol = undefined;
+      var innerString = undefined;
 
       if ((zeroSymbol = this.zeroSymbol()) !== undefined && zeroSymbol !== null && string === zeroSymbol) {
         result = 0;
@@ -4709,7 +4773,7 @@ var NumberFormatter = (function (_Formatter) {
   }, {
     key: '_parseAbsoluteValue',
     value: function _parseAbsoluteValue(string, error) {
-      var number;
+      var number = undefined;
       if (string.length === 0) {
         if (typeof error === 'function') {
           error('number-formatter.invalid-format');
@@ -6122,7 +6186,7 @@ var CurrencyDefaults = {
 exports['default'] = NumberFormatter;
 module.exports = exports['default'];
 
-},{"./formatter":14,"./number_formatter_settings_formatter":17,"./utils":22,"stround":3}],17:[function(require,module,exports){
+},{"./formatter":14,"./number_formatter_settings_formatter":17,"./utils":22,"stround":3}],17:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -6139,7 +6203,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _formatter = require('./formatter');
+var _formatter = _dereq_('./formatter');
 
 var _formatter2 = _interopRequireDefault(_formatter);
 
@@ -6249,7 +6313,7 @@ var NumberFormatterSettingsFormatter = (function (_Formatter) {
 
       if (hasFractionalPart) {
         result += DECIMAL_SEPARATOR;
-        for (var i = 0, length = maximumFractionDigits; i < length; i++) {
+        for (var i = 0, _length = maximumFractionDigits; i < _length; i++) {
           result += i < minimumFractionDigits ? PADDING : DIGIT;
         }
       }
@@ -6349,7 +6413,7 @@ var NumberFormatterSettingsFormatter = (function (_Formatter) {
 exports['default'] = NumberFormatterSettingsFormatter;
 module.exports = exports['default'];
 
-},{"./formatter":14}],18:[function(require,module,exports){
+},{"./formatter":14}],18:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -6366,7 +6430,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _delimited_text_formatter = require('./delimited_text_formatter');
+var _delimited_text_formatter = _dereq_('./delimited_text_formatter');
 
 var _delimited_text_formatter2 = _interopRequireDefault(_delimited_text_formatter);
 
@@ -6630,7 +6694,7 @@ var PhoneFormatter = (function (_DelimitedTextFormatter) {
 exports['default'] = PhoneFormatter;
 module.exports = exports['default'];
 
-},{"./delimited_text_formatter":10}],19:[function(require,module,exports){
+},{"./delimited_text_formatter":10}],19:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -6647,7 +6711,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _delimited_text_formatter = require('./delimited_text_formatter');
+var _delimited_text_formatter = _dereq_('./delimited_text_formatter');
 
 var _delimited_text_formatter2 = _interopRequireDefault(_delimited_text_formatter);
 
@@ -6707,7 +6771,7 @@ var SocialSecurityNumberFormatter = (function (_DelimitedTextFormatter) {
 exports['default'] = SocialSecurityNumberFormatter;
 module.exports = exports['default'];
 
-},{"./delimited_text_formatter":10}],20:[function(require,module,exports){
+},{"./delimited_text_formatter":10}],20:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -6724,17 +6788,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _formatter = require('./formatter');
+var _formatter = _dereq_('./formatter');
 
 var _formatter2 = _interopRequireDefault(_formatter);
 
-var _undo_manager = require('./undo_manager');
+var _undo_manager = _dereq_('./undo_manager');
 
 var _undo_manager2 = _interopRequireDefault(_undo_manager);
 
-var _utils = require('./utils');
+var _utils = _dereq_('./utils');
 
-var _caret = require('./caret');
+var _caret = _dereq_('./caret');
 
 /**
  * Simulates input behavior.
@@ -6743,7 +6807,7 @@ var _caret = require('./caret');
  * @see https://github.com/iamJoeTaylor/input-sim
  */
 
-var _inputSim = require('input-sim');
+var _inputSim = _dereq_('input-sim');
 
 /**
  * TextField is the simplest input and the base for more complex
@@ -7067,7 +7131,8 @@ var TextField = (function (_Input) {
   }, {
     key: 'readSelectionFromPasteboard',
     value: function readSelectionFromPasteboard(pasteboard) {
-      var range, text;
+      var range = undefined,
+          text = undefined;
       text = pasteboard.getData('Text');
       this.replaceSelection(text);
       range = this.selectedRange();
@@ -7525,9 +7590,9 @@ var TextField = (function (_Input) {
       if (typeof window.CustomEvent === 'function') {
         this.element.dispatchEvent(new window.CustomEvent(eventType, {}));
       } else {
-        var event = document.createEvent('Event');
-        event.initEvent(eventType, false, false);
-        this.element.dispatchEvent(event);
+        var _event = document.createEvent('Event');
+        _event.initEvent(eventType, false, false);
+        this.element.dispatchEvent(_event);
       }
     }
 
@@ -7624,6 +7689,10 @@ var TextField = (function (_Input) {
                     _this5._isDirty = true;
                   }
                   _this5.undoManager().proxyFor(_this5)._applyChangeFromUndoManager(change);
+                  _this5._manualCaret = {
+                    start: change.proposed.selectedRange.start,
+                    end: change.proposed.selectedRange.start + change.proposed.selectedRange.length
+                  };
                   _this5._needsKeyUpTextDidChangeTrigger = true;
                 } else {
                   event.preventDefault();
@@ -7837,7 +7906,7 @@ var TextFieldStateChange = (function () {
         var sharedPrefixLength = 0;
         var sharedSuffixLength = 0;
         var minTextLength = Math.min(ctext.length, ptext.length);
-        var i;
+        var i = undefined;
 
         for (i = 0; i < minTextLength; i++) {
           if (ptext[i] === ctext[i]) {
@@ -7903,7 +7972,7 @@ TextFieldStateChange.build = function (field, callback) {
 exports['default'] = TextField;
 module.exports = exports['default'];
 
-},{"./caret":8,"./formatter":14,"./undo_manager":21,"./utils":22,"input-sim":2}],21:[function(require,module,exports){
+},{"./caret":8,"./formatter":14,"./undo_manager":21,"./utils":22,"input-sim":2}],21:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -7914,7 +7983,7 @@ var _createClass = (function () { function defineProperties(target, props) { for
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _utils = require('./utils');
+var _utils = _dereq_('./utils');
 
 /**
  * UndoManager is a general-purpose recorder of operations for undo and redo.
@@ -8150,7 +8219,7 @@ var UndoManager = (function () {
 exports['default'] = UndoManager;
 module.exports = exports['default'];
 
-},{"./utils":22}],22:[function(require,module,exports){
+},{"./utils":22}],22:[function(_dereq_,module,exports){
 /**
  * @const
  * @private
@@ -8364,7 +8433,7 @@ function hasGetter(object, property) {
     return false;
   }
 
-  var descriptor;
+  var descriptor = undefined;
 
   if (object && object.constructor && object.constructor.prototype) {
     descriptor = Object.getOwnPropertyDescriptor(object.constructor.prototype, property);
@@ -8402,6 +8471,6 @@ function getAllPropertyNames(object) {
   return result;
 }
 
-},{}]},{},[11]);
-
+},{}]},{},[15])(15)
+});
 //# sourceMappingURL=field-kit.js.map
