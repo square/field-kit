@@ -1,6 +1,6 @@
 {
   "name": "field-kit",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Utilities to effectively manage text entry on the web.",
   "main": "dist/field-kit.js",
   "jsnext:main": "src/index.js",
