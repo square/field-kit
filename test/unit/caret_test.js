@@ -5,13 +5,13 @@ import installCaret from '../../src/caret';
 describe('Caret', () => {
   describe('with no document', () => {
     it('throws an error', () => {
-      expect(installCaret.bind(this, null)).to.throw(/Caret does not have access to document/);
+      expect(() => installCaret(null)).to.throw(/Caret does not have access to document/);
     });
   });
 
   describe('with no native caret', () => {
     it('throws an error', () => {
-      expect(installCaret.bind(this, {
+      expect(() => installCaret({
         createElement: () => ({})
       })).to.throw(/Caret unknown input selection capabilities/);
     });
