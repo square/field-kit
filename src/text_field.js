@@ -1,8 +1,10 @@
 import Formatter from './formatter';
 import UndoManager from './undo_manager';
 import { bind } from './utils';
-import { getCaret, setCaret } from './caret';
+import installCaret from './caret';
 import { replaceStringSelection } from './utils';
+
+const { getCaret, setCaret } = installCaret();
 
 /**
  * Simulates input behavior.

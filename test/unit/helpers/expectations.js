@@ -4,8 +4,10 @@ import FakeEvent from './fake_event';
 import Selection from './selection';
 import TextField from '../../../src/text_field';
 import { buildField } from './builders';
-import { getCaret, setCaret } from '../../../src/caret';
+import installCaret from '../../../src/caret';
 import {expect} from 'chai';
+
+const { getCaret, setCaret } = installCaret();
 
 class FieldExpectationBase {
   into(field) {
