@@ -6901,7 +6901,7 @@ var TextField = (function (_Input) {
     element.addEventListener('focus', this._focus);
     element.addEventListener('blur', this._blur);
 
-    // Change event could be fired from autofill in browser
+    // Change event could be fired from vanilla-autofill-event
     element.addEventListener('change', this._change);
 
     if (!element.getAttribute('autocapitalize')) {

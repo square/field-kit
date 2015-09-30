@@ -38,6 +38,33 @@ module.exports = function(ua) {
       });
     });
 
+    test.it('formats after the change event', function() {
+      var element = 'window.testField.element';
+
+      return driver.executeScript('return ' + element + '.value = 7774446666;')
+        .then(function() {
+          return driver.executeScript('return ' + element + '.dispatchEvent(new Event("change"))')
+            .then(function() {
+              return helpers.getFieldKitValues()
+                .then(function(values) {
+                  expect(values.raw).to.equal('(777) 444-6666');
+                });
+            });
+        });
+    });
+
+    test.it('does not formats after the change event', function() {
+      var element = 'window.testField.element';
+
+      return driver.executeScript('return ' + element + '.value = 7774446666;')
+        .then(function() {
+            return helpers.getFieldKitValues()
+              .then(function(values) {
+                expect(values.raw).to.equal('7774446666');
+              });
+        });
+    });
+
     test.it('backspaces both the digit leading delimiter', function() {
       helpers.setInput('(4|', input);
 
