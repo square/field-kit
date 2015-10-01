@@ -34,10 +34,15 @@ gulp.task('dist:not-minified', ['clean:dist'], () => dist(false));
 gulp.task('dist:minified', ['clean:dist'], () => dist(true));
 gulp.task('dist', ['dist:not-minified', 'dist:minified']);
 
-gulp.task('gh-pages', function () {
-  return gulp.src(['**/*', '!node_modules/**'])
+gulp.task('gh-pages', ['build'], function () {
+  return gulp.src(['public/**/*'])
     .pipe(print())
     .pipe(ghPages());
+});
+
+gulp.task('move-fk-to-public', function() {
+  return gulp.src('dist/field-kit.js')
+    .pipe(gulp.dest('public/javascript'));
 });
 
 gulp.task('lib', ['clean:lib'], function () {
@@ -46,5 +51,5 @@ gulp.task('lib', ['clean:lib'], function () {
     .pipe(gulp.dest('lib'));
 });
 
-gulp.task('build', ['lib', 'dist']);
+gulp.task('build', ['lib', 'dist', 'move-fk-to-public']);
 gulp.task('default', ['build']);
