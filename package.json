@@ -13,6 +13,7 @@
   "repository": "square/field-kit",
   "files": [
     "dist/",
+    "lib/",
     "src/"
   ],
   "dependencies": {
