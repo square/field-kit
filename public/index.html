@@ -81,18 +81,50 @@ field.setDelegate({
       The <code>NumberFormatter</code> provides formatting for all kinds of numbers, percentages, currencies, etc.
     </p>
 
+    <h4>Currency</h4>
+
     <div class="demo">
 {% highlight html %}
-<input type="text" id="number">
+<input type="text" id="number-currency">
 {% endhighlight %}
 
 {% highlight javascript %}
-var field = new FieldKit.TextField(document.getElementById('number'));
+var field = new FieldKit.TextField(document.getElementById('number-currency'));
 field.setFormatter(new FieldKit.NumberFormatter()
-  .setNumberStyle(Math.random() < 0.5 ?
-    FieldKit.NumberFormatter.Style.PERCENT :
-    FieldKit.NumberFormatter.Style.CURRENCY));
+  .setNumberStyle(FieldKit.NumberFormatter.Style.CURRENCY)
+  .setLocale('en-US')
+  .setCountryCode('US')
+  .setCurrencyCode('USD')
+);
 field.setValue((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
+
+field.setDelegate({
+  textFieldDidEndEditing: function() {
+    field.setValue(field.value() || field.text());
+  }
+});
+{% endhighlight %}
+    </div>
+
+    <h4>Percentage</h4>
+
+    <div class="demo">
+{% highlight html %}
+<input type="text" id="number-percent">
+{% endhighlight %}
+
+{% highlight javascript %}
+var field = new FieldKit.TextField(document.getElementById('number-percent'));
+field.setFormatter(new FieldKit.NumberFormatter()
+  .setNumberStyle(FieldKit.NumberFormatter.Style.PERCENT)
+);
+field.setValue((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
+
+field.setDelegate({
+  textFieldDidEndEditing: function() {
+    field.setValue(field.value() || field.text());
+  }
+});
 {% endhighlight %}
     </div>
   </section>

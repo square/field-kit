@@ -1922,140 +1922,6 @@ process.umask = function() { return 0; };
 });
 
 },{}],4:[function(_dereq_,module,exports){
-(function(window) {
-  var rootElement = window.document.documentElement;
-
-  window.checkAndTriggerAutoFillEvent = function(els) {
-    els = this.nodeName === 'INPUT' ? [this] : els;
-    var i, el;
-    for (i=0; i<els.length; i++) {
-      el = els[i];
-      if (!valueMarked(el)) {
-        markValue(el);
-        triggerChangeEvent(el);
-      }
-    }
-  };
-
-
-  addGlobalEventListener('change', markValue);
-
-  HTMLInputElement.prototype.checkAndTriggerAutoFillEvent = window.checkAndTriggerAutoFillEvent;
-
-  // Need to use blur and not change event
-  // as Chrome does not fire change events in all cases an input is changed
-  // (e.g. when starting to type and then finish the input by auto filling a username)
-  addGlobalEventListener('blur', function(target) {
-    // setTimeout needed for Chrome as it fills other
-    // form fields a little later...
-    window.setTimeout(function() {
-      window.checkAndTriggerAutoFillEvent(findParentForm(target).querySelectorAll('input'));
-    }, 20);
-  });
-
-  function DOMContentLoadedListener() {
-    // mark all values that are present when the DOM is ready.
-    // We don't need to trigger a change event here,
-    // as js libs start with those values already being set!
-    forEach(document.getElementsByTagName('input'), markValue);
-
-    // The timeout is needed for Chrome as it auto fills
-    // login forms some time after DOMContentLoaded!
-    window.setTimeout(function() {
-      window.checkAndTriggerAutoFillEvent(rootElement.querySelectorAll('input'));
-    }, 200);
-  }
-
-  // IE8 compatibility issue
-  if(!window.document.addEventListener){
-    window.document.attachEvent('DOMContentLoaded', DOMContentLoadedListener);
-  }else{
-    window.document.addEventListener('DOMContentLoaded', DOMContentLoadedListener, false);
-  }
-
-  // ----------
-
-  function valueMarked(el) {
-    if (! ("$$currentValue" in el) ) {
-      // First time we see an element we take it's value attribute
-      // as real value. This might have been filled in the backend,
-      // ...
-      // Note: it's important to not use the value property here!
-      el.$$currentValue = el.getAttribute('value');
-    }
-
-    var val = el.value,
-         $$currentValue = el.$$currentValue;
-    if (!val && !$$currentValue) {
-      return true;
-    }
-    return val === $$currentValue;
-  }
-
-  function markValue(el) {
-    el.$$currentValue = el.value;
-  }
-
-  function addValueChangeByJsListener(listener) {
-    var jq = window.jQuery || window.angular.element,
-        jqProto = jq.prototype;
-    var _val = jqProto.val;
-    jqProto.val = function(newValue) {
-      var res = _val.apply(this, arguments);
-      if (arguments.length > 0) {
-        forEach(this, function(el) {
-          listener(el, newValue);
-        });
-      }
-      return res;
-    };
-  }
-
-  function addGlobalEventListener(eventName, listener) {
-    // Use a capturing event listener so that
-    // we also get the event when it's stopped!
-    // Also, the blur event does not bubble.
-    if(!rootElement.addEventListener){
-      rootElement.attachEvent(eventName, onEvent);
-    }else{
-      rootElement.addEventListener(eventName, onEvent, true);
-    }
-
-    function onEvent(event) {
-      var target = event.target;
-      listener(target);
-    }
-  }
-
-  function findParentForm(el) {
-    while (el) {
-      if (el.nodeName === 'FORM') {
-        return el;
-      }
-      el = el.parentNode;
-    }
-    return null;
-  }
-
-  function forEach(arr, listener) {
-    if (arr.forEach) {
-      return arr.forEach(listener);
-    }
-    var i;
-    for (i=0; i<arr.length; i++) {
-      listener(arr[i]);
-    }
-  }
-
-  function triggerChangeEvent(element) {
-    var doc = window.document;
-    var event = doc.createEvent("HTMLEvents");
-    event.initEvent("change", true, true);
-    element.dispatchEvent(event);
-  }
-})(window)
-
-},{}],5:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2161,7 +2027,7 @@ var AdaptiveCardFormatter = (function () {
 exports['default'] = AdaptiveCardFormatter;
 module.exports = exports['default'];
 
-},{"./amex_card_formatter":6,"./card_utils":8,"./default_card_formatter":10}],6:[function(_dereq_,module,exports){
+},{"./amex_card_formatter":5,"./card_utils":7,"./default_card_formatter":9}],5:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2223,7 +2089,7 @@ var AmexCardFormatter = (function (_DefaultCardFormatter) {
 exports['default'] = AmexCardFormatter;
 module.exports = exports['default'];
 
-},{"./default_card_formatter":10}],7:[function(_dereq_,module,exports){
+},{"./default_card_formatter":9}],6:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2472,7 +2338,7 @@ var CardTextField = (function (_TextField) {
 exports['default'] = CardTextField;
 module.exports = exports['default'];
 
-},{"./adaptive_card_formatter":5,"./card_utils":8,"./text_field":21}],8:[function(_dereq_,module,exports){
+},{"./adaptive_card_formatter":4,"./card_utils":7,"./text_field":20}],7:[function(_dereq_,module,exports){
 /**
  * @TODO Make this an enum
  */
@@ -2569,7 +2435,7 @@ function validCardLength(pan) {
   }
 }
 
-},{}],9:[function(_dereq_,module,exports){
+},{}],8:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2629,7 +2495,7 @@ function installCaret() {
 ;
 module.exports = exports['default'];
 
-},{}],10:[function(_dereq_,module,exports){
+},{}],9:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2731,7 +2597,7 @@ var DefaultCardFormatter = (function (_DelimitedTextFormatter) {
 exports['default'] = DefaultCardFormatter;
 module.exports = exports['default'];
 
-},{"./card_utils":8,"./delimited_text_formatter":11}],11:[function(_dereq_,module,exports){
+},{"./card_utils":7,"./delimited_text_formatter":10}],10:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3032,7 +2898,7 @@ var DelimitedTextFormatter = (function (_Formatter) {
 exports['default'] = DelimitedTextFormatter;
 module.exports = exports['default'];
 
-},{"./formatter":15}],12:[function(_dereq_,module,exports){
+},{"./formatter":14}],11:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3109,7 +2975,7 @@ var EmployerIdentificationNumberFormatter = (function (_DelimitedTextFormatter) 
 exports['default'] = EmployerIdentificationNumberFormatter;
 module.exports = exports['default'];
 
-},{"./delimited_text_formatter":11}],13:[function(_dereq_,module,exports){
+},{"./delimited_text_formatter":10}],12:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3175,7 +3041,7 @@ var ExpiryDateField = (function (_TextField) {
 exports['default'] = ExpiryDateField;
 module.exports = exports['default'];
 
-},{"./expiry_date_formatter":14,"./text_field":21}],14:[function(_dereq_,module,exports){
+},{"./expiry_date_formatter":13,"./text_field":20}],13:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3366,7 +3232,7 @@ var ExpiryDateFormatter = (function (_DelimitedTextFormatter) {
 exports['default'] = ExpiryDateFormatter;
 module.exports = exports['default'];
 
-},{"./delimited_text_formatter":11,"./utils":23}],15:[function(_dereq_,module,exports){
+},{"./delimited_text_formatter":10,"./utils":22}],14:[function(_dereq_,module,exports){
 /**
  * Base class providing basic formatting, parsing, and change validation to be
  * customized in subclasses.
@@ -3452,7 +3318,7 @@ var Formatter = (function () {
 exports['default'] = Formatter;
 module.exports = exports['default'];
 
-},{}],16:[function(_dereq_,module,exports){
+},{}],15:[function(_dereq_,module,exports){
 'use strict';
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
@@ -3550,7 +3416,7 @@ module.exports = {
   UndoManager: _undo_manager2['default']
 };
 
-},{"./adaptive_card_formatter":5,"./amex_card_formatter":6,"./card_text_field":7,"./card_utils":8,"./default_card_formatter":10,"./delimited_text_formatter":11,"./employer_identification_number_formatter":12,"./expiry_date_field":13,"./expiry_date_formatter":14,"./formatter":15,"./number_formatter":17,"./number_formatter_settings_formatter":18,"./phone_formatter":19,"./social_security_number_formatter":20,"./text_field":21,"./undo_manager":22}],17:[function(_dereq_,module,exports){
+},{"./adaptive_card_formatter":4,"./amex_card_formatter":5,"./card_text_field":6,"./card_utils":7,"./default_card_formatter":9,"./delimited_text_formatter":10,"./employer_identification_number_formatter":11,"./expiry_date_field":12,"./expiry_date_formatter":13,"./formatter":14,"./number_formatter":16,"./number_formatter_settings_formatter":17,"./phone_formatter":18,"./social_security_number_formatter":19,"./text_field":20,"./undo_manager":21}],16:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -6329,7 +6195,7 @@ var CurrencyDefaults = {
 exports['default'] = NumberFormatter;
 module.exports = exports['default'];
 
-},{"./formatter":15,"./number_formatter_settings_formatter":18,"./utils":23,"stround":3}],18:[function(_dereq_,module,exports){
+},{"./formatter":14,"./number_formatter_settings_formatter":17,"./utils":22,"stround":3}],17:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -6556,7 +6422,7 @@ var NumberFormatterSettingsFormatter = (function (_Formatter) {
 exports['default'] = NumberFormatterSettingsFormatter;
 module.exports = exports['default'];
 
-},{"./formatter":15}],19:[function(_dereq_,module,exports){
+},{"./formatter":14}],18:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -6837,7 +6703,7 @@ var PhoneFormatter = (function (_DelimitedTextFormatter) {
 exports['default'] = PhoneFormatter;
 module.exports = exports['default'];
 
-},{"./delimited_text_formatter":11}],20:[function(_dereq_,module,exports){
+},{"./delimited_text_formatter":10}],19:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -6914,7 +6780,7 @@ var SocialSecurityNumberFormatter = (function (_DelimitedTextFormatter) {
 exports['default'] = SocialSecurityNumberFormatter;
 module.exports = exports['default'];
 
-},{"./delimited_text_formatter":11}],21:[function(_dereq_,module,exports){
+},{"./delimited_text_formatter":10}],20:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -6961,8 +6827,6 @@ var _inputSim = _dereq_('input-sim');
  * @extends external:InputSim.Input
  */
 
-_dereq_('vanilla-autofill-event');
-
 var _installCaret = (0, _caret2['default'])();
 
 var getCaret = _installCaret.getCaret;
@@ -7003,7 +6867,6 @@ var TextField = (function (_Input) {
     // Make sure textDidChange fires while the value is correct
     this._needsKeyUpTextDidChangeTrigger = false;
     this._blur = (0, _utils.bind)(this._blur, this);
-    this._change = (0, _utils.bind)(this._change, this);
     this._focus = (0, _utils.bind)(this._focus, this);
     this._click = (0, _utils.bind)(this._click, this);
     this._paste = (0, _utils.bind)(this._paste, this);
@@ -7022,9 +6885,6 @@ var TextField = (function (_Input) {
     element.addEventListener('paste', this._paste);
     element.addEventListener('focus', this._focus);
     element.addEventListener('blur', this._blur);
-
-    // Change event could be fired from vanilla-autofill-event
-    element.addEventListener('change', this._change);
 
     if (!element.getAttribute('autocapitalize')) {
       element.setAttribute('autocapitalize', 'off');
@@ -7192,7 +7052,6 @@ var TextField = (function (_Input) {
       element.removeEventListener('paste', this._paste);
       element.removeEventListener('focus', this._focus);
       element.removeEventListener('blur', this._blur);
-      element.removeEventListener('change', this._change);
       delete element['field-kit-text-field'];
     }
 
@@ -7780,18 +7639,6 @@ var TextField = (function (_Input) {
     }
 
     /**
-     * This event could be triggered from vanilla-autofill-event. We should try to parse the
-     * text.
-     *
-     * @private
-     */
-  }, {
-    key: '_change',
-    value: function _change() {
-      if (this._formatter) this.setValue(this._formatter.format(this.value()));
-    }
-
-    /**
      * Handles keyDown events. This method essentially just delegates to other,
      * more semantic, methods based on the modifier keys and the pressed key of the
      * event.
@@ -8141,7 +7988,7 @@ TextFieldStateChange.build = function (field, callback) {
 exports['default'] = TextField;
 module.exports = exports['default'];
 
-},{"./caret":9,"./formatter":15,"./undo_manager":22,"./utils":23,"input-sim":2,"vanilla-autofill-event":4}],22:[function(_dereq_,module,exports){
+},{"./caret":8,"./formatter":14,"./undo_manager":21,"./utils":22,"input-sim":2}],21:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -8388,7 +8235,7 @@ var UndoManager = (function () {
 exports['default'] = UndoManager;
 module.exports = exports['default'];
 
-},{"./utils":23}],23:[function(_dereq_,module,exports){
+},{"./utils":22}],22:[function(_dereq_,module,exports){
 /**
  * @const
  * @private
@@ -8640,6 +8487,6 @@ function getAllPropertyNames(object) {
   return result;
 }
 
-},{}]},{},[16])(16)
+},{}]},{},[15])(15)
 });
 //# sourceMappingURL=field-kit.js.map
