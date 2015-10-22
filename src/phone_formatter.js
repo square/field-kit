@@ -5,6 +5,7 @@ import DelimitedTextFormatter from './delimited_text_formatter';
  * @private
  */
 const NANPPhoneDelimiters = {
+  name: 'NANPPhoneDelimiters',
   0: '(',
   4: ')',
   5: ' ',
@@ -16,6 +17,7 @@ const NANPPhoneDelimiters = {
  * @private
  */
 const NANPPhoneDelimitersWithOne = {
+  name: 'NANPPhoneDelimitersWithOne',
   1:  ' ',
   2:  '(',
   6:  ')',
@@ -28,6 +30,7 @@ const NANPPhoneDelimitersWithOne = {
  * @private
  */
 const NANPPhoneDelimitersWithPlus = {
+  name: 'NANPPhoneDelimitersWithPlus',
   2:  ' ',
   3:  '(',
   7:  ')',
@@ -172,7 +175,15 @@ class PhoneFormatter extends DelimitedTextFormatter {
     }
 
     if (/^\d*$/.test(change.inserted.text) || change.proposed.text.indexOf('+') === 0) {
-      return super.isChangeValid(change, error);
+      // We need to store the change and current format guess so that if the isChangeValid
+      // call to super changes the proposed text such that the format we thought is no longer
+      // valid. If that does happen we actually just rerun it through with the correct format
+      const _isChangeValid = super.isChangeValid(change, error);
+      const formatName = this.delimiterMap.name;
+      this.guessFormatFromText(change.proposed.text);
+      return formatName === this.delimiterMap.name ?
+        _isChangeValid :
+        super.isChangeValid(change, error);
     } else {
       return false;
     }
@@ -192,6 +203,9 @@ class PhoneFormatter extends DelimitedTextFormatter {
     } else if (text && text[0] === '1') {
       this.delimiterMap = NANPPhoneDelimitersWithOne;
       this.maximumLength = 1 + 10 + 5;
+    } else if (text && text[0] === ' ') {
+      this.delimiterMap = NANPPhoneDelimiters;
+      this.maximumLength = 10 + 5;
     } else {
       this.delimiterMap = NANPPhoneDelimiters;
       this.maximumLength = 10 + 4;
