@@ -6,7 +6,7 @@ var expect = require('chai').expect;
 var server = require('./server');
 var helpers = require('./helpers');
 
-module.exports = function() {
+module.exports = function(ua) {
   test.describe('FieldKit.PhoneFormatter', function() {
     var input;
     test.beforeEach(function() {
@@ -148,5 +148,38 @@ module.exports = function() {
       });
     });
 
+    if(ua === 'DEFAULT') {
+      describe('deletes the correct character', function() {
+        test.it('deleting the country code', function() {
+          helpers.setInput('1 (888) 888-8888', input);
+          var element = 'window.testField.element';
+
+          return driver.executeScript('return ' + element + '.selectionStart = ' + element + '.selectionEnd = 1')
+            .then(function() {
+              input.sendKeys(Key.BACK_SPACE);
+
+              return helpers.getFieldKitValues()
+                .then(function(values) {
+                  expect(values.raw).to.equal('(888) 888-8888');
+                });
+            });
+        });
+
+        test.it('deleting the space after the country code', function() {
+          helpers.setInput('1 (888) 888-8888', input);
+          var element = 'window.testField.element';
+
+          return driver.executeScript('return ' + element + '.selectionStart = ' + element + '.selectionEnd = 2')
+            .then(function() {
+              input.sendKeys(Key.BACK_SPACE);
+
+              return helpers.getFieldKitValues()
+                .then(function(values) {
+                  expect(values.raw).to.equal('(888) 888-8888');
+                });
+            });
+        });
+      });
+    }
   });
 };

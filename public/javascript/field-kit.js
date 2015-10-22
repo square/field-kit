@@ -1,97 +1,162 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.FieldKit = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
-// shim for using process in browser
+'use strict';
 
-var process = module.exports = {};
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports['default'] = installCaret;
 
-function cleanUpNextTick() {
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
+function installCaret() {
+  var _document = arguments.length <= 0 || arguments[0] === undefined ? document : arguments[0];
+
+  var getCaret = undefined;
+  var setCaret = undefined;
+
+  if (!_document) {
+    throw new Error('Caret does not have access to document');
+  } else if ('selectionStart' in _document.createElement('input')) {
+    getCaret = function (element) {
+      return {
+        start: element.selectionStart,
+        end: element.selectionEnd
+      };
+    };
+    setCaret = function (element, start, end) {
+      element.selectionStart = start;
+      element.selectionEnd = end;
+    };
+  } else if (_document.selection) {
+    getCaret = function (element) {
+      var selection = _document.selection;
+      var value = element.value;
+      var range = selection.createRange().duplicate();
+
+      range.moveEnd('character', value.length);
+
+      var start = range.text === '' ? value.length : value.lastIndexOf(range.text);
+      range = selection.createRange().duplicate();
+
+      range.moveStart('character', -value.length);
+
+      var end = range.text.length;
+      return { start: start, end: end };
+    };
+    setCaret = function (element, start, end) {
+      var range = element.createTextRange();
+      range.collapse(true);
+      range.moveStart('character', start);
+      range.moveEnd('character', end - start);
+      range.select();
+    };
+  } else {
+    throw new Error('Caret unknown input selection capabilities');
+  }
+
+  return { getCaret: getCaret, setCaret: setCaret };
 }
 
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = setTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    clearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        setTimeout(drainQueue, 0);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
+;
+module.exports = exports['default'];
 
 },{}],2:[function(_dereq_,module,exports){
+/**
+ * Base class providing basic formatting, parsing, and change validation to be
+ * customized in subclasses.
+ */
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+})();
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError('Cannot call a class as a function');
+  }
+}
+
+var Formatter = (function () {
+  function Formatter() {
+    _classCallCheck(this, Formatter);
+  }
+
+  _createClass(Formatter, [{
+    key: 'format',
+
+    /**
+     * @param {string} text
+     * @returns {string}
+     */
+    value: function format(text) {
+      if (text === undefined || text === null) {
+        text = '';
+      }
+      if (this.maximumLength !== undefined && this.maximumLength !== null) {
+        text = text.substring(0, this.maximumLength);
+      }
+      return text;
+    }
+
+    /**
+     * @param {string} text
+     * @returns {string}
+     */
+  }, {
+    key: 'parse',
+    value: function parse(text) {
+      if (text === undefined || text === null) {
+        text = '';
+      }
+      if (this.maximumLength !== undefined && this.maximumLength !== null) {
+        text = text.substring(0, this.maximumLength);
+      }
+      return text;
+    }
+
+    /**
+     * Determines whether the given change should be allowed and, if so, whether
+     * it should be altered.
+     *
+     * @param {TextFieldStateChange} change
+     * @returns {boolean}
+     */
+  }, {
+    key: 'isChangeValid',
+    value: function isChangeValid(change) {
+      var selectedRange = change.proposed.selectedRange;
+      var text = change.proposed.text;
+      if (this.maximumLength !== undefined && this.maximumLength !== null && text.length > this.maximumLength) {
+        var available = this.maximumLength - (text.length - change.inserted.text.length);
+        var newText = change.current.text.substring(0, change.current.selectedRange.start);
+        if (available > 0) {
+          newText += change.inserted.text.substring(0, available);
+        }
+        newText += change.current.text.substring(change.current.selectedRange.start + change.current.selectedRange.length);
+        var truncatedLength = text.length - newText.length;
+        change.proposed.text = newText;
+        selectedRange.start -= truncatedLength;
+      }
+      return true;
+    }
+  }]);
+
+  return Formatter;
+})();
+
+exports['default'] = Formatter;
+module.exports = exports['default'];
+
+},{}],3:[function(_dereq_,module,exports){
 (function (process){
 (function (global, factory) {
   if (typeof define === 'function' && define.amd) {
@@ -1586,7 +1651,2783 @@ process.umask = function() { return 0; };
 
 
 }).call(this,_dereq_('_process'))
-},{"_process":1}],3:[function(_dereq_,module,exports){
+},{"_process":7}],4:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+})();
+
+var _get = function get(_x, _x2, _x3) {
+  var _again = true;_function: while (_again) {
+    var object = _x,
+        property = _x2,
+        receiver = _x3;desc = parent = getter = undefined;_again = false;if (object === null) object = Function.prototype;var desc = Object.getOwnPropertyDescriptor(object, property);if (desc === undefined) {
+      var parent = Object.getPrototypeOf(object);if (parent === null) {
+        return undefined;
+      } else {
+        _x = parent;_x2 = property;_x3 = receiver;_again = true;continue _function;
+      }
+    } else if ('value' in desc) {
+      return desc.value;
+    } else {
+      var getter = desc.get;if (getter === undefined) {
+        return undefined;
+      }return getter.call(receiver);
+    }
+  }
+};
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { 'default': obj };
+}
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError('Cannot call a class as a function');
+  }
+}
+
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== 'function' && superClass !== null) {
+    throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass);
+  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+}
+
+var _formatter = _dereq_('./formatter');
+
+var _formatter2 = _interopRequireDefault(_formatter);
+
+var _undo_manager = _dereq_('./undo_manager');
+
+var _undo_manager2 = _interopRequireDefault(_undo_manager);
+
+var _utils = _dereq_('./utils');
+
+var _caret = _dereq_('./caret');
+
+var _caret2 = _interopRequireDefault(_caret);
+
+/**
+ * Simulates input behavior.
+ *
+ * @external InputSim
+ * @see https://github.com/iamJoeTaylor/input-sim
+ */
+
+var _inputSim = _dereq_('input-sim');
+
+/**
+ * TextField is the simplest input and the base for more complex
+ * types to inherit.
+ *
+ * @extends external:InputSim.Input
+ */
+
+var _installCaret = (0, _caret2['default'])();
+
+var getCaret = _installCaret.getCaret;
+var setCaret = _installCaret.setCaret;
+
+var TextField = (function (_Input) {
+  _inherits(TextField, _Input);
+
+  /**
+   * Sets up the initial properties of the TextField and
+   * sets  up the event listeners
+   *
+   * @param {HTMLElement} element
+   * @param {Formatter} formatter
+   */
+
+  function TextField(element, formatter) {
+    _classCallCheck(this, TextField);
+
+    _get(Object.getPrototypeOf(TextField.prototype), 'constructor', this).call(this);
+
+    var caret = getCaret(element);
+    if (typeof element.get === 'function') {
+      console.warn('DEPRECATION: FieldKit.TextField instances should no longer be ' + 'created with a jQuery-wrapped element.');
+      element = element.get(0);
+    }
+    this.element = element;
+    this._formatter = formatter;
+    this._enabled = true;
+    this._manualCaret = { start: 0, end: 0 };
+    this._placeholder = null;
+    this._disabledPlaceholder = null;
+    this._focusedPlaceholder = null;
+    this._unfocusedPlaceholder = null;
+    this._isDirty = false;
+    this._valueOnFocus = '';
+    this._currentValue = '';
+    // Make sure textDidChange fires while the value is correct
+    this._needsKeyUpTextDidChangeTrigger = false;
+    this._blur = (0, _utils.bind)(this._blur, this);
+    this._focus = (0, _utils.bind)(this._focus, this);
+    this._click = (0, _utils.bind)(this._click, this);
+    this._paste = (0, _utils.bind)(this._paste, this);
+    this._keyUp = (0, _utils.bind)(this._keyUp, this);
+    this._keyPress = (0, _utils.bind)(this._keyPress, this);
+    this._keyDown = (0, _utils.bind)(this._keyDown, this);
+    if (element['field-kit-text-field']) {
+      throw new Error('already attached a TextField to this element');
+    } else {
+      element['field-kit-text-field'] = this;
+    }
+    element.addEventListener('keydown', this._keyDown);
+    element.addEventListener('keypress', this._keyPress);
+    element.addEventListener('keyup', this._keyUp);
+    element.addEventListener('click', this._click);
+    element.addEventListener('paste', this._paste);
+    element.addEventListener('focus', this._focus);
+    element.addEventListener('blur', this._blur);
+
+    if (!element.getAttribute('autocapitalize')) {
+      element.setAttribute('autocapitalize', 'off');
+    }
+
+    var window = element.ownerDocument.defaultView;
+
+    /**
+     * Fixes caret bug (Android) that caused the input
+     * to place inserted characters in the wrong place
+     * Expected: 1234 5678|  =>  1234 5678 9|
+     * Bug: 1234 5678|  =>  1234 5679| 8
+     *
+     * @private
+     */
+    this._needsManualCaret = window.navigator.userAgent.toLowerCase().indexOf('android') > -1;
+
+    this.setText(element.value);
+
+    this.setSelectedRange({
+      start: caret.start,
+      length: caret.end - caret.start
+    });
+  }
+
+  /**
+   * Helps calculate the changes after an event on a FieldKit.TextField.
+   *
+   * @private
+   */
+
+  /**
+   * **** Public Events ****
+   */
+
+  /**
+   * Called when the user has changed the text of the field. Can be used in
+   * subclasses to perform actions suitable for this event.
+   *
+   * @private
+   */
+
+  _createClass(TextField, [{
+    key: 'textDidChange',
+    value: function textDidChange() {}
+
+    /**
+     * Called when the user has in some way declared that they are done editing,
+     * such as leaving the field or perhaps pressing enter. Can be used in
+     * subclasses to perform actions suitable for this event.
+     *
+     * @private
+     */
+  }, {
+    key: 'textFieldDidEndEditing',
+    value: function textFieldDidEndEditing() {}
+
+    /**
+     * Performs actions necessary for beginning editing.
+     *
+     * @private
+     */
+  }, {
+    key: 'textFieldDidBeginEditing',
+    value: function textFieldDidBeginEditing() {}
+
+    /**
+     * **** Private Events ****
+     */
+
+    /**
+     * Performs actions necessary for text change.
+     *
+     * @private
+     */
+  }, {
+    key: '_textDidChange',
+    value: function _textDidChange() {
+      var delegate = this._delegate;
+      this.textDidChange();
+      if (delegate && typeof delegate.textDidChange === 'function') {
+        delegate.textDidChange(this);
+      }
+
+      // manually fire the HTML5 input event
+      this._fireEvent('input');
+    }
+
+    /**
+     * Performs actions necessary for ending editing.
+     *
+     * @private
+     */
+  }, {
+    key: '_textFieldDidEndEditing',
+    value: function _textFieldDidEndEditing() {
+      var delegate = this._delegate;
+      this.textFieldDidEndEditing();
+      if (delegate && typeof delegate.textFieldDidEndEditing === 'function') {
+        delegate.textFieldDidEndEditing(this);
+      }
+
+      // manually fire the HTML5 change event, only when a change has been made since focus
+      if (this._isDirty && this._valueOnFocus !== this.element.value) {
+        this._fireEvent('change');
+      }
+
+      // reset the dirty property
+      this._isDirty = false;
+      this._valueOnFocus = '';
+    }
+
+    /**
+     * Performs actions necessary for beginning editing.
+     *
+     * @private
+     */
+  }, {
+    key: '_textFieldDidBeginEditing',
+    value: function _textFieldDidBeginEditing() {
+      var delegate = this._delegate;
+      this.textFieldDidBeginEditing();
+      if (delegate && typeof delegate.textFieldDidBeginEditing === 'function') {
+        delegate.textFieldDidBeginEditing(this);
+      }
+    }
+
+    /**
+     * **** Public Methods ****
+     */
+
+    /**
+     * Gets the current delegate for this text field.
+     *
+     * @returns {TextFieldDelegate}
+     */
+  }, {
+    key: 'delegate',
+    value: function delegate() {
+      return this._delegate;
+    }
+
+    /**
+     * Sets the current delegate for this text field.
+     *
+     * @param {TextFieldDelegate} delegate
+     */
+  }, {
+    key: 'setDelegate',
+    value: function setDelegate(delegate) {
+      this._delegate = delegate;
+    }
+
+    /**
+     * Tears down FieldKit
+     */
+  }, {
+    key: 'destroy',
+    value: function destroy() {
+      var element = this.element;
+      element.removeEventListener('keydown', this._keyDown);
+      element.removeEventListener('keypress', this._keyPress);
+      element.removeEventListener('keyup', this._keyUp);
+      element.removeEventListener('click', this._click);
+      element.removeEventListener('paste', this._paste);
+      element.removeEventListener('focus', this._focus);
+      element.removeEventListener('blur', this._blur);
+      delete element['field-kit-text-field'];
+    }
+
+    /**
+     * Gets the current formatter. Formatters are used to translate between text
+     * and value properties of the field.
+     *
+     * @returns {Formatter}
+     */
+  }, {
+    key: 'formatter',
+    value: function formatter() {
+      if (!this._formatter) {
+        this._formatter = new _formatter2['default']();
+        var maximumLengthString = this.element.getAttribute('maxlength');
+        if (maximumLengthString !== undefined && maximumLengthString !== null) {
+          this._formatter.maximumLength = parseInt(maximumLengthString, 10);
+        }
+      }
+
+      return this._formatter;
+    }
+
+    /**
+     * Sets the current formatter.
+     *
+     * @param {Formatter} formatter
+     */
+  }, {
+    key: 'setFormatter',
+    value: function setFormatter(formatter) {
+      var value = this.value();
+      this._formatter = formatter;
+      this.setValue(value);
+    }
+
+    /**
+     * Builds a change instance and formats the change to see if it's valid
+     *
+     * @param   {object} current
+     * @param   {object} proposed
+     * @returns {?object} false if change doesn't have changes or change isn't valid. Change object if it is.
+     */
+  }, {
+    key: 'hasChangesAndIsValid',
+    value: function hasChangesAndIsValid(current, proposed) {
+      var _this = this;
+
+      var change = new TextFieldStateChange(this);
+      var error = function error(errorType) {
+        var delegate = _this.delegate();
+        if (delegate) {
+          if (typeof delegate.textFieldDidFailToValidateChange === 'function') {
+            delegate.textFieldDidFailToValidateChange(_this, change, errorType);
+          }
+        }
+<<<<<<< HEAD
+
+        if (shouldRoundUp) {
+          intPart = increment(intPart);
+        }
+        break;
+    }
+
+    return format(shiftParts([negative, intPart, ''], -precision));
+  }
+});
+
+},{}],4:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var _amex_card_formatter = _dereq_('./amex_card_formatter');
+
+var _amex_card_formatter2 = _interopRequireDefault(_amex_card_formatter);
+
+var _default_card_formatter = _dereq_('./default_card_formatter');
+
+var _default_card_formatter2 = _interopRequireDefault(_default_card_formatter);
+||||||| merged common ancestors
+
+        if (shouldRoundUp) {
+          intPart = increment(intPart);
+        }
+        break;
+    }
+
+    return format(shiftParts([negative, intPart, ''], -precision));
+  }
+});
+
+},{}],4:[function(_dereq_,module,exports){
+(function(window) {
+  var rootElement = window.document.documentElement;
+
+  window.checkAndTriggerAutoFillEvent = function(els) {
+    els = this.nodeName === 'INPUT' ? [this] : els;
+    var i, el;
+    for (i=0; i<els.length; i++) {
+      el = els[i];
+      if (!valueMarked(el)) {
+        markValue(el);
+        triggerChangeEvent(el);
+      }
+    }
+  };
+
+
+  addGlobalEventListener('change', markValue);
+
+  HTMLInputElement.prototype.checkAndTriggerAutoFillEvent = window.checkAndTriggerAutoFillEvent;
+
+  // Need to use blur and not change event
+  // as Chrome does not fire change events in all cases an input is changed
+  // (e.g. when starting to type and then finish the input by auto filling a username)
+  addGlobalEventListener('blur', function(target) {
+    // setTimeout needed for Chrome as it fills other
+    // form fields a little later...
+    window.setTimeout(function() {
+      window.checkAndTriggerAutoFillEvent(findParentForm(target).querySelectorAll('input'));
+    }, 20);
+  });
+
+  function DOMContentLoadedListener() {
+    // mark all values that are present when the DOM is ready.
+    // We don't need to trigger a change event here,
+    // as js libs start with those values already being set!
+    forEach(document.getElementsByTagName('input'), markValue);
+
+    // The timeout is needed for Chrome as it auto fills
+    // login forms some time after DOMContentLoaded!
+    window.setTimeout(function() {
+      window.checkAndTriggerAutoFillEvent(rootElement.querySelectorAll('input'));
+    }, 200);
+  }
+
+  // IE8 compatibility issue
+  if(!window.document.addEventListener){
+    window.document.attachEvent('DOMContentLoaded', DOMContentLoadedListener);
+  }else{
+    window.document.addEventListener('DOMContentLoaded', DOMContentLoadedListener, false);
+  }
+
+  // ----------
+
+  function valueMarked(el) {
+    if (! ("$$currentValue" in el) ) {
+      // First time we see an element we take it's value attribute
+      // as real value. This might have been filled in the backend,
+      // ...
+      // Note: it's important to not use the value property here!
+      el.$$currentValue = el.getAttribute('value');
+    }
+
+    var val = el.value,
+         $$currentValue = el.$$currentValue;
+    if (!val && !$$currentValue) {
+      return true;
+    }
+    return val === $$currentValue;
+  }
+
+  function markValue(el) {
+    el.$$currentValue = el.value;
+  }
+
+  function addValueChangeByJsListener(listener) {
+    var jq = window.jQuery || window.angular.element,
+        jqProto = jq.prototype;
+    var _val = jqProto.val;
+    jqProto.val = function(newValue) {
+      var res = _val.apply(this, arguments);
+      if (arguments.length > 0) {
+        forEach(this, function(el) {
+          listener(el, newValue);
+        });
+      }
+      return res;
+    };
+  }
+
+  function addGlobalEventListener(eventName, listener) {
+    // Use a capturing event listener so that
+    // we also get the event when it's stopped!
+    // Also, the blur event does not bubble.
+    if(!rootElement.addEventListener){
+      rootElement.attachEvent(eventName, onEvent);
+    }else{
+      rootElement.addEventListener(eventName, onEvent, true);
+    }
+
+    function onEvent(event) {
+      var target = event.target;
+      listener(target);
+    }
+  }
+
+  function findParentForm(el) {
+    while (el) {
+      if (el.nodeName === 'FORM') {
+        return el;
+      }
+      el = el.parentNode;
+    }
+    return null;
+  }
+
+  function forEach(arr, listener) {
+    if (arr.forEach) {
+      return arr.forEach(listener);
+    }
+    var i;
+    for (i=0; i<arr.length; i++) {
+      listener(arr[i]);
+    }
+  }
+
+  function triggerChangeEvent(element) {
+    var doc = window.document;
+    var event = doc.createEvent("HTMLEvents");
+    event.initEvent("change", true, true);
+    element.dispatchEvent(event);
+  }
+})(window)
+
+},{}],5:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var _amex_card_formatter = _dereq_('./amex_card_formatter');
+
+var _amex_card_formatter2 = _interopRequireDefault(_amex_card_formatter);
+
+var _default_card_formatter = _dereq_('./default_card_formatter');
+
+var _default_card_formatter2 = _interopRequireDefault(_default_card_formatter);
+=======
+      };
+      change.current = { text: current.text, selectedRange: current.selectedRange };
+      change.proposed = { text: proposed.text, selectedRange: proposed.selectedRange };
+      if (change.hasChanges() && this.formatter().isChangeValid(change, error)) {
+        return change;
+      }
+      return null;
+    }
+
+    /**
+     * Handles a key event could be trying to end editing.
+     *
+     */
+  }, {
+    key: 'insertNewline',
+    value: function insertNewline() {
+      this._textFieldDidEndEditing();
+      this._didEndEditingButKeptFocus = true;
+    }
+
+    /**
+     * Debug support
+     *
+     * @returns {string}
+     */
+  }, {
+    key: 'inspect',
+    value: function inspect() {
+      return '#<TextField text="' + this.text() + '">';
+    }
+
+    /**
+     * Replaces the current selection with text from the given pasteboard.
+     *
+     * @param {DataTransfer} pasteboard
+     */
+  }, {
+    key: 'readSelectionFromPasteboard',
+    value: function readSelectionFromPasteboard(pasteboard) {
+      var range = undefined,
+          text = undefined;
+      text = pasteboard.getData('Text');
+      this.replaceSelection(text);
+      range = this.selectedRange();
+      range.start += range.length;
+      range.length = 0;
+      this.setSelectedRange(range);
+    }
+
+    /**
+     * Checks changes after invoking the passed function for validity and rolls
+     * them back if the changes turned out to be invalid.
+     *
+     * @returns {Object} whatever object `callback` returns
+     */
+  }, {
+    key: 'rollbackInvalidChanges',
+    value: function rollbackInvalidChanges(callback) {
+      var result = null;
+      var errorType = null;
+      var change = TextFieldStateChange.build(this, function () {
+        return result = callback();
+      });
+      var error = function error(type) {
+        errorType = type;
+      };
+      if (change.hasChanges()) {
+        var formatter = this.formatter();
+        if (formatter && typeof formatter.isChangeValid === 'function') {
+          if (!this._isDirty) {
+            this._valueOnFocus = change.current.text || '';
+            this._isDirty = true;
+          }
+          if (formatter.isChangeValid(change, error)) {
+            change.recomputeDiff();
+            this.setText(change.proposed.text);
+            this.setSelectedRange(change.proposed.selectedRange);
+          } else {
+            var delegate = this.delegate();
+            if (delegate) {
+              if (typeof delegate.textFieldDidFailToValidateChange === 'function') {
+                delegate.textFieldDidFailToValidateChange(this, change, errorType);
+              }
+            }
+            this.setText(change.current.text);
+            this.setSelectedRange(change.current.selectedRange);
+            return result;
+          }
+        }
+        if (change.inserted.text.length || change.deleted.text.length) {
+          this.undoManager().proxyFor(this)._applyChangeFromUndoManager(change);
+          this._textDidChange();
+        }
+      }
+      return result;
+    }
+
+    /**
+     * Gets the object value. This is the value that should be considered the
+     * 'real' value of the field.
+     *
+     * @returns {Object}
+     */
+  }, {
+    key: 'value',
+    value: function value() {
+      var _this2 = this;
+
+      var text = this.text();
+      var delegate = this.delegate();
+      var formatter = this.formatter();
+      if (!formatter) {
+        return text;
+      }
+
+      return formatter.parse(text, function (errorType) {
+        if (delegate) {
+          if (typeof delegate.textFieldDidFailToParseString === 'function') {
+            delegate.textFieldDidFailToParseString(_this2, text, errorType);
+          }
+        }
+      });
+    }
+>>>>>>> add failing test cases for issue #53
+
+    /**
+     * Sets the object value of the field.
+     *
+     * @param {string} value
+     */
+  }, {
+    key: 'setValue',
+    value: function setValue(value) {
+      if (this._formatter) {
+        value = this._formatter.format(value);
+      }
+      this.setText('' + value);
+    }
+
+    /**
+     * **** InputSim Overrides ****
+     */
+
+    /**
+     * Gets the formatted text value. This is the same as the value of the
+     * underlying input element.
+     *
+     * @augments external:InputSim.Input#text
+     * @returns {string}
+     */
+  }, {
+    key: 'text',
+    value: function text() {
+      return this.element.value;
+    }
+
+    /**
+     * Sets the formatted text value. This generally should not be used. Instead,
+     * use the value setter.
+     *
+     * @augments external:InputSim.Input#setText
+     * @param {string} text
+     */
+  }, {
+    key: 'setText',
+    value: function setText(text) {
+      this.element.value = text;
+      this._currentValue = text;
+    }
+
+    /**
+     * Gets the range of the current selection.
+     *
+     * @augments external:InputSim.Input#selectedRange
+     * @returns {Object} {start: number, length: number}
+     */
+  }, {
+    key: 'selectedRange',
+    value: function selectedRange() {
+      var caret = this._needsManualCaret ? this._manualCaret : getCaret(this.element);
+
+      return {
+        start: caret.start,
+        length: caret.end - caret.start
+      };
+    }
+
+    /**
+     * Sets the range of the current selection and the selection affinity.
+     *
+     * @augments external:InputSim.Input#setSelectedRangeWithAffinity
+     * @param {{start: number, length: number}} range
+     * @param {Affinity} affinity
+     */
+  }, {
+<<<<<<< HEAD
+    key: '_formatterForPan',
+    value: function _formatterForPan(pan) {
+      if ((0, _card_utils.determineCardType)(pan.replace(/[^\d]+/g, '')) === _card_utils.AMEX) {
+        return this.amexCardFormatter;
+      } else {
+        return this.defaultCardFormatter;
+      }
+    }
+  }]);
+
+  return AdaptiveCardFormatter;
+})();
+
+exports['default'] = AdaptiveCardFormatter;
+module.exports = exports['default'];
+
+},{"./amex_card_formatter":5,"./card_utils":7,"./default_card_formatter":9}],5:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _default_card_formatter = _dereq_('./default_card_formatter');
+
+var _default_card_formatter2 = _interopRequireDefault(_default_card_formatter);
+
+/**
+ * Amex credit card formatter.
+ *
+ * @extends DefaultCardFormatter
+ */
+
+var AmexCardFormatter = (function (_DefaultCardFormatter) {
+  _inherits(AmexCardFormatter, _DefaultCardFormatter);
+
+  function AmexCardFormatter() {
+    _classCallCheck(this, AmexCardFormatter);
+
+    _get(Object.getPrototypeOf(AmexCardFormatter.prototype), 'constructor', this).apply(this, arguments);
+  }
+
+  _createClass(AmexCardFormatter, [{
+    key: 'hasDelimiterAtIndex',
+||||||| merged common ancestors
+    key: '_formatterForPan',
+    value: function _formatterForPan(pan) {
+      if ((0, _card_utils.determineCardType)(pan.replace(/[^\d]+/g, '')) === _card_utils.AMEX) {
+        return this.amexCardFormatter;
+      } else {
+        return this.defaultCardFormatter;
+      }
+    }
+  }]);
+
+  return AdaptiveCardFormatter;
+})();
+
+exports['default'] = AdaptiveCardFormatter;
+module.exports = exports['default'];
+
+},{"./amex_card_formatter":6,"./card_utils":8,"./default_card_formatter":10}],6:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _default_card_formatter = _dereq_('./default_card_formatter');
+
+var _default_card_formatter2 = _interopRequireDefault(_default_card_formatter);
+
+/**
+ * Amex credit card formatter.
+ *
+ * @extends DefaultCardFormatter
+ */
+
+var AmexCardFormatter = (function (_DefaultCardFormatter) {
+  _inherits(AmexCardFormatter, _DefaultCardFormatter);
+
+  function AmexCardFormatter() {
+    _classCallCheck(this, AmexCardFormatter);
+
+    _get(Object.getPrototypeOf(AmexCardFormatter.prototype), 'constructor', this).apply(this, arguments);
+  }
+
+  _createClass(AmexCardFormatter, [{
+    key: 'hasDelimiterAtIndex',
+=======
+    key: 'setSelectedRangeWithAffinity',
+    value: function setSelectedRangeWithAffinity(range, affinity) {
+      var newRange = _get(Object.getPrototypeOf(TextField.prototype), 'setSelectedRangeWithAffinity', this).call(this, range, affinity);
+      var caret = {
+        start: newRange.start,
+        end: newRange.start + newRange.length
+      };
+      this._manualCaret = caret;
+      setCaret(this.element, caret.start, caret.end);
+      this.selectionAffinity = range.length === 0 ? null : affinity;
+    }
+>>>>>>> add failing test cases for issue #53
+
+    /**
+     * **** Undo Support ****
+     */
+
+    /**
+     * Gets whether this text field records undo actions with its undo manager.
+     *
+     * @returns {boolean}
+     */
+  }, {
+    key: 'allowsUndo',
+    value: function allowsUndo() {
+      return this._allowsUndo;
+    }
+<<<<<<< HEAD
+  }]);
+
+  return AmexCardFormatter;
+})(_default_card_formatter2['default']);
+
+exports['default'] = AmexCardFormatter;
+module.exports = exports['default'];
+
+},{"./default_card_formatter":9}],6:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _text_field = _dereq_('./text_field');
+
+var _text_field2 = _interopRequireDefault(_text_field);
+
+var _adaptive_card_formatter = _dereq_('./adaptive_card_formatter');
+
+var _adaptive_card_formatter2 = _interopRequireDefault(_adaptive_card_formatter);
+
+var _card_utils = _dereq_('./card_utils');
+
+/**
+ * Enum for card mask strategies.
+ *
+ * @readonly
+ * @enum {number}
+ * @private
+ */
+var CardMaskStrategy = {
+  None: 'None',
+  DoneEditing: 'DoneEditing'
+};
+
+/**
+ * CardTextField add some functionality for credit card inputs
+ *
+ * @extends TextField
+ */
+
+var CardTextField = (function (_TextField) {
+  _inherits(CardTextField, _TextField);
+
+  /**
+   * @param {HTMLElement} element
+   */
+
+  function CardTextField(element) {
+    _classCallCheck(this, CardTextField);
+
+    _get(Object.getPrototypeOf(CardTextField.prototype), 'constructor', this).call(this, element, new _adaptive_card_formatter2['default']());
+    this.setCardMaskStrategy(CardMaskStrategy.None);
+||||||| merged common ancestors
+  }]);
+
+  return AmexCardFormatter;
+})(_default_card_formatter2['default']);
+
+exports['default'] = AmexCardFormatter;
+module.exports = exports['default'];
+
+},{"./default_card_formatter":10}],7:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _text_field = _dereq_('./text_field');
+
+var _text_field2 = _interopRequireDefault(_text_field);
+
+var _adaptive_card_formatter = _dereq_('./adaptive_card_formatter');
+
+var _adaptive_card_formatter2 = _interopRequireDefault(_adaptive_card_formatter);
+
+var _card_utils = _dereq_('./card_utils');
+
+/**
+ * Enum for card mask strategies.
+ *
+ * @readonly
+ * @enum {number}
+ * @private
+ */
+var CardMaskStrategy = {
+  None: 'None',
+  DoneEditing: 'DoneEditing'
+};
+
+/**
+ * CardTextField add some functionality for credit card inputs
+ *
+ * @extends TextField
+ */
+
+var CardTextField = (function (_TextField) {
+  _inherits(CardTextField, _TextField);
+
+  /**
+   * @param {HTMLElement} element
+   */
+
+  function CardTextField(element) {
+    _classCallCheck(this, CardTextField);
+
+    _get(Object.getPrototypeOf(CardTextField.prototype), 'constructor', this).call(this, element, new _adaptive_card_formatter2['default']());
+    this.setCardMaskStrategy(CardMaskStrategy.None);
+=======
+>>>>>>> add failing test cases for issue #53
+
+    /**
+     * Sets whether this text field records undo actions with its undo manager.
+     *
+     * @param {boolean} allowsUndo
+     */
+  }, {
+    key: 'setAllowsUndo',
+    value: function setAllowsUndo(allowsUndo) {
+      this._allowsUndo = allowsUndo;
+    }
+
+    /**
+     * Triggers a redo in the underlying UndoManager, if applicable.
+     *
+     * @param {Event} event
+     */
+  }, {
+    key: 'redo',
+    value: function redo(event) {
+      if (this.undoManager().canRedo()) {
+        this.undoManager().redo();
+      }
+      event.preventDefault();
+    }
+
+    /**
+     * Triggers an undo in the underlying UndoManager, if applicable.
+     *
+     * @param {Event} event
+     */
+  }, {
+    key: 'undo',
+    value: function undo(event) {
+      if (this.undoManager().canUndo()) {
+        this.undoManager().undo();
+      }
+      event.preventDefault();
+    }
+
+    /**
+     * Gets the UndoManager for this text field.
+     *
+     * @returns {UndoManager}
+     */
+  }, {
+    key: 'undoManager',
+    value: function undoManager() {
+      return this._undoManager || (this._undoManager = new _undo_manager2['default']());
+    }
+
+    /**
+     * **** Enabled/disabled support *****
+     */
+
+    /**
+     * Removes focus from this field if it has focus.
+     */
+  }, {
+    key: 'becomeFirstResponder',
+    value: function becomeFirstResponder() {
+      var _this3 = this;
+
+      this.element.focus();
+      this.rollbackInvalidChanges(function () {
+        _this3.element.select();
+        _this3._syncPlaceholder();
+      });
+    }
+
+    /**
+     * Determines whether this field has focus.
+     *
+     * @returns {boolean} true if this field has focus
+     */
+  }, {
+    key: 'hasFocus',
+    value: function hasFocus() {
+      return this.element.ownerDocument.activeElement === this.element;
+    }
+
+    /**
+     * Determines whether this field is enabled or disabled.
+     *
+     * @returns {boolean} true if this field is enabled
+     */
+  }, {
+    key: 'isEnabled',
+    value: function isEnabled() {
+      return this._enabled;
+    }
+
+    /**
+     * Sets whether this text field is enabled
+     * and syncs the placeholder to match
+     *
+     * @param {boolean} enabled
+     */
+  }, {
+    key: 'setEnabled',
+    value: function setEnabled(enabled) {
+      this._enabled = enabled;
+      this._syncPlaceholder();
+    }
+
+    /**
+     * Removes focus from this field if it has focus.
+     *
+     * @param {Event} event
+     */
+  }, {
+    key: 'resignFirstResponder',
+    value: function resignFirstResponder(event) {
+      if (event !== undefined && event !== null) {
+        event.preventDefault();
+      }
+      this.element.blur();
+      this._syncPlaceholder();
+    }
+
+    /*
+     * **** Placeholder support ****
+     */
+
+    /**
+     * Gets the disabled placeholder if one
+     * has been set.
+     *
+     * @returns {string}
+     */
+  }, {
+    key: 'disabledPlaceholder',
+    value: function disabledPlaceholder() {
+      return this._disabledPlaceholder;
+    }
+
+    /**
+     * Sets the disabled placeholder.
+     *
+     * @param {string} disabledPlaceholder
+     */
+  }, {
+    key: 'setDisabledPlaceholder',
+    value: function setDisabledPlaceholder(disabledPlaceholder) {
+      this._disabledPlaceholder = disabledPlaceholder;
+      this._syncPlaceholder();
+    }
+
+    /**
+     * Gets the focused placeholder if one
+     * has been set.
+     *
+     * @returns {string}
+     */
+  }, {
+    key: 'focusedPlaceholder',
+    value: function focusedPlaceholder() {
+      return this._focusedPlaceholder;
+    }
+
+    /**
+     * Sets the focused placeholder.
+     *
+     * @param {string} focusedPlaceholder
+     */
+  }, {
+    key: 'setFocusedPlaceholder',
+    value: function setFocusedPlaceholder(focusedPlaceholder) {
+      this._focusedPlaceholder = focusedPlaceholder;
+      this._syncPlaceholder();
+    }
+
+<<<<<<< HEAD
+exports['default'] = CardTextField;
+module.exports = exports['default'];
+
+},{"./adaptive_card_formatter":4,"./card_utils":7,"./text_field":20}],7:[function(_dereq_,module,exports){
+/**
+ * @TODO Make this an enum
+ */
+'use strict';
+||||||| merged common ancestors
+exports['default'] = CardTextField;
+module.exports = exports['default'];
+
+},{"./adaptive_card_formatter":5,"./card_utils":8,"./text_field":21}],8:[function(_dereq_,module,exports){
+/**
+ * @TODO Make this an enum
+ */
+'use strict';
+=======
+    /**
+     * Gets the placeholder if one has
+     * been set.
+     *
+     * @TODO Does this do anything?
+     *
+     * @returns {string}
+     */
+  }, {
+    key: 'placeholder',
+    value: function placeholder() {
+      return this._placeholder;
+    }
+>>>>>>> add failing test cases for issue #53
+
+    /**
+     * Sets the placeholder.
+     *
+     * @param {string} placeholder
+     */
+  }, {
+    key: 'setPlaceholder',
+    value: function setPlaceholder(placeholder) {
+      this._placeholder = placeholder;
+      this.element.setAttribute('placeholder', this._placeholder);
+    }
+
+    /**
+     * Gets the unfocused placeholder if one
+     * has been set.
+     *
+     * @returns {string}
+     */
+  }, {
+    key: 'unfocusedPlaceholder',
+    value: function unfocusedPlaceholder() {
+      return this._unfocusedPlaceholder;
+    }
+
+    /**
+     * Sets the unfocused placeholder.
+     *
+     * @param {string} unfocusedPlaceholder
+     */
+  }, {
+    key: 'setUnfocusedPlaceholder',
+    value: function setUnfocusedPlaceholder(unfocusedPlaceholder) {
+      this._unfocusedPlaceholder = unfocusedPlaceholder;
+      this._syncPlaceholder();
+    }
+
+    /**
+     * **** Private Methods ****
+     */
+
+    /**
+     * Applies the given change as an undo/redo.
+     *
+     * @param {Object} change object with current and proposed properties
+     * @private
+     */
+  }, {
+    key: '_applyChangeFromUndoManager',
+    value: function _applyChangeFromUndoManager(change) {
+      this.undoManager().proxyFor(this)._applyChangeFromUndoManager(change);
+
+      if (this.undoManager().isUndoing()) {
+        this.setText(change.current.text);
+        this.setSelectedRange(change.current.selectedRange);
+      } else {
+        this.setText(change.proposed.text);
+        this.setSelectedRange(change.proposed.selectedRange);
+      }
+
+      this._textDidChange();
+    }
+
+    /**
+     * Handles clicks by resetting the selection affinity.
+     *
+     * @private
+     */
+  }, {
+    key: '_click',
+    value: function _click() {
+      this._manualCaret = getCaret(this.element);
+      this._selectedRange = {
+        start: this._manualCaret.start,
+        length: this._manualCaret.end - this._manualCaret.start
+      };
+      this.selectionAffinity = null;
+    }
+
+<<<<<<< HEAD
+/**
+ * Pass in a credit card number and it'll return if it
+ * is a valid length for that type. If it doesn't know the
+ * type it'll return false
+ *
+ * @param {string} pan
+ * @returns {boolean}
+ */
+
+function validCardLength(pan) {
+  switch (determineCardType(pan)) {
+    case VISA:
+      return pan.length === 13 || pan.length === 16;
+    case DISCOVER:case MASTERCARD:
+      return pan.length === 16;
+    case JCB:
+      return pan.length === 15 || pan.length === 16;
+    case AMEX:
+      return pan.length === 15;
+    default:
+      return false;
+  }
+}
+
+},{}],8:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports['default'] = installCaret;
+
+function installCaret() {
+  var _document = arguments.length <= 0 || arguments[0] === undefined ? document : arguments[0];
+
+  var getCaret = undefined;
+  var setCaret = undefined;
+
+  if (!_document) {
+    throw new Error('Caret does not have access to document');
+  } else if ('selectionStart' in _document.createElement('input')) {
+    getCaret = function (element) {
+      return {
+        start: element.selectionStart,
+        end: element.selectionEnd
+      };
+    };
+    setCaret = function (element, start, end) {
+      element.selectionStart = start;
+      element.selectionEnd = end;
+    };
+  } else if (_document.selection) {
+    getCaret = function (element) {
+      var selection = _document.selection;
+      var value = element.value;
+      var range = selection.createRange().duplicate();
+
+      range.moveEnd('character', value.length);
+
+      var start = range.text === '' ? value.length : value.lastIndexOf(range.text);
+      range = selection.createRange().duplicate();
+
+      range.moveStart('character', -value.length);
+
+      var end = range.text.length;
+      return { start: start, end: end };
+    };
+    setCaret = function (element, start, end) {
+      var range = element.createTextRange();
+      range.collapse(true);
+      range.moveStart('character', start);
+      range.moveEnd('character', end - start);
+      range.select();
+    };
+  } else {
+    throw new Error('Caret unknown input selection capabilities');
+  }
+
+  return { getCaret: getCaret, setCaret: setCaret };
+}
+
+;
+module.exports = exports['default'];
+
+},{}],9:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _delimited_text_formatter = _dereq_('./delimited_text_formatter');
+
+var _delimited_text_formatter2 = _interopRequireDefault(_delimited_text_formatter);
+
+var _card_utils = _dereq_('./card_utils');
+
+/**
+ * A generic credit card formatter.
+ *
+ * @extends DelimitedTextFormatter
+ */
+
+var DefaultCardFormatter = (function (_DelimitedTextFormatter) {
+  _inherits(DefaultCardFormatter, _DelimitedTextFormatter);
+
+  function DefaultCardFormatter() {
+    _classCallCheck(this, DefaultCardFormatter);
+
+    _get(Object.getPrototypeOf(DefaultCardFormatter.prototype), 'constructor', this).call(this, ' ');
+  }
+
+  /**
+   * @param {number} index
+   * @returns {boolean}
+   */
+
+  _createClass(DefaultCardFormatter, [{
+    key: 'hasDelimiterAtIndex',
+    value: function hasDelimiterAtIndex(index) {
+      return index === 4 || index === 9 || index === 14;
+    }
+||||||| merged common ancestors
+/**
+ * Pass in a credit card number and it'll return if it
+ * is a valid length for that type. If it doesn't know the
+ * type it'll return false
+ *
+ * @param {string} pan
+ * @returns {boolean}
+ */
+
+function validCardLength(pan) {
+  switch (determineCardType(pan)) {
+    case VISA:
+      return pan.length === 13 || pan.length === 16;
+    case DISCOVER:case MASTERCARD:
+      return pan.length === 16;
+    case JCB:
+      return pan.length === 15 || pan.length === 16;
+    case AMEX:
+      return pan.length === 15;
+    default:
+      return false;
+  }
+}
+
+},{}],9:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports['default'] = installCaret;
+
+function installCaret() {
+  var _document = arguments.length <= 0 || arguments[0] === undefined ? document : arguments[0];
+
+  var getCaret = undefined;
+  var setCaret = undefined;
+
+  if (!_document) {
+    throw new Error('Caret does not have access to document');
+  } else if ('selectionStart' in _document.createElement('input')) {
+    getCaret = function (element) {
+      return {
+        start: element.selectionStart,
+        end: element.selectionEnd
+      };
+    };
+    setCaret = function (element, start, end) {
+      element.selectionStart = start;
+      element.selectionEnd = end;
+    };
+  } else if (_document.selection) {
+    getCaret = function (element) {
+      var selection = _document.selection;
+      var value = element.value;
+      var range = selection.createRange().duplicate();
+
+      range.moveEnd('character', value.length);
+
+      var start = range.text === '' ? value.length : value.lastIndexOf(range.text);
+      range = selection.createRange().duplicate();
+
+      range.moveStart('character', -value.length);
+
+      var end = range.text.length;
+      return { start: start, end: end };
+    };
+    setCaret = function (element, start, end) {
+      var range = element.createTextRange();
+      range.collapse(true);
+      range.moveStart('character', start);
+      range.moveEnd('character', end - start);
+      range.select();
+    };
+  } else {
+    throw new Error('Caret unknown input selection capabilities');
+  }
+
+  return { getCaret: getCaret, setCaret: setCaret };
+}
+
+;
+module.exports = exports['default'];
+
+},{}],10:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _delimited_text_formatter = _dereq_('./delimited_text_formatter');
+
+var _delimited_text_formatter2 = _interopRequireDefault(_delimited_text_formatter);
+
+var _card_utils = _dereq_('./card_utils');
+
+/**
+ * A generic credit card formatter.
+ *
+ * @extends DelimitedTextFormatter
+ */
+
+var DefaultCardFormatter = (function (_DelimitedTextFormatter) {
+  _inherits(DefaultCardFormatter, _DelimitedTextFormatter);
+
+  function DefaultCardFormatter() {
+    _classCallCheck(this, DefaultCardFormatter);
+
+    _get(Object.getPrototypeOf(DefaultCardFormatter.prototype), 'constructor', this).call(this, ' ');
+  }
+
+  /**
+   * @param {number} index
+   * @returns {boolean}
+   */
+
+  _createClass(DefaultCardFormatter, [{
+    key: 'hasDelimiterAtIndex',
+    value: function hasDelimiterAtIndex(index) {
+      return index === 4 || index === 9 || index === 14;
+    }
+=======
+    /**
+     * Fires event on the element
+     *
+     * @param {string} eventType
+     * @private
+     */
+  }, {
+    key: '_fireEvent',
+    value: function _fireEvent(eventType) {
+      var document = this.element.ownerDocument;
+      var window = document.defaultView;
+      if (typeof window.CustomEvent === 'function') {
+        this.element.dispatchEvent(new window.CustomEvent(eventType, {}));
+      } else {
+        var _event = document.createEvent('Event');
+        _event.initEvent(eventType, false, false);
+        this.element.dispatchEvent(_event);
+      }
+    }
+>>>>>>> add failing test cases for issue #53
+
+    /**
+     * Handles gaining focus. This method delegates to other methods, and syncs
+     * the placeholder appropriately.
+     *
+     * @private
+     */
+  }, {
+    key: '_focus',
+    value: function _focus() {
+      this._textFieldDidBeginEditing();
+      this._syncPlaceholder();
+    }
+
+    /**
+     * Handles losing focus. This method delegates to other methods, and syncs the
+     * placeholder appropriately.
+     *
+     * @private
+     */
+  }, {
+    key: '_blur',
+    value: function _blur() {
+      this._textFieldDidEndEditing();
+      this._syncPlaceholder();
+    }
+
+    /**
+     * Handles keyDown events. This method essentially just delegates to other,
+     * more semantic, methods based on the modifier keys and the pressed key of the
+     * event.
+     *
+     * @param {Event} event
+     * @private
+     */
+  }, {
+<<<<<<< HEAD
+    key: 'maximumLength',
+    get: function get() {
+      return 16 + 3;
+    }
+  }]);
+
+  return DefaultCardFormatter;
+})(_delimited_text_formatter2['default']);
+
+exports['default'] = DefaultCardFormatter;
+module.exports = exports['default'];
+
+},{"./card_utils":7,"./delimited_text_formatter":10}],10:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x2, _x3, _x4) { var _again = true; _function: while (_again) { var object = _x2, property = _x3, receiver = _x4; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x2 = parent; _x3 = property; _x4 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _formatter = _dereq_('./formatter');
+
+var _formatter2 = _interopRequireDefault(_formatter);
+
+/**
+ * A generic delimited formatter.
+ *
+ * @extends Formatter
+ */
+
+var DelimitedTextFormatter = (function (_Formatter) {
+  _inherits(DelimitedTextFormatter, _Formatter);
+
+  /**
+   * @param {string=} delimiter
+   * @param {boolean=} isLazy
+   * @throws {Error} delimiter must have just one character
+   */
+
+  function DelimitedTextFormatter(delimiter) {
+    var isLazy = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+||||||| merged common ancestors
+    key: 'maximumLength',
+    get: function get() {
+      return 16 + 3;
+    }
+  }]);
+
+  return DefaultCardFormatter;
+})(_delimited_text_formatter2['default']);
+
+exports['default'] = DefaultCardFormatter;
+module.exports = exports['default'];
+
+},{"./card_utils":8,"./delimited_text_formatter":11}],11:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x2, _x3, _x4) { var _again = true; _function: while (_again) { var object = _x2, property = _x3, receiver = _x4; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x2 = parent; _x3 = property; _x4 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _formatter = _dereq_('./formatter');
+
+var _formatter2 = _interopRequireDefault(_formatter);
+
+/**
+ * A generic delimited formatter.
+ *
+ * @extends Formatter
+ */
+
+var DelimitedTextFormatter = (function (_Formatter) {
+  _inherits(DelimitedTextFormatter, _Formatter);
+
+  /**
+   * @param {string=} delimiter
+   * @param {boolean=} isLazy
+   * @throws {Error} delimiter must have just one character
+   */
+
+  function DelimitedTextFormatter(delimiter) {
+    var isLazy = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+=======
+    key: '_keyDown',
+    value: function _keyDown(event) {
+      var _this4 = this;
+>>>>>>> add failing test cases for issue #53
+
+      if (this._didEndEditingButKeptFocus) {
+        this._textFieldDidBeginEditing();
+        this._didEndEditingButKeptFocus = false;
+      }
+
+      var action = this._bindings.actionForEvent(event);
+      if (action) {
+        switch (action) {
+          case 'undo':
+          case 'redo':
+            this[action](event);
+            break;
+
+          default:
+            this.rollbackInvalidChanges(function () {
+              return _this4[action](event);
+            });
+            break;
+        }
+      }
+    }
+
+    /**
+     * Handles inserting characters based on the typed key for normal keyboards.
+     *
+     * NOTE: Does not fire on some versions of Android, in which case we handle
+     * changes in _keyUp instead.
+     *
+     * @param {Event} event
+     * @private
+     */
+  }, {
+    key: '_keyPress',
+    value: function _keyPress(event) {
+      var _this5 = this;
+
+      var keyCode = event.keyCode;
+      if (!event.metaKey && !event.ctrlKey && keyCode !== _inputSim.KEYS.ENTER && keyCode !== _inputSim.KEYS.TAB && keyCode !== _inputSim.KEYS.BACKSPACE) {
+        if (event.charCode !== 0) {
+          (function () {
+            var newText = String.fromCharCode(event.charCode || event.keyCode);
+
+            _this5._processChange({
+              currentText: _this5.text(),
+              proposedText: (0, _utils.replaceStringSelection)(newText, _this5.text(), _this5.selectedRange()),
+              onSuccess: function onSuccess(change, changeTriggeredFormatting) {
+                if (!changeTriggeredFormatting && event instanceof KeyboardEvent) {
+                  // HACK(JoeTaylor) Use Browser's native input when using the formatter
+                  // would not make a difference https://code.google.com/p/chromium/issues/detail?id=32865
+                  if (!_this5._isDirty) {
+                    _this5._valueOnFocus = change.current.text || '';
+                    _this5._isDirty = true;
+                  }
+                  _this5.undoManager().proxyFor(_this5)._applyChangeFromUndoManager(change);
+                  _this5._manualCaret = {
+                    start: change.proposed.selectedRange.start,
+                    end: change.proposed.selectedRange.start + change.proposed.selectedRange.length
+                  };
+                  _this5._needsKeyUpTextDidChangeTrigger = true;
+                } else {
+                  event.preventDefault();
+                  _this5.rollbackInvalidChanges(function () {
+                    return _this5.insertText(newText);
+                  });
+                }
+                _this5._currentValue = change.proposed.text;
+              },
+              onFail: function onFail() {
+                event.preventDefault();
+                _this5.rollbackInvalidChanges(function () {
+                  return _this5.insertText(newText);
+                });
+              }
+            });
+          })();
+        } else {
+          event.preventDefault();
+        }
+      }
+    }
+
+    /**
+     * Handles keyup events. On Some Android we need to do all input processing
+     * here because no other information comes in.
+     *
+     * @param {Event} event
+     * @private
+     */
+  }, {
+    key: '_keyUp',
+    value: function _keyUp(event) {
+      var _this6 = this;
+
+      if (this._needsKeyUpTextDidChangeTrigger) {
+        this._textDidChange();
+        this._needsKeyUpTextDidChangeTrigger = false;
+      }
+      var keyCode = event.keyCode;
+      // NOTE: Certain Androids on Chrome always return 229
+      // https://code.google.com/p/chromium/issues/detail?id=118639
+      if (keyCode === 229) {
+        (function () {
+          // Text has already been changed at this point, so we check the previous text
+          // to determine whether we need to undo the change.
+          var previousText = _this6._currentValue || '';
+          _this6._processChange({
+            currentText: previousText,
+            proposedText: _this6.text(),
+            onSuccess: function onSuccess(change, changeTriggeredFormatting) {
+              if (changeTriggeredFormatting) {
+                var newText = change.proposed.text;
+                _this6.setSelectedRange(change.proposed.selectedRange);
+                _this6.setText(newText);
+              }
+              if (!_this6._isDirty) {
+                _this6._valueOnFocus = change.current.text || '';
+                _this6._isDirty = true;
+              }
+              _this6.undoManager().proxyFor(_this6)._applyChangeFromUndoManager(change);
+              _this6._textDidChange();
+              _this6._currentValue = change.proposed.text;
+            },
+            onFail: function onFail() {
+              // Need to rollback the letter input in the Keyup event because it is not valid,
+              // so we set text to the previous state (as collected from the UndoManager).
+              _this6.setText(previousText);
+            }
+          });
+        })();
+      } else {
+        this.rollbackInvalidChanges(function () {
+          if (event.keyCode === _inputSim.KEYS.TAB) {
+            _this6.selectAll(event);
+          }
+        });
+      }
+    }
+
+    /**
+     * Checks if a change is valid and calls `onSuccess` if so,
+     * and `onFail` if not.
+     *
+     * @param {object} options
+     * @param {string} options.currentText
+     * @param {string} options.proposedText
+     * @param {function} options.onSuccess
+     * @param {function=} options.onFail
+     * @private
+     */
+  }, {
+    key: '_processChange',
+    value: function _processChange(_ref) {
+      var currentText = _ref.currentText;
+      var proposedText = _ref.proposedText;
+      var onSuccess = _ref.onSuccess;
+      var _ref$onFail = _ref.onFail;
+      var onFail = _ref$onFail === undefined ? function () {} : _ref$onFail;
+
+      var current = {
+        text: currentText,
+        selectedRange: this.selectedRange()
+      };
+      var proposed = {
+        text: proposedText,
+        selectedRange: { start: current.selectedRange.start + 1, length: 0 }
+      };
+      var change = this.hasChangesAndIsValid(current, proposed);
+      var changeTriggeredFormatting = change && (change.proposed.text !== proposed.text || change.proposed.selectedRange.start !== proposed.selectedRange.start || change.proposed.selectedRange.length !== proposed.selectedRange.length);
+
+      if (change) {
+        onSuccess(change, changeTriggeredFormatting);
+      } else {
+        onFail();
+      }
+    }
+
+    /**
+     * Handles paste events.
+     *
+     * @param {Event} event
+     * @private
+     */
+  }, {
+    key: '_paste',
+    value: function _paste(event) {
+      var _this7 = this;
+
+      event.preventDefault();
+      this.rollbackInvalidChanges(function () {
+        _this7.readSelectionFromPasteboard(event.clipboardData);
+      });
+    }
+
+    /**
+     * @private
+     */
+  }, {
+    key: '_syncPlaceholder',
+    value: function _syncPlaceholder() {
+      if (!this._enabled) {
+        var disabledPlaceholder = this._disabledPlaceholder;
+        if (disabledPlaceholder !== undefined && disabledPlaceholder !== null) {
+          this.setPlaceholder(disabledPlaceholder);
+        }
+      } else if (this.hasFocus()) {
+        var focusedPlaceholder = this._focusedPlaceholder;
+        if (focusedPlaceholder !== undefined && focusedPlaceholder !== null) {
+          this.setPlaceholder(focusedPlaceholder);
+        }
+      } else {
+        var unfocusedPlaceholder = this._unfocusedPlaceholder;
+        if (unfocusedPlaceholder !== undefined && unfocusedPlaceholder !== null) {
+          this.setPlaceholder(unfocusedPlaceholder);
+        }
+      }
+    }
+  }]);
+
+  return TextField;
+})(_inputSim.Input);
+
+var TextFieldStateChange = (function () {
+  /**
+   * @param {TextField} field
+   */
+
+  function TextFieldStateChange(field) {
+    _classCallCheck(this, TextFieldStateChange);
+
+    this.field = field;
+  }
+
+  /**
+   * Builds a new {TextFieldStateChange} that will allow you to
+   * compute differences, and see the current vs proposed changes.
+   *
+   * @param {TextField} field
+   * @param {Function} callback called when you want changes to the field
+   *    take place. Current will be calculated before this callback.
+   *    Proposed will be calculated after this callback.
+   *
+   * @returns {Object} change object with current and proposed properties
+   */
+
+  /**
+   * Determines whether this field has changes.
+   *
+   * @returns {boolean} true if either the current text doesn't match the proposed text
+   *    or the current selection range doesn't match the proposed selection range
+   */
+
+  _createClass(TextFieldStateChange, [{
+    key: 'hasChanges',
+    value: function hasChanges() {
+      this.recomputeDiff();
+      return this.current.text !== this.proposed.text || this.current.selectedRange.start !== this.proposed.selectedRange.start || this.current.selectedRange.length !== this.proposed.selectedRange.length;
+    }
+
+    /**
+     * Updates {TextFieldStateChange} inserted and {TextFieldStateChange} deleted
+     * based on proposed and current
+     */
+  }, {
+    key: 'recomputeDiff',
+    value: function recomputeDiff() {
+      if (this.proposed.text !== this.current.text) {
+        var ctext = this.current.text;
+        var ptext = this.proposed.text;
+        var sharedPrefixLength = 0;
+        var sharedSuffixLength = 0;
+        var minTextLength = Math.min(ctext.length, ptext.length);
+        var i = undefined;
+
+        for (i = 0; i < minTextLength; i++) {
+          if (ptext[i] === ctext[i]) {
+            sharedPrefixLength = i + 1;
+          } else {
+            break;
+          }
+        }
+
+        for (i = 0; i < minTextLength - sharedPrefixLength; i++) {
+          if (ptext[ptext.length - 1 - i] === ctext[ctext.length - 1 - i]) {
+            sharedSuffixLength = i + 1;
+          } else {
+            break;
+          }
+        }
+
+        var inserted = {
+          start: sharedPrefixLength,
+          end: ptext.length - sharedSuffixLength
+        };
+        var deleted = {
+          start: sharedPrefixLength,
+          end: ctext.length - sharedSuffixLength
+        };
+        inserted.text = ptext.substring(inserted.start, inserted.end);
+        deleted.text = ctext.substring(deleted.start, deleted.end);
+        this.inserted = inserted;
+        this.deleted = deleted;
+      } else {
+        this.inserted = {
+          start: this.proposed.selectedRange.start,
+          end: this.proposed.selectedRange.start + this.proposed.selectedRange.length,
+          text: ''
+        };
+        this.deleted = {
+          start: this.current.selectedRange.start,
+          end: this.current.selectedRange.start + this.current.selectedRange.length,
+          text: ''
+        };
+      }
+    }
+  }]);
+
+  return TextFieldStateChange;
+})();
+
+TextFieldStateChange.build = function (field, callback) {
+  var change = new this(field);
+  change.current = {
+    text: field.text(),
+    selectedRange: field.selectedRange()
+  };
+  callback();
+  change.proposed = {
+    text: field.text(),
+    selectedRange: field.selectedRange()
+  };
+  change.recomputeDiff();
+  return change;
+};
+
+exports['default'] = TextField;
+module.exports = exports['default'];
+
+<<<<<<< HEAD
+},{"./formatter":14}],11:[function(_dereq_,module,exports){
+||||||| merged common ancestors
+},{"./formatter":15}],12:[function(_dereq_,module,exports){
+=======
+},{"./caret":1,"./formatter":2,"./undo_manager":5,"./utils":6,"input-sim":3}],5:[function(_dereq_,module,exports){
+>>>>>>> add failing test cases for issue #53
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+<<<<<<< HEAD
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _delimited_text_formatter = _dereq_('./delimited_text_formatter');
+||||||| merged common ancestors
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _delimited_text_formatter = _dereq_('./delimited_text_formatter');
+=======
+var _createClass = (function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+})();
+>>>>>>> add failing test cases for issue #53
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError('Cannot call a class as a function');
+  }
+}
+
+var _utils = _dereq_('./utils');
+
+/**
+ * UndoManager is a general-purpose recorder of operations for undo and redo.
+ *
+ * Registering an undo action is done by specifying the changed object, along
+ * with a method to invoke to revert its state and the arguments for that
+ * method. When performing undo an UndoManager saves the operations reverted so
+ * that you can redo the undos.
+ */
+
+var UndoManager = (function () {
+  function UndoManager() {
+    _classCallCheck(this, UndoManager);
+
+    /** @private */
+    this._undos = [];
+    /** @private */
+    this._redos = [];
+    /** @private */
+    this._isUndoing = false;
+    /** @private */
+    this._isRedoing = false;
+  }
+
+  /**
+   * Determines whether there are any undo actions on the stack.
+   *
+   * @returns {boolean}
+   */
+
+  _createClass(UndoManager, [{
+    key: 'canUndo',
+    value: function canUndo() {
+      return this._undos.length !== 0;
+    }
+
+    /**
+     * Determines whether there are any redo actions on the stack.
+     *
+     * @returns {boolean}
+     */
+  }, {
+    key: 'canRedo',
+    value: function canRedo() {
+      return this._redos.length !== 0;
+    }
+
+<<<<<<< HEAD
+},{"./delimited_text_formatter":10}],12:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+||||||| merged common ancestors
+},{"./delimited_text_formatter":11}],13:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+=======
+    /**
+     * Indicates whether or not this manager is currently processing an undo.
+     *
+     * @returns {boolean}
+     */
+  }, {
+    key: 'isUndoing',
+    value: function isUndoing() {
+      return this._isUndoing;
+    }
+>>>>>>> add failing test cases for issue #53
+
+    /**
+     * Indicates whether or not this manager is currently processing a redo.
+     *
+     * @returns {boolean}
+     */
+  }, {
+    key: 'isRedoing',
+    value: function isRedoing() {
+      return this._isRedoing;
+    }
+
+<<<<<<< HEAD
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+||||||| merged common ancestors
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+=======
+    /**
+     * Manually registers an simple undo action with the given args.
+     *
+     * If this undo manager is currently undoing then this will register a redo
+     * action instead. If this undo manager is neither undoing or redoing then the
+     * redo stack will be cleared.
+     *
+     * @param {Object} target call `selector` on this object
+     * @param {string} selector the method name to call on `target`
+     * @param {...Object} args arguments to pass when calling `selector` on `target`
+     */
+  }, {
+    key: 'registerUndo',
+    value: function registerUndo(target, selector) {
+      for (var _len = arguments.length, args = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+        args[_key - 2] = arguments[_key];
+      }
+>>>>>>> add failing test cases for issue #53
+
+      if (this._isUndoing) {
+        this._appendRedo.apply(this, [target, selector].concat(args));
+      } else {
+        if (!this._isRedoing) {
+          this._redos.length = 0;
+        }
+        this._appendUndo.apply(this, [target, selector].concat(args));
+      }
+    }
+
+    /**
+     * Appends an undo action to the internal stack.
+     *
+     * @param {Object} target call `selector` on this object
+     * @param {string} selector the method name to call on `target`
+     * @param {...Object} args arguments to pass when calling `selector` on `target`
+     * @private
+     */
+  }, {
+    key: '_appendUndo',
+    value: function _appendUndo(target, selector) {
+      for (var _len2 = arguments.length, args = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
+        args[_key2 - 2] = arguments[_key2];
+      }
+
+      this._undos.push({
+        target: target,
+        selector: selector,
+        args: args
+      });
+    }
+
+    /**
+     * Appends a redo action to the internal stack.
+     *
+     * @param {Object} target call `selector` on this object
+     * @param {string} selector the method name to call on `target`
+     * @param {...Object} args arguments to pass when calling `selector` on `target`
+     * @private
+     */
+  }, {
+    key: '_appendRedo',
+    value: function _appendRedo(target, selector) {
+      for (var _len3 = arguments.length, args = Array(_len3 > 2 ? _len3 - 2 : 0), _key3 = 2; _key3 < _len3; _key3++) {
+        args[_key3 - 2] = arguments[_key3];
+      }
+
+      this._redos.push({
+        target: target,
+        selector: selector,
+        args: args
+      });
+    }
+
+    /**
+     * Performs the top-most undo action on the stack.
+     *
+     * @throws {Error} Raises an error if there are no available undo actions.
+     */
+  }, {
+    key: 'undo',
+    value: function undo() {
+      if (!this.canUndo()) {
+        throw new Error('there are no registered undos');
+      }
+      var data = this._undos.pop();
+      var target = data.target;
+      var selector = data.selector;
+      var args = data.args;
+      this._isUndoing = true;
+      target[selector].apply(target, args);
+      this._isUndoing = false;
+    }
+
+    /**
+     * Performs the top-most redo action on the stack.
+     *
+     * @throws {Error} Raises an error if there are no available redo actions.
+     */
+  }, {
+    key: 'redo',
+    value: function redo() {
+      if (!this.canRedo()) {
+        throw new Error('there are no registered redos');
+      }
+      var data = this._redos.pop();
+      var target = data.target;
+      var selector = data.selector;
+      var args = data.args;
+      this._isRedoing = true;
+      target[selector].apply(target, args);
+      this._isRedoing = false;
+    }
+
+    /**
+     * Returns a proxy object based on target that will register undo/redo actions
+     * by calling methods on the proxy.
+     *
+     * @example
+     *     setSize(size) {
+     *       this.undoManager.proxyFor(this).setSize(this._size);
+     *       this._size = size;
+     *     }
+     *
+     * @param {Object} target call `selector` on this object
+     * @returns {Object}
+     */
+  }, {
+    key: 'proxyFor',
+    value: function proxyFor(target) {
+      var proxy = {};
+      var self = this;
+
+      function proxyMethod(selector) {
+        return function () {
+          for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+            args[_key4] = arguments[_key4];
+          }
+
+          self.registerUndo.apply(self, [target, selector].concat(args));
+        };
+      }
+
+      (0, _utils.getAllPropertyNames)(target).forEach(function (selector) {
+        // don't trigger anything that has a getter
+        if ((0, _utils.hasGetter)(target, selector)) {
+          return;
+        }
+
+        // don't try to proxy properties that aren't functions
+        if (typeof target[selector] !== 'function') {
+          return;
+        }
+
+        // set up a proxy function to register an undo
+        proxy[selector] = proxyMethod(selector);
+      });
+
+      return proxy;
+    }
+  }]);
+
+  return UndoManager;
+})();
+
+exports['default'] = UndoManager;
+module.exports = exports['default'];
+
+<<<<<<< HEAD
+},{"./expiry_date_formatter":13,"./text_field":20}],13:[function(_dereq_,module,exports){
+||||||| merged common ancestors
+},{"./expiry_date_formatter":14,"./text_field":21}],14:[function(_dereq_,module,exports){
+=======
+},{"./utils":6}],6:[function(_dereq_,module,exports){
+/**
+ * @const
+ * @private
+ */
+>>>>>>> add failing test cases for issue #53
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports.isDigits = isDigits;
+exports.startsWith = startsWith;
+exports.endsWith = endsWith;
+exports.zpad = zpad;
+exports.zpad2 = zpad2;
+exports.bind = bind;
+exports.replaceStringSelection = replaceStringSelection;
+exports.forEach = forEach;
+exports.hasGetter = hasGetter;
+exports.getAllPropertyNames = getAllPropertyNames;
+
+<<<<<<< HEAD
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+||||||| merged common ancestors
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+=======
+function _toConsumableArray(arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];return arr2;
+  } else {
+    return Array.from(arr);
+  }
+}
+>>>>>>> add failing test cases for issue #53
+
+var DIGITS_PATTERN = /^\d*$/;
+
+/**
+ * @const
+ * @private
+ */
+var SURROUNDING_SPACE_PATTERN = /(^\s+|\s+$)/;
+
+/**
+ * @param {string} string
+ * @returns {boolean}
+ */
+
+function isDigits(string) {
+  return DIGITS_PATTERN.test(string);
+}
+
+/**
+ * @param {string} prefix
+ * @param {string} string
+ * @returns {boolean}
+ */
+
+function startsWith(prefix, string) {
+  return string.slice(0, prefix.length) === prefix;
+}
+
+/**
+ * @param {string} suffix
+ * @param {string} string
+ * @returns {boolean}
+ */
+
+function endsWith(suffix, string) {
+  return string.slice(string.length - suffix.length) === suffix;
+}
+
+/**
+ * @param {string} string
+ * @returns {string}
+ */
+var trim = typeof ''.trim === 'function' ? function (string) {
+  return string.trim();
+} : function (string) {
+  return string.replace(SURROUNDING_SPACE_PATTERN, '');
+};
+
+exports.trim = trim;
+/**
+ * Will pad n with `0` up until length.
+ *
+ * @example
+ *     zpad(16, '1234');
+ *     // => 0000000000001234
+ *
+ * @param {number} length
+ * @param {(string|number)} n
+ * @returns {string}
+ */
+
+function zpad(length, n) {
+  var result = '' + n;
+  while (result.length < length) {
+    result = '0' + result;
+  }
+  return result;
+}
+
+/**
+ * Will pad n with `0` up until length is 2.
+ *
+ * @example
+ *     zpad2('2');
+ *     // => 02
+ *
+ * @param {(string|number)} n
+ * @returns {string}
+ */
+
+function zpad2(n) {
+  return zpad(2, n);
+}
+
+/**
+ * PhantomJS 1.9 does not have Function.bind.
+ *
+ * @param {Function} fn
+ * @param {*} context
+ * @returns {*}
+ */
+
+function bind(fn, context) {
+  return fn.bind(context);
+}
+
+if (!Function.prototype.bind) {
+  Function.prototype.bind = function (context) {
+    for (var _len = arguments.length, prependedArgs = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      prependedArgs[_key - 1] = arguments[_key];
+    }
+
+    var self = this;
+    return function () {
+      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        args[_key2] = arguments[_key2];
+      }
+
+      return self.apply(context, prependedArgs.concat(args));
+    };
+  };
+}
+
+/**
+ * Replaces the characters within the selection with given text.
+ *
+ * @example
+ *     // 12|34567|8
+ *     replaceStringSelection('12345678', '00', { start: 2, length: 5 });
+ *     // 12|00|8
+ *
+ * @param   {string} replacement
+ * @param   {string} text
+ * @param   {object} {start: number, length: number}
+ * @returns {string}
+ */
+
+function replaceStringSelection(replacement, text, range) {
+  var end = range.start + range.length;
+  return text.substring(0, range.start) + replacement + text.substring(end);
+}
+
+var hasOwnProp = Object.prototype.hasOwnProperty;
+/**
+ * @param {*} iterable
+ * @param {Function} iterator
+ */
+
+function forEach(iterable, iterator) {
+  if (iterable && typeof iterable.forEach === 'function') {
+    iterable.forEach(iterator);
+  } else if (({}).toString.call(iterable) === '[object Array]') {
+    for (var i = 0, l = iterable.length; i < l; i++) {
+      iterator.call(null, iterable[i], i, iterable);
+    }
+  } else {
+    for (var key in iterable) {
+      if (hasOwnProp.call(iterable, key)) {
+        iterator.call(null, iterable[key], key, iterable);
+      }
+    }
+  }
+}
+
+var getOwnPropertyNames = (function () {
+  var getOwnPropertyNames = Object.getOwnPropertyNames;
+
+  try {
+    Object.getOwnPropertyNames({}, 'sq');
+  } catch (e) {
+    // IE 8
+    getOwnPropertyNames = function (object) {
+      var result = [];
+      for (var key in object) {
+        if (hasOwnProp.call(object, key)) {
+          result.push(key);
+        }
+      }
+      return result;
+    };
+  }
+
+  return getOwnPropertyNames;
+})();
+
+var getPrototypeOf = Object.getPrototypeOf || function (object) {
+  return object.__proto__;
+};
+/**
+ * @param {Object} object
+ * @param {string} property
+ * @returns {boolean}
+ */
+
+function hasGetter(object, property) {
+  // Skip if getOwnPropertyDescriptor throws (IE8)
+  try {
+    Object.getOwnPropertyDescriptor({}, 'sq');
+  } catch (e) {
+    return false;
+  }
+
+  var descriptor = undefined;
+
+  if (object && object.constructor && object.constructor.prototype) {
+    descriptor = Object.getOwnPropertyDescriptor(object.constructor.prototype, property);
+  }
+
+  if (!descriptor) {
+    descriptor = Object.getOwnPropertyDescriptor(object, property);
+  }
+
+  if (descriptor && descriptor.get) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+<<<<<<< HEAD
+},{"./delimited_text_formatter":10,"./utils":22}],14:[function(_dereq_,module,exports){
+||||||| merged common ancestors
+},{"./delimited_text_formatter":11,"./utils":23}],15:[function(_dereq_,module,exports){
+=======
+>>>>>>> add failing test cases for issue #53
+/**
+ * @param {Object} object
+ * @returns {?string[]}
+ */
+
+function getAllPropertyNames(object) {
+  if (object === null || object === undefined) {
+    return [];
+  }
+
+  var result = getOwnPropertyNames(object);
+
+  var prototype = object.constructor && object.constructor.prototype;
+  while (prototype) {
+    result.push.apply(result, _toConsumableArray(getOwnPropertyNames(prototype)));
+    prototype = getPrototypeOf(prototype);
+  }
+
+  return result;
+}
+
+},{}],7:[function(_dereq_,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = setTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    clearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        setTimeout(drainQueue, 0);
+    }
+};
+
+<<<<<<< HEAD
+},{}],15:[function(_dereq_,module,exports){
+'use strict';
+||||||| merged common ancestors
+},{}],16:[function(_dereq_,module,exports){
+'use strict';
+=======
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+>>>>>>> add failing test cases for issue #53
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],8:[function(_dereq_,module,exports){
 (function (global, factory) {
   if (typeof define === 'function' && define.amd) {
     define('stround', ['exports'], factory);
@@ -1777,6 +4618,13 @@ process.umask = function() { return 0; };
 
     var partToMove = undefined;
 
+<<<<<<< HEAD
+},{"./adaptive_card_formatter":4,"./amex_card_formatter":5,"./card_text_field":6,"./card_utils":7,"./default_card_formatter":9,"./delimited_text_formatter":10,"./employer_identification_number_formatter":11,"./expiry_date_field":12,"./expiry_date_formatter":13,"./formatter":14,"./number_formatter":16,"./number_formatter_settings_formatter":17,"./phone_formatter":18,"./social_security_number_formatter":19,"./text_field":20,"./undo_manager":21}],16:[function(_dereq_,module,exports){
+'use strict';
+||||||| merged common ancestors
+},{"./adaptive_card_formatter":5,"./amex_card_formatter":6,"./card_text_field":7,"./card_utils":8,"./default_card_formatter":10,"./delimited_text_formatter":11,"./employer_identification_number_formatter":12,"./expiry_date_field":13,"./expiry_date_formatter":14,"./formatter":15,"./number_formatter":17,"./number_formatter_settings_formatter":18,"./phone_formatter":19,"./social_security_number_formatter":20,"./text_field":21,"./undo_manager":22}],17:[function(_dereq_,module,exports){
+'use strict';
+=======
     if (exponent > 0) {
       partToMove = fracPart.slice(0, exponent);
       while (partToMove.length < exponent) {
@@ -1792,6 +4640,7 @@ process.umask = function() { return 0; };
       fracPart = partToMove + fracPart;
       intPart = intPart.slice(0, intPart.length - partToMove.length);
     }
+>>>>>>> add failing test cases for issue #53
 
     return [negative, intPart, fracPart];
   }
@@ -1807,10 +4656,16 @@ process.umask = function() { return 0; };
    * @return {string}
    */
 
+<<<<<<< HEAD
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+||||||| merged common ancestors
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+=======
   function shift(strnum, exponent) {
     if (typeof strnum === 'number') {
       strnum = '' + strnum;
     }
+>>>>>>> add failing test cases for issue #53
 
     var parsed = parse(strnum);
     if (parsed === null) {
@@ -1921,7 +4776,7 @@ process.umask = function() { return 0; };
   }
 });
 
-},{}],4:[function(_dereq_,module,exports){
+},{}],9:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2027,7 +4882,7 @@ var AdaptiveCardFormatter = (function () {
 exports['default'] = AdaptiveCardFormatter;
 module.exports = exports['default'];
 
-},{"./amex_card_formatter":5,"./card_utils":7,"./default_card_formatter":9}],5:[function(_dereq_,module,exports){
+},{"./amex_card_formatter":10,"./card_utils":12,"./default_card_formatter":13}],10:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2036,7 +4891,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
@@ -2089,7 +4944,7 @@ var AmexCardFormatter = (function (_DefaultCardFormatter) {
 exports['default'] = AmexCardFormatter;
 module.exports = exports['default'];
 
-},{"./default_card_formatter":9}],6:[function(_dereq_,module,exports){
+},{"./default_card_formatter":13}],11:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2098,7 +4953,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
@@ -2106,9 +4961,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _text_field = _dereq_('./text_field');
+var _fieldKitCoreText_field = _dereq_('field-kit-core/text_field');
 
-var _text_field2 = _interopRequireDefault(_text_field);
+var _fieldKitCoreText_field2 = _interopRequireDefault(_fieldKitCoreText_field);
 
 var _adaptive_card_formatter = _dereq_('./adaptive_card_formatter');
 
@@ -2333,12 +5188,12 @@ var CardTextField = (function (_TextField) {
   }]);
 
   return CardTextField;
-})(_text_field2['default']);
+})(_fieldKitCoreText_field2['default']);
 
 exports['default'] = CardTextField;
 module.exports = exports['default'];
 
-},{"./adaptive_card_formatter":4,"./card_utils":7,"./text_field":20}],7:[function(_dereq_,module,exports){
+},{"./adaptive_card_formatter":9,"./card_utils":12,"field-kit-core/text_field":4}],12:[function(_dereq_,module,exports){
 /**
  * @TODO Make this an enum
  */
@@ -2435,67 +5290,7 @@ function validCardLength(pan) {
   }
 }
 
-},{}],8:[function(_dereq_,module,exports){
-'use strict';
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-exports['default'] = installCaret;
-
-function installCaret() {
-  var _document = arguments.length <= 0 || arguments[0] === undefined ? document : arguments[0];
-
-  var getCaret = undefined;
-  var setCaret = undefined;
-
-  if (!_document) {
-    throw new Error('Caret does not have access to document');
-  } else if ('selectionStart' in _document.createElement('input')) {
-    getCaret = function (element) {
-      return {
-        start: element.selectionStart,
-        end: element.selectionEnd
-      };
-    };
-    setCaret = function (element, start, end) {
-      element.selectionStart = start;
-      element.selectionEnd = end;
-    };
-  } else if (_document.selection) {
-    getCaret = function (element) {
-      var selection = _document.selection;
-      var value = element.value;
-      var range = selection.createRange().duplicate();
-
-      range.moveEnd('character', value.length);
-
-      var start = range.text === '' ? value.length : value.lastIndexOf(range.text);
-      range = selection.createRange().duplicate();
-
-      range.moveStart('character', -value.length);
-
-      var end = range.text.length;
-      return { start: start, end: end };
-    };
-    setCaret = function (element, start, end) {
-      var range = element.createTextRange();
-      range.collapse(true);
-      range.moveStart('character', start);
-      range.moveEnd('character', end - start);
-      range.select();
-    };
-  } else {
-    throw new Error('Caret unknown input selection capabilities');
-  }
-
-  return { getCaret: getCaret, setCaret: setCaret };
-}
-
-;
-module.exports = exports['default'];
-
-},{}],9:[function(_dereq_,module,exports){
+},{}],13:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2504,7 +5299,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
@@ -2597,7 +5392,7 @@ var DefaultCardFormatter = (function (_DelimitedTextFormatter) {
 exports['default'] = DefaultCardFormatter;
 module.exports = exports['default'];
 
-},{"./card_utils":7,"./delimited_text_formatter":10}],10:[function(_dereq_,module,exports){
+},{"./card_utils":12,"./delimited_text_formatter":14}],14:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2606,7 +5401,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x2, _x3, _x4) { var _again = true; _function: while (_again) { var object = _x2, property = _x3, receiver = _x4; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x2 = parent; _x3 = property; _x4 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x2, _x3, _x4) { var _again = true; _function: while (_again) { var object = _x2, property = _x3, receiver = _x4; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x2 = parent; _x3 = property; _x4 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
@@ -2614,9 +5409,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _formatter = _dereq_('./formatter');
+var _fieldKitCoreFormatter = _dereq_('field-kit-core/formatter');
 
-var _formatter2 = _interopRequireDefault(_formatter);
+var _fieldKitCoreFormatter2 = _interopRequireDefault(_fieldKitCoreFormatter);
 
 /**
  * A generic delimited formatter.
@@ -2893,12 +5688,12 @@ var DelimitedTextFormatter = (function (_Formatter) {
   }]);
 
   return DelimitedTextFormatter;
-})(_formatter2['default']);
+})(_fieldKitCoreFormatter2['default']);
 
 exports['default'] = DelimitedTextFormatter;
 module.exports = exports['default'];
 
-},{"./formatter":14}],11:[function(_dereq_,module,exports){
+},{"field-kit-core/formatter":2}],15:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2907,7 +5702,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
@@ -2975,7 +5770,7 @@ var EmployerIdentificationNumberFormatter = (function (_DelimitedTextFormatter) 
 exports['default'] = EmployerIdentificationNumberFormatter;
 module.exports = exports['default'];
 
-},{"./delimited_text_formatter":10}],12:[function(_dereq_,module,exports){
+},{"./delimited_text_formatter":14}],16:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2984,7 +5779,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
@@ -2992,9 +5787,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _text_field = _dereq_('./text_field');
+var _fieldKitCoreText_field = _dereq_('field-kit-core/text_field');
 
-var _text_field2 = _interopRequireDefault(_text_field);
+var _fieldKitCoreText_field2 = _interopRequireDefault(_fieldKitCoreText_field);
 
 var _expiry_date_formatter = _dereq_('./expiry_date_formatter');
 
@@ -3036,12 +5831,12 @@ var ExpiryDateField = (function (_TextField) {
   }]);
 
   return ExpiryDateField;
-})(_text_field2['default']);
+})(_fieldKitCoreText_field2['default']);
 
 exports['default'] = ExpiryDateField;
 module.exports = exports['default'];
 
-},{"./expiry_date_formatter":13,"./text_field":20}],13:[function(_dereq_,module,exports){
+},{"./expiry_date_formatter":17,"field-kit-core/text_field":4}],17:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3050,7 +5845,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
@@ -3062,7 +5857,7 @@ var _delimited_text_formatter = _dereq_('./delimited_text_formatter');
 
 var _delimited_text_formatter2 = _interopRequireDefault(_delimited_text_formatter);
 
-var _utils = _dereq_('./utils');
+var _fieldKitCoreUtils = _dereq_('field-kit-core/utils');
 
 /**
  * Give this function a 2 digit year it'll return with 4.
@@ -3128,7 +5923,7 @@ var ExpiryDateFormatter = (function (_DelimitedTextFormatter) {
 
       year = year % 100;
 
-      return _get(Object.getPrototypeOf(ExpiryDateFormatter.prototype), 'format', this).call(this, (0, _utils.zpad2)(month) + (0, _utils.zpad2)(year));
+      return _get(Object.getPrototypeOf(ExpiryDateFormatter.prototype), 'format', this).call(this, (0, _fieldKitCoreUtils.zpad2)(month) + (0, _fieldKitCoreUtils.zpad2)(year));
     }
 
     /**
@@ -3232,93 +6027,7 @@ var ExpiryDateFormatter = (function (_DelimitedTextFormatter) {
 exports['default'] = ExpiryDateFormatter;
 module.exports = exports['default'];
 
-},{"./delimited_text_formatter":10,"./utils":22}],14:[function(_dereq_,module,exports){
-/**
- * Base class providing basic formatting, parsing, and change validation to be
- * customized in subclasses.
- */
-'use strict';
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-var Formatter = (function () {
-  function Formatter() {
-    _classCallCheck(this, Formatter);
-  }
-
-  _createClass(Formatter, [{
-    key: 'format',
-
-    /**
-     * @param {string} text
-     * @returns {string}
-     */
-    value: function format(text) {
-      if (text === undefined || text === null) {
-        text = '';
-      }
-      if (this.maximumLength !== undefined && this.maximumLength !== null) {
-        text = text.substring(0, this.maximumLength);
-      }
-      return text;
-    }
-
-    /**
-     * @param {string} text
-     * @returns {string}
-     */
-  }, {
-    key: 'parse',
-    value: function parse(text) {
-      if (text === undefined || text === null) {
-        text = '';
-      }
-      if (this.maximumLength !== undefined && this.maximumLength !== null) {
-        text = text.substring(0, this.maximumLength);
-      }
-      return text;
-    }
-
-    /**
-     * Determines whether the given change should be allowed and, if so, whether
-     * it should be altered.
-     *
-     * @param {TextFieldStateChange} change
-     * @returns {boolean}
-     */
-  }, {
-    key: 'isChangeValid',
-    value: function isChangeValid(change) {
-      var selectedRange = change.proposed.selectedRange;
-      var text = change.proposed.text;
-      if (this.maximumLength !== undefined && this.maximumLength !== null && text.length > this.maximumLength) {
-        var available = this.maximumLength - (text.length - change.inserted.text.length);
-        var newText = change.current.text.substring(0, change.current.selectedRange.start);
-        if (available > 0) {
-          newText += change.inserted.text.substring(0, available);
-        }
-        newText += change.current.text.substring(change.current.selectedRange.start + change.current.selectedRange.length);
-        var truncatedLength = text.length - newText.length;
-        change.proposed.text = newText;
-        selectedRange.start -= truncatedLength;
-      }
-      return true;
-    }
-  }]);
-
-  return Formatter;
-})();
-
-exports['default'] = Formatter;
-module.exports = exports['default'];
-
-},{}],15:[function(_dereq_,module,exports){
+},{"./delimited_text_formatter":14,"field-kit-core/utils":6}],18:[function(_dereq_,module,exports){
 'use strict';
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
@@ -3357,9 +6066,9 @@ var _expiry_date_formatter = _dereq_('./expiry_date_formatter');
 
 var _expiry_date_formatter2 = _interopRequireDefault(_expiry_date_formatter);
 
-var _formatter = _dereq_('./formatter');
+var _fieldKitCoreFormatter = _dereq_('field-kit-core/formatter');
 
-var _formatter2 = _interopRequireDefault(_formatter);
+var _fieldKitCoreFormatter2 = _interopRequireDefault(_fieldKitCoreFormatter);
 
 var _number_formatter = _dereq_('./number_formatter');
 
@@ -3377,13 +6086,13 @@ var _social_security_number_formatter = _dereq_('./social_security_number_format
 
 var _social_security_number_formatter2 = _interopRequireDefault(_social_security_number_formatter);
 
-var _text_field = _dereq_('./text_field');
+var _fieldKitCoreText_field = _dereq_('field-kit-core/text_field');
 
-var _text_field2 = _interopRequireDefault(_text_field);
+var _fieldKitCoreText_field2 = _interopRequireDefault(_fieldKitCoreText_field);
 
-var _undo_manager = _dereq_('./undo_manager');
+var _fieldKitCoreUndo_manager = _dereq_('field-kit-core/undo_manager');
 
-var _undo_manager2 = _interopRequireDefault(_undo_manager);
+var _fieldKitCoreUndo_manager2 = _interopRequireDefault(_fieldKitCoreUndo_manager);
 
 /**
  * @namespace FieldKit
@@ -3407,16 +6116,16 @@ module.exports = {
   EmployerIdentificationNumberFormatter: _employer_identification_number_formatter2['default'],
   ExpiryDateField: _expiry_date_field2['default'],
   ExpiryDateFormatter: _expiry_date_formatter2['default'],
-  Formatter: _formatter2['default'],
+  Formatter: _fieldKitCoreFormatter2['default'],
   NumberFormatter: _number_formatter2['default'],
   NumberFormatterSettingsFormatter: _number_formatter_settings_formatter2['default'],
   PhoneFormatter: _phone_formatter2['default'],
   SocialSecurityNumberFormatter: _social_security_number_formatter2['default'],
-  TextField: _text_field2['default'],
-  UndoManager: _undo_manager2['default']
+  TextField: _fieldKitCoreText_field2['default'],
+  UndoManager: _fieldKitCoreUndo_manager2['default']
 };
 
-},{"./adaptive_card_formatter":4,"./amex_card_formatter":5,"./card_text_field":6,"./card_utils":7,"./default_card_formatter":9,"./delimited_text_formatter":10,"./employer_identification_number_formatter":11,"./expiry_date_field":12,"./expiry_date_formatter":13,"./formatter":14,"./number_formatter":16,"./number_formatter_settings_formatter":17,"./phone_formatter":18,"./social_security_number_formatter":19,"./text_field":20,"./undo_manager":21}],16:[function(_dereq_,module,exports){
+},{"./adaptive_card_formatter":9,"./amex_card_formatter":10,"./card_text_field":11,"./card_utils":12,"./default_card_formatter":13,"./delimited_text_formatter":14,"./employer_identification_number_formatter":15,"./expiry_date_field":16,"./expiry_date_formatter":17,"./number_formatter":19,"./number_formatter_settings_formatter":20,"./phone_formatter":21,"./social_security_number_formatter":22,"field-kit-core/formatter":2,"field-kit-core/text_field":4,"field-kit-core/undo_manager":5}],19:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3425,7 +6134,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
@@ -3433,15 +6142,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _formatter = _dereq_('./formatter');
+var _fieldKitCoreFormatter = _dereq_('field-kit-core/formatter');
 
-var _formatter2 = _interopRequireDefault(_formatter);
+var _fieldKitCoreFormatter2 = _interopRequireDefault(_fieldKitCoreFormatter);
 
 var _number_formatter_settings_formatter = _dereq_('./number_formatter_settings_formatter');
 
 var _number_formatter_settings_formatter2 = _interopRequireDefault(_number_formatter_settings_formatter);
 
-var _utils = _dereq_('./utils');
+var _fieldKitCoreUtils = _dereq_('field-kit-core/utils');
 
 var _stround = _dereq_('stround');
 
@@ -3494,8 +6203,2310 @@ function get(object, key) {
  * @return {string}
  * @private
  */
+<<<<<<< HEAD
+var RegionDefaults = {
+  AE: {
+    currencyCode: 'AED'
+  },
+  AG: {
+    currencyCode: 'XCD'
+  },
+  AI: {
+    currencyCode: 'XCD'
+  },
+  AL: {
+    currencyCode: 'ALL'
+  },
+  AM: {
+    currencyCode: 'AMD'
+  },
+  AO: {
+    currencyCode: 'AOA'
+  },
+  AR: {
+    currencyCode: 'ARS'
+  },
+  AT: {
+    currencyCode: 'EUR'
+  },
+  AU: {
+    currencyCode: 'AUD'
+  },
+  AW: {
+    currencyCode: 'AWG'
+  },
+  AZ: {
+    currencyCode: 'AZN'
+  },
+  BA: {
+    currencyCode: 'BAM'
+  },
+  BB: {
+    currencyCode: 'BBD'
+  },
+  BD: {
+    currencyCode: 'BDT'
+  },
+  BE: {
+    currencyCode: 'EUR'
+  },
+  BF: {
+    currencyCode: 'XOF'
+  },
+  BG: {
+    currencyCode: 'BGN'
+  },
+  BH: {
+    currencyCode: 'BHD'
+  },
+  BJ: {
+    currencyCode: 'XOF'
+  },
+  BM: {
+    currencyCode: 'BMD'
+  },
+  BN: {
+    currencyCode: 'BND'
+  },
+  BO: {
+    currencyCode: 'BOB'
+  },
+  BR: {
+    currencyCode: 'BRL'
+  },
+  BS: {
+    currencyCode: 'BSD'
+  },
+  BT: {
+    currencyCode: 'BTN'
+  },
+  BW: {
+    currencyCode: 'BWP'
+  },
+  BY: {
+    currencyCode: 'BYR'
+  },
+  BZ: {
+    currencyCode: 'BZD'
+  },
+  CA: {
+    currencyCode: 'CAD'
+  },
+  CG: {
+    currencyCode: 'CDF'
+  },
+  CH: {
+    currencyCode: 'CHF'
+  },
+  CI: {
+    currencyCode: 'XOF'
+  },
+  CL: {
+    currencyCode: 'CLP'
+  },
+  CM: {
+    currencyCode: 'XAF'
+  },
+  CN: {
+    currencyCode: 'CNY'
+  },
+  CO: {
+    currencyCode: 'COP'
+  },
+  CR: {
+    currencyCode: 'CRC'
+  },
+  CV: {
+    currencyCode: 'CVE'
+  },
+  CY: {
+    currencyCode: 'EUR'
+  },
+  CZ: {
+    currencyCode: 'CZK'
+  },
+  DE: {
+    currencyCode: 'EUR'
+  },
+  DK: {
+    currencyCode: 'DKK'
+  },
+  DM: {
+    currencyCode: 'XCD'
+  },
+  DO: {
+    currencyCode: 'DOP'
+  },
+  DZ: {
+    currencyCode: 'DZD'
+  },
+  EC: {
+    currencyCode: 'USD'
+  },
+  EE: {
+    currencyCode: 'EUR'
+  },
+  EG: {
+    currencyCode: 'EGP'
+  },
+  ES: {
+    currencyCode: 'EUR'
+  },
+  ET: {
+    currencyCode: 'ETB'
+  },
+  FI: {
+    currencyCode: 'EUR'
+  },
+  FJ: {
+    currencyCode: 'FJD'
+  },
+  FM: {
+    currencyCode: 'USD'
+  },
+  FR: {
+    currencyCode: 'EUR'
+  },
+  GA: {
+    currencyCode: 'XAF'
+  },
+  GB: {
+    currencyCode: 'GBP'
+  },
+  GD: {
+    currencyCode: 'XCD'
+  },
+  GE: {
+    currencyCode: 'GEL'
+  },
+  GH: {
+    currencyCode: 'GHS'
+  },
+  GI: {
+    currencyCode: 'GIP'
+  },
+  GM: {
+    currencyCode: 'GMD'
+  },
+  GR: {
+    currencyCode: 'EUR'
+  },
+  GT: {
+    currencyCode: 'GTQ'
+  },
+  GU: {
+    currencyCode: 'USD'
+  },
+  GW: {
+    currencyCode: 'XOF'
+  },
+  GY: {
+    currencyCode: 'GYD'
+  },
+  HK: {
+    currencyCode: 'HKD'
+  },
+  HN: {
+    currencyCode: 'HNL'
+  },
+  HR: {
+    currencyCode: 'HRK'
+  },
+  HT: {
+    currencyCode: 'HTG'
+  },
+  HU: {
+    currencyCode: 'HUF'
+  },
+  ID: {
+    currencyCode: 'IDR'
+  },
+  IE: {
+    currencyCode: 'EUR'
+  },
+  IL: {
+    currencyCode: 'ILS'
+  },
+  IN: {
+    currencyCode: 'INR'
+  },
+  IS: {
+    currencyCode: 'ISK'
+  },
+  IT: {
+    currencyCode: 'EUR'
+  },
+  JM: {
+    currencyCode: 'JMD'
+  },
+  JO: {
+    currencyCode: 'JOD'
+  },
+  JP: {
+    currencyCode: 'JPY'
+  },
+  KE: {
+    currencyCode: 'KES'
+  },
+  KG: {
+    currencyCode: 'KGS'
+  },
+  KH: {
+    currencyCode: 'KHR'
+  },
+  KN: {
+    currencyCode: 'XCD'
+  },
+  KR: {
+    currencyCode: 'KRW'
+  },
+  KW: {
+    currencyCode: 'KWD'
+  },
+  KY: {
+    currencyCode: 'KYD'
+  },
+  KZ: {
+    currencyCode: 'KZT'
+  },
+  LA: {
+    currencyCode: 'LAK'
+  },
+  LB: {
+    currencyCode: 'LBP'
+  },
+  LC: {
+    currencyCode: 'XCD'
+  },
+  LI: {
+    currencyCode: 'CHF'
+  },
+  LK: {
+    currencyCode: 'LKR'
+  },
+  LR: {
+    currencyCode: 'LRD'
+  },
+  LT: {
+    currencyCode: 'LTL'
+  },
+  LU: {
+    currencyCode: 'EUR'
+  },
+  LV: {
+    currencyCode: 'EUR'
+  },
+  MA: {
+    currencyCode: 'MAD'
+  },
+  MD: {
+    currencyCode: 'MDL'
+  },
+  MG: {
+    currencyCode: 'MGA'
+  },
+  MK: {
+    currencyCode: 'MKD'
+  },
+  ML: {
+    currencyCode: 'XOF'
+  },
+  MM: {
+    currencyCode: 'MMK'
+  },
+  MN: {
+    currencyCode: 'MNT'
+  },
+  MO: {
+    currencyCode: 'MOP'
+  },
+  MP: {
+    currencyCode: 'USD'
+  },
+  MR: {
+    currencyCode: 'MRO'
+  },
+  MS: {
+    currencyCode: 'XCD'
+  },
+  MT: {
+    currencyCode: 'EUR'
+  },
+  MU: {
+    currencyCode: 'MUR'
+  },
+  MW: {
+    currencyCode: 'MWK'
+  },
+  MX: {
+    currencyCode: 'MXN'
+  },
+  MY: {
+    currencyCode: 'MYR'
+  },
+  MZ: {
+    currencyCode: 'MZN'
+  },
+  NA: {
+    currencyCode: 'NAD'
+  },
+  NE: {
+    currencyCode: 'XOF'
+  },
+  NG: {
+    currencyCode: 'NGN'
+  },
+  NI: {
+    currencyCode: 'NIO'
+  },
+  NL: {
+    currencyCode: 'EUR'
+  },
+  NO: {
+    currencyCode: 'NOK'
+  },
+  NP: {
+    currencyCode: 'NPR'
+  },
+  NZ: {
+    currencyCode: 'NZD'
+  },
+  OM: {
+    currencyCode: 'OMR'
+  },
+  PA: {
+    currencyCode: 'PAB'
+  },
+  PE: {
+    currencyCode: 'PEN'
+  },
+  PG: {
+    currencyCode: 'PGK'
+  },
+  PH: {
+    currencyCode: 'PHP'
+  },
+  PK: {
+    currencyCode: 'PKR'
+  },
+  PL: {
+    currencyCode: 'PLN'
+  },
+  PR: {
+    currencyCode: 'USD'
+  },
+  PT: {
+    currencyCode: 'EUR'
+  },
+  PW: {
+    currencyCode: 'USD'
+  },
+  PY: {
+    currencyCode: 'PYG'
+  },
+  QA: {
+    currencyCode: 'QAR'
+  },
+  RO: {
+    currencyCode: 'RON'
+  },
+  RS: {
+    currencyCode: 'RSD'
+  },
+  RU: {
+    currencyCode: 'RUB'
+  },
+  RW: {
+    currencyCode: 'RWF'
+  },
+  SA: {
+    currencyCode: 'SAR'
+  },
+  SB: {
+    currencyCode: 'SBD'
+  },
+  SC: {
+    currencyCode: 'SCR'
+  },
+  SE: {
+    currencyCode: 'SEK'
+  },
+  SG: {
+    currencyCode: 'SGD'
+  },
+  SI: {
+    currencyCode: 'EUR'
+  },
+  SK: {
+    currencyCode: 'EUR'
+  },
+  SL: {
+    currencyCode: 'SLL'
+  },
+  SN: {
+    currencyCode: 'XOF'
+  },
+  SR: {
+    currencyCode: 'SRD'
+  },
+  ST: {
+    currencyCode: 'STD'
+  },
+  SV: {
+    currencyCode: 'SVC'
+  },
+  SZ: {
+    currencyCode: 'SZL'
+  },
+  TC: {
+    currencyCode: 'USD'
+  },
+  TD: {
+    currencyCode: 'XAF'
+  },
+  TG: {
+    currencyCode: 'XOF'
+  },
+  TH: {
+    currencyCode: 'THB'
+  },
+  TJ: {
+    currencyCode: 'TJS'
+  },
+  TM: {
+    currencyCode: 'TMT'
+  },
+  TN: {
+    currencyCode: 'TND'
+  },
+  TR: {
+    currencyCode: 'TRY'
+  },
+  TT: {
+    currencyCode: 'TTD'
+  },
+  TW: {
+    currencyCode: 'TWD'
+  },
+  TZ: {
+    currencyCode: 'TZS'
+  },
+  UA: {
+    currencyCode: 'UAH'
+  },
+  UG: {
+    currencyCode: 'UGX'
+  },
+  US: {
+    currencyCode: 'USD'
+  },
+  UY: {
+    currencyCode: 'UYU'
+  },
+  UZ: {
+    currencyCode: 'UZS'
+  },
+  VC: {
+    currencyCode: 'XCD'
+  },
+  VE: {
+    currencyCode: 'VEF'
+  },
+  VG: {
+    currencyCode: 'USD'
+  },
+  VI: {
+    currencyCode: 'USD'
+  },
+  VN: {
+    currencyCode: 'VND'
+  },
+  YE: {
+    currencyCode: 'YER'
+  },
+  ZA: {
+    currencyCode: 'ZAR'
+  },
+  ZM: {
+    currencyCode: 'ZMW'
+  },
+  ZW: {
+    currencyCode: 'USD'
+  }
+};
+
+/**
+ * @namespace CurrencyDefaults
+ */
+var CurrencyDefaults = {
+  'default': {
+    currencySymbol: function currencySymbol(formatter) {
+      return formatter.currencyCode();
+    },
+    internationalCurrencySymbol: function internationalCurrencySymbol(formatter) {
+      return formatter.currencyCode();
+    },
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+    minimumIntegerDigits: 1,
+    usesGroupingSeparator: true
+  },
+  AED: {
+    currencySymbol: 'د.إ',
+    internationalCurrencySymbol: 'د.إ'
+  },
+  ALL: {
+    currencySymbol: 'L',
+    internationalCurrencySymbol: 'L'
+  },
+  AMD: {
+    currencySymbol: 'դր.',
+    internationalCurrencySymbol: 'դր.'
+  },
+  AOA: {
+    currencySymbol: 'Kz',
+    internationalCurrencySymbol: 'Kz'
+  },
+  ARS: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  AUD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  AWG: {
+    currencySymbol: 'ƒ',
+    internationalCurrencySymbol: 'ƒ'
+  },
+  AZN: {
+    currencySymbol: '₼',
+    internationalCurrencySymbol: '₼'
+  },
+  BAM: {
+    currencySymbol: 'КМ',
+    internationalCurrencySymbol: 'КМ'
+  },
+  BBD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  BDT: {
+    currencySymbol: '৳',
+    internationalCurrencySymbol: '৳'
+  },
+  BGN: {
+    currencySymbol: 'лв',
+    internationalCurrencySymbol: 'лв'
+  },
+  BHD: {
+    currencySymbol: 'ب.د',
+    internationalCurrencySymbol: 'ب.د',
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 3
+  },
+  BMD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  BND: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  BOB: {
+    currencySymbol: 'Bs.',
+    internationalCurrencySymbol: 'Bs.'
+  },
+  BRL: {
+    currencySymbol: 'R$',
+    internationalCurrencySymbol: 'R$'
+  },
+  BSD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  BTN: {
+    currencySymbol: 'Nu.',
+    internationalCurrencySymbol: 'Nu.'
+  },
+  BWP: {
+    currencySymbol: 'P',
+    internationalCurrencySymbol: 'P'
+  },
+  BYR: {
+    currencySymbol: 'Br',
+    internationalCurrencySymbol: 'Br'
+  },
+  BZD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  CAD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  CDF: {
+    currencySymbol: 'Fr',
+    internationalCurrencySymbol: 'Fr'
+  },
+  CHF: {
+    currencySymbol: 'Fr',
+    internationalCurrencySymbol: 'Fr'
+  },
+  CLP: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  },
+  CNY: {
+    currencySymbol: '¥',
+    internationalCurrencySymbol: '¥'
+  },
+  COP: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  CRC: {
+    currencySymbol: '₡',
+    internationalCurrencySymbol: '₡'
+  },
+  CVE: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  CZK: {
+    currencySymbol: 'Kč',
+    internationalCurrencySymbol: 'Kč'
+  },
+  DKK: {
+    currencySymbol: 'kr',
+    internationalCurrencySymbol: 'kr'
+  },
+  DOP: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  DZD: {
+    currencySymbol: 'د.ج',
+    internationalCurrencySymbol: 'د.ج'
+  },
+  EGP: {
+    currencySymbol: 'E£',
+    internationalCurrencySymbol: 'E£'
+  },
+  ETB: {
+    currencySymbol: 'ብር',
+    internationalCurrencySymbol: 'ብር'
+  },
+  EUR: {
+    currencySymbol: '€',
+    internationalCurrencySymbol: '€'
+  },
+  FJD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  GBP: {
+    currencySymbol: '£',
+    internationalCurrencySymbol: '£'
+  },
+  GEL: {
+    currencySymbol: 'ლ,',
+    internationalCurrencySymbol: 'ლ,'
+  },
+  GHS: {
+    currencySymbol: '₵',
+    internationalCurrencySymbol: '₵'
+  },
+  GIP: {
+    currencySymbol: '£',
+    internationalCurrencySymbol: '£'
+  },
+  GMD: {
+    currencySymbol: 'D',
+    internationalCurrencySymbol: 'D'
+  },
+  GTQ: {
+    currencySymbol: 'Q',
+    internationalCurrencySymbol: 'Q'
+  },
+  GYD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  HKD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  HNL: {
+    currencySymbol: 'L',
+    internationalCurrencySymbol: 'L'
+  },
+  HRK: {
+    currencySymbol: 'kn',
+    internationalCurrencySymbol: 'kn'
+  },
+  HTG: {
+    currencySymbol: 'G',
+    internationalCurrencySymbol: 'G'
+  },
+  HUF: {
+    currencySymbol: 'Ft',
+    internationalCurrencySymbol: 'Ft'
+  },
+  IDR: {
+    currencySymbol: 'Rp',
+    internationalCurrencySymbol: 'Rp'
+  },
+  ILS: {
+    currencySymbol: '₪',
+    internationalCurrencySymbol: '₪'
+  },
+  INR: {
+    currencySymbol: '₹',
+    internationalCurrencySymbol: '₹'
+  },
+  ISK: {
+    currencySymbol: 'kr',
+    internationalCurrencySymbol: 'kr'
+  },
+  JMD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  JOD: {
+    currencySymbol: 'د.ا',
+    internationalCurrencySymbol: 'د.ا',
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 3
+  },
+  JPY: {
+    currencySymbol: '¥',
+    internationalCurrencySymbol: '¥',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  },
+  KES: {
+    currencySymbol: 'KSh',
+    internationalCurrencySymbol: 'KSh'
+  },
+  KGS: {
+    currencySymbol: 'som',
+    internationalCurrencySymbol: 'som'
+  },
+  KHR: {
+    currencySymbol: '៛',
+    internationalCurrencySymbol: '៛'
+  },
+  KRW: {
+    currencySymbol: '₩',
+    internationalCurrencySymbol: '₩',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  },
+  KWD: {
+    currencySymbol: 'د.ك',
+    internationalCurrencySymbol: 'د.ك',
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 3
+  },
+  KYD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  KZT: {
+    currencySymbol: '〒',
+    internationalCurrencySymbol: '〒'
+  },
+  LAK: {
+    currencySymbol: '₭',
+    internationalCurrencySymbol: '₭'
+  },
+  LBP: {
+    currencySymbol: 'ل.ل',
+    internationalCurrencySymbol: 'ل.ل'
+  },
+  LKR: {
+    currencySymbol: '₨',
+    internationalCurrencySymbol: '₨'
+  },
+  LRD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  LTL: {
+    currencySymbol: 'Lt',
+    internationalCurrencySymbol: 'Lt'
+  },
+  MAD: {
+    currencySymbol: 'د.م.',
+    internationalCurrencySymbol: 'د.م.'
+  },
+  MDL: {
+    currencySymbol: 'L',
+    internationalCurrencySymbol: 'L'
+  },
+  MGA: {
+    currencySymbol: 'Ar',
+    internationalCurrencySymbol: 'Ar',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  },
+  MKD: {
+    currencySymbol: 'ден',
+    internationalCurrencySymbol: 'ден'
+  },
+  MMK: {
+    currencySymbol: 'K',
+    internationalCurrencySymbol: 'K'
+  },
+  MNT: {
+    currencySymbol: '₮',
+    internationalCurrencySymbol: '₮'
+  },
+  MOP: {
+    currencySymbol: 'P',
+    internationalCurrencySymbol: 'P'
+  },
+  MRO: {
+    currencySymbol: 'UM',
+    internationalCurrencySymbol: 'UM',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  },
+  MUR: {
+    currencySymbol: '₨',
+    internationalCurrencySymbol: '₨'
+  },
+  MWK: {
+    currencySymbol: 'MK',
+    internationalCurrencySymbol: 'MK'
+  },
+  MXN: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  MYR: {
+    currencySymbol: 'RM',
+    internationalCurrencySymbol: 'RM'
+  },
+  MZN: {
+    currencySymbol: 'MTn',
+    internationalCurrencySymbol: 'MTn'
+  },
+  NAD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  NGN: {
+    currencySymbol: '₦',
+    internationalCurrencySymbol: '₦'
+  },
+  NIO: {
+    currencySymbol: 'C$',
+    internationalCurrencySymbol: 'C$'
+  },
+  NOK: {
+    currencySymbol: 'kr',
+    internationalCurrencySymbol: 'kr'
+  },
+  NPR: {
+    currencySymbol: '₨',
+    internationalCurrencySymbol: '₨'
+  },
+  NZD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  OMR: {
+    currencySymbol: 'ر.ع.',
+    internationalCurrencySymbol: 'ر.ع.',
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 3
+  },
+  PAB: {
+    currencySymbol: 'B/.',
+    internationalCurrencySymbol: 'B/.'
+  },
+  PEN: {
+    currencySymbol: 'S/.',
+    internationalCurrencySymbol: 'S/.'
+  },
+  PGK: {
+    currencySymbol: 'K',
+    internationalCurrencySymbol: 'K'
+  },
+  PHP: {
+    currencySymbol: '₱',
+    internationalCurrencySymbol: '₱'
+  },
+  PKR: {
+    currencySymbol: '₨',
+    internationalCurrencySymbol: '₨'
+  },
+  PLN: {
+    currencySymbol: 'zł',
+    internationalCurrencySymbol: 'zł'
+  },
+  PYG: {
+    currencySymbol: '₲',
+    internationalCurrencySymbol: '₲'
+  },
+  QAR: {
+    currencySymbol: 'ر.ق',
+    internationalCurrencySymbol: 'ر.ق'
+  },
+  RON: {
+    currencySymbol: 'Lei',
+    internationalCurrencySymbol: 'Lei'
+  },
+  RSD: {
+    currencySymbol: 'РСД',
+    internationalCurrencySymbol: 'РСД'
+  },
+  RUB: {
+    currencySymbol: '₽',
+    internationalCurrencySymbol: '₽'
+  },
+  RWF: {
+    currencySymbol: 'FRw',
+    internationalCurrencySymbol: 'FRw'
+  },
+  SAR: {
+    currencySymbol: 'ر.س',
+    internationalCurrencySymbol: 'ر.س'
+  },
+  SBD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  SCR: {
+    currencySymbol: '₨',
+    internationalCurrencySymbol: '₨'
+  },
+  SEK: {
+    currencySymbol: 'kr',
+    internationalCurrencySymbol: 'kr'
+  },
+  SGD: {
+    currencySymbol: 'S$',
+    internationalCurrencySymbol: 'S$'
+  },
+  SLL: {
+    currencySymbol: 'Le',
+    internationalCurrencySymbol: 'Le'
+  },
+  SRD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  STD: {
+    currencySymbol: 'Db',
+    internationalCurrencySymbol: 'Db'
+  },
+  SVC: {
+    currencySymbol: '₡',
+    internationalCurrencySymbol: '₡'
+  },
+  SZL: {
+    currencySymbol: 'E',
+    internationalCurrencySymbol: 'E'
+  },
+  THB: {
+    currencySymbol: '฿',
+    internationalCurrencySymbol: '฿'
+  },
+  TJS: {
+    currencySymbol: 'ЅМ',
+    internationalCurrencySymbol: 'ЅМ'
+  },
+  TMT: {
+    currencySymbol: 'm',
+    internationalCurrencySymbol: 'm'
+  },
+  TND: {
+    currencySymbol: 'د.ت',
+    internationalCurrencySymbol: 'د.ت',
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 3
+  },
+  TRY: {
+    currencySymbol: '₺',
+    internationalCurrencySymbol: '₺'
+  },
+  TTD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  TWD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  TZS: {
+    currencySymbol: 'Sh',
+    internationalCurrencySymbol: 'Sh'
+  },
+  UAH: {
+    currencySymbol: '₴',
+    internationalCurrencySymbol: '₴'
+  },
+  UGX: {
+    currencySymbol: 'USh',
+    internationalCurrencySymbol: 'USh'
+  },
+  USD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: 'US$'
+  },
+  UYU: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  UZS: {
+    currencySymbol: 'лв',
+    internationalCurrencySymbol: 'лв'
+  },
+  VEF: {
+    currencySymbol: 'Bs F',
+    internationalCurrencySymbol: 'Bs F'
+  },
+  VND: {
+    currencySymbol: '₫',
+    internationalCurrencySymbol: '₫',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  },
+  XAF: {
+    currencySymbol: 'Fr',
+    internationalCurrencySymbol: 'Fr'
+  },
+  XCD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  XOF: {
+    currencySymbol: 'Fr',
+    internationalCurrencySymbol: 'Fr'
+  },
+  YER: {
+    currencySymbol: '﷼',
+    internationalCurrencySymbol: '﷼'
+  },
+  ZAR: {
+    currencySymbol: 'R',
+    internationalCurrencySymbol: 'R'
+  },
+  ZMW: {
+    currencySymbol: 'ZMK',
+    internationalCurrencySymbol: 'ZMK'
+  }
+};
+
+exports['default'] = NumberFormatter;
+module.exports = exports['default'];
+
+},{"./formatter":14,"./number_formatter_settings_formatter":17,"./utils":22,"stround":3}],17:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var _formatter = _dereq_('./formatter');
+
+var _formatter2 = _interopRequireDefault(_formatter);
+
+var NumberFormatterSettings = function NumberFormatterSettings() {
+  _classCallCheck(this, NumberFormatterSettings);
+
+  /** @type boolean */
+  this.alwaysShowsDecimalSeparator = false;
+
+  /** @type number */
+  this.groupingSize = 0;
+
+  /** @type number */
+  this.maximumFractionDigits = 0;
+
+  /** @type number */
+  this.minimumFractionDigits = 0;
+
+  /** @type number */
+  this.minimumIntegerDigits = 0;
+
+  /** @type string */
+  this.prefix = '';
+
+  /** @type string */
+  this.suffix = '';
+
+  /** @type boolean */
+  this.usesGroupingSeparator = false;
+||||||| merged common ancestors
+var RegionDefaults = {
+  AE: {
+    currencyCode: 'AED'
+  },
+  AG: {
+    currencyCode: 'XCD'
+  },
+  AI: {
+    currencyCode: 'XCD'
+  },
+  AL: {
+    currencyCode: 'ALL'
+  },
+  AM: {
+    currencyCode: 'AMD'
+  },
+  AO: {
+    currencyCode: 'AOA'
+  },
+  AR: {
+    currencyCode: 'ARS'
+  },
+  AT: {
+    currencyCode: 'EUR'
+  },
+  AU: {
+    currencyCode: 'AUD'
+  },
+  AW: {
+    currencyCode: 'AWG'
+  },
+  AZ: {
+    currencyCode: 'AZN'
+  },
+  BA: {
+    currencyCode: 'BAM'
+  },
+  BB: {
+    currencyCode: 'BBD'
+  },
+  BD: {
+    currencyCode: 'BDT'
+  },
+  BE: {
+    currencyCode: 'EUR'
+  },
+  BF: {
+    currencyCode: 'XOF'
+  },
+  BG: {
+    currencyCode: 'BGN'
+  },
+  BH: {
+    currencyCode: 'BHD'
+  },
+  BJ: {
+    currencyCode: 'XOF'
+  },
+  BM: {
+    currencyCode: 'BMD'
+  },
+  BN: {
+    currencyCode: 'BND'
+  },
+  BO: {
+    currencyCode: 'BOB'
+  },
+  BR: {
+    currencyCode: 'BRL'
+  },
+  BS: {
+    currencyCode: 'BSD'
+  },
+  BT: {
+    currencyCode: 'BTN'
+  },
+  BW: {
+    currencyCode: 'BWP'
+  },
+  BY: {
+    currencyCode: 'BYR'
+  },
+  BZ: {
+    currencyCode: 'BZD'
+  },
+  CA: {
+    currencyCode: 'CAD'
+  },
+  CG: {
+    currencyCode: 'CDF'
+  },
+  CH: {
+    currencyCode: 'CHF'
+  },
+  CI: {
+    currencyCode: 'XOF'
+  },
+  CL: {
+    currencyCode: 'CLP'
+  },
+  CM: {
+    currencyCode: 'XAF'
+  },
+  CN: {
+    currencyCode: 'CNY'
+  },
+  CO: {
+    currencyCode: 'COP'
+  },
+  CR: {
+    currencyCode: 'CRC'
+  },
+  CV: {
+    currencyCode: 'CVE'
+  },
+  CY: {
+    currencyCode: 'EUR'
+  },
+  CZ: {
+    currencyCode: 'CZK'
+  },
+  DE: {
+    currencyCode: 'EUR'
+  },
+  DK: {
+    currencyCode: 'DKK'
+  },
+  DM: {
+    currencyCode: 'XCD'
+  },
+  DO: {
+    currencyCode: 'DOP'
+  },
+  DZ: {
+    currencyCode: 'DZD'
+  },
+  EC: {
+    currencyCode: 'USD'
+  },
+  EE: {
+    currencyCode: 'EUR'
+  },
+  EG: {
+    currencyCode: 'EGP'
+  },
+  ES: {
+    currencyCode: 'EUR'
+  },
+  ET: {
+    currencyCode: 'ETB'
+  },
+  FI: {
+    currencyCode: 'EUR'
+  },
+  FJ: {
+    currencyCode: 'FJD'
+  },
+  FM: {
+    currencyCode: 'USD'
+  },
+  FR: {
+    currencyCode: 'EUR'
+  },
+  GA: {
+    currencyCode: 'XAF'
+  },
+  GB: {
+    currencyCode: 'GBP'
+  },
+  GD: {
+    currencyCode: 'XCD'
+  },
+  GE: {
+    currencyCode: 'GEL'
+  },
+  GH: {
+    currencyCode: 'GHS'
+  },
+  GI: {
+    currencyCode: 'GIP'
+  },
+  GM: {
+    currencyCode: 'GMD'
+  },
+  GR: {
+    currencyCode: 'EUR'
+  },
+  GT: {
+    currencyCode: 'GTQ'
+  },
+  GU: {
+    currencyCode: 'USD'
+  },
+  GW: {
+    currencyCode: 'XOF'
+  },
+  GY: {
+    currencyCode: 'GYD'
+  },
+  HK: {
+    currencyCode: 'HKD'
+  },
+  HN: {
+    currencyCode: 'HNL'
+  },
+  HR: {
+    currencyCode: 'HRK'
+  },
+  HT: {
+    currencyCode: 'HTG'
+  },
+  HU: {
+    currencyCode: 'HUF'
+  },
+  ID: {
+    currencyCode: 'IDR'
+  },
+  IE: {
+    currencyCode: 'EUR'
+  },
+  IL: {
+    currencyCode: 'ILS'
+  },
+  IN: {
+    currencyCode: 'INR'
+  },
+  IS: {
+    currencyCode: 'ISK'
+  },
+  IT: {
+    currencyCode: 'EUR'
+  },
+  JM: {
+    currencyCode: 'JMD'
+  },
+  JO: {
+    currencyCode: 'JOD'
+  },
+  JP: {
+    currencyCode: 'JPY'
+  },
+  KE: {
+    currencyCode: 'KES'
+  },
+  KG: {
+    currencyCode: 'KGS'
+  },
+  KH: {
+    currencyCode: 'KHR'
+  },
+  KN: {
+    currencyCode: 'XCD'
+  },
+  KR: {
+    currencyCode: 'KRW'
+  },
+  KW: {
+    currencyCode: 'KWD'
+  },
+  KY: {
+    currencyCode: 'KYD'
+  },
+  KZ: {
+    currencyCode: 'KZT'
+  },
+  LA: {
+    currencyCode: 'LAK'
+  },
+  LB: {
+    currencyCode: 'LBP'
+  },
+  LC: {
+    currencyCode: 'XCD'
+  },
+  LI: {
+    currencyCode: 'CHF'
+  },
+  LK: {
+    currencyCode: 'LKR'
+  },
+  LR: {
+    currencyCode: 'LRD'
+  },
+  LT: {
+    currencyCode: 'LTL'
+  },
+  LU: {
+    currencyCode: 'EUR'
+  },
+  LV: {
+    currencyCode: 'EUR'
+  },
+  MA: {
+    currencyCode: 'MAD'
+  },
+  MD: {
+    currencyCode: 'MDL'
+  },
+  MG: {
+    currencyCode: 'MGA'
+  },
+  MK: {
+    currencyCode: 'MKD'
+  },
+  ML: {
+    currencyCode: 'XOF'
+  },
+  MM: {
+    currencyCode: 'MMK'
+  },
+  MN: {
+    currencyCode: 'MNT'
+  },
+  MO: {
+    currencyCode: 'MOP'
+  },
+  MP: {
+    currencyCode: 'USD'
+  },
+  MR: {
+    currencyCode: 'MRO'
+  },
+  MS: {
+    currencyCode: 'XCD'
+  },
+  MT: {
+    currencyCode: 'EUR'
+  },
+  MU: {
+    currencyCode: 'MUR'
+  },
+  MW: {
+    currencyCode: 'MWK'
+  },
+  MX: {
+    currencyCode: 'MXN'
+  },
+  MY: {
+    currencyCode: 'MYR'
+  },
+  MZ: {
+    currencyCode: 'MZN'
+  },
+  NA: {
+    currencyCode: 'NAD'
+  },
+  NE: {
+    currencyCode: 'XOF'
+  },
+  NG: {
+    currencyCode: 'NGN'
+  },
+  NI: {
+    currencyCode: 'NIO'
+  },
+  NL: {
+    currencyCode: 'EUR'
+  },
+  NO: {
+    currencyCode: 'NOK'
+  },
+  NP: {
+    currencyCode: 'NPR'
+  },
+  NZ: {
+    currencyCode: 'NZD'
+  },
+  OM: {
+    currencyCode: 'OMR'
+  },
+  PA: {
+    currencyCode: 'PAB'
+  },
+  PE: {
+    currencyCode: 'PEN'
+  },
+  PG: {
+    currencyCode: 'PGK'
+  },
+  PH: {
+    currencyCode: 'PHP'
+  },
+  PK: {
+    currencyCode: 'PKR'
+  },
+  PL: {
+    currencyCode: 'PLN'
+  },
+  PR: {
+    currencyCode: 'USD'
+  },
+  PT: {
+    currencyCode: 'EUR'
+  },
+  PW: {
+    currencyCode: 'USD'
+  },
+  PY: {
+    currencyCode: 'PYG'
+  },
+  QA: {
+    currencyCode: 'QAR'
+  },
+  RO: {
+    currencyCode: 'RON'
+  },
+  RS: {
+    currencyCode: 'RSD'
+  },
+  RU: {
+    currencyCode: 'RUB'
+  },
+  RW: {
+    currencyCode: 'RWF'
+  },
+  SA: {
+    currencyCode: 'SAR'
+  },
+  SB: {
+    currencyCode: 'SBD'
+  },
+  SC: {
+    currencyCode: 'SCR'
+  },
+  SE: {
+    currencyCode: 'SEK'
+  },
+  SG: {
+    currencyCode: 'SGD'
+  },
+  SI: {
+    currencyCode: 'EUR'
+  },
+  SK: {
+    currencyCode: 'EUR'
+  },
+  SL: {
+    currencyCode: 'SLL'
+  },
+  SN: {
+    currencyCode: 'XOF'
+  },
+  SR: {
+    currencyCode: 'SRD'
+  },
+  ST: {
+    currencyCode: 'STD'
+  },
+  SV: {
+    currencyCode: 'SVC'
+  },
+  SZ: {
+    currencyCode: 'SZL'
+  },
+  TC: {
+    currencyCode: 'USD'
+  },
+  TD: {
+    currencyCode: 'XAF'
+  },
+  TG: {
+    currencyCode: 'XOF'
+  },
+  TH: {
+    currencyCode: 'THB'
+  },
+  TJ: {
+    currencyCode: 'TJS'
+  },
+  TM: {
+    currencyCode: 'TMT'
+  },
+  TN: {
+    currencyCode: 'TND'
+  },
+  TR: {
+    currencyCode: 'TRY'
+  },
+  TT: {
+    currencyCode: 'TTD'
+  },
+  TW: {
+    currencyCode: 'TWD'
+  },
+  TZ: {
+    currencyCode: 'TZS'
+  },
+  UA: {
+    currencyCode: 'UAH'
+  },
+  UG: {
+    currencyCode: 'UGX'
+  },
+  US: {
+    currencyCode: 'USD'
+  },
+  UY: {
+    currencyCode: 'UYU'
+  },
+  UZ: {
+    currencyCode: 'UZS'
+  },
+  VC: {
+    currencyCode: 'XCD'
+  },
+  VE: {
+    currencyCode: 'VEF'
+  },
+  VG: {
+    currencyCode: 'USD'
+  },
+  VI: {
+    currencyCode: 'USD'
+  },
+  VN: {
+    currencyCode: 'VND'
+  },
+  YE: {
+    currencyCode: 'YER'
+  },
+  ZA: {
+    currencyCode: 'ZAR'
+  },
+  ZM: {
+    currencyCode: 'ZMW'
+  },
+  ZW: {
+    currencyCode: 'USD'
+  }
+};
+
+/**
+ * @namespace CurrencyDefaults
+ */
+var CurrencyDefaults = {
+  'default': {
+    currencySymbol: function currencySymbol(formatter) {
+      return formatter.currencyCode();
+    },
+    internationalCurrencySymbol: function internationalCurrencySymbol(formatter) {
+      return formatter.currencyCode();
+    },
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+    minimumIntegerDigits: 1,
+    usesGroupingSeparator: true
+  },
+  AED: {
+    currencySymbol: 'د.إ',
+    internationalCurrencySymbol: 'د.إ'
+  },
+  ALL: {
+    currencySymbol: 'L',
+    internationalCurrencySymbol: 'L'
+  },
+  AMD: {
+    currencySymbol: 'դր.',
+    internationalCurrencySymbol: 'դր.'
+  },
+  AOA: {
+    currencySymbol: 'Kz',
+    internationalCurrencySymbol: 'Kz'
+  },
+  ARS: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  AUD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  AWG: {
+    currencySymbol: 'ƒ',
+    internationalCurrencySymbol: 'ƒ'
+  },
+  AZN: {
+    currencySymbol: '₼',
+    internationalCurrencySymbol: '₼'
+  },
+  BAM: {
+    currencySymbol: 'КМ',
+    internationalCurrencySymbol: 'КМ'
+  },
+  BBD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  BDT: {
+    currencySymbol: '৳',
+    internationalCurrencySymbol: '৳'
+  },
+  BGN: {
+    currencySymbol: 'лв',
+    internationalCurrencySymbol: 'лв'
+  },
+  BHD: {
+    currencySymbol: 'ب.د',
+    internationalCurrencySymbol: 'ب.د',
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 3
+  },
+  BMD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  BND: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  BOB: {
+    currencySymbol: 'Bs.',
+    internationalCurrencySymbol: 'Bs.'
+  },
+  BRL: {
+    currencySymbol: 'R$',
+    internationalCurrencySymbol: 'R$'
+  },
+  BSD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  BTN: {
+    currencySymbol: 'Nu.',
+    internationalCurrencySymbol: 'Nu.'
+  },
+  BWP: {
+    currencySymbol: 'P',
+    internationalCurrencySymbol: 'P'
+  },
+  BYR: {
+    currencySymbol: 'Br',
+    internationalCurrencySymbol: 'Br'
+  },
+  BZD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  CAD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  CDF: {
+    currencySymbol: 'Fr',
+    internationalCurrencySymbol: 'Fr'
+  },
+  CHF: {
+    currencySymbol: 'Fr',
+    internationalCurrencySymbol: 'Fr'
+  },
+  CLP: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  },
+  CNY: {
+    currencySymbol: '¥',
+    internationalCurrencySymbol: '¥'
+  },
+  COP: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  CRC: {
+    currencySymbol: '₡',
+    internationalCurrencySymbol: '₡'
+  },
+  CVE: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  CZK: {
+    currencySymbol: 'Kč',
+    internationalCurrencySymbol: 'Kč'
+  },
+  DKK: {
+    currencySymbol: 'kr',
+    internationalCurrencySymbol: 'kr'
+  },
+  DOP: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  DZD: {
+    currencySymbol: 'د.ج',
+    internationalCurrencySymbol: 'د.ج'
+  },
+  EGP: {
+    currencySymbol: 'E£',
+    internationalCurrencySymbol: 'E£'
+  },
+  ETB: {
+    currencySymbol: 'ብር',
+    internationalCurrencySymbol: 'ብር'
+  },
+  EUR: {
+    currencySymbol: '€',
+    internationalCurrencySymbol: '€'
+  },
+  FJD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  GBP: {
+    currencySymbol: '£',
+    internationalCurrencySymbol: '£'
+  },
+  GEL: {
+    currencySymbol: 'ლ,',
+    internationalCurrencySymbol: 'ლ,'
+  },
+  GHS: {
+    currencySymbol: '₵',
+    internationalCurrencySymbol: '₵'
+  },
+  GIP: {
+    currencySymbol: '£',
+    internationalCurrencySymbol: '£'
+  },
+  GMD: {
+    currencySymbol: 'D',
+    internationalCurrencySymbol: 'D'
+  },
+  GTQ: {
+    currencySymbol: 'Q',
+    internationalCurrencySymbol: 'Q'
+  },
+  GYD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  HKD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  HNL: {
+    currencySymbol: 'L',
+    internationalCurrencySymbol: 'L'
+  },
+  HRK: {
+    currencySymbol: 'kn',
+    internationalCurrencySymbol: 'kn'
+  },
+  HTG: {
+    currencySymbol: 'G',
+    internationalCurrencySymbol: 'G'
+  },
+  HUF: {
+    currencySymbol: 'Ft',
+    internationalCurrencySymbol: 'Ft'
+  },
+  IDR: {
+    currencySymbol: 'Rp',
+    internationalCurrencySymbol: 'Rp'
+  },
+  ILS: {
+    currencySymbol: '₪',
+    internationalCurrencySymbol: '₪'
+  },
+  INR: {
+    currencySymbol: '₹',
+    internationalCurrencySymbol: '₹'
+  },
+  ISK: {
+    currencySymbol: 'kr',
+    internationalCurrencySymbol: 'kr'
+  },
+  JMD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  JOD: {
+    currencySymbol: 'د.ا',
+    internationalCurrencySymbol: 'د.ا',
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 3
+  },
+  JPY: {
+    currencySymbol: '¥',
+    internationalCurrencySymbol: '¥',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  },
+  KES: {
+    currencySymbol: 'KSh',
+    internationalCurrencySymbol: 'KSh'
+  },
+  KGS: {
+    currencySymbol: 'som',
+    internationalCurrencySymbol: 'som'
+  },
+  KHR: {
+    currencySymbol: '៛',
+    internationalCurrencySymbol: '៛'
+  },
+  KRW: {
+    currencySymbol: '₩',
+    internationalCurrencySymbol: '₩',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  },
+  KWD: {
+    currencySymbol: 'د.ك',
+    internationalCurrencySymbol: 'د.ك',
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 3
+  },
+  KYD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  KZT: {
+    currencySymbol: '〒',
+    internationalCurrencySymbol: '〒'
+  },
+  LAK: {
+    currencySymbol: '₭',
+    internationalCurrencySymbol: '₭'
+  },
+  LBP: {
+    currencySymbol: 'ل.ل',
+    internationalCurrencySymbol: 'ل.ل'
+  },
+  LKR: {
+    currencySymbol: '₨',
+    internationalCurrencySymbol: '₨'
+  },
+  LRD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  LTL: {
+    currencySymbol: 'Lt',
+    internationalCurrencySymbol: 'Lt'
+  },
+  MAD: {
+    currencySymbol: 'د.م.',
+    internationalCurrencySymbol: 'د.م.'
+  },
+  MDL: {
+    currencySymbol: 'L',
+    internationalCurrencySymbol: 'L'
+  },
+  MGA: {
+    currencySymbol: 'Ar',
+    internationalCurrencySymbol: 'Ar',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  },
+  MKD: {
+    currencySymbol: 'ден',
+    internationalCurrencySymbol: 'ден'
+  },
+  MMK: {
+    currencySymbol: 'K',
+    internationalCurrencySymbol: 'K'
+  },
+  MNT: {
+    currencySymbol: '₮',
+    internationalCurrencySymbol: '₮'
+  },
+  MOP: {
+    currencySymbol: 'P',
+    internationalCurrencySymbol: 'P'
+  },
+  MRO: {
+    currencySymbol: 'UM',
+    internationalCurrencySymbol: 'UM',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  },
+  MUR: {
+    currencySymbol: '₨',
+    internationalCurrencySymbol: '₨'
+  },
+  MWK: {
+    currencySymbol: 'MK',
+    internationalCurrencySymbol: 'MK'
+  },
+  MXN: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  MYR: {
+    currencySymbol: 'RM',
+    internationalCurrencySymbol: 'RM'
+  },
+  MZN: {
+    currencySymbol: 'MTn',
+    internationalCurrencySymbol: 'MTn'
+  },
+  NAD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  NGN: {
+    currencySymbol: '₦',
+    internationalCurrencySymbol: '₦'
+  },
+  NIO: {
+    currencySymbol: 'C$',
+    internationalCurrencySymbol: 'C$'
+  },
+  NOK: {
+    currencySymbol: 'kr',
+    internationalCurrencySymbol: 'kr'
+  },
+  NPR: {
+    currencySymbol: '₨',
+    internationalCurrencySymbol: '₨'
+  },
+  NZD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  OMR: {
+    currencySymbol: 'ر.ع.',
+    internationalCurrencySymbol: 'ر.ع.',
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 3
+  },
+  PAB: {
+    currencySymbol: 'B/.',
+    internationalCurrencySymbol: 'B/.'
+  },
+  PEN: {
+    currencySymbol: 'S/.',
+    internationalCurrencySymbol: 'S/.'
+  },
+  PGK: {
+    currencySymbol: 'K',
+    internationalCurrencySymbol: 'K'
+  },
+  PHP: {
+    currencySymbol: '₱',
+    internationalCurrencySymbol: '₱'
+  },
+  PKR: {
+    currencySymbol: '₨',
+    internationalCurrencySymbol: '₨'
+  },
+  PLN: {
+    currencySymbol: 'zł',
+    internationalCurrencySymbol: 'zł'
+  },
+  PYG: {
+    currencySymbol: '₲',
+    internationalCurrencySymbol: '₲'
+  },
+  QAR: {
+    currencySymbol: 'ر.ق',
+    internationalCurrencySymbol: 'ر.ق'
+  },
+  RON: {
+    currencySymbol: 'Lei',
+    internationalCurrencySymbol: 'Lei'
+  },
+  RSD: {
+    currencySymbol: 'РСД',
+    internationalCurrencySymbol: 'РСД'
+  },
+  RUB: {
+    currencySymbol: '₽',
+    internationalCurrencySymbol: '₽'
+  },
+  RWF: {
+    currencySymbol: 'FRw',
+    internationalCurrencySymbol: 'FRw'
+  },
+  SAR: {
+    currencySymbol: 'ر.س',
+    internationalCurrencySymbol: 'ر.س'
+  },
+  SBD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  SCR: {
+    currencySymbol: '₨',
+    internationalCurrencySymbol: '₨'
+  },
+  SEK: {
+    currencySymbol: 'kr',
+    internationalCurrencySymbol: 'kr'
+  },
+  SGD: {
+    currencySymbol: 'S$',
+    internationalCurrencySymbol: 'S$'
+  },
+  SLL: {
+    currencySymbol: 'Le',
+    internationalCurrencySymbol: 'Le'
+  },
+  SRD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  STD: {
+    currencySymbol: 'Db',
+    internationalCurrencySymbol: 'Db'
+  },
+  SVC: {
+    currencySymbol: '₡',
+    internationalCurrencySymbol: '₡'
+  },
+  SZL: {
+    currencySymbol: 'E',
+    internationalCurrencySymbol: 'E'
+  },
+  THB: {
+    currencySymbol: '฿',
+    internationalCurrencySymbol: '฿'
+  },
+  TJS: {
+    currencySymbol: 'ЅМ',
+    internationalCurrencySymbol: 'ЅМ'
+  },
+  TMT: {
+    currencySymbol: 'm',
+    internationalCurrencySymbol: 'm'
+  },
+  TND: {
+    currencySymbol: 'د.ت',
+    internationalCurrencySymbol: 'د.ت',
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 3
+  },
+  TRY: {
+    currencySymbol: '₺',
+    internationalCurrencySymbol: '₺'
+  },
+  TTD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  TWD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  TZS: {
+    currencySymbol: 'Sh',
+    internationalCurrencySymbol: 'Sh'
+  },
+  UAH: {
+    currencySymbol: '₴',
+    internationalCurrencySymbol: '₴'
+  },
+  UGX: {
+    currencySymbol: 'USh',
+    internationalCurrencySymbol: 'USh'
+  },
+  USD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: 'US$'
+  },
+  UYU: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  UZS: {
+    currencySymbol: 'лв',
+    internationalCurrencySymbol: 'лв'
+  },
+  VEF: {
+    currencySymbol: 'Bs F',
+    internationalCurrencySymbol: 'Bs F'
+  },
+  VND: {
+    currencySymbol: '₫',
+    internationalCurrencySymbol: '₫',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  },
+  XAF: {
+    currencySymbol: 'Fr',
+    internationalCurrencySymbol: 'Fr'
+  },
+  XCD: {
+    currencySymbol: '$',
+    internationalCurrencySymbol: '$'
+  },
+  XOF: {
+    currencySymbol: 'Fr',
+    internationalCurrencySymbol: 'Fr'
+  },
+  YER: {
+    currencySymbol: '﷼',
+    internationalCurrencySymbol: '﷼'
+  },
+  ZAR: {
+    currencySymbol: 'R',
+    internationalCurrencySymbol: 'R'
+  },
+  ZMW: {
+    currencySymbol: 'ZMK',
+    internationalCurrencySymbol: 'ZMK'
+  }
+};
+
+exports['default'] = NumberFormatter;
+module.exports = exports['default'];
+
+},{"./formatter":15,"./number_formatter_settings_formatter":18,"./utils":23,"stround":3}],18:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var _formatter = _dereq_('./formatter');
+
+var _formatter2 = _interopRequireDefault(_formatter);
+
+var NumberFormatterSettings = function NumberFormatterSettings() {
+  _classCallCheck(this, NumberFormatterSettings);
+
+  /** @type boolean */
+  this.alwaysShowsDecimalSeparator = false;
+
+  /** @type number */
+  this.groupingSize = 0;
+
+  /** @type number */
+  this.maximumFractionDigits = 0;
+
+  /** @type number */
+  this.minimumFractionDigits = 0;
+
+  /** @type number */
+  this.minimumIntegerDigits = 0;
+
+  /** @type string */
+  this.prefix = '';
+
+  /** @type string */
+  this.suffix = '';
+
+  /** @type boolean */
+  this.usesGroupingSeparator = false;
+=======
 function replaceCurrencySymbol(string, currencySymbol) {
   return string.replace(/¤/g, currencySymbol);
+>>>>>>> add failing test cases for issue #53
 }
 
 /**
@@ -3504,9 +8515,441 @@ function replaceCurrencySymbol(string, currencySymbol) {
  * @returns {string}
  * @private
  */
+<<<<<<< HEAD
+;
+
+function chars(character, length) {
+  return new Array(length + 1).join(character);
+}
+
+/**
+ * @const
+ * @private
+ */
+var DIGIT = '#';
+
+/**
+ * @const
+ * @private
+ */
+var PADDING = '0';
+
+/**
+ * @const
+ * @private
+ */
+var DECIMAL_SEPARATOR = '.';
+
+/**
+ * @const
+ * @private
+ */
+var GROUPING_SEPARATOR = ',';
+
+var NumberFormatterSettingsFormatter = (function (_Formatter) {
+  _inherits(NumberFormatterSettingsFormatter, _Formatter);
+
+  function NumberFormatterSettingsFormatter() {
+    _classCallCheck(this, NumberFormatterSettingsFormatter);
+
+    _get(Object.getPrototypeOf(NumberFormatterSettingsFormatter.prototype), 'constructor', this).apply(this, arguments);
+  }
+
+  _createClass(NumberFormatterSettingsFormatter, [{
+    key: 'format',
+
+    /**
+     * @param {NumberFormatterSettings} settings
+     * @returns {string}
+     */
+    value: function format(settings) {
+      var result = '';
+
+      var minimumIntegerDigits = settings.minimumIntegerDigits;
+      if (minimumIntegerDigits !== 0) {
+        result += chars(PADDING, minimumIntegerDigits);
+      }
+
+      result = DIGIT + result;
+
+      if (settings.usesGroupingSeparator) {
+        while (result.length <= settings.groupingSize) {
+          result = DIGIT + result;
+        }
+
+        result = result.slice(0, -settings.groupingSize) + GROUPING_SEPARATOR + result.slice(-settings.groupingSize);
+      }
+
+      var minimumFractionDigits = settings.minimumFractionDigits;
+      var maximumFractionDigits = settings.maximumFractionDigits;
+      var hasFractionalPart = settings.alwaysShowsDecimalSeparator || minimumFractionDigits > 0 || maximumFractionDigits > 0;
+
+      if (hasFractionalPart) {
+        result += DECIMAL_SEPARATOR;
+        for (var i = 0, _length = maximumFractionDigits; i < _length; i++) {
+          result += i < minimumFractionDigits ? PADDING : DIGIT;
+        }
+      }
+
+      return settings.prefix + result + settings.suffix;
+    }
+
+    /**
+     * @param {string} string
+     * @returns {?NumberFormatterSettings}
+     */
+  }, {
+    key: 'parse',
+    value: function parse(string) {
+      var result = new NumberFormatterSettings();
+
+      var hasPassedPrefix = false;
+      var hasStartedSuffix = false;
+      var decimalSeparatorIndex = null;
+      var groupingSeparatorIndex = null;
+      var lastIntegerDigitIndex = null;
+
+      for (var i = 0, length = string.length; i < length; i++) {
+        var c = string[i];
+
+        switch (c) {
+          case DIGIT:
+            if (hasStartedSuffix) {
+              return null;
+            }
+            hasPassedPrefix = true;
+            if (decimalSeparatorIndex !== null) {
+              result.maximumFractionDigits++;
+            }
+            break;
+
+          case PADDING:
+            if (hasStartedSuffix) {
+              return null;
+            }
+            hasPassedPrefix = true;
+            if (decimalSeparatorIndex === null) {
+              result.minimumIntegerDigits++;
+            } else {
+              result.minimumFractionDigits++;
+              result.maximumFractionDigits++;
+            }
+            break;
+
+          case DECIMAL_SEPARATOR:
+            if (hasStartedSuffix) {
+              return null;
+            }
+            hasPassedPrefix = true;
+            decimalSeparatorIndex = i;
+            lastIntegerDigitIndex = i - 1;
+            break;
+
+          case GROUPING_SEPARATOR:
+            if (hasStartedSuffix) {
+              return null;
+            }
+            hasPassedPrefix = true;
+            groupingSeparatorIndex = i;
+            break;
+
+          default:
+            if (hasPassedPrefix) {
+              hasStartedSuffix = true;
+              result.suffix += c;
+            } else {
+              result.prefix += c;
+            }
+        }
+      }
+
+      if (decimalSeparatorIndex === null) {
+        lastIntegerDigitIndex = length - 1;
+      }
+
+      if (decimalSeparatorIndex === length - 1) {
+        result.alwaysShowsDecimalSeparator = true;
+      }
+
+      if (groupingSeparatorIndex !== null) {
+        result.groupingSize = lastIntegerDigitIndex - groupingSeparatorIndex;
+        result.usesGroupingSeparator = true;
+      }
+
+      return result;
+    }
+  }]);
+
+  return NumberFormatterSettingsFormatter;
+})(_formatter2['default']);
+
+exports['default'] = NumberFormatterSettingsFormatter;
+module.exports = exports['default'];
+
+},{"./formatter":14}],18:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _delimited_text_formatter = _dereq_('./delimited_text_formatter');
+
+var _delimited_text_formatter2 = _interopRequireDefault(_delimited_text_formatter);
+
+/**
+ * @const
+ * @private
+ */
+var NANPPhoneDelimiters = {
+  0: '(',
+  4: ')',
+  5: ' ',
+  9: '-'
+};
+
+/**
+ * @const
+ * @private
+ */
+var NANPPhoneDelimitersWithOne = {
+  1: ' ',
+  2: '(',
+  6: ')',
+  7: ' ',
+  11: '-'
+};
+
+||||||| merged common ancestors
+;
+
+function chars(character, length) {
+  return new Array(length + 1).join(character);
+}
+
+/**
+ * @const
+ * @private
+ */
+var DIGIT = '#';
+
+/**
+ * @const
+ * @private
+ */
+var PADDING = '0';
+
+/**
+ * @const
+ * @private
+ */
+var DECIMAL_SEPARATOR = '.';
+
+/**
+ * @const
+ * @private
+ */
+var GROUPING_SEPARATOR = ',';
+
+var NumberFormatterSettingsFormatter = (function (_Formatter) {
+  _inherits(NumberFormatterSettingsFormatter, _Formatter);
+
+  function NumberFormatterSettingsFormatter() {
+    _classCallCheck(this, NumberFormatterSettingsFormatter);
+
+    _get(Object.getPrototypeOf(NumberFormatterSettingsFormatter.prototype), 'constructor', this).apply(this, arguments);
+  }
+
+  _createClass(NumberFormatterSettingsFormatter, [{
+    key: 'format',
+
+    /**
+     * @param {NumberFormatterSettings} settings
+     * @returns {string}
+     */
+    value: function format(settings) {
+      var result = '';
+
+      var minimumIntegerDigits = settings.minimumIntegerDigits;
+      if (minimumIntegerDigits !== 0) {
+        result += chars(PADDING, minimumIntegerDigits);
+      }
+
+      result = DIGIT + result;
+
+      if (settings.usesGroupingSeparator) {
+        while (result.length <= settings.groupingSize) {
+          result = DIGIT + result;
+        }
+
+        result = result.slice(0, -settings.groupingSize) + GROUPING_SEPARATOR + result.slice(-settings.groupingSize);
+      }
+
+      var minimumFractionDigits = settings.minimumFractionDigits;
+      var maximumFractionDigits = settings.maximumFractionDigits;
+      var hasFractionalPart = settings.alwaysShowsDecimalSeparator || minimumFractionDigits > 0 || maximumFractionDigits > 0;
+
+      if (hasFractionalPart) {
+        result += DECIMAL_SEPARATOR;
+        for (var i = 0, _length = maximumFractionDigits; i < _length; i++) {
+          result += i < minimumFractionDigits ? PADDING : DIGIT;
+        }
+      }
+
+      return settings.prefix + result + settings.suffix;
+    }
+
+    /**
+     * @param {string} string
+     * @returns {?NumberFormatterSettings}
+     */
+  }, {
+    key: 'parse',
+    value: function parse(string) {
+      var result = new NumberFormatterSettings();
+
+      var hasPassedPrefix = false;
+      var hasStartedSuffix = false;
+      var decimalSeparatorIndex = null;
+      var groupingSeparatorIndex = null;
+      var lastIntegerDigitIndex = null;
+
+      for (var i = 0, length = string.length; i < length; i++) {
+        var c = string[i];
+
+        switch (c) {
+          case DIGIT:
+            if (hasStartedSuffix) {
+              return null;
+            }
+            hasPassedPrefix = true;
+            if (decimalSeparatorIndex !== null) {
+              result.maximumFractionDigits++;
+            }
+            break;
+
+          case PADDING:
+            if (hasStartedSuffix) {
+              return null;
+            }
+            hasPassedPrefix = true;
+            if (decimalSeparatorIndex === null) {
+              result.minimumIntegerDigits++;
+            } else {
+              result.minimumFractionDigits++;
+              result.maximumFractionDigits++;
+            }
+            break;
+
+          case DECIMAL_SEPARATOR:
+            if (hasStartedSuffix) {
+              return null;
+            }
+            hasPassedPrefix = true;
+            decimalSeparatorIndex = i;
+            lastIntegerDigitIndex = i - 1;
+            break;
+
+          case GROUPING_SEPARATOR:
+            if (hasStartedSuffix) {
+              return null;
+            }
+            hasPassedPrefix = true;
+            groupingSeparatorIndex = i;
+            break;
+
+          default:
+            if (hasPassedPrefix) {
+              hasStartedSuffix = true;
+              result.suffix += c;
+            } else {
+              result.prefix += c;
+            }
+        }
+      }
+
+      if (decimalSeparatorIndex === null) {
+        lastIntegerDigitIndex = length - 1;
+      }
+
+      if (decimalSeparatorIndex === length - 1) {
+        result.alwaysShowsDecimalSeparator = true;
+      }
+
+      if (groupingSeparatorIndex !== null) {
+        result.groupingSize = lastIntegerDigitIndex - groupingSeparatorIndex;
+        result.usesGroupingSeparator = true;
+      }
+
+      return result;
+    }
+  }]);
+
+  return NumberFormatterSettingsFormatter;
+})(_formatter2['default']);
+
+exports['default'] = NumberFormatterSettingsFormatter;
+module.exports = exports['default'];
+
+},{"./formatter":15}],19:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _delimited_text_formatter = _dereq_('./delimited_text_formatter');
+
+var _delimited_text_formatter2 = _interopRequireDefault(_delimited_text_formatter);
+
+/**
+ * @const
+ * @private
+ */
+var NANPPhoneDelimiters = {
+  0: '(',
+  4: ')',
+  5: ' ',
+  9: '-'
+};
+
+/**
+ * @const
+ * @private
+ */
+var NANPPhoneDelimitersWithOne = {
+  1: ' ',
+  2: '(',
+  6: ')',
+  7: ' ',
+  11: '-'
+};
+
+=======
 function replacePlusSign(string, plusSign) {
   return string.replace(/\+/g, plusSign);
 }
+>>>>>>> add failing test cases for issue #53
 /**
  * @param {string} string
  * @param {string} minusSign
@@ -3782,10 +9225,130 @@ var NumberFormatter = (function (_Formatter) {
       this._exponent = exponent;
       return this;
     }
+<<<<<<< HEAD
+  }]);
+
+  return PhoneFormatter;
+})(_delimited_text_formatter2['default']);
+
+exports['default'] = PhoneFormatter;
+module.exports = exports['default'];
+
+},{"./delimited_text_formatter":10}],19:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _delimited_text_formatter = _dereq_('./delimited_text_formatter');
+
+var _delimited_text_formatter2 = _interopRequireDefault(_delimited_text_formatter);
+
+/**
+ * @const
+ * @private
+ */
+var DIGITS_PATTERN = /^\d*$/;
+
+/**
+ * @extends DelimitedTextFormatter
+ */
+
+var SocialSecurityNumberFormatter = (function (_DelimitedTextFormatter) {
+  _inherits(SocialSecurityNumberFormatter, _DelimitedTextFormatter);
+
+  function SocialSecurityNumberFormatter() {
+    _classCallCheck(this, SocialSecurityNumberFormatter);
+
+    _get(Object.getPrototypeOf(SocialSecurityNumberFormatter.prototype), 'constructor', this).call(this, '-');
+    this.maximumLength = 9 + 2;
+  }
+
+  /**
+   * @param {number} index
+   * @returns {boolean}
+   */
+
+  _createClass(SocialSecurityNumberFormatter, [{
+    key: 'hasDelimiterAtIndex',
+    value: function hasDelimiterAtIndex(index) {
+      return index === 3 || index === 6;
+||||||| merged common ancestors
+  }]);
+
+  return PhoneFormatter;
+})(_delimited_text_formatter2['default']);
+
+exports['default'] = PhoneFormatter;
+module.exports = exports['default'];
+
+},{"./delimited_text_formatter":11}],20:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _delimited_text_formatter = _dereq_('./delimited_text_formatter');
+
+var _delimited_text_formatter2 = _interopRequireDefault(_delimited_text_formatter);
+
+/**
+ * @const
+ * @private
+ */
+var DIGITS_PATTERN = /^\d*$/;
+
+/**
+ * @extends DelimitedTextFormatter
+ */
+
+var SocialSecurityNumberFormatter = (function (_DelimitedTextFormatter) {
+  _inherits(SocialSecurityNumberFormatter, _DelimitedTextFormatter);
+
+  function SocialSecurityNumberFormatter() {
+    _classCallCheck(this, SocialSecurityNumberFormatter);
+
+    _get(Object.getPrototypeOf(SocialSecurityNumberFormatter.prototype), 'constructor', this).call(this, '-');
+    this.maximumLength = 9 + 2;
+  }
+
+  /**
+   * @param {number} index
+   * @returns {boolean}
+   */
+
+  _createClass(SocialSecurityNumberFormatter, [{
+    key: 'hasDelimiterAtIndex',
+    value: function hasDelimiterAtIndex(index) {
+      return index === 3 || index === 6;
+=======
   }, {
     key: 'groupingSeparator',
     value: function groupingSeparator() {
       return this._get('groupingSeparator');
+>>>>>>> add failing test cases for issue #53
     }
 
     /**
@@ -3798,7 +9361,126 @@ var NumberFormatter = (function (_Formatter) {
       this._groupingSeparator = groupingSeparator;
       return this;
     }
+<<<<<<< HEAD
+  }]);
 
+  return SocialSecurityNumberFormatter;
+})(_delimited_text_formatter2['default']);
+
+exports['default'] = SocialSecurityNumberFormatter;
+module.exports = exports['default'];
+
+},{"./delimited_text_formatter":10}],20:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _formatter = _dereq_('./formatter');
+
+var _formatter2 = _interopRequireDefault(_formatter);
+
+var _undo_manager = _dereq_('./undo_manager');
+
+var _undo_manager2 = _interopRequireDefault(_undo_manager);
+
+var _utils = _dereq_('./utils');
+
+var _caret = _dereq_('./caret');
+
+var _caret2 = _interopRequireDefault(_caret);
+
+/**
+ * Simulates input behavior.
+ *
+ * @external InputSim
+ * @see https://github.com/iamJoeTaylor/input-sim
+ */
+||||||| merged common ancestors
+  }]);
+
+  return SocialSecurityNumberFormatter;
+})(_delimited_text_formatter2['default']);
+
+exports['default'] = SocialSecurityNumberFormatter;
+module.exports = exports['default'];
+
+},{"./delimited_text_formatter":11}],21:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _formatter = _dereq_('./formatter');
+
+var _formatter2 = _interopRequireDefault(_formatter);
+
+var _undo_manager = _dereq_('./undo_manager');
+
+var _undo_manager2 = _interopRequireDefault(_undo_manager);
+
+var _utils = _dereq_('./utils');
+
+var _caret = _dereq_('./caret');
+
+var _caret2 = _interopRequireDefault(_caret);
+
+/**
+ * Simulates input behavior.
+ *
+ * @external InputSim
+ * @see https://github.com/iamJoeTaylor/input-sim
+ */
+=======
+>>>>>>> add failing test cases for issue #53
+
+<<<<<<< HEAD
+var _inputSim = _dereq_('input-sim');
+
+/**
+ * TextField is the simplest input and the base for more complex
+ * types to inherit.
+ *
+ * @extends external:InputSim.Input
+ */
+
+var _installCaret = (0, _caret2['default'])();
+||||||| merged common ancestors
+var _inputSim = _dereq_('input-sim');
+
+/**
+ * TextField is the simplest input and the base for more complex
+ * types to inherit.
+ *
+ * @extends external:InputSim.Input
+ */
+
+_dereq_('vanilla-autofill-event');
+
+var _installCaret = (0, _caret2['default'])();
+=======
     /**
      * Gets the grouping size for formatter.
      *
@@ -3820,6 +9502,7 @@ var NumberFormatter = (function (_Formatter) {
       this._groupingSize = groupingSize;
       return this;
     }
+>>>>>>> add failing test cases for issue #53
 
     /**
      * @returns {string}
@@ -3888,6 +9571,58 @@ var NumberFormatter = (function (_Formatter) {
       this._locale = locale;
       return this;
     }
+<<<<<<< HEAD
+    this.element = element;
+    this._formatter = formatter;
+    this._enabled = true;
+    this._manualCaret = { start: 0, end: 0 };
+    this._placeholder = null;
+    this._disabledPlaceholder = null;
+    this._focusedPlaceholder = null;
+    this._unfocusedPlaceholder = null;
+    this._isDirty = false;
+    this._valueOnFocus = '';
+    this._currentValue = '';
+    // Make sure textDidChange fires while the value is correct
+    this._needsKeyUpTextDidChangeTrigger = false;
+    this._blur = (0, _utils.bind)(this._blur, this);
+    this._focus = (0, _utils.bind)(this._focus, this);
+    this._click = (0, _utils.bind)(this._click, this);
+    this._paste = (0, _utils.bind)(this._paste, this);
+    this._keyUp = (0, _utils.bind)(this._keyUp, this);
+    this._keyPress = (0, _utils.bind)(this._keyPress, this);
+    this._keyDown = (0, _utils.bind)(this._keyDown, this);
+    if (element['field-kit-text-field']) {
+      throw new Error('already attached a TextField to this element');
+    } else {
+      element['field-kit-text-field'] = this;
+||||||| merged common ancestors
+    this.element = element;
+    this._formatter = formatter;
+    this._enabled = true;
+    this._manualCaret = { start: 0, end: 0 };
+    this._placeholder = null;
+    this._disabledPlaceholder = null;
+    this._focusedPlaceholder = null;
+    this._unfocusedPlaceholder = null;
+    this._isDirty = false;
+    this._valueOnFocus = '';
+    this._currentValue = '';
+    // Make sure textDidChange fires while the value is correct
+    this._needsKeyUpTextDidChangeTrigger = false;
+    this._blur = (0, _utils.bind)(this._blur, this);
+    this._change = (0, _utils.bind)(this._change, this);
+    this._focus = (0, _utils.bind)(this._focus, this);
+    this._click = (0, _utils.bind)(this._click, this);
+    this._paste = (0, _utils.bind)(this._paste, this);
+    this._keyUp = (0, _utils.bind)(this._keyUp, this);
+    this._keyPress = (0, _utils.bind)(this._keyPress, this);
+    this._keyDown = (0, _utils.bind)(this._keyDown, this);
+    if (element['field-kit-text-field']) {
+      throw new Error('already attached a TextField to this element');
+    } else {
+      element['field-kit-text-field'] = this;
+=======
 
     /**
      * @returns {number}
@@ -3896,8 +9631,19 @@ var NumberFormatter = (function (_Formatter) {
     key: 'maximum',
     value: function maximum() {
       return this._maximum;
+>>>>>>> add failing test cases for issue #53
     }
 
+<<<<<<< HEAD
+    if (!element.getAttribute('autocapitalize')) {
+      element.setAttribute('autocapitalize', 'off');
+||||||| merged common ancestors
+    // Change event could be fired from vanilla-autofill-event
+    element.addEventListener('change', this._change);
+
+    if (!element.getAttribute('autocapitalize')) {
+      element.setAttribute('autocapitalize', 'off');
+=======
     /**
      * @param {number} max
      * @returns {NumberFormatter}
@@ -3916,6 +9662,7 @@ var NumberFormatter = (function (_Formatter) {
     key: 'minimum',
     value: function minimum() {
       return this._minimum;
+>>>>>>> add failing test cases for issue #53
     }
 
     /**
@@ -4150,10 +9897,37 @@ var NumberFormatter = (function (_Formatter) {
      * @returns {NumberFormatter}
      */
   }, {
+<<<<<<< HEAD
+    key: 'destroy',
+    value: function destroy() {
+      var element = this.element;
+      element.removeEventListener('keydown', this._keyDown);
+      element.removeEventListener('keypress', this._keyPress);
+      element.removeEventListener('keyup', this._keyUp);
+      element.removeEventListener('click', this._click);
+      element.removeEventListener('paste', this._paste);
+      element.removeEventListener('focus', this._focus);
+      element.removeEventListener('blur', this._blur);
+      delete element['field-kit-text-field'];
+||||||| merged common ancestors
+    key: 'destroy',
+    value: function destroy() {
+      var element = this.element;
+      element.removeEventListener('keydown', this._keyDown);
+      element.removeEventListener('keypress', this._keyPress);
+      element.removeEventListener('keyup', this._keyUp);
+      element.removeEventListener('click', this._click);
+      element.removeEventListener('paste', this._paste);
+      element.removeEventListener('focus', this._focus);
+      element.removeEventListener('blur', this._blur);
+      element.removeEventListener('change', this._change);
+      delete element['field-kit-text-field'];
+=======
     key: 'setNegativeSuffix',
     value: function setNegativeSuffix(prefix) {
       this._negativeSuffix = prefix;
       return this;
+>>>>>>> add failing test cases for issue #53
     }
 
     /**
@@ -4696,10 +10470,10 @@ var NumberFormatter = (function (_Formatter) {
 
       if (this.isLenient()) {
         string = string.replace(/\s/g, '');
-        positivePrefix = (0, _utils.trim)(positivePrefix);
-        negativePrefix = (0, _utils.trim)(negativePrefix);
-        positiveSuffix = (0, _utils.trim)(positiveSuffix);
-        negativeSuffix = (0, _utils.trim)(negativeSuffix);
+        positivePrefix = (0, _fieldKitCoreUtils.trim)(positivePrefix);
+        negativePrefix = (0, _fieldKitCoreUtils.trim)(negativePrefix);
+        positiveSuffix = (0, _fieldKitCoreUtils.trim)(positiveSuffix);
+        negativeSuffix = (0, _fieldKitCoreUtils.trim)(negativeSuffix);
       }
 
       var zeroSymbol = undefined;
@@ -4720,8 +10494,8 @@ var NumberFormatter = (function (_Formatter) {
       } else if ((negativeInfinitySymbol = this.negativeInfinitySymbol()) !== undefined && negativeInfinitySymbol !== null && string === negativeInfinitySymbol) {
         result = -Infinity;
       } else {
-        var hasNegativePrefix = (0, _utils.startsWith)(negativePrefix, string);
-        var hasNegativeSuffix = (0, _utils.endsWith)(negativeSuffix, string);
+        var hasNegativePrefix = (0, _fieldKitCoreUtils.startsWith)(negativePrefix, string);
+        var hasNegativeSuffix = (0, _fieldKitCoreUtils.endsWith)(negativeSuffix, string);
         if (hasNegativePrefix && (this.isLenient() || hasNegativeSuffix)) {
           innerString = string.slice(negativePrefix.length);
           if (hasNegativeSuffix) {
@@ -4732,8 +10506,8 @@ var NumberFormatter = (function (_Formatter) {
             result *= -1;
           }
         } else {
-          var hasPositivePrefix = (0, _utils.startsWith)(positivePrefix, string);
-          var hasPositiveSuffix = (0, _utils.endsWith)(positiveSuffix, string);
+          var hasPositivePrefix = (0, _fieldKitCoreUtils.startsWith)(positivePrefix, string);
+          var hasPositiveSuffix = (0, _fieldKitCoreUtils.endsWith)(positiveSuffix, string);
           if (this.isLenient() || hasPositivePrefix && hasPositiveSuffix) {
             innerString = string;
             if (hasPositivePrefix) {
@@ -4790,6 +10564,45 @@ var NumberFormatter = (function (_Formatter) {
         return null;
       }
 
+<<<<<<< HEAD
+    /**
+     * Handles keyDown events. This method essentially just delegates to other,
+     * more semantic, methods based on the modifier keys and the pressed key of the
+     * event.
+     *
+     * @param {Event} event
+     * @private
+     */
+  }, {
+    key: '_keyDown',
+    value: function _keyDown(event) {
+      var _this4 = this;
+||||||| merged common ancestors
+    /**
+     * This event could be triggered from vanilla-autofill-event. We should try to parse the
+     * text.
+     *
+     * @private
+     */
+  }, {
+    key: '_change',
+    value: function _change() {
+      if (this._formatter) this.setValue(this._formatter.format(this.value()));
+    }
+
+    /**
+     * Handles keyDown events. This method essentially just delegates to other,
+     * more semantic, methods based on the modifier keys and the pressed key of the
+     * event.
+     *
+     * @param {Event} event
+     * @private
+     */
+  }, {
+    key: '_keyDown',
+    value: function _keyDown(event) {
+      var _this4 = this;
+=======
       var parts = string.split(this.decimalSeparator());
       if (parts.length > 2) {
         if (typeof error === 'function') {
@@ -4800,6 +10613,7 @@ var NumberFormatter = (function (_Formatter) {
 
       var integerPart = parts[0];
       var fractionPart = parts[1] || '';
+>>>>>>> add failing test cases for issue #53
 
       if (this.usesGroupingSeparator()) {
         var groupingSize = this.groupingSize();
@@ -4832,7 +10646,7 @@ var NumberFormatter = (function (_Formatter) {
         integerPart = groupParts.join('');
       }
 
-      if (!(0, _utils.isDigits)(integerPart) || !(0, _utils.isDigits)(fractionPart)) {
+      if (!(0, _fieldKitCoreUtils.isDigits)(integerPart) || !(0, _fieldKitCoreUtils.isDigits)(fractionPart)) {
         if (typeof error === 'function') {
           error('number-formatter.invalid-format');
         }
@@ -4869,11 +10683,11 @@ var NumberFormatter = (function (_Formatter) {
     value: function _currencyDefaults() {
       var result = {};
 
-      (0, _utils.forEach)(CurrencyDefaults['default'], function (value, key) {
+      (0, _fieldKitCoreUtils.forEach)(CurrencyDefaults['default'], function (value, key) {
         result[key] = value;
       });
 
-      (0, _utils.forEach)(CurrencyDefaults[this.currencyCode()], function (value, key) {
+      (0, _fieldKitCoreUtils.forEach)(CurrencyDefaults[this.currencyCode()], function (value, key) {
         result[key] = value;
       });
 
@@ -4891,11 +10705,11 @@ var NumberFormatter = (function (_Formatter) {
     value: function _regionDefaults() {
       var result = {};
 
-      (0, _utils.forEach)(RegionDefaults['default'], function (value, key) {
+      (0, _fieldKitCoreUtils.forEach)(RegionDefaults['default'], function (value, key) {
         result[key] = value;
       });
 
-      (0, _utils.forEach)(RegionDefaults[this.countryCode()], function (value, key) {
+      (0, _fieldKitCoreUtils.forEach)(RegionDefaults[this.countryCode()], function (value, key) {
         result[key] = value;
       });
 
@@ -4921,8 +10735,8 @@ var NumberFormatter = (function (_Formatter) {
       LocaleDefaults[locale] // fr-CA
       ];
 
-      (0, _utils.forEach)(defaultFallbacks, function (defaults) {
-        (0, _utils.forEach)(defaults, function (value, key) {
+      (0, _fieldKitCoreUtils.forEach)(defaultFallbacks, function (defaults) {
+        (0, _fieldKitCoreUtils.forEach)(defaults, function (value, key) {
           result[key] = value;
         });
       });
@@ -4932,7 +10746,7 @@ var NumberFormatter = (function (_Formatter) {
   }]);
 
   return NumberFormatter;
-})(_formatter2['default']);
+})(_fieldKitCoreFormatter2['default']);
 
 NumberFormatter.prototype._allowsFloats = null;
 /** @private */
@@ -6195,7 +12009,7 @@ var CurrencyDefaults = {
 exports['default'] = NumberFormatter;
 module.exports = exports['default'];
 
-},{"./formatter":14,"./number_formatter_settings_formatter":17,"./utils":22,"stround":3}],17:[function(_dereq_,module,exports){
+},{"./number_formatter_settings_formatter":20,"field-kit-core/formatter":2,"field-kit-core/utils":6,"stround":8}],20:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -6204,7 +12018,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
@@ -6212,9 +12026,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _formatter = _dereq_('./formatter');
+var _fieldKitCoreFormatter = _dereq_('field-kit-core/formatter');
 
-var _formatter2 = _interopRequireDefault(_formatter);
+var _fieldKitCoreFormatter2 = _interopRequireDefault(_fieldKitCoreFormatter);
 
 var NumberFormatterSettings = function NumberFormatterSettings() {
   _classCallCheck(this, NumberFormatterSettings);
@@ -6237,8 +12051,16 @@ var NumberFormatterSettings = function NumberFormatterSettings() {
   /** @type string */
   this.prefix = '';
 
+<<<<<<< HEAD
+},{"./caret":8,"./formatter":14,"./undo_manager":21,"./utils":22,"input-sim":2}],21:[function(_dereq_,module,exports){
+'use strict';
+||||||| merged common ancestors
+},{"./caret":9,"./formatter":15,"./undo_manager":22,"./utils":23,"input-sim":2,"vanilla-autofill-event":4}],22:[function(_dereq_,module,exports){
+'use strict';
+=======
   /** @type string */
   this.suffix = '';
+>>>>>>> add failing test cases for issue #53
 
   /** @type boolean */
   this.usesGroupingSeparator = false;
@@ -6417,12 +12239,26 @@ var NumberFormatterSettingsFormatter = (function (_Formatter) {
   }]);
 
   return NumberFormatterSettingsFormatter;
-})(_formatter2['default']);
+})(_fieldKitCoreFormatter2['default']);
 
 exports['default'] = NumberFormatterSettingsFormatter;
 module.exports = exports['default'];
 
-},{"./formatter":14}],18:[function(_dereq_,module,exports){
+<<<<<<< HEAD
+},{"./utils":22}],22:[function(_dereq_,module,exports){
+/**
+ * @const
+ * @private
+ */
+||||||| merged common ancestors
+},{"./utils":23}],23:[function(_dereq_,module,exports){
+/**
+ * @const
+ * @private
+ */
+=======
+},{"field-kit-core/formatter":2}],21:[function(_dereq_,module,exports){
+>>>>>>> add failing test cases for issue #53
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -6431,7 +12267,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
@@ -6703,7 +12539,7 @@ var PhoneFormatter = (function (_DelimitedTextFormatter) {
 exports['default'] = PhoneFormatter;
 module.exports = exports['default'];
 
-},{"./delimited_text_formatter":10}],19:[function(_dereq_,module,exports){
+},{"./delimited_text_formatter":14}],22:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -6712,7 +12548,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
@@ -6780,1713 +12616,12 @@ var SocialSecurityNumberFormatter = (function (_DelimitedTextFormatter) {
 exports['default'] = SocialSecurityNumberFormatter;
 module.exports = exports['default'];
 
-},{"./delimited_text_formatter":10}],20:[function(_dereq_,module,exports){
-'use strict';
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var _formatter = _dereq_('./formatter');
-
-var _formatter2 = _interopRequireDefault(_formatter);
-
-var _undo_manager = _dereq_('./undo_manager');
-
-var _undo_manager2 = _interopRequireDefault(_undo_manager);
-
-var _utils = _dereq_('./utils');
-
-var _caret = _dereq_('./caret');
-
-var _caret2 = _interopRequireDefault(_caret);
-
-/**
- * Simulates input behavior.
- *
- * @external InputSim
- * @see https://github.com/iamJoeTaylor/input-sim
- */
-
-var _inputSim = _dereq_('input-sim');
-
-/**
- * TextField is the simplest input and the base for more complex
- * types to inherit.
- *
- * @extends external:InputSim.Input
- */
-
-var _installCaret = (0, _caret2['default'])();
-
-var getCaret = _installCaret.getCaret;
-var setCaret = _installCaret.setCaret;
-
-var TextField = (function (_Input) {
-  _inherits(TextField, _Input);
-
-  /**
-   * Sets up the initial properties of the TextField and
-   * sets  up the event listeners
-   *
-   * @param {HTMLElement} element
-   * @param {Formatter} formatter
-   */
-
-  function TextField(element, formatter) {
-    _classCallCheck(this, TextField);
-
-    _get(Object.getPrototypeOf(TextField.prototype), 'constructor', this).call(this);
-
-    var caret = getCaret(element);
-    if (typeof element.get === 'function') {
-      console.warn('DEPRECATION: FieldKit.TextField instances should no longer be ' + 'created with a jQuery-wrapped element.');
-      element = element.get(0);
-    }
-    this.element = element;
-    this._formatter = formatter;
-    this._enabled = true;
-    this._manualCaret = { start: 0, end: 0 };
-    this._placeholder = null;
-    this._disabledPlaceholder = null;
-    this._focusedPlaceholder = null;
-    this._unfocusedPlaceholder = null;
-    this._isDirty = false;
-    this._valueOnFocus = '';
-    this._currentValue = '';
-    // Make sure textDidChange fires while the value is correct
-    this._needsKeyUpTextDidChangeTrigger = false;
-    this._blur = (0, _utils.bind)(this._blur, this);
-    this._focus = (0, _utils.bind)(this._focus, this);
-    this._click = (0, _utils.bind)(this._click, this);
-    this._paste = (0, _utils.bind)(this._paste, this);
-    this._keyUp = (0, _utils.bind)(this._keyUp, this);
-    this._keyPress = (0, _utils.bind)(this._keyPress, this);
-    this._keyDown = (0, _utils.bind)(this._keyDown, this);
-    if (element['field-kit-text-field']) {
-      throw new Error('already attached a TextField to this element');
-    } else {
-      element['field-kit-text-field'] = this;
-    }
-    element.addEventListener('keydown', this._keyDown);
-    element.addEventListener('keypress', this._keyPress);
-    element.addEventListener('keyup', this._keyUp);
-    element.addEventListener('click', this._click);
-    element.addEventListener('paste', this._paste);
-    element.addEventListener('focus', this._focus);
-    element.addEventListener('blur', this._blur);
-
-    if (!element.getAttribute('autocapitalize')) {
-      element.setAttribute('autocapitalize', 'off');
-    }
-
-    var window = element.ownerDocument.defaultView;
-
-    /**
-     * Fixes caret bug (Android) that caused the input
-     * to place inserted characters in the wrong place
-     * Expected: 1234 5678|  =>  1234 5678 9|
-     * Bug: 1234 5678|  =>  1234 5679| 8
-     *
-     * @private
-     */
-    this._needsManualCaret = window.navigator.userAgent.toLowerCase().indexOf('android') > -1;
-
-    this.setText(element.value);
-
-    this.setSelectedRange({
-      start: caret.start,
-      length: caret.end - caret.start
-    });
-  }
-
-  /**
-   * Helps calculate the changes after an event on a FieldKit.TextField.
-   *
-   * @private
-   */
-
-  /**
-   * **** Public Events ****
-   */
-
-  /**
-   * Called when the user has changed the text of the field. Can be used in
-   * subclasses to perform actions suitable for this event.
-   *
-   * @private
-   */
-
-  _createClass(TextField, [{
-    key: 'textDidChange',
-    value: function textDidChange() {}
-
-    /**
-     * Called when the user has in some way declared that they are done editing,
-     * such as leaving the field or perhaps pressing enter. Can be used in
-     * subclasses to perform actions suitable for this event.
-     *
-     * @private
-     */
-  }, {
-    key: 'textFieldDidEndEditing',
-    value: function textFieldDidEndEditing() {}
-
-    /**
-     * Performs actions necessary for beginning editing.
-     *
-     * @private
-     */
-  }, {
-    key: 'textFieldDidBeginEditing',
-    value: function textFieldDidBeginEditing() {}
-
-    /**
-     * **** Private Events ****
-     */
-
-    /**
-     * Performs actions necessary for text change.
-     *
-     * @private
-     */
-  }, {
-    key: '_textDidChange',
-    value: function _textDidChange() {
-      var delegate = this._delegate;
-      this.textDidChange();
-      if (delegate && typeof delegate.textDidChange === 'function') {
-        delegate.textDidChange(this);
-      }
-
-      // manually fire the HTML5 input event
-      this._fireEvent('input');
-    }
-
-    /**
-     * Performs actions necessary for ending editing.
-     *
-     * @private
-     */
-  }, {
-    key: '_textFieldDidEndEditing',
-    value: function _textFieldDidEndEditing() {
-      var delegate = this._delegate;
-      this.textFieldDidEndEditing();
-      if (delegate && typeof delegate.textFieldDidEndEditing === 'function') {
-        delegate.textFieldDidEndEditing(this);
-      }
-
-      // manually fire the HTML5 change event, only when a change has been made since focus
-      if (this._isDirty && this._valueOnFocus !== this.element.value) {
-        this._fireEvent('change');
-      }
-
-      // reset the dirty property
-      this._isDirty = false;
-      this._valueOnFocus = '';
-    }
-
-    /**
-     * Performs actions necessary for beginning editing.
-     *
-     * @private
-     */
-  }, {
-    key: '_textFieldDidBeginEditing',
-    value: function _textFieldDidBeginEditing() {
-      var delegate = this._delegate;
-      this.textFieldDidBeginEditing();
-      if (delegate && typeof delegate.textFieldDidBeginEditing === 'function') {
-        delegate.textFieldDidBeginEditing(this);
-      }
-    }
-
-    /**
-     * **** Public Methods ****
-     */
-
-    /**
-     * Gets the current delegate for this text field.
-     *
-     * @returns {TextFieldDelegate}
-     */
-  }, {
-    key: 'delegate',
-    value: function delegate() {
-      return this._delegate;
-    }
-
-    /**
-     * Sets the current delegate for this text field.
-     *
-     * @param {TextFieldDelegate} delegate
-     */
-  }, {
-    key: 'setDelegate',
-    value: function setDelegate(delegate) {
-      this._delegate = delegate;
-    }
-
-    /**
-     * Tears down FieldKit
-     */
-  }, {
-    key: 'destroy',
-    value: function destroy() {
-      var element = this.element;
-      element.removeEventListener('keydown', this._keyDown);
-      element.removeEventListener('keypress', this._keyPress);
-      element.removeEventListener('keyup', this._keyUp);
-      element.removeEventListener('click', this._click);
-      element.removeEventListener('paste', this._paste);
-      element.removeEventListener('focus', this._focus);
-      element.removeEventListener('blur', this._blur);
-      delete element['field-kit-text-field'];
-    }
-
-    /**
-     * Gets the current formatter. Formatters are used to translate between text
-     * and value properties of the field.
-     *
-     * @returns {Formatter}
-     */
-  }, {
-    key: 'formatter',
-    value: function formatter() {
-      if (!this._formatter) {
-        this._formatter = new _formatter2['default']();
-        var maximumLengthString = this.element.getAttribute('maxlength');
-        if (maximumLengthString !== undefined && maximumLengthString !== null) {
-          this._formatter.maximumLength = parseInt(maximumLengthString, 10);
-        }
-      }
-
-      return this._formatter;
-    }
-
-    /**
-     * Sets the current formatter.
-     *
-     * @param {Formatter} formatter
-     */
-  }, {
-    key: 'setFormatter',
-    value: function setFormatter(formatter) {
-      var value = this.value();
-      this._formatter = formatter;
-      this.setValue(value);
-    }
-
-    /**
-     * Builds a change instance and formats the change to see if it's valid
-     *
-     * @param   {object} current
-     * @param   {object} proposed
-     * @returns {?object} false if change doesn't have changes or change isn't valid. Change object if it is.
-     */
-  }, {
-    key: 'hasChangesAndIsValid',
-    value: function hasChangesAndIsValid(current, proposed) {
-      var _this = this;
-
-      var change = new TextFieldStateChange(this);
-      var error = function error(errorType) {
-        var delegate = _this.delegate();
-        if (delegate) {
-          if (typeof delegate.textFieldDidFailToValidateChange === 'function') {
-            delegate.textFieldDidFailToValidateChange(_this, change, errorType);
-          }
-        }
-      };
-      change.current = { text: current.text, selectedRange: current.selectedRange };
-      change.proposed = { text: proposed.text, selectedRange: proposed.selectedRange };
-      if (change.hasChanges() && this.formatter().isChangeValid(change, error)) {
-        return change;
-      }
-      return null;
-    }
-
-    /**
-     * Handles a key event could be trying to end editing.
-     *
-     */
-  }, {
-    key: 'insertNewline',
-    value: function insertNewline() {
-      this._textFieldDidEndEditing();
-      this._didEndEditingButKeptFocus = true;
-    }
-
-    /**
-     * Debug support
-     *
-     * @returns {string}
-     */
-  }, {
-    key: 'inspect',
-    value: function inspect() {
-      return '#<TextField text="' + this.text() + '">';
-    }
-
-    /**
-     * Replaces the current selection with text from the given pasteboard.
-     *
-     * @param {DataTransfer} pasteboard
-     */
-  }, {
-    key: 'readSelectionFromPasteboard',
-    value: function readSelectionFromPasteboard(pasteboard) {
-      var range = undefined,
-          text = undefined;
-      text = pasteboard.getData('Text');
-      this.replaceSelection(text);
-      range = this.selectedRange();
-      range.start += range.length;
-      range.length = 0;
-      this.setSelectedRange(range);
-    }
-
-    /**
-     * Checks changes after invoking the passed function for validity and rolls
-     * them back if the changes turned out to be invalid.
-     *
-     * @returns {Object} whatever object `callback` returns
-     */
-  }, {
-    key: 'rollbackInvalidChanges',
-    value: function rollbackInvalidChanges(callback) {
-      var result = null;
-      var errorType = null;
-      var change = TextFieldStateChange.build(this, function () {
-        return result = callback();
-      });
-      var error = function error(type) {
-        errorType = type;
-      };
-      if (change.hasChanges()) {
-        var formatter = this.formatter();
-        if (formatter && typeof formatter.isChangeValid === 'function') {
-          if (!this._isDirty) {
-            this._valueOnFocus = change.current.text || '';
-            this._isDirty = true;
-          }
-          if (formatter.isChangeValid(change, error)) {
-            change.recomputeDiff();
-            this.setText(change.proposed.text);
-            this.setSelectedRange(change.proposed.selectedRange);
-          } else {
-            var delegate = this.delegate();
-            if (delegate) {
-              if (typeof delegate.textFieldDidFailToValidateChange === 'function') {
-                delegate.textFieldDidFailToValidateChange(this, change, errorType);
-              }
-            }
-            this.setText(change.current.text);
-            this.setSelectedRange(change.current.selectedRange);
-            return result;
-          }
-        }
-        if (change.inserted.text.length || change.deleted.text.length) {
-          this.undoManager().proxyFor(this)._applyChangeFromUndoManager(change);
-          this._textDidChange();
-        }
-      }
-      return result;
-    }
-
-    /**
-     * Gets the object value. This is the value that should be considered the
-     * 'real' value of the field.
-     *
-     * @returns {Object}
-     */
-  }, {
-    key: 'value',
-    value: function value() {
-      var _this2 = this;
-
-      var text = this.text();
-      var delegate = this.delegate();
-      var formatter = this.formatter();
-      if (!formatter) {
-        return text;
-      }
-
-      return formatter.parse(text, function (errorType) {
-        if (delegate) {
-          if (typeof delegate.textFieldDidFailToParseString === 'function') {
-            delegate.textFieldDidFailToParseString(_this2, text, errorType);
-          }
-        }
-      });
-    }
-
-    /**
-     * Sets the object value of the field.
-     *
-     * @param {string} value
-     */
-  }, {
-    key: 'setValue',
-    value: function setValue(value) {
-      if (this._formatter) {
-        value = this._formatter.format(value);
-      }
-      this.setText('' + value);
-    }
-
-    /**
-     * **** InputSim Overrides ****
-     */
-
-    /**
-     * Gets the formatted text value. This is the same as the value of the
-     * underlying input element.
-     *
-     * @augments external:InputSim.Input#text
-     * @returns {string}
-     */
-  }, {
-    key: 'text',
-    value: function text() {
-      return this.element.value;
-    }
-
-    /**
-     * Sets the formatted text value. This generally should not be used. Instead,
-     * use the value setter.
-     *
-     * @augments external:InputSim.Input#setText
-     * @param {string} text
-     */
-  }, {
-    key: 'setText',
-    value: function setText(text) {
-      this.element.value = text;
-      this._currentValue = text;
-    }
-
-    /**
-     * Gets the range of the current selection.
-     *
-     * @augments external:InputSim.Input#selectedRange
-     * @returns {Object} {start: number, length: number}
-     */
-  }, {
-    key: 'selectedRange',
-    value: function selectedRange() {
-      var caret = this._needsManualCaret ? this._manualCaret : getCaret(this.element);
-
-      return {
-        start: caret.start,
-        length: caret.end - caret.start
-      };
-    }
-
-    /**
-     * Sets the range of the current selection and the selection affinity.
-     *
-     * @augments external:InputSim.Input#setSelectedRangeWithAffinity
-     * @param {{start: number, length: number}} range
-     * @param {Affinity} affinity
-     */
-  }, {
-    key: 'setSelectedRangeWithAffinity',
-    value: function setSelectedRangeWithAffinity(range, affinity) {
-      var newRange = _get(Object.getPrototypeOf(TextField.prototype), 'setSelectedRangeWithAffinity', this).call(this, range, affinity);
-      var caret = {
-        start: newRange.start,
-        end: newRange.start + newRange.length
-      };
-      this._manualCaret = caret;
-      setCaret(this.element, caret.start, caret.end);
-      this.selectionAffinity = range.length === 0 ? null : affinity;
-    }
-
-    /**
-     * **** Undo Support ****
-     */
-
-    /**
-     * Gets whether this text field records undo actions with its undo manager.
-     *
-     * @returns {boolean}
-     */
-  }, {
-    key: 'allowsUndo',
-    value: function allowsUndo() {
-      return this._allowsUndo;
-    }
-
-    /**
-     * Sets whether this text field records undo actions with its undo manager.
-     *
-     * @param {boolean} allowsUndo
-     */
-  }, {
-    key: 'setAllowsUndo',
-    value: function setAllowsUndo(allowsUndo) {
-      this._allowsUndo = allowsUndo;
-    }
-
-    /**
-     * Triggers a redo in the underlying UndoManager, if applicable.
-     *
-     * @param {Event} event
-     */
-  }, {
-    key: 'redo',
-    value: function redo(event) {
-      if (this.undoManager().canRedo()) {
-        this.undoManager().redo();
-      }
-      event.preventDefault();
-    }
-
-    /**
-     * Triggers an undo in the underlying UndoManager, if applicable.
-     *
-     * @param {Event} event
-     */
-  }, {
-    key: 'undo',
-    value: function undo(event) {
-      if (this.undoManager().canUndo()) {
-        this.undoManager().undo();
-      }
-      event.preventDefault();
-    }
-
-    /**
-     * Gets the UndoManager for this text field.
-     *
-     * @returns {UndoManager}
-     */
-  }, {
-    key: 'undoManager',
-    value: function undoManager() {
-      return this._undoManager || (this._undoManager = new _undo_manager2['default']());
-    }
-
-    /**
-     * **** Enabled/disabled support *****
-     */
-
-    /**
-     * Removes focus from this field if it has focus.
-     */
-  }, {
-    key: 'becomeFirstResponder',
-    value: function becomeFirstResponder() {
-      var _this3 = this;
-
-      this.element.focus();
-      this.rollbackInvalidChanges(function () {
-        _this3.element.select();
-        _this3._syncPlaceholder();
-      });
-    }
-
-    /**
-     * Determines whether this field has focus.
-     *
-     * @returns {boolean} true if this field has focus
-     */
-  }, {
-    key: 'hasFocus',
-    value: function hasFocus() {
-      return this.element.ownerDocument.activeElement === this.element;
-    }
-
-    /**
-     * Determines whether this field is enabled or disabled.
-     *
-     * @returns {boolean} true if this field is enabled
-     */
-  }, {
-    key: 'isEnabled',
-    value: function isEnabled() {
-      return this._enabled;
-    }
-
-    /**
-     * Sets whether this text field is enabled
-     * and syncs the placeholder to match
-     *
-     * @param {boolean} enabled
-     */
-  }, {
-    key: 'setEnabled',
-    value: function setEnabled(enabled) {
-      this._enabled = enabled;
-      this._syncPlaceholder();
-    }
-
-    /**
-     * Removes focus from this field if it has focus.
-     *
-     * @param {Event} event
-     */
-  }, {
-    key: 'resignFirstResponder',
-    value: function resignFirstResponder(event) {
-      if (event !== undefined && event !== null) {
-        event.preventDefault();
-      }
-      this.element.blur();
-      this._syncPlaceholder();
-    }
-
-    /*
-     * **** Placeholder support ****
-     */
-
-    /**
-     * Gets the disabled placeholder if one
-     * has been set.
-     *
-     * @returns {string}
-     */
-  }, {
-    key: 'disabledPlaceholder',
-    value: function disabledPlaceholder() {
-      return this._disabledPlaceholder;
-    }
-
-    /**
-     * Sets the disabled placeholder.
-     *
-     * @param {string} disabledPlaceholder
-     */
-  }, {
-    key: 'setDisabledPlaceholder',
-    value: function setDisabledPlaceholder(disabledPlaceholder) {
-      this._disabledPlaceholder = disabledPlaceholder;
-      this._syncPlaceholder();
-    }
-
-    /**
-     * Gets the focused placeholder if one
-     * has been set.
-     *
-     * @returns {string}
-     */
-  }, {
-    key: 'focusedPlaceholder',
-    value: function focusedPlaceholder() {
-      return this._focusedPlaceholder;
-    }
-
-    /**
-     * Sets the focused placeholder.
-     *
-     * @param {string} focusedPlaceholder
-     */
-  }, {
-    key: 'setFocusedPlaceholder',
-    value: function setFocusedPlaceholder(focusedPlaceholder) {
-      this._focusedPlaceholder = focusedPlaceholder;
-      this._syncPlaceholder();
-    }
-
-    /**
-     * Gets the placeholder if one has
-     * been set.
-     *
-     * @TODO Does this do anything?
-     *
-     * @returns {string}
-     */
-  }, {
-    key: 'placeholder',
-    value: function placeholder() {
-      return this._placeholder;
-    }
-
-    /**
-     * Sets the placeholder.
-     *
-     * @param {string} placeholder
-     */
-  }, {
-    key: 'setPlaceholder',
-    value: function setPlaceholder(placeholder) {
-      this._placeholder = placeholder;
-      this.element.setAttribute('placeholder', this._placeholder);
-    }
-
-    /**
-     * Gets the unfocused placeholder if one
-     * has been set.
-     *
-     * @returns {string}
-     */
-  }, {
-    key: 'unfocusedPlaceholder',
-    value: function unfocusedPlaceholder() {
-      return this._unfocusedPlaceholder;
-    }
-
-    /**
-     * Sets the unfocused placeholder.
-     *
-     * @param {string} unfocusedPlaceholder
-     */
-  }, {
-    key: 'setUnfocusedPlaceholder',
-    value: function setUnfocusedPlaceholder(unfocusedPlaceholder) {
-      this._unfocusedPlaceholder = unfocusedPlaceholder;
-      this._syncPlaceholder();
-    }
-
-    /**
-     * **** Private Methods ****
-     */
-
-    /**
-     * Applies the given change as an undo/redo.
-     *
-     * @param {Object} change object with current and proposed properties
-     * @private
-     */
-  }, {
-    key: '_applyChangeFromUndoManager',
-    value: function _applyChangeFromUndoManager(change) {
-      this.undoManager().proxyFor(this)._applyChangeFromUndoManager(change);
-
-      if (this.undoManager().isUndoing()) {
-        this.setText(change.current.text);
-        this.setSelectedRange(change.current.selectedRange);
-      } else {
-        this.setText(change.proposed.text);
-        this.setSelectedRange(change.proposed.selectedRange);
-      }
-
-      this._textDidChange();
-    }
-
-    /**
-     * Handles clicks by resetting the selection affinity.
-     *
-     * @private
-     */
-  }, {
-    key: '_click',
-    value: function _click() {
-      this._manualCaret = getCaret(this.element);
-      this._selectedRange = {
-        start: this._manualCaret.start,
-        length: this._manualCaret.end - this._manualCaret.start
-      };
-      this.selectionAffinity = null;
-    }
-
-    /**
-     * Fires event on the element
-     *
-     * @param {string} eventType
-     * @private
-     */
-  }, {
-    key: '_fireEvent',
-    value: function _fireEvent(eventType) {
-      var document = this.element.ownerDocument;
-      var window = document.defaultView;
-      if (typeof window.CustomEvent === 'function') {
-        this.element.dispatchEvent(new window.CustomEvent(eventType, {}));
-      } else {
-        var _event = document.createEvent('Event');
-        _event.initEvent(eventType, false, false);
-        this.element.dispatchEvent(_event);
-      }
-    }
-
-    /**
-     * Handles gaining focus. This method delegates to other methods, and syncs
-     * the placeholder appropriately.
-     *
-     * @private
-     */
-  }, {
-    key: '_focus',
-    value: function _focus() {
-      this._textFieldDidBeginEditing();
-      this._syncPlaceholder();
-    }
-
-    /**
-     * Handles losing focus. This method delegates to other methods, and syncs the
-     * placeholder appropriately.
-     *
-     * @private
-     */
-  }, {
-    key: '_blur',
-    value: function _blur() {
-      this._textFieldDidEndEditing();
-      this._syncPlaceholder();
-    }
-
-    /**
-     * Handles keyDown events. This method essentially just delegates to other,
-     * more semantic, methods based on the modifier keys and the pressed key of the
-     * event.
-     *
-     * @param {Event} event
-     * @private
-     */
-  }, {
-    key: '_keyDown',
-    value: function _keyDown(event) {
-      var _this4 = this;
-
-      if (this._didEndEditingButKeptFocus) {
-        this._textFieldDidBeginEditing();
-        this._didEndEditingButKeptFocus = false;
-      }
-
-      var action = this._bindings.actionForEvent(event);
-      if (action) {
-        switch (action) {
-          case 'undo':
-          case 'redo':
-            this[action](event);
-            break;
-
-          default:
-            this.rollbackInvalidChanges(function () {
-              return _this4[action](event);
-            });
-            break;
-        }
-      }
-    }
-
-    /**
-     * Handles inserting characters based on the typed key for normal keyboards.
-     *
-     * NOTE: Does not fire on some versions of Android, in which case we handle
-     * changes in _keyUp instead.
-     *
-     * @param {Event} event
-     * @private
-     */
-  }, {
-    key: '_keyPress',
-    value: function _keyPress(event) {
-      var _this5 = this;
-
-      var keyCode = event.keyCode;
-      if (!event.metaKey && !event.ctrlKey && keyCode !== _inputSim.KEYS.ENTER && keyCode !== _inputSim.KEYS.TAB && keyCode !== _inputSim.KEYS.BACKSPACE) {
-        if (event.charCode !== 0) {
-          (function () {
-            var newText = String.fromCharCode(event.charCode || event.keyCode);
-
-            _this5._processChange({
-              currentText: _this5.text(),
-              proposedText: (0, _utils.replaceStringSelection)(newText, _this5.text(), _this5.selectedRange()),
-              onSuccess: function onSuccess(change, changeTriggeredFormatting) {
-                if (!changeTriggeredFormatting && event instanceof KeyboardEvent) {
-                  // HACK(JoeTaylor) Use Browser's native input when using the formatter
-                  // would not make a difference https://code.google.com/p/chromium/issues/detail?id=32865
-                  if (!_this5._isDirty) {
-                    _this5._valueOnFocus = change.current.text || '';
-                    _this5._isDirty = true;
-                  }
-                  _this5.undoManager().proxyFor(_this5)._applyChangeFromUndoManager(change);
-                  _this5._manualCaret = {
-                    start: change.proposed.selectedRange.start,
-                    end: change.proposed.selectedRange.start + change.proposed.selectedRange.length
-                  };
-                  _this5._needsKeyUpTextDidChangeTrigger = true;
-                } else {
-                  event.preventDefault();
-                  _this5.rollbackInvalidChanges(function () {
-                    return _this5.insertText(newText);
-                  });
-                }
-                _this5._currentValue = change.proposed.text;
-              },
-              onFail: function onFail() {
-                event.preventDefault();
-                _this5.rollbackInvalidChanges(function () {
-                  return _this5.insertText(newText);
-                });
-              }
-            });
-          })();
-        } else {
-          event.preventDefault();
-        }
-      }
-    }
-
-    /**
-     * Handles keyup events. On Some Android we need to do all input processing
-     * here because no other information comes in.
-     *
-     * @param {Event} event
-     * @private
-     */
-  }, {
-    key: '_keyUp',
-    value: function _keyUp(event) {
-      var _this6 = this;
-
-      if (this._needsKeyUpTextDidChangeTrigger) {
-        this._textDidChange();
-        this._needsKeyUpTextDidChangeTrigger = false;
-      }
-      var keyCode = event.keyCode;
-      // NOTE: Certain Androids on Chrome always return 229
-      // https://code.google.com/p/chromium/issues/detail?id=118639
-      if (keyCode === 229) {
-        (function () {
-          // Text has already been changed at this point, so we check the previous text
-          // to determine whether we need to undo the change.
-          var previousText = _this6._currentValue || '';
-          _this6._processChange({
-            currentText: previousText,
-            proposedText: _this6.text(),
-            onSuccess: function onSuccess(change, changeTriggeredFormatting) {
-              if (changeTriggeredFormatting) {
-                var newText = change.proposed.text;
-                _this6.setSelectedRange(change.proposed.selectedRange);
-                _this6.setText(newText);
-              }
-              if (!_this6._isDirty) {
-                _this6._valueOnFocus = change.current.text || '';
-                _this6._isDirty = true;
-              }
-              _this6.undoManager().proxyFor(_this6)._applyChangeFromUndoManager(change);
-              _this6._textDidChange();
-              _this6._currentValue = change.proposed.text;
-            },
-            onFail: function onFail() {
-              // Need to rollback the letter input in the Keyup event because it is not valid,
-              // so we set text to the previous state (as collected from the UndoManager).
-              _this6.setText(previousText);
-            }
-          });
-        })();
-      } else {
-        this.rollbackInvalidChanges(function () {
-          if (event.keyCode === _inputSim.KEYS.TAB) {
-            _this6.selectAll(event);
-          }
-        });
-      }
-    }
-
-    /**
-     * Checks if a change is valid and calls `onSuccess` if so,
-     * and `onFail` if not.
-     *
-     * @param {object} options
-     * @param {string} options.currentText
-     * @param {string} options.proposedText
-     * @param {function} options.onSuccess
-     * @param {function=} options.onFail
-     * @private
-     */
-  }, {
-    key: '_processChange',
-    value: function _processChange(_ref) {
-      var currentText = _ref.currentText;
-      var proposedText = _ref.proposedText;
-      var onSuccess = _ref.onSuccess;
-      var _ref$onFail = _ref.onFail;
-      var onFail = _ref$onFail === undefined ? function () {} : _ref$onFail;
-
-      var current = {
-        text: currentText,
-        selectedRange: this.selectedRange()
-      };
-      var proposed = {
-        text: proposedText,
-        selectedRange: { start: current.selectedRange.start + 1, length: 0 }
-      };
-      var change = this.hasChangesAndIsValid(current, proposed);
-      var changeTriggeredFormatting = change && (change.proposed.text !== proposed.text || change.proposed.selectedRange.start !== proposed.selectedRange.start || change.proposed.selectedRange.length !== proposed.selectedRange.length);
-
-      if (change) {
-        onSuccess(change, changeTriggeredFormatting);
-      } else {
-        onFail();
-      }
-    }
-
-    /**
-     * Handles paste events.
-     *
-     * @param {Event} event
-     * @private
-     */
-  }, {
-    key: '_paste',
-    value: function _paste(event) {
-      var _this7 = this;
-
-      event.preventDefault();
-      this.rollbackInvalidChanges(function () {
-        _this7.readSelectionFromPasteboard(event.clipboardData);
-      });
-    }
-
-    /**
-     * @private
-     */
-  }, {
-    key: '_syncPlaceholder',
-    value: function _syncPlaceholder() {
-      if (!this._enabled) {
-        var disabledPlaceholder = this._disabledPlaceholder;
-        if (disabledPlaceholder !== undefined && disabledPlaceholder !== null) {
-          this.setPlaceholder(disabledPlaceholder);
-        }
-      } else if (this.hasFocus()) {
-        var focusedPlaceholder = this._focusedPlaceholder;
-        if (focusedPlaceholder !== undefined && focusedPlaceholder !== null) {
-          this.setPlaceholder(focusedPlaceholder);
-        }
-      } else {
-        var unfocusedPlaceholder = this._unfocusedPlaceholder;
-        if (unfocusedPlaceholder !== undefined && unfocusedPlaceholder !== null) {
-          this.setPlaceholder(unfocusedPlaceholder);
-        }
-      }
-    }
-  }]);
-
-  return TextField;
-})(_inputSim.Input);
-
-var TextFieldStateChange = (function () {
-  /**
-   * @param {TextField} field
-   */
-
-  function TextFieldStateChange(field) {
-    _classCallCheck(this, TextFieldStateChange);
-
-    this.field = field;
-  }
-
-  /**
-   * Builds a new {TextFieldStateChange} that will allow you to
-   * compute differences, and see the current vs proposed changes.
-   *
-   * @param {TextField} field
-   * @param {Function} callback called when you want changes to the field
-   *    take place. Current will be calculated before this callback.
-   *    Proposed will be calculated after this callback.
-   *
-   * @returns {Object} change object with current and proposed properties
-   */
-
-  /**
-   * Determines whether this field has changes.
-   *
-   * @returns {boolean} true if either the current text doesn't match the proposed text
-   *    or the current selection range doesn't match the proposed selection range
-   */
-
-  _createClass(TextFieldStateChange, [{
-    key: 'hasChanges',
-    value: function hasChanges() {
-      this.recomputeDiff();
-      return this.current.text !== this.proposed.text || this.current.selectedRange.start !== this.proposed.selectedRange.start || this.current.selectedRange.length !== this.proposed.selectedRange.length;
-    }
-
-    /**
-     * Updates {TextFieldStateChange} inserted and {TextFieldStateChange} deleted
-     * based on proposed and current
-     */
-  }, {
-    key: 'recomputeDiff',
-    value: function recomputeDiff() {
-      if (this.proposed.text !== this.current.text) {
-        var ctext = this.current.text;
-        var ptext = this.proposed.text;
-        var sharedPrefixLength = 0;
-        var sharedSuffixLength = 0;
-        var minTextLength = Math.min(ctext.length, ptext.length);
-        var i = undefined;
-
-        for (i = 0; i < minTextLength; i++) {
-          if (ptext[i] === ctext[i]) {
-            sharedPrefixLength = i + 1;
-          } else {
-            break;
-          }
-        }
-
-        for (i = 0; i < minTextLength - sharedPrefixLength; i++) {
-          if (ptext[ptext.length - 1 - i] === ctext[ctext.length - 1 - i]) {
-            sharedSuffixLength = i + 1;
-          } else {
-            break;
-          }
-        }
-
-        var inserted = {
-          start: sharedPrefixLength,
-          end: ptext.length - sharedSuffixLength
-        };
-        var deleted = {
-          start: sharedPrefixLength,
-          end: ctext.length - sharedSuffixLength
-        };
-        inserted.text = ptext.substring(inserted.start, inserted.end);
-        deleted.text = ctext.substring(deleted.start, deleted.end);
-        this.inserted = inserted;
-        this.deleted = deleted;
-      } else {
-        this.inserted = {
-          start: this.proposed.selectedRange.start,
-          end: this.proposed.selectedRange.start + this.proposed.selectedRange.length,
-          text: ''
-        };
-        this.deleted = {
-          start: this.current.selectedRange.start,
-          end: this.current.selectedRange.start + this.current.selectedRange.length,
-          text: ''
-        };
-      }
-    }
-  }]);
-
-  return TextFieldStateChange;
-})();
-
-TextFieldStateChange.build = function (field, callback) {
-  var change = new this(field);
-  change.current = {
-    text: field.text(),
-    selectedRange: field.selectedRange()
-  };
-  callback();
-  change.proposed = {
-    text: field.text(),
-    selectedRange: field.selectedRange()
-  };
-  change.recomputeDiff();
-  return change;
-};
-
-exports['default'] = TextField;
-module.exports = exports['default'];
-
-},{"./caret":8,"./formatter":14,"./undo_manager":21,"./utils":22,"input-sim":2}],21:[function(_dereq_,module,exports){
-'use strict';
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-var _utils = _dereq_('./utils');
-
-/**
- * UndoManager is a general-purpose recorder of operations for undo and redo.
- *
- * Registering an undo action is done by specifying the changed object, along
- * with a method to invoke to revert its state and the arguments for that
- * method. When performing undo an UndoManager saves the operations reverted so
- * that you can redo the undos.
- */
-
-var UndoManager = (function () {
-  function UndoManager() {
-    _classCallCheck(this, UndoManager);
-
-    /** @private */
-    this._undos = [];
-    /** @private */
-    this._redos = [];
-    /** @private */
-    this._isUndoing = false;
-    /** @private */
-    this._isRedoing = false;
-  }
-
-  /**
-   * Determines whether there are any undo actions on the stack.
-   *
-   * @returns {boolean}
-   */
-
-  _createClass(UndoManager, [{
-    key: 'canUndo',
-    value: function canUndo() {
-      return this._undos.length !== 0;
-    }
-
-    /**
-     * Determines whether there are any redo actions on the stack.
-     *
-     * @returns {boolean}
-     */
-  }, {
-    key: 'canRedo',
-    value: function canRedo() {
-      return this._redos.length !== 0;
-    }
-
-    /**
-     * Indicates whether or not this manager is currently processing an undo.
-     *
-     * @returns {boolean}
-     */
-  }, {
-    key: 'isUndoing',
-    value: function isUndoing() {
-      return this._isUndoing;
-    }
-
-    /**
-     * Indicates whether or not this manager is currently processing a redo.
-     *
-     * @returns {boolean}
-     */
-  }, {
-    key: 'isRedoing',
-    value: function isRedoing() {
-      return this._isRedoing;
-    }
-
-    /**
-     * Manually registers an simple undo action with the given args.
-     *
-     * If this undo manager is currently undoing then this will register a redo
-     * action instead. If this undo manager is neither undoing or redoing then the
-     * redo stack will be cleared.
-     *
-     * @param {Object} target call `selector` on this object
-     * @param {string} selector the method name to call on `target`
-     * @param {...Object} args arguments to pass when calling `selector` on `target`
-     */
-  }, {
-    key: 'registerUndo',
-    value: function registerUndo(target, selector) {
-      for (var _len = arguments.length, args = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
-        args[_key - 2] = arguments[_key];
-      }
-
-      if (this._isUndoing) {
-        this._appendRedo.apply(this, [target, selector].concat(args));
-      } else {
-        if (!this._isRedoing) {
-          this._redos.length = 0;
-        }
-        this._appendUndo.apply(this, [target, selector].concat(args));
-      }
-    }
-
-    /**
-     * Appends an undo action to the internal stack.
-     *
-     * @param {Object} target call `selector` on this object
-     * @param {string} selector the method name to call on `target`
-     * @param {...Object} args arguments to pass when calling `selector` on `target`
-     * @private
-     */
-  }, {
-    key: '_appendUndo',
-    value: function _appendUndo(target, selector) {
-      for (var _len2 = arguments.length, args = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
-        args[_key2 - 2] = arguments[_key2];
-      }
-
-      this._undos.push({
-        target: target,
-        selector: selector,
-        args: args
-      });
-    }
-
-    /**
-     * Appends a redo action to the internal stack.
-     *
-     * @param {Object} target call `selector` on this object
-     * @param {string} selector the method name to call on `target`
-     * @param {...Object} args arguments to pass when calling `selector` on `target`
-     * @private
-     */
-  }, {
-    key: '_appendRedo',
-    value: function _appendRedo(target, selector) {
-      for (var _len3 = arguments.length, args = Array(_len3 > 2 ? _len3 - 2 : 0), _key3 = 2; _key3 < _len3; _key3++) {
-        args[_key3 - 2] = arguments[_key3];
-      }
-
-      this._redos.push({
-        target: target,
-        selector: selector,
-        args: args
-      });
-    }
-
-    /**
-     * Performs the top-most undo action on the stack.
-     *
-     * @throws {Error} Raises an error if there are no available undo actions.
-     */
-  }, {
-    key: 'undo',
-    value: function undo() {
-      if (!this.canUndo()) {
-        throw new Error('there are no registered undos');
-      }
-      var data = this._undos.pop();
-      var target = data.target;
-      var selector = data.selector;
-      var args = data.args;
-      this._isUndoing = true;
-      target[selector].apply(target, args);
-      this._isUndoing = false;
-    }
-
-    /**
-     * Performs the top-most redo action on the stack.
-     *
-     * @throws {Error} Raises an error if there are no available redo actions.
-     */
-  }, {
-    key: 'redo',
-    value: function redo() {
-      if (!this.canRedo()) {
-        throw new Error('there are no registered redos');
-      }
-      var data = this._redos.pop();
-      var target = data.target;
-      var selector = data.selector;
-      var args = data.args;
-      this._isRedoing = true;
-      target[selector].apply(target, args);
-      this._isRedoing = false;
-    }
-
-    /**
-     * Returns a proxy object based on target that will register undo/redo actions
-     * by calling methods on the proxy.
-     *
-     * @example
-     *     setSize(size) {
-     *       this.undoManager.proxyFor(this).setSize(this._size);
-     *       this._size = size;
-     *     }
-     *
-     * @param {Object} target call `selector` on this object
-     * @returns {Object}
-     */
-  }, {
-    key: 'proxyFor',
-    value: function proxyFor(target) {
-      var proxy = {};
-      var self = this;
-
-      function proxyMethod(selector) {
-        return function () {
-          for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-            args[_key4] = arguments[_key4];
-          }
-
-          self.registerUndo.apply(self, [target, selector].concat(args));
-        };
-      }
-
-      (0, _utils.getAllPropertyNames)(target).forEach(function (selector) {
-        // don't trigger anything that has a getter
-        if ((0, _utils.hasGetter)(target, selector)) {
-          return;
-        }
-
-        // don't try to proxy properties that aren't functions
-        if (typeof target[selector] !== 'function') {
-          return;
-        }
-
-        // set up a proxy function to register an undo
-        proxy[selector] = proxyMethod(selector);
-      });
-
-      return proxy;
-    }
-  }]);
-
-  return UndoManager;
-})();
-
-exports['default'] = UndoManager;
-module.exports = exports['default'];
-
-},{"./utils":22}],22:[function(_dereq_,module,exports){
-/**
- * @const
- * @private
- */
-'use strict';
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-exports.isDigits = isDigits;
-exports.startsWith = startsWith;
-exports.endsWith = endsWith;
-exports.zpad = zpad;
-exports.zpad2 = zpad2;
-exports.bind = bind;
-exports.replaceStringSelection = replaceStringSelection;
-exports.forEach = forEach;
-exports.hasGetter = hasGetter;
-exports.getAllPropertyNames = getAllPropertyNames;
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
-
-var DIGITS_PATTERN = /^\d*$/;
-
-/**
- * @const
- * @private
- */
-var SURROUNDING_SPACE_PATTERN = /(^\s+|\s+$)/;
-
-/**
- * @param {string} string
- * @returns {boolean}
- */
-
-function isDigits(string) {
-  return DIGITS_PATTERN.test(string);
-}
-
-/**
- * @param {string} prefix
- * @param {string} string
- * @returns {boolean}
- */
-
-function startsWith(prefix, string) {
-  return string.slice(0, prefix.length) === prefix;
-}
-
-/**
- * @param {string} suffix
- * @param {string} string
- * @returns {boolean}
- */
-
-function endsWith(suffix, string) {
-  return string.slice(string.length - suffix.length) === suffix;
-}
-
-/**
- * @param {string} string
- * @returns {string}
- */
-var trim = typeof ''.trim === 'function' ? function (string) {
-  return string.trim();
-} : function (string) {
-  return string.replace(SURROUNDING_SPACE_PATTERN, '');
-};
-
-exports.trim = trim;
-/**
- * Will pad n with `0` up until length.
- *
- * @example
- *     zpad(16, '1234');
- *     // => 0000000000001234
- *
- * @param {number} length
- * @param {(string|number)} n
- * @returns {string}
- */
-
-function zpad(length, n) {
-  var result = '' + n;
-  while (result.length < length) {
-    result = '0' + result;
-  }
-  return result;
-}
-
-/**
- * Will pad n with `0` up until length is 2.
- *
- * @example
- *     zpad2('2');
- *     // => 02
- *
- * @param {(string|number)} n
- * @returns {string}
- */
-
-function zpad2(n) {
-  return zpad(2, n);
-}
-
-/**
- * PhantomJS 1.9 does not have Function.bind.
- *
- * @param {Function} fn
- * @param {*} context
- * @returns {*}
- */
-
-function bind(fn, context) {
-  return fn.bind(context);
-}
-
-if (!Function.prototype.bind) {
-  Function.prototype.bind = function (context) {
-    for (var _len = arguments.length, prependedArgs = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      prependedArgs[_key - 1] = arguments[_key];
-    }
-
-    var self = this;
-    return function () {
-      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        args[_key2] = arguments[_key2];
-      }
-
-      return self.apply(context, prependedArgs.concat(args));
-    };
-  };
-}
-
-/**
- * Replaces the characters within the selection with given text.
- *
- * @example
- *     // 12|34567|8
- *     replaceStringSelection('12345678', '00', { start: 2, length: 5 });
- *     // 12|00|8
- *
- * @param   {string} replacement
- * @param   {string} text
- * @param   {object} {start: number, length: number}
- * @returns {string}
- */
-
-function replaceStringSelection(replacement, text, range) {
-  var end = range.start + range.length;
-  return text.substring(0, range.start) + replacement + text.substring(end);
-}
-
-var hasOwnProp = Object.prototype.hasOwnProperty;
-/**
- * @param {*} iterable
- * @param {Function} iterator
- */
-
-function forEach(iterable, iterator) {
-  if (iterable && typeof iterable.forEach === 'function') {
-    iterable.forEach(iterator);
-  } else if (({}).toString.call(iterable) === '[object Array]') {
-    for (var i = 0, l = iterable.length; i < l; i++) {
-      iterator.call(null, iterable[i], i, iterable);
-    }
-  } else {
-    for (var key in iterable) {
-      if (hasOwnProp.call(iterable, key)) {
-        iterator.call(null, iterable[key], key, iterable);
-      }
-    }
-  }
-}
-
-var getOwnPropertyNames = (function () {
-  var getOwnPropertyNames = Object.getOwnPropertyNames;
-
-  try {
-    Object.getOwnPropertyNames({}, 'sq');
-  } catch (e) {
-    // IE 8
-    getOwnPropertyNames = function (object) {
-      var result = [];
-      for (var key in object) {
-        if (hasOwnProp.call(object, key)) {
-          result.push(key);
-        }
-      }
-      return result;
-    };
-  }
-
-  return getOwnPropertyNames;
-})();
-
-var getPrototypeOf = Object.getPrototypeOf || function (object) {
-  return object.__proto__;
-};
-/**
- * @param {Object} object
- * @param {string} property
- * @returns {boolean}
- */
-
-function hasGetter(object, property) {
-  // Skip if getOwnPropertyDescriptor throws (IE8)
-  try {
-    Object.getOwnPropertyDescriptor({}, 'sq');
-  } catch (e) {
-    return false;
-  }
-
-  var descriptor = undefined;
-
-  if (object && object.constructor && object.constructor.prototype) {
-    descriptor = Object.getOwnPropertyDescriptor(object.constructor.prototype, property);
-  }
-
-  if (!descriptor) {
-    descriptor = Object.getOwnPropertyDescriptor(object, property);
-  }
-
-  if (descriptor && descriptor.get) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
-/**
- * @param {Object} object
- * @returns {?string[]}
- */
-
-function getAllPropertyNames(object) {
-  if (object === null || object === undefined) {
-    return [];
-  }
-
-  var result = getOwnPropertyNames(object);
-
-  var prototype = object.constructor && object.constructor.prototype;
-  while (prototype) {
-    result.push.apply(result, _toConsumableArray(getOwnPropertyNames(prototype)));
-    prototype = getPrototypeOf(prototype);
-  }
-
-  return result;
-}
-
+<<<<<<< HEAD
 },{}]},{},[15])(15)
+||||||| merged common ancestors
+},{}]},{},[16])(16)
+=======
+},{"./delimited_text_formatter":14}]},{},[18])(18)
+>>>>>>> add failing test cases for issue #53
 });
 //# sourceMappingURL=field-kit.js.map
