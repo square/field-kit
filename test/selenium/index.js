@@ -55,7 +55,7 @@ test.describe('FieldKit Selenium Test', function() {
       cardTextFieldTest();
       defaultCardFormatterTest();
       delimitedTextFormatterTest();
-      expiryDateFormatterTest();
+      expiryDateFormatterTest(ua);
       phoneFormatterTest();
       socialSecurityNumberFormatterTest();
       textFieldTest();

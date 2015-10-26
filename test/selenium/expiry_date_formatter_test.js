@@ -6,7 +6,7 @@ var expect = require('chai').expect;
 var server = require('./server');
 var helpers = require('./helpers');
 
-module.exports = function() {
+module.exports = function(ua) {
   test.describe('FieldKit.ExpiryDateFormatter', function() {
     var input;
     test.beforeEach(function() {
@@ -169,5 +169,22 @@ module.exports = function() {
             });
         });
     });
+
+    if(ua === 'DEFAULT') {
+      test.it('full selecting and typing', function() {
+        helpers.setInput('12/12', input);
+        var element = 'window.testField.element';
+
+        return driver.executeScript(element + '.selectionStart = 0; ' + element + '.selectionEnd = 7;')
+          .then(function() {
+            input.sendKeys('444');
+
+            return helpers.getFieldKitValues()
+              .then(function(values) {
+                expect(values.raw).to.equal('04/44');
+              });
+          });
+      });
+    }
   });
 };
