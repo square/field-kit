@@ -91,23 +91,25 @@ class ExpiryDateFormatter extends DelimitedTextFormatter {
     const isBackspace = change.proposed.text.length < change.current.text.length;
     let newText = change.proposed.text;
 
-    if (isBackspace) {
-      if (change.deleted.text === this.delimiter) {
-        newText = newText[0];
-      }
-      if (newText === '0') {
-        newText = '';
-      }
-      if (change.inserted.text.length > 0 && !/^\d$/.test(change.inserted.text)) {
-        error('expiry-date-formatter.only-digits-allowed');
-        return false;
-      }
-    } else if (change.inserted.text === this.delimiter && change.current.text === '1') {
+    if (change.inserted.text === this.delimiter && change.current.text === '1') {
       newText = '01' + this.delimiter;
     } else if (change.inserted.text.length > 0 && !/^\d$/.test(change.inserted.text)) {
       error('expiry-date-formatter.only-digits-allowed');
       return false;
     } else {
+      if (isBackspace) {
+        if (change.deleted.text === this.delimiter) {
+          newText = newText[0];
+        }
+        if (newText === '0') {
+          newText = '';
+        }
+        if (change.inserted.text.length > 0 && !/^\d$/.test(change.inserted.text)) {
+          error('expiry-date-formatter.only-digits-allowed');
+          return false;
+        }
+      }
+
       // 4| -> 04|
       if (/^[2-9]$/.test(newText)) {
         newText = '0' + newText;
