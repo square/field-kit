@@ -3174,23 +3174,25 @@ var ExpiryDateFormatter = (function (_DelimitedTextFormatter) {
       var isBackspace = change.proposed.text.length < change.current.text.length;
       var newText = change.proposed.text;
 
-      if (isBackspace) {
-        if (change.deleted.text === this.delimiter) {
-          newText = newText[0];
-        }
-        if (newText === '0') {
-          newText = '';
-        }
-        if (change.inserted.text.length > 0 && !/^\d$/.test(change.inserted.text)) {
-          error('expiry-date-formatter.only-digits-allowed');
-          return false;
-        }
-      } else if (change.inserted.text === this.delimiter && change.current.text === '1') {
+      if (change.inserted.text === this.delimiter && change.current.text === '1') {
         newText = '01' + this.delimiter;
       } else if (change.inserted.text.length > 0 && !/^\d$/.test(change.inserted.text)) {
         error('expiry-date-formatter.only-digits-allowed');
         return false;
       } else {
+        if (isBackspace) {
+          if (change.deleted.text === this.delimiter) {
+            newText = newText[0];
+          }
+          if (newText === '0') {
+            newText = '';
+          }
+          if (change.inserted.text.length > 0 && !/^\d$/.test(change.inserted.text)) {
+            error('expiry-date-formatter.only-digits-allowed');
+            return false;
+          }
+        }
+
         // 4| -> 04|
         if (/^[2-9]$/.test(newText)) {
           newText = '0' + newText;
@@ -6448,6 +6450,7 @@ var _delimited_text_formatter2 = _interopRequireDefault(_delimited_text_formatte
  * @private
  */
 var NANPPhoneDelimiters = {
+  name: 'NANPPhoneDelimiters',
   0: '(',
   4: ')',
   5: ' ',
@@ -6459,6 +6462,7 @@ var NANPPhoneDelimiters = {
  * @private
  */
 var NANPPhoneDelimitersWithOne = {
+  name: 'NANPPhoneDelimitersWithOne',
   1: ' ',
   2: '(',
   6: ')',
@@ -6471,6 +6475,7 @@ var NANPPhoneDelimitersWithOne = {
  * @private
  */
 var NANPPhoneDelimitersWithPlus = {
+  name: 'NANPPhoneDelimitersWithPlus',
   2: ' ',
   3: '(',
   7: ')',
@@ -6636,7 +6641,13 @@ var PhoneFormatter = (function (_DelimitedTextFormatter) {
       }
 
       if (/^\d*$/.test(change.inserted.text) || change.proposed.text.indexOf('+') === 0) {
-        return _get(Object.getPrototypeOf(PhoneFormatter.prototype), 'isChangeValid', this).call(this, change, error);
+        // We need to store the change and current format guess so that if the isChangeValid
+        // call to super changes the proposed text such that the format we thought is no longer
+        // valid. If that does happen we actually just rerun it through with the correct format
+        var _isChangeValid = _get(Object.getPrototypeOf(PhoneFormatter.prototype), 'isChangeValid', this).call(this, change, error);
+        var formatName = this.delimiterMap.name;
+        this.guessFormatFromText(change.proposed.text);
+        return formatName === this.delimiterMap.name ? _isChangeValid : _get(Object.getPrototypeOf(PhoneFormatter.prototype), 'isChangeValid', this).call(this, change, error);
       } else {
         return false;
       }
@@ -6658,6 +6669,9 @@ var PhoneFormatter = (function (_DelimitedTextFormatter) {
       } else if (text && text[0] === '1') {
         this.delimiterMap = NANPPhoneDelimitersWithOne;
         this.maximumLength = 1 + 10 + 5;
+      } else if (text && text[0] === ' ') {
+        this.delimiterMap = NANPPhoneDelimiters;
+        this.maximumLength = 10 + 5;
       } else {
         this.delimiterMap = NANPPhoneDelimiters;
         this.maximumLength = 10 + 4;
