@@ -21,6 +21,9 @@ testsWithAllKeyboards('FieldKit.PhoneFormatter', function() {
     expect(formatter.format('4155551234')).to.equal('(415) 555-1234');
     expect(formatter.format('14155551234')).to.equal('1 (415) 555-1234');
     expect(formatter.format('+14155551234')).to.equal('+1 (415) 555-1234');
+    expect(formatter.format('+73213433555')).to.equal('+7 (321) 343-3555');
+    expect(formatter.format('+543213433555')).to.equal('+54 (321) 343-3555');
+    expect(formatter.format('+2323213433555')).to.equal('+232 (321) 343-3555');
     expect(formatter.format('1-415-555-1234')).to.equal('1 (415) 555-1234');
     expect(formatter.format('1 (415) 555 1234')).to.equal('1 (415) 555-1234');
     expect(formatter.format('1 (415) 555-1234')).to.equal('1 (415) 555-1234');
@@ -179,6 +182,68 @@ testsWithAllKeyboards('FieldKit.PhoneFormatter', function() {
       expectThatTyping('backspace').into(field).willChange('+1 (31|').to('+1 (3|');
       expectThatTyping('backspace').into(field).willChange('+1 (3|').to('+1 (|');
       expectThatTyping('backspace').into(field).willChange('+1 (|').to('+|');
+      expectThatTyping('backspace').into(field).willChange('+|').to('|');
+    });
+
+    it('can enter and delete an 12-digit number with a leading +54', function() {
+      expectThatTyping('+').into(field).willChange('|').to('+|');
+      expectThatTyping('5').into(field).willChange('+|').to('+5|');
+      expectThatTyping('4').into(field).willChange('+5|').to('+54 (|');
+      expectThatTyping('3').into(field).willChange('+54 (|').to('+54 (3|');
+      expectThatTyping('1').into(field).willChange('+54 (3|').to('+54 (31|');
+      expectThatTyping('4').into(field).willChange('+54 (31|').to('+54 (314) |');
+      expectThatTyping('5').into(field).willChange('+54 (314) |').to('+54 (314) 5|');
+      expectThatTyping('5').into(field).willChange('+54 (314) 5|').to('+54 (314) 55|');
+      expectThatTyping('5').into(field).willChange('+54 (314) 55|').to('+54 (314) 555-|');
+      expectThatTyping('1').into(field).willChange('+54 (314) 555-|').to('+54 (314) 555-1|');
+      expectThatTyping('2').into(field).willChange('+54 (314) 555-1|').to('+54 (314) 555-12|');
+      expectThatTyping('3').into(field).willChange('+54 (314) 555-12|').to('+54 (314) 555-123|');
+      expectThatTyping('4').into(field).willChange('+54 (314) 555-123|').to('+54 (314) 555-1234|');
+
+      expectThatTyping('backspace').into(field).willChange('+54 (314) 555-1234|').to('+54 (314) 555-123|');
+      expectThatTyping('backspace').into(field).willChange('+54 (314) 555-123|').to('+54 (314) 555-12|');
+      expectThatTyping('backspace').into(field).willChange('+54 (314) 555-12|').to('+54 (314) 555-1|');
+      expectThatTyping('backspace').into(field).willChange('+54 (314) 555-1|').to('+54 (314) 555-|');
+      expectThatTyping('backspace').into(field).willChange('+54 (314) 555-|').to('+54 (314) 55|');
+      expectThatTyping('backspace').into(field).willChange('+54 (314) 55|').to('+54 (314) 5|');
+      expectThatTyping('backspace').into(field).willChange('+54 (314) 5|').to('+54 (314) |');
+      expectThatTyping('backspace').into(field).willChange('+54 (314) |').to('+54 (31|');
+      expectThatTyping('backspace').into(field).willChange('+54 (31|').to('+54 (3|');
+      expectThatTyping('backspace').into(field).willChange('+54 (3|').to('+54 (|');
+      expectThatTyping('backspace').into(field).willChange('+54 (|').to('+5|');
+      expectThatTyping('backspace').into(field).willChange('+5|').to('+|');
+      expectThatTyping('backspace').into(field).willChange('+|').to('|');
+    });
+
+    it('can enter and delete an 13-digit number with a leading +854', function() {
+      expectThatTyping('+').into(field).willChange('|').to('+|');
+      expectThatTyping('8').into(field).willChange('+|').to('+8|');
+      expectThatTyping('5').into(field).willChange('+8|').to('+85|');
+      expectThatTyping('4').into(field).willChange('+85|').to('+854 (|');
+      expectThatTyping('3').into(field).willChange('+854 (|').to('+854 (3|');
+      expectThatTyping('1').into(field).willChange('+854 (3|').to('+854 (31|');
+      expectThatTyping('4').into(field).willChange('+854 (31|').to('+854 (314) |');
+      expectThatTyping('5').into(field).willChange('+854 (314) |').to('+854 (314) 5|');
+      expectThatTyping('5').into(field).willChange('+854 (314) 5|').to('+854 (314) 55|');
+      expectThatTyping('5').into(field).willChange('+854 (314) 55|').to('+854 (314) 555-|');
+      expectThatTyping('1').into(field).willChange('+854 (314) 555-|').to('+854 (314) 555-1|');
+      expectThatTyping('2').into(field).willChange('+854 (314) 555-1|').to('+854 (314) 555-12|');
+      expectThatTyping('3').into(field).willChange('+854 (314) 555-12|').to('+854 (314) 555-123|');
+      expectThatTyping('4').into(field).willChange('+854 (314) 555-123|').to('+854 (314) 555-1234|');
+
+      expectThatTyping('backspace').into(field).willChange('+854 (314) 555-1234|').to('+854 (314) 555-123|');
+      expectThatTyping('backspace').into(field).willChange('+854 (314) 555-123|').to('+854 (314) 555-12|');
+      expectThatTyping('backspace').into(field).willChange('+854 (314) 555-12|').to('+854 (314) 555-1|');
+      expectThatTyping('backspace').into(field).willChange('+854 (314) 555-1|').to('+854 (314) 555-|');
+      expectThatTyping('backspace').into(field).willChange('+854 (314) 555-|').to('+854 (314) 55|');
+      expectThatTyping('backspace').into(field).willChange('+854 (314) 55|').to('+854 (314) 5|');
+      expectThatTyping('backspace').into(field).willChange('+854 (314) 5|').to('+854 (314) |');
+      expectThatTyping('backspace').into(field).willChange('+854 (314) |').to('+854 (31|');
+      expectThatTyping('backspace').into(field).willChange('+854 (31|').to('+854 (3|');
+      expectThatTyping('backspace').into(field).willChange('+854 (3|').to('+854 (|');
+      expectThatTyping('backspace').into(field).willChange('+854 (|').to('+85|');
+      expectThatTyping('backspace').into(field).willChange('+85|').to('+8|');
+      expectThatTyping('backspace').into(field).willChange('+8|').to('+|');
       expectThatTyping('backspace').into(field).willChange('+|').to('|');
     });
 

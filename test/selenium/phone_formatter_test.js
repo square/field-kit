@@ -151,6 +151,21 @@ module.exports = function(ua) {
     if(ua === 'DEFAULT') {
       describe('deletes the correct character', function() {
         test.it('deleting the country code', function() {
+          helpers.setInput('+1 (234) 567-8910', input);
+          var element = 'window.testField.element';
+
+          return driver.executeScript('return ' + element + '.selectionStart = ' + element + '.selectionEnd = 4')
+            .then(function() {
+              input.sendKeys(Key.BACK_SPACE);
+
+              return helpers.getFieldKitValues()
+                .then(function(values) {
+                  expect(values.raw).to.equal('+234 (567) 891-0');
+                });
+            });
+        });
+
+        test.it('deleting the country code', function() {
           helpers.setInput('1 (888) 888-8888', input);
           var element = 'window.testField.element';
 
