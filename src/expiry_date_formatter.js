@@ -47,11 +47,29 @@ class ExpiryDateFormatter extends DelimitedTextFormatter {
    */
   format(value) {
     if (!value) { return ''; }
+    if (typeof value === 'string') {
+      let [month = '', year = ''] = value.split(this.delimiter);
 
-    let {month, year} = value;
-    year = year % 100;
+      if (month.length > 2) {
+        year = typeof year === 'undefined' ? month.slice(2) :
+          month.slice(2) + year;
+        month = month.slice(0,2);
+      }
 
-    return super.format(zpad2(month) + zpad2(year));
+      // If it looks like a valid 4 digit year
+      if (year.length === 4 && /^(19|20)\d{2}$/.test(year)) {
+        year = year.slice(2);
+      } else if (year.length > 2) {
+        year = year.slice(0,2);
+      }
+
+      return super.format(zpad2(month) + year);
+    } else {
+      let {month, year} = value;
+      year = year % 100;
+
+      return super.format(zpad2(month) + zpad2(year));
+    }
   }
 
   /**
@@ -104,10 +122,6 @@ class ExpiryDateFormatter extends DelimitedTextFormatter {
         if (newText === '0') {
           newText = '';
         }
-        if (change.inserted.text.length > 0 && !/^\d$/.test(change.inserted.text)) {
-          error('expiry-date-formatter.only-digits-allowed');
-          return false;
-        }
       }
 
       // 4| -> 04|
@@ -116,7 +130,7 @@ class ExpiryDateFormatter extends DelimitedTextFormatter {
       }
 
       // 15| -> 1|
-      if (/^1[3-9]$/.test(newText)) {
+      if (/^1[3-9].*$/.test(newText)) {
         error('expiry-date-formatter.invalid-month');
         return false;
       }
@@ -130,6 +144,12 @@ class ExpiryDateFormatter extends DelimitedTextFormatter {
       // 11| -> 11/
       if (/^(0[1-9]|1[0-2])$/.test(newText)) {
         newText += this.delimiter;
+      }
+
+      // 103 -> 10/3
+      if (newText.length > 2 && !new RegExp('^\\d\\d' + this.delimiter + '(\\d)*').test(newText)) {
+        newText = newText.replace(this.delimiter, '');
+        newText = this.format(newText);
       }
 
       const match = newText.match(/^(\d\d)(.)(\d\d?).*$/);

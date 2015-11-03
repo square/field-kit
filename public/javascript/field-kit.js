@@ -3048,6 +3048,8 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
+var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
+
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
@@ -3122,13 +3124,37 @@ var ExpiryDateFormatter = (function (_DelimitedTextFormatter) {
       if (!value) {
         return '';
       }
+      if (typeof value === 'string') {
+        var _value$split = value.split(this.delimiter);
 
-      var month = value.month;
-      var year = value.year;
+        var _value$split2 = _slicedToArray(_value$split, 2);
 
-      year = year % 100;
+        var _value$split2$0 = _value$split2[0];
+        var month = _value$split2$0 === undefined ? '' : _value$split2$0;
+        var _value$split2$1 = _value$split2[1];
+        var year = _value$split2$1 === undefined ? '' : _value$split2$1;
 
-      return _get(Object.getPrototypeOf(ExpiryDateFormatter.prototype), 'format', this).call(this, (0, _utils.zpad2)(month) + (0, _utils.zpad2)(year));
+        if (month.length > 2) {
+          year = typeof year === 'undefined' ? month.slice(2) : month.slice(2) + year;
+          month = month.slice(0, 2);
+        }
+
+        // If it looks like a valid 4 digit year
+        if (year.length === 4 && /^(19|20)\d{2}$/.test(year)) {
+          year = year.slice(2);
+        } else if (year.length > 2) {
+          year = year.slice(0, 2);
+        }
+
+        return _get(Object.getPrototypeOf(ExpiryDateFormatter.prototype), 'format', this).call(this, (0, _utils.zpad2)(month) + year);
+      } else {
+        var month = value.month;
+        var year = value.year;
+
+        year = year % 100;
+
+        return _get(Object.getPrototypeOf(ExpiryDateFormatter.prototype), 'format', this).call(this, (0, _utils.zpad2)(month) + (0, _utils.zpad2)(year));
+      }
     }
 
     /**
@@ -3187,10 +3213,6 @@ var ExpiryDateFormatter = (function (_DelimitedTextFormatter) {
           if (newText === '0') {
             newText = '';
           }
-          if (change.inserted.text.length > 0 && !/^\d$/.test(change.inserted.text)) {
-            error('expiry-date-formatter.only-digits-allowed');
-            return false;
-          }
         }
 
         // 4| -> 04|
@@ -3199,7 +3221,7 @@ var ExpiryDateFormatter = (function (_DelimitedTextFormatter) {
         }
 
         // 15| -> 1|
-        if (/^1[3-9]$/.test(newText)) {
+        if (/^1[3-9].*$/.test(newText)) {
           error('expiry-date-formatter.invalid-month');
           return false;
         }
@@ -3213,6 +3235,12 @@ var ExpiryDateFormatter = (function (_DelimitedTextFormatter) {
         // 11| -> 11/
         if (/^(0[1-9]|1[0-2])$/.test(newText)) {
           newText += this.delimiter;
+        }
+
+        // 103 -> 10/3
+        if (newText.length > 2 && !new RegExp('^\\d\\d' + this.delimiter + '(\\d)*').test(newText)) {
+          newText = newText.replace(this.delimiter, '');
+          newText = this.format(newText);
         }
 
         var match = newText.match(/^(\d\d)(.)(\d\d?).*$/);
