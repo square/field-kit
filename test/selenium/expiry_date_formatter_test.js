@@ -185,6 +185,36 @@ module.exports = function(ua) {
               });
           });
       });
+
+      test.it('part selecting and typing a nonvalid month', function() {
+        helpers.setInput('12/12', input);
+        var element = 'window.testField.element';
+
+        return driver.executeScript(element + '.selectionStart = 1; ' + element + '.selectionEnd = 4;')
+          .then(function() {
+            input.sendKeys('444');
+
+            return helpers.getFieldKitValues()
+              .then(function(values) {
+                expect(values.raw).to.equal('12/12');
+              });
+          });
+      });
+
+      test.it('part selecting and typing a valid month', function() {
+        helpers.setInput('12/12', input);
+        var element = 'window.testField.element';
+
+        return driver.executeScript(element + '.selectionStart = 1; ' + element + '.selectionEnd = 4;')
+          .then(function() {
+            input.sendKeys('0');
+
+            return helpers.getFieldKitValues()
+              .then(function(values) {
+                expect(values.raw).to.equal('10/2');
+              });
+          });
+      });
     }
   });
 };
