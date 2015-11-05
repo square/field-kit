@@ -71,6 +71,52 @@ testsWithAllKeyboards('FieldKit.ExpiryDateFormatter', function() {
     expect(textFieldDidFailToParseString.firstCall.args).to.eql([field, 'abc', 'expiry-date-formatter.invalid-date']);
   });
 
+  describe('#format', function() {
+    describe('formats object into string date', function() {
+      it('with one digit month', function() {
+        expect(formatter.format({month: 9, year: 1999})).to.eql('09/99');
+      });
+
+      it('with two digit month', function() {
+        expect(formatter.format({month: 11, year: 1999})).to.eql('11/99');
+      });
+
+      it('with two digit year', function() {
+        expect(formatter.format({month: 9, year: 99})).to.eql('09/99');
+      });
+
+      it('with one digit year', function() {
+        expect(formatter.format({month: 9, year: 9})).to.eql('09/09');
+      });
+    });
+
+    describe('formats string into string date', function() {
+      it('with one digit month', function() {
+        expect(formatter.format('9/99')).to.eql('09/99');
+      });
+
+      it('with two digit month', function() {
+        expect(formatter.format('11/99')).to.eql('11/99');
+      });
+
+      it('with three digit month', function() {
+        expect(formatter.format('119/9')).to.eql('11/99');
+      });
+
+      it('with no delimiter', function() {
+        expect(formatter.format('1199')).to.eql('11/99');
+      });
+
+      it('with no year', function() {
+        expect(formatter.format('11')).to.eql('11/');
+      });
+
+      it('with four digit year', function() {
+        expect(formatter.format('11/2018')).to.eql('11/18');
+      });
+    });
+  });
+
   describe('#parse', function() {
     var clock;
 
