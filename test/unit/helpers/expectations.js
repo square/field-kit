@@ -109,6 +109,10 @@ class FieldExpectationBase {
         value: this.field.element.value
       });
 
+    if (this.expectedDescription.indexOf('|') < 0) {
+      actual = actual.replace('|', '');
+    }
+
     expect(actual).to.equal(this.expectedDescription);
   }
 
