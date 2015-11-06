@@ -36,7 +36,7 @@ testsWithAllKeyboards('FieldKit.ExpiryDateFormatter', function() {
   });
 
   it('prevents entry of an invalid two-digit month', function() {
-    expectThatTyping('3').into(field).willNotChange('1|');
+    expectThatTyping('3').into(field).willChange('1|1/5').to('11/5');
   });
 
   it('prevents entry of an additional slash', function() {

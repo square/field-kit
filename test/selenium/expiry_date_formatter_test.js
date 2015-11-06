@@ -80,17 +80,6 @@ module.exports = function(ua) {
         });
     });
 
-    test.it('prevents entry of an invalid two-digit month', function() {
-      helpers.setInput('1|', input);
-
-      input.sendKeys('3');
-
-      return helpers.getFieldKitValues()
-        .then(function(values) {
-          expect(values.raw).to.equal('1');
-        });
-    });
-
     test.it('prevents entry of an additional slash', function() {
       helpers.setInput('11/|', input);
 
@@ -170,7 +159,32 @@ module.exports = function(ua) {
         });
     });
 
+    test.it('typing a 1 then starting year should add the prefixing 0', function() {
+      helpers.setInput('1|', input);
+      input.sendKeys('4');
+
+      return helpers.getFieldKitValues()
+        .then(function(values) {
+          expect(values.raw).to.equal('01/4');
+        });
+    });
+
     if(ua === 'DEFAULT') {
+      test.it('prevents entry of an invalid two-digit month', function() {
+        helpers.setInput('1|1|/4', input);
+        var element = 'window.testField.element';
+
+        return driver.executeScript(element + '.selectionStart = 1; ' + element + '.selectionEnd = 2;')
+          .then(function() {
+            input.sendKeys('3');
+
+            return helpers.getFieldKitValues()
+              .then(function(values) {
+                expect(values.raw).to.equal('11/4');
+              });
+          });
+      });
+
       test.it('full selecting and typing', function() {
         helpers.setInput('12/12', input);
         var element = 'window.testField.element';
