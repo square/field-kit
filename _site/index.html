@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width,user-scalable=no">
+
+  <title>FieldKit</title>
+
+  <link rel="stylesheet" media="screen" href="https://d1g145x70srn7h.cloudfront.net/fonts/sqmarket/sq-market.css" />
+  <link rel="stylesheet" media="screen" href="css/index.css" />
+</head>
+
+<body>
+  <nav class="links">
+    <a href="https://github.com/square/fieldkit">
+      <img src="images/icon-github.png" alt="FieldKit on GitHub" />
+    </a>
+    <a href="http://square.github.io/">
+      <img src="images/icon-square.png" alt="Square Open Source Portal" />
+    </a>
+  </nav>
+  <h1>FieldKit</h1>
+
+  <section>
+    <p>FieldKit provides real-time, text field formatting as users type. It simplifies input formatting and creates a more polished experience for users, while outputting standardized data.</p>
+  </section>
+
+  <h2>Demos</h2>
+
+  <section>
+    <h3>Credit Card Fields</h3>
+
+    <p>
+      The <code>CardTextField</code> and <code>AdaptiveCardFormatter</code> provide formatting for credit card PANs, preventing the input of non-digit characters and automatically breaking into digit groups according to the rules for the entered card type.
+    </p>
+
+    <div class="demo">
+      <table>
+        <tbody>
+        <tr>
+          <td>“411111111”</td>
+          <td>“4111 1111 1” (Visa)</td>
+        </tr>
+        <tr>
+          <td>“3725123456”</td>
+          <td>“3725 123456” (Amex)</td>
+        </tr>
+        <tr>
+          <td>“4111” + backspace</td>
+          <td>“411”</td>
+        </tr>
+        </tbody>
+      </table>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">id=</span><span class="s">"card-number"</span> <span class="na">placeholder=</span><span class="s">"1234 5678 9012 3456"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"card-type"</span><span class="nt">&gt;</span>Card type: <span class="nt">&lt;span</span> <span class="na">id=</span><span class="s">"card-type-span"</span><span class="nt">&gt;</span>Unknown<span class="nt">&lt;/span&gt;&lt;/div&gt;</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">field</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FieldKit</span><span class="p">.</span><span class="nx">CardTextField</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">'card-number'</span><span class="p">));</span>
+<span class="nx">field</span><span class="p">.</span><span class="nx">setCardMaskStrategy</span><span class="p">(</span><span class="nx">FieldKit</span><span class="p">.</span><span class="nx">CardTextField</span><span class="p">.</span><span class="nx">CardMaskStrategy</span><span class="p">.</span><span class="nx">DoneEditing</span><span class="p">);</span>
+<span class="nx">field</span><span class="p">.</span><span class="nx">setDelegate</span><span class="p">({</span>
+  <span class="na">textDidChange</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">cardTypeString</span> <span class="o">=</span> <span class="nx">field</span><span class="p">.</span><span class="nx">cardType</span><span class="p">()</span> <span class="o">||</span> <span class="s1">'unknown'</span><span class="p">;</span>
+    <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">'card-type-span'</span><span class="p">).</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">cardTypeString</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></figure>
+    </div>
+  </section>
+
+  <section>
+    <h3>NumberFormatter</h3>
+
+    <p>
+      The <code>NumberFormatter</code> provides formatting for all kinds of numbers, percentages, currencies, etc.
+    </p>
+
+    <div class="demo">
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">id=</span><span class="s">"number"</span><span class="nt">&gt;</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">field</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FieldKit</span><span class="p">.</span><span class="nx">TextField</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">'number'</span><span class="p">));</span>
+<span class="nx">field</span><span class="p">.</span><span class="nx">setFormatter</span><span class="p">(</span><span class="k">new</span> <span class="nx">FieldKit</span><span class="p">.</span><span class="nx">NumberFormatter</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">setNumberStyle</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.5</span> <span class="p">?</span>
+    <span class="nx">FieldKit</span><span class="p">.</span><span class="nx">NumberFormatter</span><span class="p">.</span><span class="nx">Style</span><span class="p">.</span><span class="nx">PERCENT</span> <span class="p">:</span>
+    <span class="nx">FieldKit</span><span class="p">.</span><span class="nx">NumberFormatter</span><span class="p">.</span><span class="nx">Style</span><span class="p">.</span><span class="nx">CURRENCY</span><span class="p">));</span>
+<span class="nx">field</span><span class="p">.</span><span class="nx">setValue</span><span class="p">((</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.5</span> <span class="p">?</span> <span class="mi">1</span> <span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">10</span><span class="p">);</span></code></pre></figure>
+    </div>
+  </section>
+
+  <section>
+    <h3>ExpiryDateField / ExpiryDateFormatter</h3>
+
+    <p>
+      The <code>ExpiryDateField</code> wraps <code>ExpiryDateFormatter</code> for credit card expiry
+      dates, preventing the input of nonsense months or non-date characters. It also adds the preceding zero and the slash between the month and year automatically, but treats them as if they are not
+      there. In order to do this predictably it forces the cursor to remain at the end of the field and prevents any kind of selection.
+    </p>
+
+    <div class="demo">
+      <table>
+        <tbody>
+          <tr>
+            <td>“4”</td>
+            <td>“04/”</td>
+          </tr>
+          <tr>
+            <td>“1212”</td>
+            <td>“12/12”</td>
+          </tr>
+          <tr>
+            <td>“12/” + backspace</td>
+            <td>“1”</td>
+          </tr>
+        </tbody>
+      </table>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">id=</span><span class="s">"expiry"</span> <span class="na">placeholder=</span><span class="s">"mm/yy"</span><span class="nt">&gt;</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">new</span> <span class="nx">FieldKit</span><span class="p">.</span><span class="nx">ExpiryDateField</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">'expiry'</span><span class="p">));</span></code></pre></figure>
+    </div>
+  </section>
+
+  <section>
+    <h3>SocialSecurityNumberFormatter</h3>
+
+    <p>
+      The <code>SocialSecurityNumberFormatter</code> provides formatting for US Social Security numbers, preventing the input of non-digit characters and automatically breaking into digit groups like <code>NNN-NN-NNNN</code>.
+    </p>
+
+    <div class="demo">
+      <table>
+        <tbody>
+          <tr>
+            <td>“1234”</td>
+            <td>“123-4”</td>
+          </tr>
+          <tr>
+            <td>“123-45-” + backspace</td>
+            <td>“123-4”</td>
+          </tr>
+        </tbody>
+      </table>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">id=</span><span class="s">"ssn"</span> <span class="na">placeholder=</span><span class="s">"123-45-6789"</span><span class="nt">&gt;</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">ssnFormatter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FieldKit</span><span class="p">.</span><span class="nx">SocialSecurityNumberFormatter</span><span class="p">();</span>
+<span class="k">new</span> <span class="nx">FieldKit</span><span class="p">.</span><span class="nx">TextField</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">'ssn'</span><span class="p">),</span> <span class="nx">ssnFormatter</span><span class="p">);</span></code></pre></figure>
+    </div>
+  </section>
+
+  <section>
+    <h3>PhoneFormatter</h3>
+
+    <p>
+      The <code>PhoneFormatter</code> provides formatting for phone numbers, preventing the input of non-digit characters and automatically formatting like <code>(NNN) NNN-NNNN</code>.
+    </p>
+
+    <div class="demo">
+      <table>
+        <tbody>
+          <tr>
+            <td>“4155”</td>
+            <td>“(415) 5”</td>
+          </tr>
+        </tbody>
+      </table>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"tel"</span> <span class="na">id=</span><span class="s">"phone"</span> <span class="na">placeholder=</span><span class="s">"(415) 555-1212"</span><span class="nt">&gt;</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">new</span> <span class="nx">FieldKit</span><span class="p">.</span><span class="nx">TextField</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">'phone'</span><span class="p">),</span> <span class="k">new</span> <span class="nx">FieldKit</span><span class="p">.</span><span class="nx">PhoneFormatter</span><span class="p">());</span></code></pre></figure>
+    </div>
+  </section>
+
+  <a id="fork-me" href="https://github.com/square/fieldkit">
+    <img src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png">
+  </a>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/field-kit/2.0.4/field-kit.js" type="text/javascript" charset="utf-8"></script>
+
+  <!-- Demo JS -->
+  <!-- This code grabs the example HTML and JavaScript and use it to build the actual demo! -->
+  <script type="text/javascript" charset="utf-8">
+    (function() {
+      var htmlCodeBlocks = document.querySelectorAll('code.language-html');
+
+      for (var i = 0; i < htmlCodeBlocks.length; ++i) {
+        var htmlCode = htmlCodeBlocks[i];
+        var container = htmlCode.parentNode.parentNode.parentNode; // gets containing .demo div
+        container.insertAdjacentHTML('afterbegin', '<div class="input-container">' + htmlCode.textContent + '</div>');
+        var jsCode = container.querySelector('code.language-javascript').textContent;
+        var fn = new Function(jsCode);
+        fn.call(this);
+      }
+    })();
+  </script>
+</body>
+</html>
