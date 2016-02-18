@@ -19,7 +19,7 @@ module.exports = function(config) {
     },
 
     eslint: {
-      stopOnError: true
+      stopOnError: false
     },
 
     browserify: {
