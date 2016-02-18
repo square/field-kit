@@ -3198,15 +3198,10 @@ var ExpiryDateFormatter = (function (_DelimitedTextFormatter) {
           newText = '0' + newText;
         }
 
-        // 1|1|/5 -> 11|/5
-        if (/^1[3-9].+$/.test(newText)) {
+        // 15| -> 1|
+        if (/^1[3-9]$/.test(newText)) {
           error('expiry-date-formatter.invalid-month');
           return false;
-        }
-
-        // 15| -> 01/5|
-        if (/^1[3-9]$/.test(newText)) {
-          newText = '01' + this.delimiter + newText.slice(-1);
         }
 
         // Don't allow 00
