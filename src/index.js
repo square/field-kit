@@ -14,6 +14,7 @@ import PhoneFormatter from './phone_formatter';
 import SocialSecurityNumberFormatter from './social_security_number_formatter';
 import TextField from './text_field';
 import UndoManager from './undo_manager';
+import ZipCodeFormatter from './zip_code_formatter';
 
 /**
  * @namespace FieldKit
@@ -43,5 +44,6 @@ module.exports = {
   PhoneFormatter: PhoneFormatter,
   SocialSecurityNumberFormatter: SocialSecurityNumberFormatter,
   TextField: TextField,
-  UndoManager: UndoManager
+  UndoManager: UndoManager,
+  ZipCodeFormatter: ZipCodeFormatter
 };
