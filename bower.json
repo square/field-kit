@@ -1,0 +1,22 @@
+{
+  "name": "field-kit",
+  "description": "Utilities to effectively manage text entry on the web.",
+  "main": "dist/field-kit.js",
+  "authors": [
+    "Square",
+    "Inc."
+  ],
+  "license": "Apache-2.0",
+  "keywords": [
+    "text-fields"
+  ],
+  "homepage": "http://square.github.io/field-kit/",
+  "moduleType": [],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
