@@ -6,7 +6,8 @@
   "jsnext:main": "src/index.js",
   "scripts": {
     "test": "gulp build && karma start --single-run && mocha --harmony -t 600000 test/selenium/index.js",
-    "prepublish": "gulp build"
+    "prepublish": "gulp build",
+    "public": "gulp build && bundle install && cd public && jekyll serve"
   },
   "author": "Square, Inc.",
   "license": "Apache-2.0",
