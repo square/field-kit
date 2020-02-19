@@ -193,6 +193,52 @@ new FieldKit.TextField(document.getElementById('phone'), new FieldKit.PhoneForma
     </div>
   </section>
 
+  <section>
+    <h3>Forms</h3>
+
+    <div class="demo">
+      <table>
+        <tbody>
+          <tr>
+            <td>“4155”</td>
+            <td>“(415) 5”</td>
+          </tr>
+        </tbody>
+      </table>
+
+{% highlight html %}
+<form id="form-test">
+  <input type="text" class="form-test" placeholder="first name">
+  <input type="text" class="form-test" placeholder="last name">
+  <input type="text" id="phone" name="phone" class="form-test" placeholder="phone">
+  <input type="text" id="cardnumber" name="cardnumber" class="form-test" placeholder="cardnumber">
+
+  <input type="submit" class="btn btn-primary">
+</form>
+{% endhighlight %}
+
+{% highlight javascript %}
+var fields = Array.prototype.filter.call(document.getElementsByClassName('form-test'), function(el) {
+ if(el.id === 'phone') return new FieldKit.TextField(el, new FieldKit.PhoneFormatter());
+ if(el.id === 'cardnumber') return new FieldKit.TextField(el, new FieldKit.AdaptiveCardFormatter());
+ return new FieldKit.TextField(el);
+});
+var form = document.getElementById('form-test'),
+ popup = function(event) {
+ event&&event.preventDefault();
+ alert('Hello, ' + fields[0].value + ' ' + fields[1].value);
+ return false;
+};
+
+if (form.addEventListener) {
+ form.addEventListener('submit', popup, false);  //Modern browsers
+} else if (form.attachEvent) {
+ form.attachEvent('onsubmit', popup);            //Old IE
+}
+{% endhighlight %}
+    </div>
+  </section>
+
   <a id="fork-me" href="https://github.com/square/fieldkit">
     <img src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png">
   </a>
