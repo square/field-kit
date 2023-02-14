@@ -1525,6 +1525,9 @@ const LocaleDefaults = {
   'en-GB': {
     negativeCurrencyPrefix: '-¤',
     negativeCurrencySuffix: ''
+  },
+  es: {
+    decimalSeparator: ',',
   }
 };
 
