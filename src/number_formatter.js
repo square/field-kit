@@ -1526,8 +1526,8 @@ const LocaleDefaults = {
     negativeCurrencyPrefix: '-¤',
     negativeCurrencySuffix: ''
   },
-  es: {
-    decimalSeparator: ',',
+  'es-ES': {
+    decimalSeparator: ','
   }
 };
 
