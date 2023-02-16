@@ -1528,7 +1528,12 @@ const LocaleDefaults = {
   },
   'es-ES': {
     decimalSeparator: ',',
-    percentSymbol: ' %'
+    groupingSeparator: ' ',
+    percentSymbol: ' %',
+    positiveCurrencyPrefix: '',
+    positiveCurrencySuffix: ' ¤',
+    negativeCurrencyPrefix: '(',
+    negativeCurrencySuffix: ' ¤)'
   }
 };
 
