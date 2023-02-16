@@ -1527,7 +1527,8 @@ const LocaleDefaults = {
     negativeCurrencySuffix: ''
   },
   'es-ES': {
-    decimalSeparator: ','
+    decimalSeparator: ',',
+    percentSymbol: ' %'
   }
 };
 
