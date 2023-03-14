@@ -976,21 +976,29 @@ class NumberFormatter extends Formatter {
       return '';
     }
 
-    let symbol;
-    if (number === 0) {
-      symbol = this.zeroSymbol();
-    } else if (number === null) {
-      symbol = this.nullSymbol();
-    } else if (isNaN(number)) {
-      symbol = this.notANumberSymbol();
-    } else if (number === Infinity) {
-      symbol = this.positiveInfinitySymbol();
-    } else if (number === -Infinity) {
-      symbol = this.negativeInfinitySymbol();
+    const zeroSymbol = this.zeroSymbol();
+    if (zeroSymbol !== undefined && zeroSymbol !== null && number === 0) {
+      return zeroSymbol;
     }
 
-    if (symbol !== undefined && symbol !== null) {
-      return symbol;
+    const nullSymbol = this.nullSymbol();
+    if (nullSymbol !== undefined && nullSymbol !== null && number === null) {
+      return nullSymbol;
+    }
+
+    const notANumberSymbol = this.notANumberSymbol();
+    if (notANumberSymbol !== undefined && notANumberSymbol !== null && isNaN(number)) {
+      return notANumberSymbol;
+    }
+
+    const positiveInfinitySymbol = this.positiveInfinitySymbol();
+    if (positiveInfinitySymbol !== undefined && positiveInfinitySymbol !== null && number === Infinity) {
+      return positiveInfinitySymbol;
+    }
+
+    const negativeInfinitySymbol = this.negativeInfinitySymbol();
+    if (negativeInfinitySymbol !== undefined && negativeInfinitySymbol !== null && number === -Infinity) {
+      return negativeInfinitySymbol;
     }
 
     let negative = number < 0;
