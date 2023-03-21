@@ -134,7 +134,6 @@ function replaceMinusSign(string, minusSign) {
 class NumberFormatter extends Formatter {
   constructor() {
     super();
-    this._defaultCache = {};
     this.setNumberStyle(NONE);
   }
 
@@ -197,7 +196,6 @@ class NumberFormatter extends Formatter {
    */
   setCountryCode(countryCode) {
     this._countryCode = countryCode;
-    this._defaultCache = {};
     return this;
   }
 
@@ -218,7 +216,6 @@ class NumberFormatter extends Formatter {
    */
   setCurrencyCode(currencyCode) {
     this._currencyCode = currencyCode;
-    this._defaultCache = {};
     return this;
   }
 
@@ -382,7 +379,6 @@ class NumberFormatter extends Formatter {
    */
   setLocale(locale) {
     this._locale = locale;
-    this._defaultCache = {};
     return this;
   }
 
@@ -916,25 +912,10 @@ class NumberFormatter extends Formatter {
    * @private
    */
   _get(attr) {
-    const attrKey = '_' + attr;
-    let value = this[attrKey];
+    let value = this['_' + attr];
     if (value !== null && value !== undefined) {
       return value;
     }
-    if (this._defaultCache[attrKey]) {
-      return this._defaultCache[attrKey];
-    }
-    let result = this.getFromDefaults(attr);
-    this._defaultCache[attrKey] = result;
-    return result;
-  }
-
-  /**
-   * @param {string} attr
-   * @returns {*}
-   * @private
-   */
-  getFromDefaults(attr) {
     const styleDefaults = this._styleDefaults;
     const localeDefaults = this._localeDefaults();
     const regionDefaults = this._regionDefaults();
@@ -995,21 +976,29 @@ class NumberFormatter extends Formatter {
       return '';
     }
 
-    let symbol;
-    if (number === 0) {
-      symbol = this.zeroSymbol();
-    } else if (number === null) {
-      symbol = this.nullSymbol();
-    } else if (isNaN(number)) {
-      symbol = this.notANumberSymbol();
-    } else if (number === Infinity) {
-      symbol = this.positiveInfinitySymbol();
-    } else if (number === -Infinity) {
-      symbol = this.negativeInfinitySymbol();
+    const zeroSymbol = this.zeroSymbol();
+    if (zeroSymbol !== undefined && zeroSymbol !== null && number === 0) {
+      return zeroSymbol;
     }
 
-    if (symbol !== undefined && symbol !== null) {
-      return symbol;
+    const nullSymbol = this.nullSymbol();
+    if (nullSymbol !== undefined && nullSymbol !== null && number === null) {
+      return nullSymbol;
+    }
+
+    const notANumberSymbol = this.notANumberSymbol();
+    if (notANumberSymbol !== undefined && notANumberSymbol !== null && isNaN(number)) {
+      return notANumberSymbol;
+    }
+
+    const positiveInfinitySymbol = this.positiveInfinitySymbol();
+    if (positiveInfinitySymbol !== undefined && positiveInfinitySymbol !== null && number === Infinity) {
+      return positiveInfinitySymbol;
+    }
+
+    const negativeInfinitySymbol = this.negativeInfinitySymbol();
+    if (negativeInfinitySymbol !== undefined && negativeInfinitySymbol !== null && number === -Infinity) {
+      return negativeInfinitySymbol;
     }
 
     let negative = number < 0;
@@ -1297,9 +1286,6 @@ class NumberFormatter extends Formatter {
    * @private
    */
   _currencyDefaults() {
-    if (this._defaultCache.currencyDefaults) {
-      return this._defaultCache.currencyDefaults;
-    }
     const result = {};
 
     forEach(CurrencyDefaults['default'], function(value, key) {
@@ -1310,7 +1296,6 @@ class NumberFormatter extends Formatter {
       result[key] = value;
     });
 
-    this._defaultCache.currencyDefaults = result;
     return result;
   }
 
@@ -1341,10 +1326,6 @@ class NumberFormatter extends Formatter {
    * @private
    */
   _localeDefaults() {
-    if (this._defaultCache.localeDefaults) {
-      return this._defaultCache.localeDefaults;
-    }
-
     const locale = this.locale();
     const countryCode = this.countryCode();
     const lang = splitLocaleComponents(locale).lang;
@@ -1364,7 +1345,6 @@ class NumberFormatter extends Formatter {
       });
     });
 
-    this._defaultCache.localeDefaults = result;
     return result;
   }
 }
@@ -1417,8 +1397,6 @@ NumberFormatter.prototype._roundingMode = null;
 NumberFormatter.prototype._usesGroupingSeparator = null;
 /** @private */
 NumberFormatter.prototype._zeroSymbol = null;
-/** @private */
-NumberFormatter.prototype._defaultCache = null;
 
 /**
  * Aliases
