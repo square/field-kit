@@ -1,4 +1,97 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.FieldKit = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = setTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    clearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        setTimeout(drainQueue, 0);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],2:[function(_dereq_,module,exports){
 (function (process){
 (function (global, factory) {
   if (typeof define === 'function' && define.amd) {
@@ -1493,193 +1586,7 @@
 
 
 }).call(this,_dereq_('_process'))
-},{"_process":2}],2:[function(_dereq_,module,exports){
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-process.prependListener = noop;
-process.prependOnceListener = noop;
-
-process.listeners = function (name) { return [] }
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],3:[function(_dereq_,module,exports){
+},{"_process":1}],3:[function(_dereq_,module,exports){
 (function (global, factory) {
   if (typeof define === 'function' && define.amd) {
     define('stround', ['exports'], factory);
@@ -3291,15 +3198,10 @@ var ExpiryDateFormatter = (function (_DelimitedTextFormatter) {
           newText = '0' + newText;
         }
 
-        // 1|1|/5 -> 11|/5
-        if (/^1[3-9].+$/.test(newText)) {
+        // 15| -> 1|
+        if (/^1[3-9]$/.test(newText)) {
           error('expiry-date-formatter.invalid-month');
           return false;
-        }
-
-        // 15| -> 01/5|
-        if (/^1[3-9]$/.test(newText)) {
-          newText = '01' + this.delimiter + newText.slice(-1);
         }
 
         // Don't allow 00
@@ -3575,15 +3477,15 @@ function splitLocaleComponents(locale) {
  */
 function get(object, key) {
   if (object) {
-    var _value = object[key];
-    if (typeof _value === 'function') {
+    var value = object[key];
+    if (typeof value === 'function') {
       for (var _len = arguments.length, args = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
         args[_key - 2] = arguments[_key];
       }
 
-      return _value.apply(undefined, args);
+      return value.apply(undefined, args);
     } else {
-      return _value;
+      return value;
     }
   }
 }
@@ -3685,7 +3587,6 @@ var NumberFormatter = (function (_Formatter) {
     _classCallCheck(this, NumberFormatter);
 
     _get(Object.getPrototypeOf(NumberFormatter.prototype), 'constructor', this).call(this);
-    this._defaultCache = {};
     this.setNumberStyle(NONE);
   }
 
@@ -3767,7 +3668,6 @@ var NumberFormatter = (function (_Formatter) {
     key: 'setCountryCode',
     value: function setCountryCode(countryCode) {
       this._countryCode = countryCode;
-      this._defaultCache = {};
       return this;
     }
 
@@ -3792,7 +3692,6 @@ var NumberFormatter = (function (_Formatter) {
     key: 'setCurrencyCode',
     value: function setCurrencyCode(currencyCode) {
       this._currencyCode = currencyCode;
-      this._defaultCache = {};
       return this;
     }
 
@@ -3989,7 +3888,6 @@ var NumberFormatter = (function (_Formatter) {
     key: 'setLocale',
     value: function setLocale(locale) {
       this._locale = locale;
-      this._defaultCache = {};
       return this;
     }
 
@@ -4587,27 +4485,10 @@ var NumberFormatter = (function (_Formatter) {
   }, {
     key: '_get',
     value: function _get(attr) {
-      var attrKey = '_' + attr;
-      var value = this[attrKey];
+      var value = this['_' + attr];
       if (value !== null && value !== undefined) {
         return value;
       }
-      if (this._defaultCache[attrKey]) {
-        return this._defaultCache[attrKey];
-      }
-      var result = this.getFromDefaults(attr);
-      this._defaultCache[attrKey] = result;
-      return result;
-    }
-
-    /**
-     * @param {string} attr
-     * @returns {*}
-     * @private
-     */
-  }, {
-    key: 'getFromDefaults',
-    value: function getFromDefaults(attr) {
       var styleDefaults = this._styleDefaults;
       var localeDefaults = this._localeDefaults();
       var regionDefaults = this._regionDefaults();
@@ -4670,21 +4551,29 @@ var NumberFormatter = (function (_Formatter) {
         return '';
       }
 
-      var symbol = undefined;
-      if (number === 0) {
-        symbol = this.zeroSymbol();
-      } else if (number === null) {
-        symbol = this.nullSymbol();
-      } else if (isNaN(number)) {
-        symbol = this.notANumberSymbol();
-      } else if (number === Infinity) {
-        symbol = this.positiveInfinitySymbol();
-      } else if (number === -Infinity) {
-        symbol = this.negativeInfinitySymbol();
+      var zeroSymbol = this.zeroSymbol();
+      if (zeroSymbol !== undefined && zeroSymbol !== null && number === 0) {
+        return zeroSymbol;
       }
 
-      if (symbol !== undefined && symbol !== null) {
-        return symbol;
+      var nullSymbol = this.nullSymbol();
+      if (nullSymbol !== undefined && nullSymbol !== null && number === null) {
+        return nullSymbol;
+      }
+
+      var notANumberSymbol = this.notANumberSymbol();
+      if (notANumberSymbol !== undefined && notANumberSymbol !== null && isNaN(number)) {
+        return notANumberSymbol;
+      }
+
+      var positiveInfinitySymbol = this.positiveInfinitySymbol();
+      if (positiveInfinitySymbol !== undefined && positiveInfinitySymbol !== null && number === Infinity) {
+        return positiveInfinitySymbol;
+      }
+
+      var negativeInfinitySymbol = this.negativeInfinitySymbol();
+      if (negativeInfinitySymbol !== undefined && negativeInfinitySymbol !== null && number === -Infinity) {
+        return negativeInfinitySymbol;
       }
 
       var negative = number < 0;
@@ -4980,9 +4869,6 @@ var NumberFormatter = (function (_Formatter) {
   }, {
     key: '_currencyDefaults',
     value: function _currencyDefaults() {
-      if (this._defaultCache.currencyDefaults) {
-        return this._defaultCache.currencyDefaults;
-      }
       var result = {};
 
       (0, _utils.forEach)(CurrencyDefaults['default'], function (value, key) {
@@ -4993,7 +4879,6 @@ var NumberFormatter = (function (_Formatter) {
         result[key] = value;
       });
 
-      this._defaultCache.currencyDefaults = result;
       return result;
     }
 
@@ -5028,10 +4913,6 @@ var NumberFormatter = (function (_Formatter) {
   }, {
     key: '_localeDefaults',
     value: function _localeDefaults() {
-      if (this._defaultCache.localeDefaults) {
-        return this._defaultCache.localeDefaults;
-      }
-
       var locale = this.locale();
       var countryCode = this.countryCode();
       var lang = splitLocaleComponents(locale).lang;
@@ -5048,7 +4929,6 @@ var NumberFormatter = (function (_Formatter) {
         });
       });
 
-      this._defaultCache.localeDefaults = result;
       return result;
     }
   }]);
@@ -5099,8 +4979,6 @@ NumberFormatter.prototype._roundingMode = null;
 NumberFormatter.prototype._usesGroupingSeparator = null;
 /** @private */
 NumberFormatter.prototype._zeroSymbol = null;
-/** @private */
-NumberFormatter.prototype._defaultCache = null;
 
 /**
  * Aliases
@@ -5211,15 +5089,6 @@ var LocaleDefaults = {
   'en-GB': {
     negativeCurrencyPrefix: '-¤',
     negativeCurrencySuffix: ''
-  },
-  'es-ES': {
-    decimalSeparator: ',',
-    groupingSeparator: ' ',
-    percentSymbol: ' %',
-    positiveCurrencyPrefix: '',
-    positiveCurrencySuffix: ' ¤',
-    negativeCurrencyPrefix: '(',
-    negativeCurrencySuffix: ' ¤)'
   }
 };
 
@@ -6605,39 +6474,13 @@ var NANPPhoneDelimitersWithOne = {
  * @const
  * @private
  */
-var E164PhoneDelimitersWithOneDigit = {
-  name: 'E164PhoneDelimitersWithOneDigit',
+var NANPPhoneDelimitersWithPlus = {
+  name: 'NANPPhoneDelimitersWithPlus',
   2: ' ',
   3: '(',
   7: ')',
   8: ' ',
   12: '-'
-};
-
-/**
- * @const
- * @private
- */
-var E164PhoneDelimitersWithTwoDigit = {
-  name: 'E164PhoneDelimitersWithTwoDigit',
-  3: ' ',
-  4: '(',
-  8: ')',
-  9: ' ',
-  13: '-'
-};
-
-/**
- * @const
- * @private
- */
-var E164PhoneDelimitersWithThreeDigit = {
-  name: 'E164PhoneDelimitersWithThreeDigit',
-  4: ' ',
-  5: '(',
-  9: ')',
-  10: ' ',
-  14: '-'
 };
 
 /**
@@ -6647,22 +6490,6 @@ var E164PhoneDelimitersWithThreeDigit = {
  * @private
  */
 var DELIMITER_PATTERN = /[-\(\) ]/g;
-
-/**
- * @const
- * @private
- */
-var DEFAULT_COUNTRY_CODE = {
-  "E164": "1",
-  "country": ["American Samoa", "Anguilla", "Antigua and Barbuda", "Bahamas", "Barbados", "Bermuda", "British Virgin Islands", "Canada", "Cayman Islands", "Dominica", "Dominican Republic", "Grenada", "Guam", "Jamaica", "Montserrat", "Northern Mariana Islands", "Puerto Rico", "Saint Kitts and Nevis", "Saint Lucia", "Saint Martin", "Saint Vincent and the Grenadines", "Sint Maarten", "Trinidad and Tobago", "Turks and Caicos Islands", "U.S. Virgin Islands", "United States"]
-};
-
-/**
- * This is an internal store for the current country
- *
- * @private
- */
-var currentCountryCode = DEFAULT_COUNTRY_CODE;
 
 /**
  * @extends DelimitedTextFormatter
@@ -6814,37 +6641,13 @@ var PhoneFormatter = (function (_DelimitedTextFormatter) {
       }
 
       if (/^\d*$/.test(change.inserted.text) || change.proposed.text.indexOf('+') === 0) {
-        var formatName = this.delimiterMap.name;
-
-        // First guess at the localized format
-        if (currentCountryCode.localizedFormat) {
-          this.delimiterMap = currentCountryCode.localizedFormat;
-          this.maximumLength = currentCountryCode.localizedFormat.maximumLength;
-          formatName = 'localized-' + currentCountryCode.E164;
-        }
-
         // We need to store the change and current format guess so that if the isChangeValid
         // call to super changes the proposed text such that the format we thought is no longer
         // valid. If that does happen we actually just rerun it through with the correct format
-        var originalProposed = change.proposed.text;
         var _isChangeValid = _get(Object.getPrototypeOf(PhoneFormatter.prototype), 'isChangeValid', this).call(this, change, error);
-
+        var formatName = this.delimiterMap.name;
         this.guessFormatFromText(change.proposed.text);
-
-        // Make sure if the localizedFormat changed, respect that
-        if (currentCountryCode.localizedFormat) {
-          this.delimiterMap = currentCountryCode.localizedFormat;
-          this.maximumLength = currentCountryCode.localizedFormat.maximumLength;
-          this.delimiterMap.name = 'localized-' + currentCountryCode.E164;
-        }
-
-        if (formatName === this.delimiterMap.name) {
-          return _isChangeValid;
-        } else {
-          var originalChange = change;
-          originalChange.proposed.text = originalProposed;
-          return _get(Object.getPrototypeOf(PhoneFormatter.prototype), 'isChangeValid', this).call(this, originalChange, error);
-        }
+        return formatName === this.delimiterMap.name ? _isChangeValid : _get(Object.getPrototypeOf(PhoneFormatter.prototype), 'isChangeValid', this).call(this, change, error);
       } else {
         return false;
       }
@@ -6860,34 +6663,9 @@ var PhoneFormatter = (function (_DelimitedTextFormatter) {
   }, {
     key: 'guessFormatFromText',
     value: function guessFormatFromText(text) {
-      currentCountryCode = DEFAULT_COUNTRY_CODE;
       if (text && text[0] === '+') {
-        if (text.length > 1) {
-          var isValidCountryCode = function isValidCountryCode(countryCode) {
-            var matchingCodes = COUNTRY_CODES.filter(function (country) {
-              return country.E164 === countryCode;
-            });
-
-            return matchingCodes.length > 0;
-          };
-
-          var rawText = this.removeDelimiterMapChars(text);
-          if (currentCountryCode = isValidCountryCode(rawText[1])) {
-            this.delimiterMap = E164PhoneDelimitersWithOneDigit;
-            this.maximumLength = 1 + 1 + 10 + 5;
-          } else if (text.length > 2 && (currentCountryCode = isValidCountryCode(rawText.slice(1, 3)))) {
-            this.delimiterMap = E164PhoneDelimitersWithTwoDigit;
-            this.maximumLength = 1 + 2 + 10 + 5;
-          } else {
-            currentCountryCode = isValidCountryCode(rawText.slice(1, 4)) || DEFAULT_COUNTRY_CODE;
-            this.delimiterMap = E164PhoneDelimitersWithThreeDigit;
-            this.maximumLength = 1 + 3 + 10 + 5;
-          }
-        } else {
-
-          this.delimiterMap = E164PhoneDelimitersWithThreeDigit;
-          this.maximumLength = 1 + 3 + 10 + 5;
-        }
+        this.delimiterMap = NANPPhoneDelimitersWithPlus;
+        this.maximumLength = 1 + 1 + 10 + 5;
       } else if (text && text[0] === '1') {
         this.delimiterMap = NANPPhoneDelimitersWithOne;
         this.maximumLength = 1 + 10 + 5;
@@ -6936,628 +6714,6 @@ var PhoneFormatter = (function (_DelimitedTextFormatter) {
   return PhoneFormatter;
 })(_delimited_text_formatter2['default']);
 
-var COUNTRY_CODES = [{
-  "E164": "93",
-  "country": "Afghanistan"
-}, {
-  "E164": "355",
-  "country": "Albania"
-}, {
-  "E164": "213",
-  "country": "Algeria"
-}, {
-  "E164": "1",
-  "country": ["American Samoa", "Anguilla", "Antigua and Barbuda", "Bahamas", "Barbados", "Bermuda", "British Virgin Islands", "Canada", "Cayman Islands", "Dominica", "Dominican Republic", "Grenada", "Guam", "Jamaica", "Montserrat", "Northern Mariana Islands", "Puerto Rico", "Saint Kitts and Nevis", "Saint Lucia", "Saint Martin", "Saint Vincent and the Grenadines", "Sint Maarten", "Trinidad and Tobago", "Turks and Caicos Islands", "U.S. Virgin Islands", "United States"]
-}, {
-  "E164": "376",
-  "country": "Andorra"
-}, {
-  "E164": "244",
-  "country": "Angola"
-}, {
-  "E164": "672",
-  "country": "Antarctica"
-}, {
-  "E164": "54",
-  "country": "Argentina"
-}, {
-  "E164": "374",
-  "country": "Armenia"
-}, {
-  "E164": "297",
-  "country": "Aruba"
-}, {
-  "E164": "43",
-  "country": "Austria"
-}, {
-  "E164": "994",
-  "country": "Azerbaijan"
-}, {
-  "E164": "973",
-  "country": "Bahrain"
-}, {
-  "E164": "880",
-  "country": "Bangladesh"
-}, {
-  "E164": "375",
-  "country": "Belarus"
-}, {
-  "E164": "32",
-  "country": "Belgium"
-}, {
-  "E164": "501",
-  "country": "Belize"
-}, {
-  "E164": "229",
-  "country": "Benin"
-}, {
-  "E164": "975",
-  "country": "Bhutan"
-}, {
-  "E164": "591",
-  "country": "Bolivia"
-}, {
-  "E164": "387",
-  "country": "Bosnia and Herzegovina"
-}, {
-  "E164": "267",
-  "country": "Botswana"
-}, {
-  "E164": "55",
-  "country": "Brazil"
-}, {
-  "E164": "246",
-  "country": "British Indian Ocean Territory"
-}, {
-  "E164": "673",
-  "country": "Brunei"
-}, {
-  "E164": "359",
-  "country": "Bulgaria"
-}, {
-  "E164": "226",
-  "country": "Burkina Faso"
-}, {
-  "E164": "257",
-  "country": "Burundi"
-}, {
-  "E164": "855",
-  "country": "Cambodia"
-}, {
-  "E164": "237",
-  "country": "Cameroon"
-}, {
-  "E164": "238",
-  "country": "Cape Verde"
-}, {
-  "E164": "236",
-  "country": "Central African Republic"
-}, {
-  "E164": "235",
-  "country": "Chad"
-}, {
-  "E164": "56",
-  "country": "Chile"
-}, {
-  "E164": "86",
-  "country": "China"
-}, {
-  "E164": "61",
-  "country": ["Australia", "Christmas Island", "Cocos Islands"]
-}, {
-  "E164": "57",
-  "country": "Colombia"
-}, {
-  "E164": "269",
-  "country": "Comoros"
-}, {
-  "E164": "682",
-  "country": "Cook Islands"
-}, {
-  "E164": "506",
-  "country": "Costa Rica"
-}, {
-  "E164": "385",
-  "country": "Croatia"
-}, {
-  "E164": "53",
-  "country": "Cuba"
-}, {
-  "E164": "599",
-  "country": ["Curacao", "Netherlands Antilles"]
-}, {
-  "E164": "357",
-  "country": "Cyprus"
-}, {
-  "E164": "420",
-  "country": "Czech Republic"
-}, {
-  "E164": "243",
-  "country": "Democratic Republic of the Congo"
-}, {
-  "E164": "45",
-  "country": "Denmark"
-}, {
-  "E164": "253",
-  "country": "Djibouti"
-}, {
-  "E164": "670",
-  "country": "East Timor"
-}, {
-  "E164": "593",
-  "country": "Ecuador"
-}, {
-  "E164": "20",
-  "country": "Egypt"
-}, {
-  "E164": "503",
-  "country": "El Salvador"
-}, {
-  "E164": "240",
-  "country": "Equatorial Guinea"
-}, {
-  "E164": "291",
-  "country": "Eritrea"
-}, {
-  "E164": "372",
-  "country": "Estonia"
-}, {
-  "E164": "251",
-  "country": "Ethiopia"
-}, {
-  "E164": "500",
-  "country": "Falkland Islands"
-}, {
-  "E164": "298",
-  "country": "Faroe Islands"
-}, {
-  "E164": "679",
-  "country": "Fiji"
-}, {
-  "E164": "358",
-  "country": "Finland"
-}, {
-  "E164": "33",
-  "country": "France"
-}, {
-  "E164": "689",
-  "country": "French Polynesia"
-}, {
-  "E164": "241",
-  "country": "Gabon"
-}, {
-  "E164": "220",
-  "country": "Gambia"
-}, {
-  "E164": "995",
-  "country": "Georgia"
-}, {
-  "E164": "49",
-  "country": "Germany"
-}, {
-  "E164": "233",
-  "country": "Ghana"
-}, {
-  "E164": "350",
-  "country": "Gibraltar"
-}, {
-  "E164": "30",
-  "country": "Greece"
-}, {
-  "E164": "299",
-  "country": "Greenland"
-}, {
-  "E164": "502",
-  "country": "Guatemala"
-}, {
-  "E164": "44",
-  "country": ["Guernsey", "Isle of Man", "Jersey", "United Kingdom"]
-}, {
-  "E164": "224",
-  "country": "Guinea"
-}, {
-  "E164": "245",
-  "country": "Guinea-Bissau"
-}, {
-  "E164": "592",
-  "country": "Guyana"
-}, {
-  "E164": "509",
-  "country": "Haiti"
-}, {
-  "E164": "504",
-  "country": "Honduras"
-}, {
-  "E164": "852",
-  "country": "Hong Kong"
-}, {
-  "E164": "36",
-  "country": "Hungary"
-}, {
-  "E164": "354",
-  "country": "Iceland"
-}, {
-  "E164": "91",
-  "country": "India"
-}, {
-  "E164": "62",
-  "country": "Indonesia"
-}, {
-  "E164": "98",
-  "country": "Iran"
-}, {
-  "E164": "964",
-  "country": "Iraq"
-}, {
-  "E164": "353",
-  "country": "Ireland"
-}, {
-  "E164": "972",
-  "country": "Israel"
-}, {
-  "E164": "39",
-  "country": ["Italy", "Vatican"]
-}, {
-  "E164": "225",
-  "country": "Ivory Coast"
-}, {
-  "E164": "81",
-  "country": "Japan"
-}, {
-  "E164": "962",
-  "country": "Jordan"
-}, {
-  "E164": "7",
-  "country": ["Kazakhstan", "Russia"],
-  "localizedFormat": {
-    "maximumLength": 1 + 1 + 10 + 6,
-    2: ' ',
-    3: '(',
-    7: ')',
-    8: ' ',
-    12: '-',
-    15: '-'
-  }
-}, {
-  "E164": "254",
-  "country": "Kenya"
-}, {
-  "E164": "686",
-  "country": "Kiribati"
-}, {
-  "E164": "383",
-  "country": "Kosovo"
-}, {
-  "E164": "965",
-  "country": "Kuwait"
-}, {
-  "E164": "996",
-  "country": "Kyrgyzstan"
-}, {
-  "E164": "856",
-  "country": "Laos"
-}, {
-  "E164": "371",
-  "country": "Latvia"
-}, {
-  "E164": "961",
-  "country": "Lebanon"
-}, {
-  "E164": "266",
-  "country": "Lesotho"
-}, {
-  "E164": "231",
-  "country": "Liberia"
-}, {
-  "E164": "218",
-  "country": "Libya"
-}, {
-  "E164": "423",
-  "country": "Liechtenstein"
-}, {
-  "E164": "370",
-  "country": "Lithuania"
-}, {
-  "E164": "352",
-  "country": "Luxembourg"
-}, {
-  "E164": "853",
-  "country": "Macao"
-}, {
-  "E164": "389",
-  "country": "Macedonia"
-}, {
-  "E164": "261",
-  "country": "Madagascar"
-}, {
-  "E164": "265",
-  "country": "Malawi"
-}, {
-  "E164": "60",
-  "country": "Malaysia"
-}, {
-  "E164": "960",
-  "country": "Maldives"
-}, {
-  "E164": "223",
-  "country": "Mali"
-}, {
-  "E164": "356",
-  "country": "Malta"
-}, {
-  "E164": "692",
-  "country": "Marshall Islands"
-}, {
-  "E164": "222",
-  "country": "Mauritania"
-}, {
-  "E164": "230",
-  "country": "Mauritius"
-}, {
-  "E164": "262",
-  "country": ["Mayotte", "Reunion"]
-}, {
-  "E164": "52",
-  "country": "Mexico"
-}, {
-  "E164": "691",
-  "country": "Micronesia"
-}, {
-  "E164": "373",
-  "country": "Moldova"
-}, {
-  "E164": "377",
-  "country": "Monaco"
-}, {
-  "E164": "976",
-  "country": "Mongolia"
-}, {
-  "E164": "382",
-  "country": "Montenegro"
-}, {
-  "E164": "212",
-  "country": ["Morocco", "Western Sahara"]
-}, {
-  "E164": "258",
-  "country": "Mozambique"
-}, {
-  "E164": "95",
-  "country": "Myanmar"
-}, {
-  "E164": "264",
-  "country": "Namibia"
-}, {
-  "E164": "674",
-  "country": "Nauru"
-}, {
-  "E164": "977",
-  "country": "Nepal"
-}, {
-  "E164": "31",
-  "country": "Netherlands"
-}, {
-  "E164": "687",
-  "country": "New Caledonia"
-}, {
-  "E164": "64",
-  "country": "New Zealand"
-}, {
-  "E164": "64",
-  "country": "Pitcairn"
-}, {
-  "E164": "505",
-  "country": "Nicaragua"
-}, {
-  "E164": "227",
-  "country": "Niger"
-}, {
-  "E164": "234",
-  "country": "Nigeria"
-}, {
-  "E164": "683",
-  "country": "Niue"
-}, {
-  "E164": "850",
-  "country": "North Korea"
-}, {
-  "E164": "47",
-  "country": ["Norway", "Svalbard and Jan Mayen"]
-}, {
-  "E164": "968",
-  "country": "Oman"
-}, {
-  "E164": "92",
-  "country": "Pakistan"
-}, {
-  "E164": "680",
-  "country": "Palau"
-}, {
-  "E164": "970",
-  "country": "Palestine"
-}, {
-  "E164": "507",
-  "country": "Panama"
-}, {
-  "E164": "675",
-  "country": "Papua New Guinea"
-}, {
-  "E164": "595",
-  "country": "Paraguay"
-}, {
-  "E164": "51",
-  "country": "Peru"
-}, {
-  "E164": "63",
-  "country": "Philippines"
-}, {
-  "E164": "48",
-  "country": "Poland"
-}, {
-  "E164": "351",
-  "country": "Portugal"
-}, {
-  "E164": "974",
-  "country": "Qatar"
-}, {
-  "E164": "242",
-  "country": "Republic of the Congo"
-}, {
-  "E164": "40",
-  "country": "Romania"
-}, {
-  "E164": "250",
-  "country": "Rwanda"
-}, {
-  "E164": "590",
-  "country": "Saint Barthelemy"
-}, {
-  "E164": "290",
-  "country": "Saint Helena"
-}, {
-  "E164": "508",
-  "country": "Saint Pierre and Miquelon"
-}, {
-  "E164": "685",
-  "country": "Samoa"
-}, {
-  "E164": "378",
-  "country": "San Marino"
-}, {
-  "E164": "239",
-  "country": "Sao Tome and Principe"
-}, {
-  "E164": "966",
-  "country": "Saudi Arabia"
-}, {
-  "E164": "221",
-  "country": "Senegal"
-}, {
-  "E164": "381",
-  "country": "Serbia"
-}, {
-  "E164": "248",
-  "country": "Seychelles"
-}, {
-  "E164": "232",
-  "country": "Sierra Leone"
-}, {
-  "E164": "65",
-  "country": "Singapore"
-}, {
-  "E164": "421",
-  "country": "Slovakia"
-}, {
-  "E164": "386",
-  "country": "Slovenia"
-}, {
-  "E164": "677",
-  "country": "Solomon Islands"
-}, {
-  "E164": "252",
-  "country": "Somalia"
-}, {
-  "E164": "27",
-  "country": "South Africa"
-}, {
-  "E164": "82",
-  "country": "South Korea"
-}, {
-  "E164": "211",
-  "country": "South Sudan"
-}, {
-  "E164": "34",
-  "country": "Spain"
-}, {
-  "E164": "94",
-  "country": "Sri Lanka"
-}, {
-  "E164": "249",
-  "country": "Sudan"
-}, {
-  "E164": "597",
-  "country": "Suriname"
-}, {
-  "E164": "268",
-  "country": "Swaziland"
-}, {
-  "E164": "46",
-  "country": "Sweden"
-}, {
-  "E164": "41",
-  "country": "Switzerland"
-}, {
-  "E164": "963",
-  "country": "Syria"
-}, {
-  "E164": "886",
-  "country": "Taiwan"
-}, {
-  "E164": "992",
-  "country": "Tajikistan"
-}, {
-  "E164": "255",
-  "country": "Tanzania"
-}, {
-  "E164": "66",
-  "country": "Thailand"
-}, {
-  "E164": "228",
-  "country": "Togo"
-}, {
-  "E164": "690",
-  "country": "Tokelau"
-}, {
-  "E164": "676",
-  "country": "Tonga"
-}, {
-  "E164": "216",
-  "country": "Tunisia"
-}, {
-  "E164": "90",
-  "country": "Turkey"
-}, {
-  "E164": "993",
-  "country": "Turkmenistan"
-}, {
-  "E164": "688",
-  "country": "Tuvalu"
-}, {
-  "E164": "256",
-  "country": "Uganda"
-}, {
-  "E164": "380",
-  "country": "Ukraine"
-}, {
-  "E164": "971",
-  "country": "United Arab Emirates"
-}, {
-  "E164": "598",
-  "country": "Uruguay"
-}, {
-  "E164": "998",
-  "country": "Uzbekistan"
-}, {
-  "E164": "678",
-  "country": "Vanuatu"
-}, {
-  "E164": "58",
-  "country": "Venezuela"
-}, {
-  "E164": "84",
-  "country": "Vietnam"
-}, {
-  "E164": "681",
-  "country": "Wallis and Futuna"
-}, {
-  "E164": "967",
-  "country": "Yemen"
-}, {
-  "E164": "260",
-  "country": "Zambia"
-}, {
-  "E164": "263",
-  "country": "Zimbabwe"
-}];
 exports['default'] = PhoneFormatter;
 module.exports = exports['default'];
 
@@ -7745,7 +6901,7 @@ var TextField = (function (_Input) {
     element.addEventListener('focus', this._focus);
     element.addEventListener('blur', this._blur);
 
-    // Change event could be fired from autofill in browser
+    // Change event could be fired from vanilla-autofill-event
     element.addEventListener('change', this._change);
 
     if (!element.getAttribute('autocapitalize')) {
@@ -8863,7 +8019,7 @@ TextFieldStateChange.build = function (field, callback) {
 exports['default'] = TextField;
 module.exports = exports['default'];
 
-},{"./caret":8,"./formatter":14,"./undo_manager":21,"./utils":22,"input-sim":1}],21:[function(_dereq_,module,exports){
+},{"./caret":8,"./formatter":14,"./undo_manager":21,"./utils":22,"input-sim":2}],21:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -9364,5 +8520,4 @@ function getAllPropertyNames(object) {
 
 },{}]},{},[15])(15)
 });
-
 //# sourceMappingURL=field-kit.js.map
